@@ -235,12 +235,12 @@ def render_css() -> str:
     .shell { max-width: 1180px; margin: 0 auto; padding: 0 24px; }
     header {
       color: var(--ink);
-      padding: 22px 0 18px;
+      padding: 16px 0;
       border-bottom: 1px solid var(--line);
-      margin-bottom: 22px;
+      margin-bottom: 0;
     }
     .topline { display: flex; justify-content: space-between; gap: 16px; align-items: center; }
-    .brand { font-weight: 700; font-size: 20px; letter-spacing: 0; }
+    .brand { font-weight: 700; font-size: 18px; letter-spacing: 0; }
     .api-links { display: flex; gap: 8px; flex-wrap: wrap; justify-content: flex-end; }
     .api-links a {
       color: #344054;
@@ -262,6 +262,28 @@ def render_css() -> str:
     }
     .lede { color: var(--muted); max-width: 720px; margin: 8px 0 0; line-height: 1.55; font-size: 15px; }
     main { padding: 0 0 48px; }
+    .intro {
+      padding: 28px 0 24px;
+      border-bottom: 1px solid var(--line);
+      margin-bottom: 22px;
+    }
+    .intro h1 {
+      font-family: Arial, Helvetica, sans-serif;
+      font-size: 30px;
+      line-height: 1.2;
+      margin: 0;
+    }
+    .intro .lede {
+      max-width: 760px;
+      margin: 8px 0 18px;
+    }
+    .intro-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
     .catalog-frame {
       display: grid;
       grid-template-columns: 265px 1fr;
@@ -293,7 +315,7 @@ def render_css() -> str:
     }
     .filter-button.active { background: #1f2933; color: #fff; border-color: #1f2933; }
     .content { padding: 18px; min-width: 0; }
-    .toolbar { display: flex; gap: 12px; justify-content: space-between; align-items: center; margin-bottom: 14px; }
+    .toolbar { display: flex; justify-content: flex-end; align-items: center; margin-bottom: 14px; }
     .search {
       width: min(620px, 100%);
       border: 1px solid var(--line-strong);
@@ -358,7 +380,13 @@ def render_css() -> str:
     .tag-slate { background: #e4e8ee; color: #344052; }
     .tag-red { background: #f5ded8; color: #7b2c1f; }
     .tag-gray { background: #ece8df; color: #4a4b4d; }
-    .detail-layout { display: grid; grid-template-columns: 1fr 340px; gap: 18px; align-items: start; }
+    .detail-layout {
+      display: grid;
+      grid-template-columns: 1fr 340px;
+      gap: 18px;
+      align-items: start;
+      margin-top: 22px;
+    }
     .detail-main, .detail-side { padding: 18px; }
     .detail-main h2 { margin-top: 0; font-size: 20px; }
     .kv { display: grid; grid-template-columns: 120px 1fr; gap: 8px 14px; font-size: 14px; }
@@ -375,6 +403,11 @@ def render_css() -> str:
     }
     .back { display: inline-block; margin: 18px 0; color: var(--accent); }
     .generated { color: var(--muted); margin-top: 12px; font-size: 13px; }
+    footer {
+      color: var(--muted);
+      font-size: 12px;
+      padding: 24px 0 32px;
+    }
     .readme {
       line-height: 1.58;
       color: #1f2937;
@@ -404,7 +437,7 @@ def render_css() -> str:
     @media (max-width: 860px) {
       .catalog-frame, .detail-layout { grid-template-columns: 1fr; }
       .filters { position: static; }
-      .toolbar { align-items: stretch; flex-direction: column; }
+      .intro-row, .toolbar { align-items: stretch; flex-direction: column; }
       .package-card { grid-template-columns: 1fr; }
       .card-actions { justify-content: flex-start; }
     }
@@ -481,6 +514,15 @@ def render_site(public_dir: Path, generated_at: str, packages: list[dict]) -> No
     </div>
   </header>
   <main class="shell">
+    <section class="intro">
+      <div class="intro-row">
+        <div>
+          <h1>Explore packages</h1>
+          <p class="lede">Registry index for Robonix primitives, services, and skills.</p>
+        </div>
+        <input class="search" id="q" placeholder="Search packages, capabilities, tags, maintainers">
+      </div>
+    </section>
     <div class="catalog-frame">
       <aside class="panel filters">
         <div class="stat-grid">
@@ -504,7 +546,6 @@ def render_site(public_dir: Path, generated_at: str, packages: list[dict]) -> No
       </aside>
       <section class="panel content">
         <div class="toolbar">
-          <input class="search" id="q" placeholder="Search packages, capabilities, tags, maintainers">
           <div class="count" id="count"></div>
         </div>
         <div class="package-list" id="packages">
@@ -513,6 +554,7 @@ def render_site(public_dir: Path, generated_at: str, packages: list[dict]) -> No
       </section>
     </div>
   </main>
+  <footer class="shell">Generated on {html.escape(generated_at)}.</footer>
   <script>
     const input = document.getElementById('q');
     const cards = Array.from(document.querySelectorAll('.package-card'));
@@ -630,7 +672,6 @@ def render_package_pages(public_dir: Path, generated_at: str, packages: list[dic
     <a class="back" href="../../">Back to catalog</a>
     <h1>{html.escape(p['name'])}</h1>
     <p class="lede">{html.escape(p['description'])}</p>
-    <div class="generated">Generated on {html.escape(generated_at)}.</div>
   </header>
   <main class="shell">
     <div class="detail-layout">
@@ -658,6 +699,7 @@ def render_package_pages(public_dir: Path, generated_at: str, packages: list[dic
       </aside>
     </div>
   </main>
+  <footer class="shell">Generated on {html.escape(generated_at)}.</footer>
 </body>
 </html>
 """,
