@@ -262,28 +262,7 @@ def render_css() -> str:
     }
     .lede { color: var(--muted); max-width: 720px; margin: 8px 0 0; line-height: 1.55; font-size: 15px; }
     main { padding: 0 0 48px; }
-    .intro {
-      padding: 28px 0 24px;
-      border-bottom: 1px solid var(--line);
-      margin-bottom: 22px;
-    }
-    .intro h1 {
-      font-family: Arial, Helvetica, sans-serif;
-      font-size: 30px;
-      line-height: 1.2;
-      margin: 0;
-    }
-    .intro .lede {
-      max-width: 760px;
-      margin: 8px 0 18px;
-    }
-    .intro-row {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 16px;
-      flex-wrap: wrap;
-    }
+    .search-strip { padding: 24px 0 22px; }
     .catalog-frame {
       display: grid;
       grid-template-columns: 265px 1fr;
@@ -437,7 +416,7 @@ def render_css() -> str:
     @media (max-width: 860px) {
       .catalog-frame, .detail-layout { grid-template-columns: 1fr; }
       .filters { position: static; }
-      .intro-row, .toolbar { align-items: stretch; flex-direction: column; }
+      .toolbar { align-items: stretch; flex-direction: column; }
       .package-card { grid-template-columns: 1fr; }
       .card-actions { justify-content: flex-start; }
     }
@@ -514,14 +493,8 @@ def render_site(public_dir: Path, generated_at: str, packages: list[dict]) -> No
     </div>
   </header>
   <main class="shell">
-    <section class="intro">
-      <div class="intro-row">
-        <div>
-          <h1>Explore packages</h1>
-          <p class="lede">Registry index for Robonix primitives, services, and skills.</p>
-        </div>
-        <input class="search" id="q" placeholder="Search packages, capabilities, tags, maintainers">
-      </div>
+    <section class="search-strip">
+      <input class="search" id="q" placeholder="Search packages, capabilities, tags, maintainers">
     </section>
     <div class="catalog-frame">
       <aside class="panel filters">
