@@ -13,14 +13,14 @@ Naming convention:
 
 | Repository | Robot / Deploy | Contract namespace | Notes |
 | --- | --- | --- | --- |
-| [robot-wheeltec-r550](https://github.com/syswonder/robot-wheeltec-r550) | WHEELTEC R550 deploy | deploy | Deploy manifest for WHEELTEC R550 with MID-360, RealSense D435i, mapping, navigation, and explore packages. |
+| [robot-agilex-ranger_mini_v3](https://github.com/syswonder/robot-agilex-ranger_mini_v3) | AgileX Ranger Mini v3 deploy | deploy | Deploy manifest for Ranger Mini v3 with MID-360, RealSense D435i, mapping, navigation, and explore packages. |
 | [robot-deeprobotics-lite3](https://github.com/syswonder/robot-deeprobotics-lite3) | DeepRobotics Lite3 deploy | deploy | Repository exists; deploy content is not populated yet. |
 
 ## Primitive Packages
 
 | Repository | Hardware | Contract namespace | Notes |
 | --- | --- | --- | --- |
-| [primitive-agilex-rangerminiv3-chassis-rbnx](https://github.com/syswonder/primitive-agilex-rangerminiv3-chassis-rbnx) | AgileX Ranger Mini v3 chassis | `robonix/primitive/chassis` | CAN/ROS2 wrapper for chassis odometry and velocity command input. |
+| [primitive-agilex-ranger_mini_v3-chassis-rbnx](https://github.com/syswonder/primitive-agilex-ranger_mini_v3-chassis-rbnx) | AgileX Ranger Mini v3 chassis | `robonix/primitive/chassis` | CAN/ROS2 wrapper for chassis odometry and velocity command input. |
 | [primitive-livox-mid360-lidar-rbnx](https://github.com/syswonder/primitive-livox-mid360-lidar-rbnx) | Livox MID-360 lidar | `robonix/primitive/lidar` | MID-360 PointCloud2 lidar wrapper. |
 | [primitive-livox-mid360-imu-rbnx](https://github.com/syswonder/primitive-livox-mid360-imu-rbnx) | Livox MID-360 embedded IMU | `robonix/primitive/imu` | IMU topic shim for the MID-360 IMU stream produced by the lidar driver. |
 | [primitive-intel-realsense_d435i-camera-rbnx](https://github.com/syswonder/primitive-intel-realsense_d435i-camera-rbnx) | Intel RealSense D435i camera | `robonix/primitive/camera` | RGB-D camera wrapper with camera streams and snapshot contracts. |
