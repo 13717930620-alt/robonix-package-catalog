@@ -10,6 +10,10 @@
     "mapping"
   ],
   "repo": "https://github.com/syswonder/skill-explore-rbnx",
+  "maintainers": [
+    "wheatfox <wheatfox17@icloud.com>"
+  ],
+  "repo_name": "skill-explore-rbnx",
   "default_branch": "main",
   "kind": "skill",
   "capabilities": [

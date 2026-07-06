@@ -10,6 +10,10 @@
     "rgbd"
   ],
   "repo": "https://github.com/syswonder/primitive-intel-realsense_d435i-camera-rbnx",
+  "maintainers": [
+    "wheatfox <wheatfox17@icloud.com>"
+  ],
+  "repo_name": "primitive-intel-realsense_d435i-camera-rbnx",
   "default_branch": "main",
   "kind": "primitive",
   "capabilities": [

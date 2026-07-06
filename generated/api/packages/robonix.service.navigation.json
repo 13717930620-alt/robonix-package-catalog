@@ -9,6 +9,10 @@
     "ros2"
   ],
   "repo": "https://github.com/syswonder/service-navigation-rbnx",
+  "maintainers": [
+    "wheatfox <wheatfox17@icloud.com>"
+  ],
+  "repo_name": "service-navigation-rbnx",
   "default_branch": "main",
   "kind": "service",
   "capabilities": [

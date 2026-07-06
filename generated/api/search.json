@@ -11,6 +11,10 @@
       "ros2"
     ],
     "repo": "https://github.com/syswonder/primitive-agilex-ranger_mini_v3-chassis-rbnx",
+    "maintainers": [
+      "wheatfox <wheatfox17@icloud.com>"
+    ],
+    "repo_name": "primitive-agilex-ranger_mini_v3-chassis-rbnx",
     "default_branch": "main",
     "kind": "primitive",
     "capabilities": [
@@ -31,6 +35,10 @@
       "rgbd"
     ],
     "repo": "https://github.com/syswonder/primitive-intel-realsense_d435i-camera-rbnx",
+    "maintainers": [
+      "wheatfox <wheatfox17@icloud.com>"
+    ],
+    "repo_name": "primitive-intel-realsense_d435i-camera-rbnx",
     "default_branch": "main",
     "kind": "primitive",
     "capabilities": [
@@ -53,6 +61,10 @@
       "mid360"
     ],
     "repo": "https://github.com/syswonder/primitive-livox-mid360-imu-rbnx",
+    "maintainers": [
+      "wheatfox <wheatfox17@icloud.com>"
+    ],
+    "repo_name": "primitive-livox-mid360-imu-rbnx",
     "default_branch": "main",
     "kind": "primitive",
     "capabilities": [
@@ -72,6 +84,10 @@
       "pointcloud"
     ],
     "repo": "https://github.com/syswonder/primitive-livox-mid360-lidar-rbnx",
+    "maintainers": [
+      "wheatfox <wheatfox17@icloud.com>"
+    ],
+    "repo_name": "primitive-livox-mid360-lidar-rbnx",
     "default_branch": "main",
     "kind": "primitive",
     "capabilities": [
@@ -92,6 +108,10 @@
       "ros2"
     ],
     "repo": "https://github.com/syswonder/service-map-rbnx",
+    "maintainers": [
+      "wheatfox <wheatfox17@icloud.com>"
+    ],
+    "repo_name": "service-map-rbnx",
     "default_branch": "main",
     "kind": "service",
     "capabilities": [
@@ -117,6 +137,10 @@
       "ros2"
     ],
     "repo": "https://github.com/syswonder/service-navigation-rbnx",
+    "maintainers": [
+      "wheatfox <wheatfox17@icloud.com>"
+    ],
+    "repo_name": "service-navigation-rbnx",
     "default_branch": "main",
     "kind": "service",
     "capabilities": [
@@ -138,6 +162,10 @@
       "mapping"
     ],
     "repo": "https://github.com/syswonder/skill-explore-rbnx",
+    "maintainers": [
+      "wheatfox <wheatfox17@icloud.com>"
+    ],
+    "repo_name": "skill-explore-rbnx",
     "default_branch": "main",
     "kind": "skill",
     "capabilities": [

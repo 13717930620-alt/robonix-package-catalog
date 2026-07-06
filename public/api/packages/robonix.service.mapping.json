@@ -10,6 +10,10 @@
     "ros2"
   ],
   "repo": "https://github.com/syswonder/service-map-rbnx",
+  "maintainers": [
+    "wheatfox <wheatfox17@icloud.com>"
+  ],
+  "repo_name": "service-map-rbnx",
   "default_branch": "main",
   "kind": "service",
   "capabilities": [

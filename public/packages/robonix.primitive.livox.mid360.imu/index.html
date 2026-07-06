@@ -1,0 +1,205 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>robonix.primitive.livox.mid360.imu - Robonix Package Catalog</title>
+  <style>
+
+    :root {
+      color-scheme: light;
+      --bg: #f4f1ea;
+      --paper: #fffdf8;
+      --ink: #1b1d21;
+      --muted: #626975;
+      --line: #d8d0c3;
+      --accent: #1f5d7a;
+      --accent-2: #b46b35;
+      --shadow: 0 18px 45px rgba(30, 27, 22, 0.08);
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      color: var(--ink);
+      background:
+        linear-gradient(180deg, rgba(32, 36, 42, 0.94), rgba(32, 36, 42, 0.82) 260px, transparent 261px),
+        var(--bg);
+      font-family: Arial, Helvetica, sans-serif;
+      font-size: 15px;
+      letter-spacing: 0;
+    }
+    a { color: var(--accent); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    .shell { max-width: 1220px; margin: 0 auto; padding: 0 24px; }
+    header { color: #fff; padding: 34px 0 26px; }
+    .topline { display: flex; justify-content: space-between; gap: 16px; align-items: center; margin-bottom: 26px; }
+    .brand { font-weight: 700; font-size: 15px; letter-spacing: 0.02em; }
+    .api-links { display: flex; gap: 8px; flex-wrap: wrap; justify-content: flex-end; }
+    .api-links a {
+      color: #f4f7fb;
+      border: 1px solid rgba(255,255,255,0.22);
+      background: rgba(255,255,255,0.08);
+      border-radius: 6px;
+      padding: 7px 9px;
+      font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      font-size: 12px;
+    }
+    h1 { margin: 0; font-size: clamp(34px, 6vw, 68px); line-height: 0.95; letter-spacing: 0; max-width: 760px; }
+    .lede { color: #d8dee8; max-width: 680px; margin: 16px 0 0; line-height: 1.55; font-size: 17px; }
+    main { padding: 0 0 48px; }
+    .catalog-frame {
+      display: grid;
+      grid-template-columns: 265px 1fr;
+      gap: 18px;
+      align-items: start;
+    }
+    .panel {
+      background: var(--paper);
+      border: 1px solid var(--line);
+      box-shadow: var(--shadow);
+      border-radius: 8px;
+    }
+    .filters { padding: 18px; position: sticky; top: 16px; }
+    .filters h2, .content h2 { margin: 0 0 12px; font-size: 16px; }
+    .stat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 18px; }
+    .stat { border: 1px solid var(--line); border-radius: 6px; padding: 10px; background: #faf8f2; }
+    .stat strong { display: block; font-size: 22px; }
+    .stat span { color: var(--muted); font-size: 12px; }
+    .filter-group { border-top: 1px solid var(--line); padding-top: 14px; margin-top: 14px; }
+    .filter-buttons { display: flex; gap: 7px; flex-wrap: wrap; }
+    .filter-button {
+      border: 1px solid var(--line);
+      background: #fff;
+      color: var(--ink);
+      border-radius: 999px;
+      padding: 6px 10px;
+      cursor: pointer;
+      font-size: 13px;
+    }
+    .filter-button.active { background: #1f2933; color: #fff; border-color: #1f2933; }
+    .content { padding: 18px; min-width: 0; }
+    .toolbar { display: flex; gap: 12px; justify-content: space-between; align-items: center; margin-bottom: 14px; }
+    .search {
+      width: min(620px, 100%);
+      border: 1px solid #b8b0a4;
+      background: #fff;
+      border-radius: 6px;
+      padding: 11px 12px;
+      font-size: 15px;
+    }
+    .count { color: var(--muted); white-space: nowrap; }
+    .package-list { display: grid; gap: 10px; }
+    .package-card {
+      border: 1px solid var(--line);
+      background: #fff;
+      border-radius: 7px;
+      padding: 14px;
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 14px;
+    }
+    .package-title { display: flex; gap: 9px; align-items: baseline; flex-wrap: wrap; margin-bottom: 7px; }
+    .package-title a {
+      font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      font-size: 16px;
+      font-weight: 700;
+      color: #152238;
+    }
+    .version {
+      font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      color: var(--muted);
+      font-size: 12px;
+      border: 1px solid var(--line);
+      border-radius: 4px;
+      padding: 2px 5px;
+      background: #faf8f2;
+    }
+    .description { color: #343941; margin: 0 0 10px; line-height: 1.45; }
+    .meta-line { color: var(--muted); font-size: 13px; display: flex; gap: 14px; flex-wrap: wrap; }
+    .meta-line code { font-size: 12px; }
+    .card-actions { display: flex; gap: 8px; align-items: start; }
+    .card-actions a {
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      padding: 7px 9px;
+      background: #faf8f2;
+      color: #29303a;
+      font-size: 13px;
+    }
+    .tags { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 10px; }
+    .tag {
+      border: 0;
+      border-radius: 999px;
+      padding: 4px 8px;
+      font-size: 12px;
+      cursor: pointer;
+      color: #1c2732;
+    }
+    .tag-blue { background: #dcecf7; color: #164965; }
+    .tag-green { background: #dff0df; color: #23562a; }
+    .tag-gold { background: #f3e6bd; color: #6b4b10; }
+    .tag-cyan { background: #d8f0f0; color: #165456; }
+    .tag-purple { background: #eadff4; color: #4d2d68; }
+    .tag-slate { background: #e4e8ee; color: #344052; }
+    .tag-red { background: #f5ded8; color: #7b2c1f; }
+    .tag-gray { background: #ece8df; color: #4a4b4d; }
+    .detail-layout { display: grid; grid-template-columns: 1fr 310px; gap: 18px; align-items: start; }
+    .detail-main, .detail-side { padding: 18px; }
+    .detail-main h2 { margin-top: 0; font-size: 20px; }
+    .kv { display: grid; grid-template-columns: 120px 1fr; gap: 8px 14px; font-size: 14px; }
+    .kv div:nth-child(odd) { color: var(--muted); }
+    .cap-list { margin: 0; padding-left: 0; list-style: none; display: grid; gap: 7px; }
+    .cap-list li {
+      font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      font-size: 13px;
+      border: 1px solid var(--line);
+      background: #faf8f2;
+      border-radius: 5px;
+      padding: 8px;
+      overflow-wrap: anywhere;
+    }
+    .back { display: inline-block; margin: 18px 0; color: #fff; }
+    .generated { color: #d8dee8; margin-top: 12px; font-size: 13px; }
+    code { font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
+    @media (max-width: 860px) {
+      .catalog-frame, .detail-layout { grid-template-columns: 1fr; }
+      .filters { position: static; }
+      .toolbar { align-items: stretch; flex-direction: column; }
+      .package-card { grid-template-columns: 1fr; }
+      .card-actions { justify-content: flex-start; }
+    }
+    
+  </style>
+</head>
+<body>
+  <header class="shell">
+    <a class="back" href="../../">Back to catalog</a>
+    <h1>robonix.primitive.livox.mid360.imu</h1>
+    <p class="lede">Livox MID-360 IMU atlas wrapper — depends on mid360_lidar_rbnx.</p>
+    <div class="generated">Generated on 2026-07-06T11:49:11+00:00.</div>
+  </header>
+  <main class="shell">
+    <div class="detail-layout">
+      <section class="panel detail-main">
+        <h2>Capabilities</h2>
+        <ul class="cap-list">
+          <li>robonix/primitive/imu/driver</li>
+<li>robonix/primitive/imu/imu</li>
+        </ul>
+      </section>
+      <aside class="panel detail-side">
+        <h2>Package</h2>
+        <div class="kv">
+          <div>Version</div><div><code>0.1.0</code></div>
+          <div>Kind</div><div>primitive</div>
+          <div>Maintainers</div><div>wheatfox &lt;wheatfox17@icloud.com&gt;</div>
+          <div>Repository</div><div><a href="https://github.com/syswonder/primitive-livox-mid360-imu-rbnx">primitive-livox-mid360-imu-rbnx</a></div>
+          <div>Branch</div><div><code>main</code></div>
+          <div>JSON API</div><div><a href="../../api/packages/robonix.primitive.livox.mid360.imu.json">package json</a></div>
+        </div>
+        <div class="tags"><button class="tag tag-blue" data-tag="primitive">primitive</button> <button class="tag tag-slate" data-tag="imu">imu</button> <button class="tag tag-gray" data-tag="livox">livox</button> <button class="tag tag-gray" data-tag="mid360">mid360</button></div>
+      </aside>
+    </div>
+  </main>
+</body>
+</html>

@@ -10,6 +10,10 @@
     "ros2"
   ],
   "repo": "https://github.com/syswonder/primitive-agilex-ranger_mini_v3-chassis-rbnx",
+  "maintainers": [
+    "wheatfox <wheatfox17@icloud.com>"
+  ],
+  "repo_name": "primitive-agilex-ranger_mini_v3-chassis-rbnx",
   "default_branch": "main",
   "kind": "primitive",
   "capabilities": [

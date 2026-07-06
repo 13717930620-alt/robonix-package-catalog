@@ -22,6 +22,7 @@ To submit a community package, add one `name` + `repo` entry to
 - Package list API: https://syswonder.github.io/robonix-package-catalog/api/packages.json
 - Search API: https://syswonder.github.io/robonix-package-catalog/api/search.json
 - Package detail API: `https://syswonder.github.io/robonix-package-catalog/api/packages/<package-name>.json`
+- Package detail page: `https://syswonder.github.io/robonix-package-catalog/packages/<package-name>/`
 
 Example:
 
@@ -40,6 +41,7 @@ The catalog builder reads these fields from that file:
 - `package.version`
 - `package.description`
 - `package.tags`
+- `package.maintainers`
 - `capabilities[].name`
 
 The `package.name` in `package_manifest.yaml` must exactly match the name in
@@ -54,21 +56,22 @@ API, and generates:
 - `generated/api/search.json`
 - `generated/api/packages/<package-name>.json`
 - `public/index.html`
+- `public/packages/<package-name>/index.html`
 - `public/api/...`
 
 The generated commit uses `[skip ci]`; normal CI only triggers from
 `catalog.yaml`, the builder script, the workflow, or manual dispatch.
 
-Generated on `2026-07-06T11:39:49+00:00`.
+Generated on `2026-07-06T11:49:11+00:00`.
 
 ## Packages
 
-| Name | Version | Kind | Tags | Repository |
-| --- | --- | --- | --- | --- |
-| `robonix.primitive.agilex.ranger_mini_v3.chassis` | `0.1.0` | `primitive` | primitive, chassis, agilex, ranger_mini_v3, ros2 | [repo](https://github.com/syswonder/primitive-agilex-ranger_mini_v3-chassis-rbnx) |
-| `robonix.primitive.intel.realsense_d435i.camera` | `0.1.0` | `primitive` | primitive, camera, intel, realsense_d435i, rgbd | [repo](https://github.com/syswonder/primitive-intel-realsense_d435i-camera-rbnx) |
-| `robonix.primitive.livox.mid360.imu` | `0.1.0` | `primitive` | primitive, imu, livox, mid360 | [repo](https://github.com/syswonder/primitive-livox-mid360-imu-rbnx) |
-| `robonix.primitive.livox.mid360.lidar` | `0.1.0` | `primitive` | primitive, lidar, livox, mid360, pointcloud | [repo](https://github.com/syswonder/primitive-livox-mid360-lidar-rbnx) |
-| `robonix.service.mapping` | `0.4.0` | `service` | service, mapping, slam, rtabmap, ros2 | [repo](https://github.com/syswonder/service-map-rbnx) |
-| `robonix.service.navigation` | `0.1.0` | `service` | service, navigation, nav2, ros2 | [repo](https://github.com/syswonder/service-navigation-rbnx) |
-| `robonix.skill.explore` | `0.1.0` | `skill` | skill, explore, frontier, navigation, mapping | [repo](https://github.com/syswonder/skill-explore-rbnx) |
+| Name | Version | Kind | Maintainer | Tags | Repository |
+| --- | --- | --- | --- | --- | --- |
+| [`robonix.primitive.agilex.ranger_mini_v3.chassis`](https://syswonder.github.io/robonix-package-catalog/packages/robonix.primitive.agilex.ranger_mini_v3.chassis/) | `0.1.0` | `primitive` | wheatfox <wheatfox17@icloud.com> | primitive, chassis, agilex, ranger_mini_v3, ros2 | [repo](https://github.com/syswonder/primitive-agilex-ranger_mini_v3-chassis-rbnx) |
+| [`robonix.primitive.intel.realsense_d435i.camera`](https://syswonder.github.io/robonix-package-catalog/packages/robonix.primitive.intel.realsense_d435i.camera/) | `0.1.0` | `primitive` | wheatfox <wheatfox17@icloud.com> | primitive, camera, intel, realsense_d435i, rgbd | [repo](https://github.com/syswonder/primitive-intel-realsense_d435i-camera-rbnx) |
+| [`robonix.primitive.livox.mid360.imu`](https://syswonder.github.io/robonix-package-catalog/packages/robonix.primitive.livox.mid360.imu/) | `0.1.0` | `primitive` | wheatfox <wheatfox17@icloud.com> | primitive, imu, livox, mid360 | [repo](https://github.com/syswonder/primitive-livox-mid360-imu-rbnx) |
+| [`robonix.primitive.livox.mid360.lidar`](https://syswonder.github.io/robonix-package-catalog/packages/robonix.primitive.livox.mid360.lidar/) | `0.1.0` | `primitive` | wheatfox <wheatfox17@icloud.com> | primitive, lidar, livox, mid360, pointcloud | [repo](https://github.com/syswonder/primitive-livox-mid360-lidar-rbnx) |
+| [`robonix.service.mapping`](https://syswonder.github.io/robonix-package-catalog/packages/robonix.service.mapping/) | `0.4.0` | `service` | wheatfox <wheatfox17@icloud.com> | service, mapping, slam, rtabmap, ros2 | [repo](https://github.com/syswonder/service-map-rbnx) |
+| [`robonix.service.navigation`](https://syswonder.github.io/robonix-package-catalog/packages/robonix.service.navigation/) | `0.1.0` | `service` | wheatfox <wheatfox17@icloud.com> | service, navigation, nav2, ros2 | [repo](https://github.com/syswonder/service-navigation-rbnx) |
+| [`robonix.skill.explore`](https://syswonder.github.io/robonix-package-catalog/packages/robonix.skill.explore/) | `0.1.0` | `skill` | wheatfox <wheatfox17@icloud.com> | skill, explore, frontier, navigation, mapping | [repo](https://github.com/syswonder/skill-explore-rbnx) |

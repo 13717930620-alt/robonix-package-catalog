@@ -9,6 +9,10 @@
     "mid360"
   ],
   "repo": "https://github.com/syswonder/primitive-livox-mid360-imu-rbnx",
+  "maintainers": [
+    "wheatfox <wheatfox17@icloud.com>"
+  ],
+  "repo_name": "primitive-livox-mid360-imu-rbnx",
   "default_branch": "main",
   "kind": "primitive",
   "capabilities": [
