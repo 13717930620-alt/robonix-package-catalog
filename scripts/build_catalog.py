@@ -183,6 +183,11 @@ def write_json(path: Path, data) -> None:
     path.write_text(json.dumps(data, ensure_ascii=False, indent=2) + "\n")
 
 
+def write_api(path: Path, data) -> None:
+    """Write an extensionless static JSON API resource for GitHub Pages."""
+    write_json(path, data)
+
+
 def tag_class(tag: str) -> str:
     known = {
         "primitive": "tag-blue",
@@ -487,8 +492,8 @@ def render_site(public_dir: Path, generated_at: str, packages: list[dict]) -> No
     <div class="topline">
       <div class="brand">Robonix Package Catalog</div>
       <nav class="api-links">
-        <a href="api/packages.json">packages.json</a>
-        <a href="api/search.json">search.json</a>
+        <a href="api/v1/packages">API: packages</a>
+        <a href="api/v1/search">API: search</a>
       </nav>
     </div>
   </header>
@@ -526,6 +531,21 @@ def render_site(public_dir: Path, generated_at: str, packages: list[dict]) -> No
         </div>
       </section>
     </div>
+    <section class="panel api-reference">
+      <h2>API Reference</h2>
+      <p class="muted">Static JSON API hosted by GitHub Pages. Use <code>GET</code>; no API key is required.</p>
+      <table>
+        <thead><tr><th>Method</th><th>Path</th><th>Parameters</th><th>Response</th></tr></thead>
+        <tbody>
+          <tr><td><code>GET</code></td><td><code>/api/v1/packages</code></td><td>none</td><td>catalog object with <code>api_version</code>, <code>generated_at</code>, and <code>packages[]</code></td></tr>
+          <tr><td><code>GET</code></td><td><code>/api/v1/search</code></td><td>none</td><td>plain package array for client-side filtering</td></tr>
+          <tr><td><code>GET</code></td><td><code>/api/v1/package/&lt;package-name&gt;</code></td><td><code>package-name</code>: exact <code>package.name</code>, URL-encoded</td><td>one package object; missing packages return GitHub Pages 404</td></tr>
+        </tbody>
+      </table>
+      <pre><code>const base = 'https://syswonder.github.io/robonix-package-catalog/api/v1';
+const catalog = await fetch(`${{base}}/packages`).then(r => r.json());
+const detail = await fetch(`${{base}}/package/${{encodeURIComponent('robonix.service.mapping')}}`).then(r => r.json());</code></pre>
+    </section>
   </main>
   <footer class="shell">Generated on {html.escape(generated_at)}.</footer>
   <script>
@@ -662,7 +682,7 @@ def render_package_pages(public_dir: Path, generated_at: str, packages: list[dic
           <div>Maintainers</div><div>{html.escape(', '.join(p['maintainers']))}</div>
           <div>Repository</div><div><a href="{html.escape(p['repo'])}">{html.escape(p['repo_name'])}</a></div>
           <div>Branch</div><div><code>{html.escape(p['default_branch'])}</code></div>
-          <div>JSON API</div><div><a href="../../api/packages/{html.escape(p['name'])}.json">package json</a></div>
+          <div>API</div><div><a href="../../api/v1/package/{html.escape(p['name'])}">package metadata</a></div>
         </div>
         <div class="tags">{render_tags(p['tags'])}</div>
         <h2>Capabilities</h2>
@@ -703,18 +723,103 @@ def render_readme(path: Path, generated_at: str, packages: list[dict]) -> None:
         "## Website",
         "",
         "- Homepage: https://syswonder.github.io/robonix-package-catalog/",
-        "- Package list API: https://syswonder.github.io/robonix-package-catalog/api/packages.json",
-        "- Search API: https://syswonder.github.io/robonix-package-catalog/api/search.json",
-        "- Package detail API: `https://syswonder.github.io/robonix-package-catalog/api/packages/<package-name>.json`",
+        "- Package list API: `GET https://syswonder.github.io/robonix-package-catalog/api/v1/packages`",
+        "- Search index API: `GET https://syswonder.github.io/robonix-package-catalog/api/v1/search`",
+        "- Package detail API: `GET https://syswonder.github.io/robonix-package-catalog/api/v1/package/<package-name>`",
         "- Package detail page: `https://syswonder.github.io/robonix-package-catalog/packages/<package-name>/`",
         "",
-        "Example:",
+        "The catalog is hosted on GitHub Pages, so these are static JSON resources",
+        "with stable API-style paths. Clients should treat the shape below as the v1",
+        "contract.",
+        "",
+        "## API Reference",
+        "",
+        "All endpoints are static JSON resources served from GitHub Pages. Use",
+        "`GET`; no API key is required. There are no server-side query parameters",
+        "because Pages is static. Filter by name, kind, tag, maintainer, or",
+        "capability on the client using the returned JSON.",
+        "",
+        "| Method | Path | Parameters | Response |",
+        "| --- | --- | --- | --- |",
+        "| `GET` | `/api/v1/packages` | none | catalog object with `api_version`, `generated_at`, and `packages[]` |",
+        "| `GET` | `/api/v1/search` | none | plain package array, intended for client-side search/filter indexes |",
+        "| `GET` | `/api/v1/package/<package-name>` | `package-name`: exact `package.name`, URL-encoded | one package object; missing packages return GitHub Pages `404` |",
+        "",
+        "Package object fields:",
+        "",
+        "| Field | Type | Meaning |",
+        "| --- | --- | --- |",
+        "| `name` | string | canonical package name, e.g. `robonix.service.mapping` |",
+        "| `version` | string | package version from `package_manifest.yaml` |",
+        "| `description` | string | short package description |",
+        "| `tags` | string[] | UI/search tags |",
+        "| `maintainers` | string[] | maintainers in `Name <email@domain>` format |",
+        "| `repo` | string | GitHub repository URL |",
+        "| `repo_name` | string | repository name without owner |",
+        "| `default_branch` | string | package repository default branch used for indexing |",
+        "| `kind` | string | `primitive`, `service`, or `skill` inferred from `package.name` |",
+        "| `capabilities` | string[] | declared Robonix contract IDs |",
+        "| `readme_url` | string | GitHub README URL for the indexed branch |",
+        "",
+        "### JavaScript",
         "",
         "```js",
-        "const res = await fetch('https://syswonder.github.io/robonix-package-catalog/api/packages.json');",
+        "const base = 'https://syswonder.github.io/robonix-package-catalog/api/v1';",
+        "const res = await fetch(`${base}/packages`);",
         "const catalog = await res.json();",
         "const mapping = catalog.packages.find(p => p.name === 'robonix.service.mapping');",
+        "",
+        "const detail = await fetch(`${base}/package/${encodeURIComponent(mapping.name)}`)",
+        "  .then(r => r.json());",
         "```",
+        "",
+        "### curl",
+        "",
+        "```bash",
+        "curl -s https://syswonder.github.io/robonix-package-catalog/api/v1/packages",
+        "curl -s https://syswonder.github.io/robonix-package-catalog/api/v1/package/robonix.service.mapping",
+        "```",
+        "",
+        "### Python",
+        "",
+        "```python",
+        "import urllib.request, json",
+        "",
+        "base = 'https://syswonder.github.io/robonix-package-catalog/api/v1'",
+        "catalog = json.load(urllib.request.urlopen(f'{base}/packages'))",
+        "mapping = next(p for p in catalog['packages'] if p['name'] == 'robonix.service.mapping')",
+        "detail = json.load(urllib.request.urlopen(f\"{base}/package/{mapping['name']}\"))",
+        "```",
+        "",
+        "### API schema",
+        "",
+        "`GET /api/v1/packages` returns:",
+        "",
+        "```json",
+        "{",
+        "  \"api_version\": \"1\",",
+        "  \"generated_at\": \"2026-07-06T12:00:00+00:00\",",
+        "  \"packages\": [",
+        "    {",
+        "      \"name\": \"robonix.service.mapping\",",
+        "      \"version\": \"0.4.0\",",
+        "      \"description\": \"Map and SLAM service package for Robonix.\",",
+        "      \"tags\": [\"service\", \"mapping\", \"slam\"],",
+        "      \"maintainers\": [\"wheatfox <wheatfox17@icloud.com>\"],",
+        "      \"repo\": \"https://github.com/syswonder/service-map-rbnx\",",
+        "      \"repo_name\": \"service-map-rbnx\",",
+        "      \"default_branch\": \"main\",",
+        "      \"kind\": \"service\",",
+        "      \"capabilities\": [\"robonix/service/map/save_map\"],",
+        "      \"readme_url\": \"https://github.com/syswonder/service-map-rbnx/blob/main/README.md\"",
+        "    }",
+        "  ]",
+        "}",
+        "```",
+        "",
+        "`GET /api/v1/search` returns the same package objects as a plain array.",
+        "",
+        "`GET /api/v1/package/<package-name>` returns one package object.",
         "",
         "## Package Manifest",
         "",
@@ -736,12 +841,15 @@ def render_readme(path: Path, generated_at: str, packages: list[dict]) -> None:
         "CI validates `catalog.yaml`, fetches every package manifest through the GitHub",
         "API, and generates:",
         "",
-        "- `generated/api/packages.json`",
-        "- `generated/api/search.json`",
-        "- `generated/api/packages/<package-name>.json`",
+        "- `generated/api/v1/packages`",
+        "- `generated/api/v1/search`",
+        "- `generated/api/v1/package/<package-name>`",
         "- `public/index.html`",
         "- `public/packages/<package-name>/index.html`",
         "- `public/api/...`",
+        "",
+        "For compatibility, CI also writes `.json` aliases under `api/`, but new",
+        "integrations should use the `/api/v1/...` paths above.",
         "",
         "The generated commit uses `[skip ci]`; normal CI only triggers from",
         "`catalog.yaml`, the builder script, the workflow, or manual dispatch.",
@@ -779,14 +887,20 @@ def main() -> None:
     public_packages = [
         {k: v for k, v in package.items() if not k.startswith("_")} for package in packages
     ]
-    payload = {"generated_at": generated_at, "packages": public_packages}
+    payload = {"api_version": "1", "generated_at": generated_at, "packages": public_packages}
     write_json(api / "packages.json", payload)
     write_json(api / "search.json", public_packages)
     write_json(public_api / "packages.json", payload)
     write_json(public_api / "search.json", public_packages)
+    write_api(api / "v1" / "packages", payload)
+    write_api(api / "v1" / "search", public_packages)
+    write_api(public_api / "v1" / "packages", payload)
+    write_api(public_api / "v1" / "search", public_packages)
     for package in public_packages:
         write_json(api / "packages" / f"{package['name']}.json", package)
         write_json(public_api / "packages" / f"{package['name']}.json", package)
+        write_api(api / "v1" / "package" / package["name"], package)
+        write_api(public_api / "v1" / "package" / package["name"], package)
     render_site(public, generated_at, packages)
     render_package_pages(public, generated_at, packages)
     render_readme(Path("README.md"), generated_at, packages)

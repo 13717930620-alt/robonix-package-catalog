@@ -225,8 +225,8 @@
     <div class="topline">
       <div class="brand">Robonix Package Catalog</div>
       <nav class="api-links">
-        <a href="api/packages.json">packages.json</a>
-        <a href="api/search.json">search.json</a>
+        <a href="api/v1/packages">API: packages</a>
+        <a href="api/v1/search">API: search</a>
       </nav>
     </div>
   </header>
@@ -390,8 +390,23 @@
         </div>
       </section>
     </div>
+    <section class="panel api-reference">
+      <h2>API Reference</h2>
+      <p class="muted">Static JSON API hosted by GitHub Pages. Use <code>GET</code>; no API key is required.</p>
+      <table>
+        <thead><tr><th>Method</th><th>Path</th><th>Parameters</th><th>Response</th></tr></thead>
+        <tbody>
+          <tr><td><code>GET</code></td><td><code>/api/v1/packages</code></td><td>none</td><td>catalog object with <code>api_version</code>, <code>generated_at</code>, and <code>packages[]</code></td></tr>
+          <tr><td><code>GET</code></td><td><code>/api/v1/search</code></td><td>none</td><td>plain package array for client-side filtering</td></tr>
+          <tr><td><code>GET</code></td><td><code>/api/v1/package/&lt;package-name&gt;</code></td><td><code>package-name</code>: exact <code>package.name</code>, URL-encoded</td><td>one package object; missing packages return GitHub Pages 404</td></tr>
+        </tbody>
+      </table>
+      <pre><code>const base = 'https://syswonder.github.io/robonix-package-catalog/api/v1';
+const catalog = await fetch(`${base}/packages`).then(r => r.json());
+const detail = await fetch(`${base}/package/${encodeURIComponent('robonix.service.mapping')}`).then(r => r.json());</code></pre>
+    </section>
   </main>
-  <footer class="shell">Generated on 2026-07-06T12:32:03+00:00.</footer>
+  <footer class="shell">Generated on 2026-07-06T13:26:50+00:00.</footer>
   <script>
     const input = document.getElementById('q');
     const cards = Array.from(document.querySelectorAll('.package-card'));

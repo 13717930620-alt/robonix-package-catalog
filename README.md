@@ -19,18 +19,103 @@ To submit a community package, add one `name` + `repo` entry to
 ## Website
 
 - Homepage: https://syswonder.github.io/robonix-package-catalog/
-- Package list API: https://syswonder.github.io/robonix-package-catalog/api/packages.json
-- Search API: https://syswonder.github.io/robonix-package-catalog/api/search.json
-- Package detail API: `https://syswonder.github.io/robonix-package-catalog/api/packages/<package-name>.json`
+- Package list API: `GET https://syswonder.github.io/robonix-package-catalog/api/v1/packages`
+- Search index API: `GET https://syswonder.github.io/robonix-package-catalog/api/v1/search`
+- Package detail API: `GET https://syswonder.github.io/robonix-package-catalog/api/v1/package/<package-name>`
 - Package detail page: `https://syswonder.github.io/robonix-package-catalog/packages/<package-name>/`
 
-Example:
+The catalog is hosted on GitHub Pages, so these are static JSON resources
+with stable API-style paths. Clients should treat the shape below as the v1
+contract.
+
+## API Reference
+
+All endpoints are static JSON resources served from GitHub Pages. Use
+`GET`; no API key is required. There are no server-side query parameters
+because Pages is static. Filter by name, kind, tag, maintainer, or
+capability on the client using the returned JSON.
+
+| Method | Path | Parameters | Response |
+| --- | --- | --- | --- |
+| `GET` | `/api/v1/packages` | none | catalog object with `api_version`, `generated_at`, and `packages[]` |
+| `GET` | `/api/v1/search` | none | plain package array, intended for client-side search/filter indexes |
+| `GET` | `/api/v1/package/<package-name>` | `package-name`: exact `package.name`, URL-encoded | one package object; missing packages return GitHub Pages `404` |
+
+Package object fields:
+
+| Field | Type | Meaning |
+| --- | --- | --- |
+| `name` | string | canonical package name, e.g. `robonix.service.mapping` |
+| `version` | string | package version from `package_manifest.yaml` |
+| `description` | string | short package description |
+| `tags` | string[] | UI/search tags |
+| `maintainers` | string[] | maintainers in `Name <email@domain>` format |
+| `repo` | string | GitHub repository URL |
+| `repo_name` | string | repository name without owner |
+| `default_branch` | string | package repository default branch used for indexing |
+| `kind` | string | `primitive`, `service`, or `skill` inferred from `package.name` |
+| `capabilities` | string[] | declared Robonix contract IDs |
+| `readme_url` | string | GitHub README URL for the indexed branch |
+
+### JavaScript
 
 ```js
-const res = await fetch('https://syswonder.github.io/robonix-package-catalog/api/packages.json');
+const base = 'https://syswonder.github.io/robonix-package-catalog/api/v1';
+const res = await fetch(`${base}/packages`);
 const catalog = await res.json();
 const mapping = catalog.packages.find(p => p.name === 'robonix.service.mapping');
+
+const detail = await fetch(`${base}/package/${encodeURIComponent(mapping.name)}`)
+  .then(r => r.json());
 ```
+
+### curl
+
+```bash
+curl -s https://syswonder.github.io/robonix-package-catalog/api/v1/packages
+curl -s https://syswonder.github.io/robonix-package-catalog/api/v1/package/robonix.service.mapping
+```
+
+### Python
+
+```python
+import urllib.request, json
+
+base = 'https://syswonder.github.io/robonix-package-catalog/api/v1'
+catalog = json.load(urllib.request.urlopen(f'{base}/packages'))
+mapping = next(p for p in catalog['packages'] if p['name'] == 'robonix.service.mapping')
+detail = json.load(urllib.request.urlopen(f"{base}/package/{mapping['name']}"))
+```
+
+### API schema
+
+`GET /api/v1/packages` returns:
+
+```json
+{
+  "api_version": "1",
+  "generated_at": "2026-07-06T12:00:00+00:00",
+  "packages": [
+    {
+      "name": "robonix.service.mapping",
+      "version": "0.4.0",
+      "description": "Map and SLAM service package for Robonix.",
+      "tags": ["service", "mapping", "slam"],
+      "maintainers": ["wheatfox <wheatfox17@icloud.com>"],
+      "repo": "https://github.com/syswonder/service-map-rbnx",
+      "repo_name": "service-map-rbnx",
+      "default_branch": "main",
+      "kind": "service",
+      "capabilities": ["robonix/service/map/save_map"],
+      "readme_url": "https://github.com/syswonder/service-map-rbnx/blob/main/README.md"
+    }
+  ]
+}
+```
+
+`GET /api/v1/search` returns the same package objects as a plain array.
+
+`GET /api/v1/package/<package-name>` returns one package object.
 
 ## Package Manifest
 
@@ -52,17 +137,20 @@ The `package.name` in `package_manifest.yaml` must exactly match the name in
 CI validates `catalog.yaml`, fetches every package manifest through the GitHub
 API, and generates:
 
-- `generated/api/packages.json`
-- `generated/api/search.json`
-- `generated/api/packages/<package-name>.json`
+- `generated/api/v1/packages`
+- `generated/api/v1/search`
+- `generated/api/v1/package/<package-name>`
 - `public/index.html`
 - `public/packages/<package-name>/index.html`
 - `public/api/...`
 
+For compatibility, CI also writes `.json` aliases under `api/`, but new
+integrations should use the `/api/v1/...` paths above.
+
 The generated commit uses `[skip ci]`; normal CI only triggers from
 `catalog.yaml`, the builder script, the workflow, or manual dispatch.
 
-Generated on `2026-07-06T12:32:03+00:00`.
+Generated on `2026-07-06T13:26:50+00:00`.
 
 ## Packages
 

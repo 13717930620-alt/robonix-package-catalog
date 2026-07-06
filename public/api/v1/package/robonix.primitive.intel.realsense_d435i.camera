@@ -1,0 +1,28 @@
+{
+  "name": "robonix.primitive.intel.realsense_d435i.camera",
+  "version": "0.1.0",
+  "description": "Intel RealSense D435i driver wrapper — declares RGB + depth + extrinsics contracts.",
+  "tags": [
+    "primitive",
+    "camera",
+    "intel",
+    "realsense_d435i",
+    "rgbd"
+  ],
+  "repo": "https://github.com/syswonder/primitive-intel-realsense_d435i-camera-rbnx",
+  "maintainers": [
+    "wheatfox <wheatfox17@icloud.com>"
+  ],
+  "repo_name": "primitive-intel-realsense_d435i-camera-rbnx",
+  "default_branch": "main",
+  "kind": "primitive",
+  "capabilities": [
+    "robonix/primitive/camera/driver",
+    "robonix/primitive/camera/rgb",
+    "robonix/primitive/camera/depth",
+    "robonix/primitive/camera/extrinsics",
+    "robonix/primitive/camera/snapshot",
+    "robonix/primitive/camera/depth_snapshot"
+  ],
+  "readme_url": "https://github.com/syswonder/primitive-intel-realsense_d435i-camera-rbnx/blob/main/README.md"
+}
