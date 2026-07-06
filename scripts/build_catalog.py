@@ -6,6 +6,7 @@ import html
 import json
 import os
 import re
+import shutil
 import sys
 import urllib.error
 import urllib.request
@@ -18,6 +19,7 @@ import yaml
 
 GITHUB_RE = re.compile(r"^https://github\.com/([^/]+)/([^/#?]+?)(?:\.git)?/?$")
 MAINTAINER_RE = re.compile(r"^[^<>\n]+ <[^<>\s@]+@[^<>\s@]+\.[^<>\s@]+>$")
+VENDOR_ASSETS = Path("assets/vendor/pico")
 
 
 def fail(msg: str) -> None:
@@ -188,6 +190,13 @@ def write_api(path: Path, data) -> None:
     write_json(path, data)
 
 
+def copy_assets(public_dir: Path) -> None:
+    asset_dir = public_dir / "assets" / "vendor" / "pico"
+    asset_dir.mkdir(parents=True, exist_ok=True)
+    shutil.copyfile(VENDOR_ASSETS / "pico.classless.min.css", asset_dir / "pico.classless.min.css")
+    shutil.copyfile(VENDOR_ASSETS / "LICENSE.md", asset_dir / "LICENSE.md")
+
+
 def tag_class(tag: str) -> str:
     known = {
         "primitive": "tag-blue",
@@ -216,6 +225,9 @@ def render_css() -> str:
     return """
     :root {
       color-scheme: light;
+      --pico-font-family: Arial, Helvetica, sans-serif;
+      --pico-border-radius: 6px;
+      --pico-spacing: 1rem;
       --bg: #ffffff;
       --paper: #ffffff;
       --soft: #f7f7f8;
@@ -237,13 +249,17 @@ def render_css() -> str:
     }
     a { color: var(--accent); text-decoration: none; }
     a:hover { text-decoration: underline; }
-    .shell { max-width: 1180px; margin: 0 auto; padding: 0 24px; }
+    .shell {
+      width: min(100% - 48px, 1180px);
+      max-width: 1180px;
+      margin: 0 auto;
+    }
     header {
       color: var(--ink);
-      padding: 16px 0;
       border-bottom: 1px solid var(--line);
       margin-bottom: 0;
     }
+    header.shell { padding-block: 18px; }
     .topline { display: flex; justify-content: space-between; gap: 16px; align-items: center; }
     .brand { font-weight: 700; font-size: 18px; letter-spacing: 0; }
     .api-links { display: flex; gap: 8px; flex-wrap: wrap; justify-content: flex-end; }
@@ -266,7 +282,7 @@ def render_css() -> str:
       word-break: break-word;
     }
     .lede { color: var(--muted); max-width: 720px; margin: 8px 0 0; line-height: 1.55; font-size: 15px; }
-    main { padding: 0 0 48px; }
+    main.shell { padding-block: 0 48px; }
     .search-strip { padding: 24px 0 22px; }
     .catalog-frame {
       display: grid;
@@ -279,6 +295,7 @@ def render_css() -> str:
       border: 1px solid var(--line);
       box-shadow: var(--shadow);
       border-radius: 8px;
+      overflow: hidden;
     }
     .filters { padding: 18px; position: sticky; top: 16px; }
     .filters h2, .content h2 { margin: 0 0 12px; font-size: 16px; }
@@ -299,6 +316,28 @@ def render_css() -> str:
     }
     .filter-button.active { background: #1f2933; color: #fff; border-color: #1f2933; }
     .content { padding: 18px; min-width: 0; }
+    .api-reference {
+      margin-top: 18px;
+      padding: 22px;
+    }
+    .api-reference h2 { margin-top: 0; }
+    .api-reference table {
+      margin: 14px 0 16px;
+      width: 100%;
+    }
+    .api-reference td,
+    .api-reference th {
+      vertical-align: top;
+    }
+    .api-reference pre {
+      margin: 0;
+      overflow-x: auto;
+      border: 1px solid var(--line);
+      background: #f8fafc;
+      border-radius: 6px;
+      padding: 14px;
+    }
+    .muted { color: var(--muted); }
     .toolbar { display: flex; justify-content: flex-end; align-items: center; margin-bottom: 14px; }
     .search {
       width: min(620px, 100%);
@@ -390,8 +429,8 @@ def render_css() -> str:
     footer {
       color: var(--muted);
       font-size: 12px;
-      padding: 24px 0 32px;
     }
+    footer.shell { padding-block: 24px 32px; }
     .readme {
       line-height: 1.58;
       color: #1f2937;
@@ -419,11 +458,13 @@ def render_css() -> str:
     .readme th, .readme td { border: 1px solid var(--line); padding: 6px 8px; }
     code { font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
     @media (max-width: 860px) {
+      .shell { width: min(100% - 28px, 1180px); }
       .catalog-frame, .detail-layout { grid-template-columns: 1fr; }
       .filters { position: static; }
       .toolbar { align-items: stretch; flex-direction: column; }
       .package-card { grid-template-columns: 1fr; }
       .card-actions { justify-content: flex-start; }
+      .api-reference { padding: 16px; }
     }
     """
 
@@ -476,13 +517,15 @@ def render_site(public_dir: Path, generated_at: str, packages: list[dict]) -> No
         for tag in all_tags
     )
     public_dir.mkdir(parents=True, exist_ok=True)
+    copy_assets(public_dir)
     (public_dir / "index.html").write_text(
         f"""<!doctype html>
-<html lang="en">
+<html lang="en" data-theme="light">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Robonix Package Catalog</title>
+  <link rel="stylesheet" href="assets/vendor/pico/pico.classless.min.css">
   <style>
 {render_css()}
   </style>
@@ -651,11 +694,12 @@ def render_package_pages(public_dir: Path, generated_at: str, packages: list[dic
         readme_html = render_markdown(p.get("_readme_markdown", ""))
         package_dir.joinpath("index.html").write_text(
             f"""<!doctype html>
-<html lang="en">
+<html lang="en" data-theme="light">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>{html.escape(p['name'])} - Robonix Package Catalog</title>
+  <link rel="stylesheet" href="../../assets/vendor/pico/pico.classless.min.css">
   <style>
 {render_css()}
   </style>

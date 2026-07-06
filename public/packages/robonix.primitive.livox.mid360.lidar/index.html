@@ -1,13 +1,17 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" data-theme="light">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>robonix.primitive.livox.mid360.lidar - Robonix Package Catalog</title>
+  <link rel="stylesheet" href="../../assets/vendor/pico/pico.classless.min.css">
   <style>
 
     :root {
       color-scheme: light;
+      --pico-font-family: Arial, Helvetica, sans-serif;
+      --pico-border-radius: 6px;
+      --pico-spacing: 1rem;
       --bg: #ffffff;
       --paper: #ffffff;
       --soft: #f7f7f8;
@@ -29,13 +33,17 @@
     }
     a { color: var(--accent); text-decoration: none; }
     a:hover { text-decoration: underline; }
-    .shell { max-width: 1180px; margin: 0 auto; padding: 0 24px; }
+    .shell {
+      width: min(100% - 48px, 1180px);
+      max-width: 1180px;
+      margin: 0 auto;
+    }
     header {
       color: var(--ink);
-      padding: 16px 0;
       border-bottom: 1px solid var(--line);
       margin-bottom: 0;
     }
+    header.shell { padding-block: 18px; }
     .topline { display: flex; justify-content: space-between; gap: 16px; align-items: center; }
     .brand { font-weight: 700; font-size: 18px; letter-spacing: 0; }
     .api-links { display: flex; gap: 8px; flex-wrap: wrap; justify-content: flex-end; }
@@ -58,7 +66,7 @@
       word-break: break-word;
     }
     .lede { color: var(--muted); max-width: 720px; margin: 8px 0 0; line-height: 1.55; font-size: 15px; }
-    main { padding: 0 0 48px; }
+    main.shell { padding-block: 0 48px; }
     .search-strip { padding: 24px 0 22px; }
     .catalog-frame {
       display: grid;
@@ -71,6 +79,7 @@
       border: 1px solid var(--line);
       box-shadow: var(--shadow);
       border-radius: 8px;
+      overflow: hidden;
     }
     .filters { padding: 18px; position: sticky; top: 16px; }
     .filters h2, .content h2 { margin: 0 0 12px; font-size: 16px; }
@@ -91,6 +100,28 @@
     }
     .filter-button.active { background: #1f2933; color: #fff; border-color: #1f2933; }
     .content { padding: 18px; min-width: 0; }
+    .api-reference {
+      margin-top: 18px;
+      padding: 22px;
+    }
+    .api-reference h2 { margin-top: 0; }
+    .api-reference table {
+      margin: 14px 0 16px;
+      width: 100%;
+    }
+    .api-reference td,
+    .api-reference th {
+      vertical-align: top;
+    }
+    .api-reference pre {
+      margin: 0;
+      overflow-x: auto;
+      border: 1px solid var(--line);
+      background: #f8fafc;
+      border-radius: 6px;
+      padding: 14px;
+    }
+    .muted { color: var(--muted); }
     .toolbar { display: flex; justify-content: flex-end; align-items: center; margin-bottom: 14px; }
     .search {
       width: min(620px, 100%);
@@ -182,8 +213,8 @@
     footer {
       color: var(--muted);
       font-size: 12px;
-      padding: 24px 0 32px;
     }
+    footer.shell { padding-block: 24px 32px; }
     .readme {
       line-height: 1.58;
       color: #1f2937;
@@ -211,11 +242,13 @@
     .readme th, .readme td { border: 1px solid var(--line); padding: 6px 8px; }
     code { font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
     @media (max-width: 860px) {
+      .shell { width: min(100% - 28px, 1180px); }
       .catalog-frame, .detail-layout { grid-template-columns: 1fr; }
       .filters { position: static; }
       .toolbar { align-items: stretch; flex-direction: column; }
       .package-card { grid-template-columns: 1fr; }
       .card-actions { justify-content: flex-start; }
+      .api-reference { padding: 16px; }
     }
     
   </style>
@@ -337,6 +370,6 @@ ros2 topic hz /livox/imu       # ~200 Hz sensor_msgs/Imu (consumed by mid360_imu
       </aside>
     </div>
   </main>
-  <footer class="shell">Generated on 2026-07-06T13:29:07+00:00.</footer>
+  <footer class="shell">Generated on 2026-07-06T13:39:36+00:00.</footer>
 </body>
 </html>

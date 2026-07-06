@@ -1,6 +1,6 @@
 {
   "api_version": "1",
-  "generated_at": "2026-07-06T13:29:07+00:00",
+  "generated_at": "2026-07-06T13:39:36+00:00",
   "packages": [
     {
       "name": "robonix.primitive.agilex.ranger_mini_v3.chassis",
