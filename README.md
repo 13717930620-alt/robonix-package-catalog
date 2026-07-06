@@ -150,7 +150,7 @@ integrations should use the `/api/v1/...` paths above.
 The generated commit uses `[skip ci]`; normal CI only triggers from
 `catalog.yaml`, the builder script, the workflow, or manual dispatch.
 
-Generated on `2026-07-06T13:43:16+00:00`.
+Generated on `2026-07-06T13:45:48+00:00`.
 
 ## Packages
 
