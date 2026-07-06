@@ -18,5 +18,6 @@
   "capabilities": [
     "robonix/primitive/imu/driver",
     "robonix/primitive/imu/imu"
-  ]
+  ],
+  "readme_url": "https://github.com/syswonder/primitive-livox-mid360-imu-rbnx/blob/main/README.md"
 }

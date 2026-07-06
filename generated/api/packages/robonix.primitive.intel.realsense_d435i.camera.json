@@ -23,5 +23,6 @@
     "robonix/primitive/camera/extrinsics",
     "robonix/primitive/camera/snapshot",
     "robonix/primitive/camera/depth_snapshot"
-  ]
+  ],
+  "readme_url": "https://github.com/syswonder/primitive-intel-realsense_d435i-camera-rbnx/blob/main/README.md"
 }

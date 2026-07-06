@@ -62,7 +62,7 @@ API, and generates:
 The generated commit uses `[skip ci]`; normal CI only triggers from
 `catalog.yaml`, the builder script, the workflow, or manual dispatch.
 
-Generated on `2026-07-06T11:49:58+00:00`.
+Generated on `2026-07-06T11:57:51+00:00`.
 
 ## Packages
 

@@ -11,6 +11,8 @@ import urllib.error
 import urllib.request
 from pathlib import Path
 
+import bleach
+import markdown
 import yaml
 
 
@@ -49,23 +51,35 @@ def parse_repo(url: str) -> tuple[str, str]:
     return m.group(1), m.group(2)
 
 
-def load_remote_manifest(repo_url: str) -> tuple[str, dict]:
+def load_remote_text(owner: str, repo: str, path: str, branch: str, *, required: bool) -> str:
+    try:
+        content = github_json(
+            f"https://api.github.com/repos/{owner}/{repo}/contents/{path}?ref={branch}"
+        )
+    except SystemExit:
+        if required:
+            raise
+        return ""
+    if content.get("encoding") != "base64" or "content" not in content:
+        if required:
+            fail(f"https://github.com/{owner}/{repo}: {path} is not base64 content")
+        return ""
+    return base64.b64decode(content["content"]).decode("utf-8")
+
+
+def load_remote_package(repo_url: str) -> tuple[str, dict, str]:
     owner, repo = parse_repo(repo_url)
     meta = github_json(f"https://api.github.com/repos/{owner}/{repo}")
     branch = meta.get("default_branch")
     if not branch:
         fail(f"{repo_url}: missing default_branch")
-    content = github_json(
-        f"https://api.github.com/repos/{owner}/{repo}/contents/package_manifest.yaml?ref={branch}"
-    )
-    if content.get("encoding") != "base64" or "content" not in content:
-        fail(f"{repo_url}: package_manifest.yaml is not base64 content")
-    raw = base64.b64decode(content["content"]).decode("utf-8")
+    raw = load_remote_text(owner, repo, "package_manifest.yaml", branch, required=True)
     try:
         manifest = yaml.safe_load(raw) or {}
     except yaml.YAMLError as e:
         fail(f"{repo_url}: invalid package_manifest.yaml: {e}")
-    return branch, manifest
+    readme = load_remote_text(owner, repo, "README.md", branch, required=False)
+    return branch, manifest, readme
 
 
 def package_slug(name: str) -> str:
@@ -110,7 +124,7 @@ def collect(catalog_path: Path) -> list[dict]:
         seen_repos.add(repo)
 
         _, repo_name = parse_repo(repo)
-        branch, manifest = load_remote_manifest(repo)
+        branch, manifest, readme = load_remote_package(repo)
         package = manifest.get("package")
         if not isinstance(package, dict):
             fail(f"{name}: package_manifest.yaml missing package mapping")
@@ -156,6 +170,8 @@ def collect(catalog_path: Path) -> list[dict]:
                 "default_branch": branch,
                 "kind": kind,
                 "capabilities": cap_names,
+                "readme_url": f"{repo}/blob/{branch}/README.md",
+                "_readme_markdown": readme,
             }
         )
     out.sort(key=lambda x: x["name"])
@@ -195,44 +211,56 @@ def render_css() -> str:
     return """
     :root {
       color-scheme: light;
-      --bg: #f4f1ea;
-      --paper: #fffdf8;
-      --ink: #1b1d21;
-      --muted: #626975;
-      --line: #d8d0c3;
-      --accent: #1f5d7a;
-      --accent-2: #b46b35;
-      --shadow: 0 18px 45px rgba(30, 27, 22, 0.08);
+      --bg: #ffffff;
+      --paper: #ffffff;
+      --soft: #f7f7f8;
+      --ink: #111827;
+      --muted: #667085;
+      --line: #e5e7eb;
+      --line-strong: #d0d5dd;
+      --accent: #2563eb;
+      --shadow: 0 1px 2px rgba(16, 24, 40, 0.04);
     }
     * { box-sizing: border-box; }
     body {
       margin: 0;
       color: var(--ink);
-      background:
-        linear-gradient(180deg, rgba(32, 36, 42, 0.94), rgba(32, 36, 42, 0.82) 260px, transparent 261px),
-        var(--bg);
+      background: var(--bg);
       font-family: Arial, Helvetica, sans-serif;
       font-size: 15px;
       letter-spacing: 0;
     }
     a { color: var(--accent); text-decoration: none; }
     a:hover { text-decoration: underline; }
-    .shell { max-width: 1220px; margin: 0 auto; padding: 0 24px; }
-    header { color: #fff; padding: 34px 0 26px; }
-    .topline { display: flex; justify-content: space-between; gap: 16px; align-items: center; margin-bottom: 26px; }
-    .brand { font-weight: 700; font-size: 15px; letter-spacing: 0.02em; }
+    .shell { max-width: 1180px; margin: 0 auto; padding: 0 24px; }
+    header {
+      color: var(--ink);
+      padding: 22px 0 18px;
+      border-bottom: 1px solid var(--line);
+      margin-bottom: 22px;
+    }
+    .topline { display: flex; justify-content: space-between; gap: 16px; align-items: center; }
+    .brand { font-weight: 700; font-size: 20px; letter-spacing: 0; }
     .api-links { display: flex; gap: 8px; flex-wrap: wrap; justify-content: flex-end; }
     .api-links a {
-      color: #f4f7fb;
-      border: 1px solid rgba(255,255,255,0.22);
-      background: rgba(255,255,255,0.08);
+      color: #344054;
+      border: 1px solid var(--line);
+      background: var(--soft);
       border-radius: 6px;
       padding: 7px 9px;
       font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
       font-size: 12px;
     }
-    h1 { margin: 0; font-size: clamp(34px, 6vw, 68px); line-height: 0.95; letter-spacing: 0; max-width: 760px; }
-    .lede { color: #d8dee8; max-width: 680px; margin: 16px 0 0; line-height: 1.55; font-size: 17px; }
+    h1 {
+      margin: 0;
+      font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      font-size: 22px;
+      line-height: 1.35;
+      letter-spacing: 0;
+      overflow-wrap: anywhere;
+      word-break: break-word;
+    }
+    .lede { color: var(--muted); max-width: 720px; margin: 8px 0 0; line-height: 1.55; font-size: 15px; }
     main { padding: 0 0 48px; }
     .catalog-frame {
       display: grid;
@@ -249,7 +277,7 @@ def render_css() -> str:
     .filters { padding: 18px; position: sticky; top: 16px; }
     .filters h2, .content h2 { margin: 0 0 12px; font-size: 16px; }
     .stat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 18px; }
-    .stat { border: 1px solid var(--line); border-radius: 6px; padding: 10px; background: #faf8f2; }
+    .stat { border: 1px solid var(--line); border-radius: 6px; padding: 10px; background: var(--soft); }
     .stat strong { display: block; font-size: 22px; }
     .stat span { color: var(--muted); font-size: 12px; }
     .filter-group { border-top: 1px solid var(--line); padding-top: 14px; margin-top: 14px; }
@@ -268,7 +296,7 @@ def render_css() -> str:
     .toolbar { display: flex; gap: 12px; justify-content: space-between; align-items: center; margin-bottom: 14px; }
     .search {
       width: min(620px, 100%);
-      border: 1px solid #b8b0a4;
+      border: 1px solid var(--line-strong);
       background: #fff;
       border-radius: 6px;
       padding: 11px 12px;
@@ -299,7 +327,7 @@ def render_css() -> str:
       border: 1px solid var(--line);
       border-radius: 4px;
       padding: 2px 5px;
-      background: #faf8f2;
+      background: var(--soft);
     }
     .description { color: #343941; margin: 0 0 10px; line-height: 1.45; }
     .meta-line { color: var(--muted); font-size: 13px; display: flex; gap: 14px; flex-wrap: wrap; }
@@ -309,7 +337,7 @@ def render_css() -> str:
       border: 1px solid var(--line);
       border-radius: 6px;
       padding: 7px 9px;
-      background: #faf8f2;
+      background: var(--soft);
       color: #29303a;
       font-size: 13px;
     }
@@ -330,7 +358,7 @@ def render_css() -> str:
     .tag-slate { background: #e4e8ee; color: #344052; }
     .tag-red { background: #f5ded8; color: #7b2c1f; }
     .tag-gray { background: #ece8df; color: #4a4b4d; }
-    .detail-layout { display: grid; grid-template-columns: 1fr 310px; gap: 18px; align-items: start; }
+    .detail-layout { display: grid; grid-template-columns: 1fr 340px; gap: 18px; align-items: start; }
     .detail-main, .detail-side { padding: 18px; }
     .detail-main h2 { margin-top: 0; font-size: 20px; }
     .kv { display: grid; grid-template-columns: 120px 1fr; gap: 8px 14px; font-size: 14px; }
@@ -340,13 +368,38 @@ def render_css() -> str:
       font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
       font-size: 13px;
       border: 1px solid var(--line);
-      background: #faf8f2;
+      background: var(--soft);
       border-radius: 5px;
       padding: 8px;
       overflow-wrap: anywhere;
     }
-    .back { display: inline-block; margin: 18px 0; color: #fff; }
-    .generated { color: #d8dee8; margin-top: 12px; font-size: 13px; }
+    .back { display: inline-block; margin: 18px 0; color: var(--accent); }
+    .generated { color: var(--muted); margin-top: 12px; font-size: 13px; }
+    .readme {
+      line-height: 1.58;
+      color: #1f2937;
+      overflow-wrap: anywhere;
+    }
+    .readme h1 { font-size: 26px; }
+    .readme h2 { font-size: 21px; border-bottom: 1px solid var(--line); padding-bottom: 7px; margin-top: 28px; }
+    .readme h3 { font-size: 17px; margin-top: 22px; }
+    .readme pre {
+      overflow: auto;
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      background: #f8fafc;
+      padding: 12px;
+      max-width: 100%;
+    }
+    .readme code {
+      background: #f1f5f9;
+      border-radius: 4px;
+      padding: 1px 4px;
+      font-size: 0.92em;
+    }
+    .readme pre code { background: transparent; padding: 0; }
+    .readme table { border-collapse: collapse; width: 100%; display: block; overflow-x: auto; }
+    .readme th, .readme td { border: 1px solid var(--line); padding: 6px 8px; }
     code { font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
     @media (max-width: 860px) {
       .catalog-frame, .detail-layout { grid-template-columns: 1fr; }
@@ -426,9 +479,6 @@ def render_site(public_dir: Path, generated_at: str, packages: list[dict]) -> No
         <a href="api/search.json">search.json</a>
       </nav>
     </div>
-    <h1>Robonix Package Catalog</h1>
-    <p class="lede">Registry index for Robonix primitives, services, and skills. Search by package name, capability, tag, maintainer, or repository.</p>
-    <div class="generated">Generated on {html.escape(generated_at)}.</div>
   </header>
   <main class="shell">
     <div class="catalog-frame">
@@ -520,11 +570,50 @@ def render_site(public_dir: Path, generated_at: str, packages: list[dict]) -> No
     )
 
 
+def render_markdown(md: str) -> str:
+    if not md.strip():
+        return "<p>No README.md was found in this package repository.</p>"
+    rendered = markdown.markdown(md, extensions=["fenced_code", "tables"])
+    allowed_tags = set(bleach.sanitizer.ALLOWED_TAGS).union(
+        {
+            "p",
+            "pre",
+            "code",
+            "h1",
+            "h2",
+            "h3",
+            "h4",
+            "h5",
+            "h6",
+            "ul",
+            "ol",
+            "li",
+            "table",
+            "thead",
+            "tbody",
+            "tr",
+            "th",
+            "td",
+            "blockquote",
+            "hr",
+            "br",
+        }
+    )
+    allowed_attrs = {
+        "a": ["href", "title"],
+        "code": ["class"],
+        "th": ["align"],
+        "td": ["align"],
+    }
+    return bleach.clean(rendered, tags=allowed_tags, attributes=allowed_attrs, strip=True)
+
+
 def render_package_pages(public_dir: Path, generated_at: str, packages: list[dict]) -> None:
     for p in packages:
         package_dir = public_dir / "packages" / package_slug(p["name"])
         package_dir.mkdir(parents=True, exist_ok=True)
         cap_items = "\n".join(f"<li>{html.escape(cap)}</li>" for cap in p["capabilities"])
+        readme_html = render_markdown(p.get("_readme_markdown", ""))
         package_dir.joinpath("index.html").write_text(
             f"""<!doctype html>
 <html lang="en">
@@ -546,10 +635,10 @@ def render_package_pages(public_dir: Path, generated_at: str, packages: list[dic
   <main class="shell">
     <div class="detail-layout">
       <section class="panel detail-main">
-        <h2>Capabilities</h2>
-        <ul class="cap-list">
-          {cap_items}
-        </ul>
+        <h2>README</h2>
+        <article class="readme">
+          {readme_html}
+        </article>
       </section>
       <aside class="panel detail-side">
         <h2>Package</h2>
@@ -562,6 +651,10 @@ def render_package_pages(public_dir: Path, generated_at: str, packages: list[dic
           <div>JSON API</div><div><a href="../../api/packages/{html.escape(p['name'])}.json">package json</a></div>
         </div>
         <div class="tags">{render_tags(p['tags'])}</div>
+        <h2>Capabilities</h2>
+        <ul class="cap-list">
+          {cap_items}
+        </ul>
       </aside>
     </div>
   </main>
@@ -668,11 +761,15 @@ def main() -> None:
     api = out / "api"
     public_api = public / "api"
     payload = {"generated_at": generated_at, "packages": packages}
+    public_packages = [
+        {k: v for k, v in package.items() if not k.startswith("_")} for package in packages
+    ]
+    payload = {"generated_at": generated_at, "packages": public_packages}
     write_json(api / "packages.json", payload)
-    write_json(api / "search.json", packages)
+    write_json(api / "search.json", public_packages)
     write_json(public_api / "packages.json", payload)
-    write_json(public_api / "search.json", packages)
-    for package in packages:
+    write_json(public_api / "search.json", public_packages)
+    for package in public_packages:
         write_json(api / "packages" / f"{package['name']}.json", package)
         write_json(public_api / "packages" / f"{package['name']}.json", package)
     render_site(public, generated_at, packages)

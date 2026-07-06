@@ -8,44 +8,56 @@
 
     :root {
       color-scheme: light;
-      --bg: #f4f1ea;
-      --paper: #fffdf8;
-      --ink: #1b1d21;
-      --muted: #626975;
-      --line: #d8d0c3;
-      --accent: #1f5d7a;
-      --accent-2: #b46b35;
-      --shadow: 0 18px 45px rgba(30, 27, 22, 0.08);
+      --bg: #ffffff;
+      --paper: #ffffff;
+      --soft: #f7f7f8;
+      --ink: #111827;
+      --muted: #667085;
+      --line: #e5e7eb;
+      --line-strong: #d0d5dd;
+      --accent: #2563eb;
+      --shadow: 0 1px 2px rgba(16, 24, 40, 0.04);
     }
     * { box-sizing: border-box; }
     body {
       margin: 0;
       color: var(--ink);
-      background:
-        linear-gradient(180deg, rgba(32, 36, 42, 0.94), rgba(32, 36, 42, 0.82) 260px, transparent 261px),
-        var(--bg);
+      background: var(--bg);
       font-family: Arial, Helvetica, sans-serif;
       font-size: 15px;
       letter-spacing: 0;
     }
     a { color: var(--accent); text-decoration: none; }
     a:hover { text-decoration: underline; }
-    .shell { max-width: 1220px; margin: 0 auto; padding: 0 24px; }
-    header { color: #fff; padding: 34px 0 26px; }
-    .topline { display: flex; justify-content: space-between; gap: 16px; align-items: center; margin-bottom: 26px; }
-    .brand { font-weight: 700; font-size: 15px; letter-spacing: 0.02em; }
+    .shell { max-width: 1180px; margin: 0 auto; padding: 0 24px; }
+    header {
+      color: var(--ink);
+      padding: 22px 0 18px;
+      border-bottom: 1px solid var(--line);
+      margin-bottom: 22px;
+    }
+    .topline { display: flex; justify-content: space-between; gap: 16px; align-items: center; }
+    .brand { font-weight: 700; font-size: 20px; letter-spacing: 0; }
     .api-links { display: flex; gap: 8px; flex-wrap: wrap; justify-content: flex-end; }
     .api-links a {
-      color: #f4f7fb;
-      border: 1px solid rgba(255,255,255,0.22);
-      background: rgba(255,255,255,0.08);
+      color: #344054;
+      border: 1px solid var(--line);
+      background: var(--soft);
       border-radius: 6px;
       padding: 7px 9px;
       font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
       font-size: 12px;
     }
-    h1 { margin: 0; font-size: clamp(34px, 6vw, 68px); line-height: 0.95; letter-spacing: 0; max-width: 760px; }
-    .lede { color: #d8dee8; max-width: 680px; margin: 16px 0 0; line-height: 1.55; font-size: 17px; }
+    h1 {
+      margin: 0;
+      font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      font-size: 22px;
+      line-height: 1.35;
+      letter-spacing: 0;
+      overflow-wrap: anywhere;
+      word-break: break-word;
+    }
+    .lede { color: var(--muted); max-width: 720px; margin: 8px 0 0; line-height: 1.55; font-size: 15px; }
     main { padding: 0 0 48px; }
     .catalog-frame {
       display: grid;
@@ -62,7 +74,7 @@
     .filters { padding: 18px; position: sticky; top: 16px; }
     .filters h2, .content h2 { margin: 0 0 12px; font-size: 16px; }
     .stat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 18px; }
-    .stat { border: 1px solid var(--line); border-radius: 6px; padding: 10px; background: #faf8f2; }
+    .stat { border: 1px solid var(--line); border-radius: 6px; padding: 10px; background: var(--soft); }
     .stat strong { display: block; font-size: 22px; }
     .stat span { color: var(--muted); font-size: 12px; }
     .filter-group { border-top: 1px solid var(--line); padding-top: 14px; margin-top: 14px; }
@@ -81,7 +93,7 @@
     .toolbar { display: flex; gap: 12px; justify-content: space-between; align-items: center; margin-bottom: 14px; }
     .search {
       width: min(620px, 100%);
-      border: 1px solid #b8b0a4;
+      border: 1px solid var(--line-strong);
       background: #fff;
       border-radius: 6px;
       padding: 11px 12px;
@@ -112,7 +124,7 @@
       border: 1px solid var(--line);
       border-radius: 4px;
       padding: 2px 5px;
-      background: #faf8f2;
+      background: var(--soft);
     }
     .description { color: #343941; margin: 0 0 10px; line-height: 1.45; }
     .meta-line { color: var(--muted); font-size: 13px; display: flex; gap: 14px; flex-wrap: wrap; }
@@ -122,7 +134,7 @@
       border: 1px solid var(--line);
       border-radius: 6px;
       padding: 7px 9px;
-      background: #faf8f2;
+      background: var(--soft);
       color: #29303a;
       font-size: 13px;
     }
@@ -143,7 +155,7 @@
     .tag-slate { background: #e4e8ee; color: #344052; }
     .tag-red { background: #f5ded8; color: #7b2c1f; }
     .tag-gray { background: #ece8df; color: #4a4b4d; }
-    .detail-layout { display: grid; grid-template-columns: 1fr 310px; gap: 18px; align-items: start; }
+    .detail-layout { display: grid; grid-template-columns: 1fr 340px; gap: 18px; align-items: start; }
     .detail-main, .detail-side { padding: 18px; }
     .detail-main h2 { margin-top: 0; font-size: 20px; }
     .kv { display: grid; grid-template-columns: 120px 1fr; gap: 8px 14px; font-size: 14px; }
@@ -153,13 +165,38 @@
       font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
       font-size: 13px;
       border: 1px solid var(--line);
-      background: #faf8f2;
+      background: var(--soft);
       border-radius: 5px;
       padding: 8px;
       overflow-wrap: anywhere;
     }
-    .back { display: inline-block; margin: 18px 0; color: #fff; }
-    .generated { color: #d8dee8; margin-top: 12px; font-size: 13px; }
+    .back { display: inline-block; margin: 18px 0; color: var(--accent); }
+    .generated { color: var(--muted); margin-top: 12px; font-size: 13px; }
+    .readme {
+      line-height: 1.58;
+      color: #1f2937;
+      overflow-wrap: anywhere;
+    }
+    .readme h1 { font-size: 26px; }
+    .readme h2 { font-size: 21px; border-bottom: 1px solid var(--line); padding-bottom: 7px; margin-top: 28px; }
+    .readme h3 { font-size: 17px; margin-top: 22px; }
+    .readme pre {
+      overflow: auto;
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      background: #f8fafc;
+      padding: 12px;
+      max-width: 100%;
+    }
+    .readme code {
+      background: #f1f5f9;
+      border-radius: 4px;
+      padding: 1px 4px;
+      font-size: 0.92em;
+    }
+    .readme pre code { background: transparent; padding: 0; }
+    .readme table { border-collapse: collapse; width: 100%; display: block; overflow-x: auto; }
+    .readme th, .readme td { border: 1px solid var(--line); padding: 6px 8px; }
     code { font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
     @media (max-width: 860px) {
       .catalog-frame, .detail-layout { grid-template-columns: 1fr; }
@@ -176,16 +213,57 @@
     <a class="back" href="../../">Back to catalog</a>
     <h1>robonix.primitive.livox.mid360.imu</h1>
     <p class="lede">Livox MID-360 IMU atlas wrapper — depends on mid360_lidar_rbnx.</p>
-    <div class="generated">Generated on 2026-07-06T11:49:58+00:00.</div>
+    <div class="generated">Generated on 2026-07-06T11:57:51+00:00.</div>
   </header>
   <main class="shell">
     <div class="detail-layout">
       <section class="panel detail-main">
-        <h2>Capabilities</h2>
-        <ul class="cap-list">
-          <li>robonix/primitive/imu/driver</li>
-<li>robonix/primitive/imu/imu</li>
-        </ul>
+        <h2>README</h2>
+        <article class="readme">
+          <h1>mid360_imu_rbnx</h1>
+<p>Robonix package owning the <code>primitive/imu/*</code> namespace for the Ranger Mini's MID-360 embedded IMU. The IMU stream itself is produced by the upstream <code>livox_ros_driver2</code> launch (spawned by <a href="https://github.com/syswonder/primitive-livox-mid360-lidar-rbnx"><code>mid360_lidar_rbnx</code></a>) and published on <code>/livox/imu</code>. <strong>This package does NOT spawn any ROS process</strong> — it's a pure topic shim that atlas-registers the existing topic.</p>
+<p>The split exists because robonix's invariant is "one primitive namespace = one package". Mixing <code>primitive/lidar/*</code> and <code>primitive/imu/*</code> in the same package would let two namespaces share one capability_id, breaking that rule.</p>
+<h2>Capability surface</h2>
+<table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Mode</th>
+<th>Transport</th>
+<th>Source / handler</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>robonix/primitive/imu/driver</code></td>
+<td>rpc</td>
+<td>gRPC</td>
+<td><code>Driver(CMD_INIT, config_json)</code> — lifecycle</td>
+</tr>
+<tr>
+<td><code>robonix/primitive/imu/imu</code></td>
+<td>topic_out</td>
+<td>ROS 2</td>
+<td><code>/livox/imu</code> (sensor_msgs/Imu)</td>
+</tr>
+</tbody>
+</table>
+<h2>Driver-init lifecycle</h2>
+<p><code>start.sh</code> brings up the atlas bridge. The bridge opens a gRPC server (default port 50233), registers the capability and declares only <code>primitive/imu/driver</code> on atlas, then blocks awaiting <code>Driver(CMD_INIT, config_json)</code>.</p>
+<p>When <code>rbnx boot</code> calls Init, the handler subscribes to the configured IMU topic and waits for the first <code>sensor_msgs/Imu</code> message — that's the sentinel proving the upstream livox driver is alive on this host's DDS bus. Once it arrives, we declare <code>primitive/imu/imu</code> on atlas and return ok.</p>
+<h2>Boot ordering — defer, no dep graph</h2>
+<p>Robonix doesn't track package startup dependencies. The deploy manifest is an unordered list. Instead, packages defer themselves at runtime: if <code>mid360_lidar_rbnx</code>'s Init hasn't completed yet, <code>/livox/imu</code> is silent. Our Init does a short probe (default 2 s), and on miss falls back to the full sentinel timeout (default 30 s). When <code>rbnx-cli</code> grows defer-queue handling, this falls back to returning <code>Driver_Response(state="deferred")</code> after the short probe so the boot loop retries us out-of-band.</p>
+<p>This pattern is intentionally simpler than a topological dep graph: each package only declares what it needs at the moment its Init runs, so there's no manifest-drift problem when contracts change shape.</p>
+<h2>Config (passed via <code>Driver(CMD_INIT, config_json)</code>)</h2>
+<pre><code class="language-json">{
+  &quot;imu_topic&quot;:          &quot;/livox/imu&quot;,
+  &quot;defer_probe_s&quot;:      2.0,
+  &quot;sentinel_timeout_s&quot;: 30.0
+}
+</code></pre>
+<h2>License</h2>
+<p>MulanPSL-2.0.</p>
+        </article>
       </section>
       <aside class="panel detail-side">
         <h2>Package</h2>
@@ -198,6 +276,11 @@
           <div>JSON API</div><div><a href="../../api/packages/robonix.primitive.livox.mid360.imu.json">package json</a></div>
         </div>
         <div class="tags"><button class="tag tag-blue" data-tag="primitive">primitive</button> <button class="tag tag-slate" data-tag="imu">imu</button> <button class="tag tag-gray" data-tag="livox">livox</button> <button class="tag tag-gray" data-tag="mid360">mid360</button></div>
+        <h2>Capabilities</h2>
+        <ul class="cap-list">
+          <li>robonix/primitive/imu/driver</li>
+<li>robonix/primitive/imu/imu</li>
+        </ul>
       </aside>
     </div>
   </main>

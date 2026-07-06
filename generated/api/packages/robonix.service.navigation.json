@@ -20,5 +20,6 @@
     "robonix/service/navigation/navigate",
     "robonix/service/navigation/navigate/status",
     "robonix/service/navigation/navigate/cancel"
-  ]
+  ],
+  "readme_url": "https://github.com/syswonder/service-navigation-rbnx/blob/main/README.md"
 }

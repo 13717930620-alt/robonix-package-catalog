@@ -21,5 +21,6 @@
     "robonix/skill/explore/explore",
     "robonix/skill/explore/explore/status",
     "robonix/skill/explore/explore/cancel"
-  ]
+  ],
+  "readme_url": "https://github.com/syswonder/skill-explore-rbnx/blob/main/README.md"
 }

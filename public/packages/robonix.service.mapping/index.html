@@ -8,44 +8,56 @@
 
     :root {
       color-scheme: light;
-      --bg: #f4f1ea;
-      --paper: #fffdf8;
-      --ink: #1b1d21;
-      --muted: #626975;
-      --line: #d8d0c3;
-      --accent: #1f5d7a;
-      --accent-2: #b46b35;
-      --shadow: 0 18px 45px rgba(30, 27, 22, 0.08);
+      --bg: #ffffff;
+      --paper: #ffffff;
+      --soft: #f7f7f8;
+      --ink: #111827;
+      --muted: #667085;
+      --line: #e5e7eb;
+      --line-strong: #d0d5dd;
+      --accent: #2563eb;
+      --shadow: 0 1px 2px rgba(16, 24, 40, 0.04);
     }
     * { box-sizing: border-box; }
     body {
       margin: 0;
       color: var(--ink);
-      background:
-        linear-gradient(180deg, rgba(32, 36, 42, 0.94), rgba(32, 36, 42, 0.82) 260px, transparent 261px),
-        var(--bg);
+      background: var(--bg);
       font-family: Arial, Helvetica, sans-serif;
       font-size: 15px;
       letter-spacing: 0;
     }
     a { color: var(--accent); text-decoration: none; }
     a:hover { text-decoration: underline; }
-    .shell { max-width: 1220px; margin: 0 auto; padding: 0 24px; }
-    header { color: #fff; padding: 34px 0 26px; }
-    .topline { display: flex; justify-content: space-between; gap: 16px; align-items: center; margin-bottom: 26px; }
-    .brand { font-weight: 700; font-size: 15px; letter-spacing: 0.02em; }
+    .shell { max-width: 1180px; margin: 0 auto; padding: 0 24px; }
+    header {
+      color: var(--ink);
+      padding: 22px 0 18px;
+      border-bottom: 1px solid var(--line);
+      margin-bottom: 22px;
+    }
+    .topline { display: flex; justify-content: space-between; gap: 16px; align-items: center; }
+    .brand { font-weight: 700; font-size: 20px; letter-spacing: 0; }
     .api-links { display: flex; gap: 8px; flex-wrap: wrap; justify-content: flex-end; }
     .api-links a {
-      color: #f4f7fb;
-      border: 1px solid rgba(255,255,255,0.22);
-      background: rgba(255,255,255,0.08);
+      color: #344054;
+      border: 1px solid var(--line);
+      background: var(--soft);
       border-radius: 6px;
       padding: 7px 9px;
       font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
       font-size: 12px;
     }
-    h1 { margin: 0; font-size: clamp(34px, 6vw, 68px); line-height: 0.95; letter-spacing: 0; max-width: 760px; }
-    .lede { color: #d8dee8; max-width: 680px; margin: 16px 0 0; line-height: 1.55; font-size: 17px; }
+    h1 {
+      margin: 0;
+      font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      font-size: 22px;
+      line-height: 1.35;
+      letter-spacing: 0;
+      overflow-wrap: anywhere;
+      word-break: break-word;
+    }
+    .lede { color: var(--muted); max-width: 720px; margin: 8px 0 0; line-height: 1.55; font-size: 15px; }
     main { padding: 0 0 48px; }
     .catalog-frame {
       display: grid;
@@ -62,7 +74,7 @@
     .filters { padding: 18px; position: sticky; top: 16px; }
     .filters h2, .content h2 { margin: 0 0 12px; font-size: 16px; }
     .stat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 18px; }
-    .stat { border: 1px solid var(--line); border-radius: 6px; padding: 10px; background: #faf8f2; }
+    .stat { border: 1px solid var(--line); border-radius: 6px; padding: 10px; background: var(--soft); }
     .stat strong { display: block; font-size: 22px; }
     .stat span { color: var(--muted); font-size: 12px; }
     .filter-group { border-top: 1px solid var(--line); padding-top: 14px; margin-top: 14px; }
@@ -81,7 +93,7 @@
     .toolbar { display: flex; gap: 12px; justify-content: space-between; align-items: center; margin-bottom: 14px; }
     .search {
       width: min(620px, 100%);
-      border: 1px solid #b8b0a4;
+      border: 1px solid var(--line-strong);
       background: #fff;
       border-radius: 6px;
       padding: 11px 12px;
@@ -112,7 +124,7 @@
       border: 1px solid var(--line);
       border-radius: 4px;
       padding: 2px 5px;
-      background: #faf8f2;
+      background: var(--soft);
     }
     .description { color: #343941; margin: 0 0 10px; line-height: 1.45; }
     .meta-line { color: var(--muted); font-size: 13px; display: flex; gap: 14px; flex-wrap: wrap; }
@@ -122,7 +134,7 @@
       border: 1px solid var(--line);
       border-radius: 6px;
       padding: 7px 9px;
-      background: #faf8f2;
+      background: var(--soft);
       color: #29303a;
       font-size: 13px;
     }
@@ -143,7 +155,7 @@
     .tag-slate { background: #e4e8ee; color: #344052; }
     .tag-red { background: #f5ded8; color: #7b2c1f; }
     .tag-gray { background: #ece8df; color: #4a4b4d; }
-    .detail-layout { display: grid; grid-template-columns: 1fr 310px; gap: 18px; align-items: start; }
+    .detail-layout { display: grid; grid-template-columns: 1fr 340px; gap: 18px; align-items: start; }
     .detail-main, .detail-side { padding: 18px; }
     .detail-main h2 { margin-top: 0; font-size: 20px; }
     .kv { display: grid; grid-template-columns: 120px 1fr; gap: 8px 14px; font-size: 14px; }
@@ -153,13 +165,38 @@
       font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
       font-size: 13px;
       border: 1px solid var(--line);
-      background: #faf8f2;
+      background: var(--soft);
       border-radius: 5px;
       padding: 8px;
       overflow-wrap: anywhere;
     }
-    .back { display: inline-block; margin: 18px 0; color: #fff; }
-    .generated { color: #d8dee8; margin-top: 12px; font-size: 13px; }
+    .back { display: inline-block; margin: 18px 0; color: var(--accent); }
+    .generated { color: var(--muted); margin-top: 12px; font-size: 13px; }
+    .readme {
+      line-height: 1.58;
+      color: #1f2937;
+      overflow-wrap: anywhere;
+    }
+    .readme h1 { font-size: 26px; }
+    .readme h2 { font-size: 21px; border-bottom: 1px solid var(--line); padding-bottom: 7px; margin-top: 28px; }
+    .readme h3 { font-size: 17px; margin-top: 22px; }
+    .readme pre {
+      overflow: auto;
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      background: #f8fafc;
+      padding: 12px;
+      max-width: 100%;
+    }
+    .readme code {
+      background: #f1f5f9;
+      border-radius: 4px;
+      padding: 1px 4px;
+      font-size: 0.92em;
+    }
+    .readme pre code { background: transparent; padding: 0; }
+    .readme table { border-collapse: collapse; width: 100%; display: block; overflow-x: auto; }
+    .readme th, .readme td { border: 1px solid var(--line); padding: 6px 8px; }
     code { font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
     @media (max-width: 860px) {
       .catalog-frame, .detail-layout { grid-template-columns: 1fr; }
@@ -176,23 +213,196 @@
     <a class="back" href="../../">Back to catalog</a>
     <h1>robonix.service.mapping</h1>
     <p class="lede">SLAM mapping service. Algo + sensor inputs config-driven.</p>
-    <div class="generated">Generated on 2026-07-06T11:49:58+00:00.</div>
+    <div class="generated">Generated on 2026-07-06T11:57:51+00:00.</div>
   </header>
   <main class="shell">
     <div class="detail-layout">
       <section class="panel detail-main">
-        <h2>Capabilities</h2>
-        <ul class="cap-list">
-          <li>robonix/service/map/driver</li>
-<li>robonix/service/map/occupancy_grid</li>
-<li>robonix/service/map/pointcloud</li>
-<li>robonix/service/map/pose</li>
-<li>robonix/service/map/odom</li>
-<li>robonix/service/map/save_map</li>
-<li>robonix/service/map/load_map</li>
-<li>robonix/service/map/pose_estimate</li>
-<li>robonix/service/map/switch_mode</li>
-        </ul>
+        <h2>README</h2>
+        <article class="readme">
+          <h1>mapping_rbnx</h1>
+<p>SLAM mapping service for <a href="https://github.com/syswonder/robonix">Robonix</a>. It
+turns a robot's lidar / camera / odom streams into a live <strong>2D occupancy
+grid</strong>, a <strong>3D point cloud</strong>, and a <strong>SLAM-corrected pose</strong>, published under a
+fixed, engine-agnostic capability surface (<code>robonix/service/map/*</code>), and
+persists named maps so a robot can re-localize across restarts.</p>
+<p>It is a Robonix <strong>service</strong> package: it registers with <code>atlas</code>, discovers its
+sensor inputs by capability contract (never hardcoded topics), and is brought
+up by <code>rbnx boot</code>. Consumers (<code>scene</code>, <code>nav</code>) bind the contracts, not the
+SLAM engine.</p>
+<ul>
+<li>Capability surface, config schema, and persistence layout: <strong><a href="CAPABILITY.md">CAPABILITY.md</a></strong>.</li>
+</ul>
+<h2>SLAM engines (<code>algo</code>)</h2>
+<table>
+<thead>
+<tr>
+<th>algo</th>
+<th>use</th>
+<th>inputs</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>rtabmap</code> <em>(default, recommended)</em></td>
+<td>sim + real; 2D/3D/RGBD, sensor-agnostic</td>
+<td>any of lidar2d / lidar3d / rgbd (+ odom)</td>
+</tr>
+<tr>
+<td><code>dlio</code></td>
+<td>real-robot 3D Livox + IMU</td>
+<td>lidar3d + imu, needs a colcon ws at <code>/ws/install</code></td>
+</tr>
+<tr>
+<td><code>fastlio2</code></td>
+<td><strong>broken (drift)</strong> — repro only</td>
+<td>—</td>
+</tr>
+</tbody>
+</table>
+<p>The launch branches on whichever sensors the deploy enabled, so the <em>same</em>
+<code>rtabmap</code> config maps a webots Tiago (2D lidar + RGBD) and a MID-360 robot
+(3D lidar + RGBD) without code changes.</p>
+<h2>How to integrate it on your robot</h2>
+<ol>
+<li><strong>Register your sensors</strong> as Robonix primitives under the standard
+   contracts (<code>robonix/primitive/lidar/lidar3d</code>, <code>.../camera/depth</code>,
+   <code>.../chassis/odom</code>, …). mapping discovers them via atlas.</li>
+<li><strong>Pick a deployment target</strong> and reference the matching package manifest
+   from your deploy <code>robonix_manifest.yaml</code>:</li>
+</ol>
+<p><code>yaml
+   service:
+     - name: mapping
+       url: https://github.com/syswonder/service-map-rbnx
+       # manifest: package_manifest.jetson-native.yaml   # x86+docker is default
+       config:
+         algo: rtabmap
+         sensors: { lidar3d: true, rgbd: true, odom: true, imu: true }
+         base_frame: base_link
+         use_sim_time: false
+         map_id: lab_3f          # optional; enables persistence
+         map_mode: mapping       # or: localization</code>
+3. <code>rbnx build -f robonix_manifest.yaml</code> then <code>rbnx boot -f robonix_manifest.yaml</code>.
+4. Consume the map: subscribe to <code>robonix/service/map/occupancy_grid</code> /
+   <code>.../pointcloud</code> / <code>.../pose</code> (resolve them via atlas).</p>
+<p>There is no robot-specific code to edit — sensors come from atlas, frames and
+SLAM mode come from config.</p>
+<h2>Deployment targets</h2>
+<p>One package, three targets (selected by the deploy <code>manifest:</code> field — see
+<a href="CAPABILITY.md#deployment-targets">CAPABILITY.md</a>):</p>
+<table>
+<thead>
+<tr>
+<th>target</th>
+<th>manifest</th>
+<th>runtime</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>x86_64 + docker</td>
+<td><code>package_manifest.yaml</code></td>
+<td>docker (<code>docker/Dockerfile</code>)</td>
+</tr>
+<tr>
+<td>arm64 Jetson + docker</td>
+<td><code>package_manifest.jetson-docker.yaml</code></td>
+<td>docker (<code>docker/Dockerfile.jetson</code>, L4T)</td>
+</tr>
+<tr>
+<td>arm64 Jetson + native</td>
+<td><code>package_manifest.jetson-native.yaml</code></td>
+<td>host ROS2 (<code>scripts/start_native.sh</code>)</td>
+</tr>
+</tbody>
+</table>
+<p>Add a target by adding a <code>package_manifest.&lt;target&gt;.yaml</code> plus a case branch
+in <code>scripts/build.sh</code> — the rest of the package is unchanged.</p>
+<h2>Saving &amp; re-using a map</h2>
+<p>Set <code>map_id</code> to persist. A named map lives under <code>{MAPPING_MAPS_DIR}/{map_id}/</code>
+(default: the package's <code>maps/</code> dir, which survives container restarts):</p>
+<pre><code>maps/lab_3f/rtabmap.db  occupancy.pgm  occupancy.yaml  occupancy.png  cloud.pcd  meta.yaml
+</code></pre>
+<ul>
+<li><strong>Build a map:</strong> <code>map_mode: mapping</code>. Drive the robot around; the db is
+  written live, and on shutdown the offline-previewable artifacts
+  (pgm/png/pcd/meta) are exported. Open <code>occupancy.png</code> to eyeball it without
+  rtabmap's database viewer.</li>
+<li><strong>Re-use a map:</strong> <code>map_mode: localization</code>. mapping loads the saved db and
+  re-localizes against it; the <strong>map frame is stable across restarts</strong>, so a
+  <code>scene</code> configured with the same <code>map_id</code> re-anchors its semantic objects
+  correctly. (<code>scene</code>'s object store keys on <code>map_id</code> — set it consistently.)</li>
+<li><strong>Start fresh:</strong> <code>map_mode: mapping</code> + <code>reset_map: true</code>.</li>
+</ul>
+<blockquote>
+<p>Localization-mode persistence only re-anchors correctly because the map
+frame is loaded from the saved db. Without <code>map_mode: localization</code> the
+map origin resets to the robot's boot pose each run.</p>
+</blockquote>
+<h2>Web UI (live map + runtime map ops)</h2>
+<p>Set <code>MAPPING_WEBUI_PORT</code> (e.g. <code>8091</code>) to enable a dependency-light operator
+page (stdlib <code>http.server</code> + Pillow), served on <code>0.0.0.0</code> so it's reachable
+from a laptop on the robot LAN (<code>http://&lt;robot-ip&gt;:8091</code>). Off by default.</p>
+<p>It runs <strong>inside the mapping bridge process</strong>, so its buttons call the same
+<code>map_ops</code> impls the gRPC/MCP capabilities use — no extra round trip — and it
+reads the live <code>/map</code> + pose straight off the bridge's rclpy node.</p>
+<ul>
+<li><strong>Live map canvas</strong> — occupancy grid + robot pose, with <strong>drag-to-pan,
+  wheel-zoom, a 1 m grid, and double-click-to-fit</strong>. Same world-centered
+  view model as scene's web UI (canvas backing-store pinned to display size,
+  so click coordinates are exact).</li>
+<li><strong>Save</strong> — snapshot the live map under a <code>map_id</code> (writes
+  <code>rtabmap.db</code> + <code>occupancy.png/pgm/yaml</code> + <code>meta.yaml</code>).</li>
+<li><strong>Library</strong> — every saved map with a thumbnail; <strong>Load</strong> re-localizes onto
+  it, <strong>Del</strong> removes it from disk.</li>
+<li><strong>Mode</strong> — flip <strong>Mapping ⇄ Localization</strong> at runtime; a badge + button
+  highlight shows the current mode.</li>
+<li><strong>Reset map</strong> — wipe the live SLAM session and rebuild from scratch (for
+  when mapping diverges). Note: the origin resets to the robot's <em>current</em>
+  pose, so the rebuilt frame won't match the old map (origin drift).</li>
+<li><strong>Click the map → pose estimate</strong> — seeds <code>/initialpose</code> so rtabmap
+  re-localizes; the <strong>activity log</strong> records the seeded pose and, a few
+  seconds later, where it converged + the distance from your estimate.</li>
+</ul>
+<p>These are the same operations exposed as runtime <strong>RPC + MCP capabilities</strong>
+(so Pilot can drive them too): <code>save_map</code>, <code>load_map</code>, <code>pose_estimate</code>,
+<code>switch_mode</code> (the webui adds <code>reset</code> + <code>delete</code> on top). All work on the
+running rtabmap without a redeploy — <code>load</code>/<code>switch_mode</code> call rtabmap's
+runtime services and fall back to a restart with the config's <code>map_mode</code> /
+<code>map_id</code> when those services aren't reachable.</p>
+<blockquote>
+<p>The web UI has no auth — it's a LAN debug tool. Don't expose the port to an
+untrusted network.</p>
+</blockquote>
+<h2>Layout</h2>
+<pre><code>mapping_rbnx/
+├── package_manifest.yaml                 x86+docker (default)
+├── package_manifest.jetson-docker.yaml   arm64 Jetson + docker
+├── package_manifest.jetson-native.yaml   arm64 Jetson + host ROS2
+├── CAPABILITY.md                         capability surface + config spec
+├── src/mapping_rbnx/atlas_bridge.py      cap registration, sensor discovery, persistence
+├── launch/rtabmap_2d.launch.py           sensor-agnostic rtabmap launch
+├── scripts/
+│   ├── build.sh                          per-target build
+│   ├── start.sh                          native↔docker dispatch
+│   ├── start_engine.sh                   in-container SLAM launcher
+│   ├── start_native.sh                   host-process launcher
+│   └── save_map.py                       offline map snapshot (pgm/png/pcd/meta)
+└── docker/                               Dockerfile, Dockerfile.jetson, compose
+</code></pre>
+<h2>Troubleshooting</h2>
+<ul>
+<li><strong><code>/map</code> never populates</strong> — no sensor enabled, or the wrong <code>sensors:</code>
+  flags. Check the <code>[start_engine] rtabmap scan2d=… scan3d=…</code> log line.</li>
+<li><strong><code>map_mode=localization</code> errors "no saved map"</strong> — run a <code>mapping</code> session
+  with that <code>map_id</code> first, and confirm <code>MAPPING_MAPS_DIR</code> is the same path
+  (mounted) across runs.</li>
+<li><strong>Map origin drifts between runs</strong> — you're in <code>mapping</code> mode (origin =
+  boot pose). Use <code>localization</code> to re-anchor to the saved map.</li>
+</ul>
+<p>License: MulanPSL-2.0</p>
+        </article>
       </section>
       <aside class="panel detail-side">
         <h2>Package</h2>
@@ -205,6 +415,18 @@
           <div>JSON API</div><div><a href="../../api/packages/robonix.service.mapping.json">package json</a></div>
         </div>
         <div class="tags"><button class="tag tag-green" data-tag="service">service</button> <button class="tag tag-blue" data-tag="mapping">mapping</button> <button class="tag tag-blue" data-tag="slam">slam</button> <button class="tag tag-gray" data-tag="rtabmap">rtabmap</button> <button class="tag tag-gray" data-tag="ros2">ros2</button></div>
+        <h2>Capabilities</h2>
+        <ul class="cap-list">
+          <li>robonix/service/map/driver</li>
+<li>robonix/service/map/occupancy_grid</li>
+<li>robonix/service/map/pointcloud</li>
+<li>robonix/service/map/pose</li>
+<li>robonix/service/map/odom</li>
+<li>robonix/service/map/save_map</li>
+<li>robonix/service/map/load_map</li>
+<li>robonix/service/map/pose_estimate</li>
+<li>robonix/service/map/switch_mode</li>
+        </ul>
       </aside>
     </div>
   </main>

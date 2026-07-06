@@ -8,44 +8,56 @@
 
     :root {
       color-scheme: light;
-      --bg: #f4f1ea;
-      --paper: #fffdf8;
-      --ink: #1b1d21;
-      --muted: #626975;
-      --line: #d8d0c3;
-      --accent: #1f5d7a;
-      --accent-2: #b46b35;
-      --shadow: 0 18px 45px rgba(30, 27, 22, 0.08);
+      --bg: #ffffff;
+      --paper: #ffffff;
+      --soft: #f7f7f8;
+      --ink: #111827;
+      --muted: #667085;
+      --line: #e5e7eb;
+      --line-strong: #d0d5dd;
+      --accent: #2563eb;
+      --shadow: 0 1px 2px rgba(16, 24, 40, 0.04);
     }
     * { box-sizing: border-box; }
     body {
       margin: 0;
       color: var(--ink);
-      background:
-        linear-gradient(180deg, rgba(32, 36, 42, 0.94), rgba(32, 36, 42, 0.82) 260px, transparent 261px),
-        var(--bg);
+      background: var(--bg);
       font-family: Arial, Helvetica, sans-serif;
       font-size: 15px;
       letter-spacing: 0;
     }
     a { color: var(--accent); text-decoration: none; }
     a:hover { text-decoration: underline; }
-    .shell { max-width: 1220px; margin: 0 auto; padding: 0 24px; }
-    header { color: #fff; padding: 34px 0 26px; }
-    .topline { display: flex; justify-content: space-between; gap: 16px; align-items: center; margin-bottom: 26px; }
-    .brand { font-weight: 700; font-size: 15px; letter-spacing: 0.02em; }
+    .shell { max-width: 1180px; margin: 0 auto; padding: 0 24px; }
+    header {
+      color: var(--ink);
+      padding: 22px 0 18px;
+      border-bottom: 1px solid var(--line);
+      margin-bottom: 22px;
+    }
+    .topline { display: flex; justify-content: space-between; gap: 16px; align-items: center; }
+    .brand { font-weight: 700; font-size: 20px; letter-spacing: 0; }
     .api-links { display: flex; gap: 8px; flex-wrap: wrap; justify-content: flex-end; }
     .api-links a {
-      color: #f4f7fb;
-      border: 1px solid rgba(255,255,255,0.22);
-      background: rgba(255,255,255,0.08);
+      color: #344054;
+      border: 1px solid var(--line);
+      background: var(--soft);
       border-radius: 6px;
       padding: 7px 9px;
       font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
       font-size: 12px;
     }
-    h1 { margin: 0; font-size: clamp(34px, 6vw, 68px); line-height: 0.95; letter-spacing: 0; max-width: 760px; }
-    .lede { color: #d8dee8; max-width: 680px; margin: 16px 0 0; line-height: 1.55; font-size: 17px; }
+    h1 {
+      margin: 0;
+      font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      font-size: 22px;
+      line-height: 1.35;
+      letter-spacing: 0;
+      overflow-wrap: anywhere;
+      word-break: break-word;
+    }
+    .lede { color: var(--muted); max-width: 720px; margin: 8px 0 0; line-height: 1.55; font-size: 15px; }
     main { padding: 0 0 48px; }
     .catalog-frame {
       display: grid;
@@ -62,7 +74,7 @@
     .filters { padding: 18px; position: sticky; top: 16px; }
     .filters h2, .content h2 { margin: 0 0 12px; font-size: 16px; }
     .stat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 18px; }
-    .stat { border: 1px solid var(--line); border-radius: 6px; padding: 10px; background: #faf8f2; }
+    .stat { border: 1px solid var(--line); border-radius: 6px; padding: 10px; background: var(--soft); }
     .stat strong { display: block; font-size: 22px; }
     .stat span { color: var(--muted); font-size: 12px; }
     .filter-group { border-top: 1px solid var(--line); padding-top: 14px; margin-top: 14px; }
@@ -81,7 +93,7 @@
     .toolbar { display: flex; gap: 12px; justify-content: space-between; align-items: center; margin-bottom: 14px; }
     .search {
       width: min(620px, 100%);
-      border: 1px solid #b8b0a4;
+      border: 1px solid var(--line-strong);
       background: #fff;
       border-radius: 6px;
       padding: 11px 12px;
@@ -112,7 +124,7 @@
       border: 1px solid var(--line);
       border-radius: 4px;
       padding: 2px 5px;
-      background: #faf8f2;
+      background: var(--soft);
     }
     .description { color: #343941; margin: 0 0 10px; line-height: 1.45; }
     .meta-line { color: var(--muted); font-size: 13px; display: flex; gap: 14px; flex-wrap: wrap; }
@@ -122,7 +134,7 @@
       border: 1px solid var(--line);
       border-radius: 6px;
       padding: 7px 9px;
-      background: #faf8f2;
+      background: var(--soft);
       color: #29303a;
       font-size: 13px;
     }
@@ -143,7 +155,7 @@
     .tag-slate { background: #e4e8ee; color: #344052; }
     .tag-red { background: #f5ded8; color: #7b2c1f; }
     .tag-gray { background: #ece8df; color: #4a4b4d; }
-    .detail-layout { display: grid; grid-template-columns: 1fr 310px; gap: 18px; align-items: start; }
+    .detail-layout { display: grid; grid-template-columns: 1fr 340px; gap: 18px; align-items: start; }
     .detail-main, .detail-side { padding: 18px; }
     .detail-main h2 { margin-top: 0; font-size: 20px; }
     .kv { display: grid; grid-template-columns: 120px 1fr; gap: 8px 14px; font-size: 14px; }
@@ -153,13 +165,38 @@
       font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
       font-size: 13px;
       border: 1px solid var(--line);
-      background: #faf8f2;
+      background: var(--soft);
       border-radius: 5px;
       padding: 8px;
       overflow-wrap: anywhere;
     }
-    .back { display: inline-block; margin: 18px 0; color: #fff; }
-    .generated { color: #d8dee8; margin-top: 12px; font-size: 13px; }
+    .back { display: inline-block; margin: 18px 0; color: var(--accent); }
+    .generated { color: var(--muted); margin-top: 12px; font-size: 13px; }
+    .readme {
+      line-height: 1.58;
+      color: #1f2937;
+      overflow-wrap: anywhere;
+    }
+    .readme h1 { font-size: 26px; }
+    .readme h2 { font-size: 21px; border-bottom: 1px solid var(--line); padding-bottom: 7px; margin-top: 28px; }
+    .readme h3 { font-size: 17px; margin-top: 22px; }
+    .readme pre {
+      overflow: auto;
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      background: #f8fafc;
+      padding: 12px;
+      max-width: 100%;
+    }
+    .readme code {
+      background: #f1f5f9;
+      border-radius: 4px;
+      padding: 1px 4px;
+      font-size: 0.92em;
+    }
+    .readme pre code { background: transparent; padding: 0; }
+    .readme table { border-collapse: collapse; width: 100%; display: block; overflow-x: auto; }
+    .readme th, .readme td { border: 1px solid var(--line); padding: 6px 8px; }
     code { font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
     @media (max-width: 860px) {
       .catalog-frame, .detail-layout { grid-template-columns: 1fr; }
@@ -176,17 +213,98 @@
     <a class="back" href="../../">Back to catalog</a>
     <h1>robonix.primitive.livox.mid360.lidar</h1>
     <p class="lede">Livox MID-360 lidar driver wrapper.</p>
-    <div class="generated">Generated on 2026-07-06T11:49:58+00:00.</div>
+    <div class="generated">Generated on 2026-07-06T11:57:51+00:00.</div>
   </header>
   <main class="shell">
     <div class="detail-layout">
       <section class="panel detail-main">
-        <h2>Capabilities</h2>
-        <ul class="cap-list">
-          <li>robonix/primitive/lidar/driver</li>
-<li>robonix/primitive/lidar/lidar3d</li>
-<li>robonix/primitive/lidar/lidar_snapshot</li>
-        </ul>
+        <h2>README</h2>
+        <article class="readme">
+          <h1>mid360_lidar_rbnx</h1>
+<p>Robonix package wrapping the <strong>Livox MID-360</strong> LiDAR (Ethernet, 360° dome, 40 m range, integrated 6-axis IMU). Owns the <code>primitive/lidar/*</code> namespace. Publishes the lidar PointCloud2 on the host DDS bus and atlas-registers it under generic contracts so that mapping, navigation, and scene services discover the topic name through atlas — no hardcoded <code>/scanner/cloud</code> paths on the consumer side.</p>
+<p>The MID-360 also produces an IMU stream (<code>/livox/imu</code>, published as a side-effect of the same upstream launch). The <code>primitive/imu/*</code> contract surface for that IMU lives in a separate package, <a href="https://github.com/syswonder/primitive-livox-mid360-imu-rbnx"><code>mid360_imu_rbnx</code></a>. Robonix's invariant is "one primitive namespace = one package".</p>
+<h2>Capability surface</h2>
+<p>The <code>mode</code> is the abstract communication pattern declared in the contract TOML (<code>rpc</code> / <code>topic_in</code> / <code>topic_out</code>). The <code>transport</code> column records how this package realises it on the wire. Both columns matter — the same mode can ride different middleware (e.g. an <code>rpc</code> mode can be a gRPC method or an MCP tool).</p>
+<table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Mode</th>
+<th>Transport</th>
+<th>Source / handler</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>robonix/primitive/lidar/driver</code></td>
+<td>rpc</td>
+<td>gRPC</td>
+<td><code>Driver(CMD_INIT, config_json)</code> — lifecycle</td>
+</tr>
+<tr>
+<td><code>robonix/primitive/lidar/lidar3d</code></td>
+<td>topic_out</td>
+<td>ROS 2</td>
+<td><code>/scanner/cloud</code> (PointCloud2)</td>
+</tr>
+<tr>
+<td><code>robonix/primitive/lidar/lidar_snapshot</code></td>
+<td>rpc</td>
+<td>MCP</td>
+<td>one-shot capture (TODO)</td>
+</tr>
+</tbody>
+</table>
+<h2>Driver-init lifecycle</h2>
+<p><code>start.sh</code> brings up the atlas bridge process — no ROS spawn at this point. The bridge opens a gRPC server on <code>MID360_DRIVER_PORT</code> (default 50231), <code>RegisterCapability</code>s + declares <strong>only</strong> <code>primitive/lidar/driver</code> on atlas, then blocks on heartbeat awaiting <code>Driver(CMD_INIT, config_json)</code>.</p>
+<p>When <code>rbnx boot</code> invokes Init it passes the manifest's <code>config:</code> block as JSON. The handler resolves the host's IP for <code>Livox/host_net_info</code> (config override <code>host_ip:</code>, env <code>LIVOX_HOST_IP</code>, or auto-detect via <code>ip route get &lt;lidar_ip&gt;</code>), generates an MID360 config JSON with the right IPs, spawns <code>ros2 launch livox_ros_driver2 msg_MID360_launch.py</code> with the appropriate environment (<code>LIVOX_MID360_CONFIG</code>, <code>LIVOX_XFER_FORMAT</code>), waits for the first PointCloud2 on the configured topic, declares <code>primitive/lidar/lidar3d</code> on atlas, and returns ok. Atlas only ever advertises endpoints we've confirmed are publishing.</p>
+<h2>Layout</h2>
+<pre><code>mid360_lidar_rbnx/
+├── package_manifest.yaml         robonix dev-packaging spec
+├── mid360_driver/
+│   └── atlas_bridge.py           driver gRPC + lazy Init + livox spawn
+├── scripts/
+│   ├── build.sh                  colcon build vendored src + rbnx codegen
+│   └── start.sh                  source ROS, exec atlas_bridge
+├── src/
+│   ├── livox_ros_driver2/        VENDORED upstream + our patches
+│   └── livox_ros_driver2.patch   diff vs upstream HEAD at vendoring time
+└── .gitignore                    excludes rbnx-build/
+</code></pre>
+<h2>What we patched on top of upstream</h2>
+<p><code>src/livox_ros_driver2.patch</code> documents the diff against <a href="https://github.com/Livox-SDK/livox_ros_driver2">Livox-SDK/livox_ros_driver2</a>. The vendored copy already has them applied:</p>
+<ol>
+<li><code>config/MID360_config.json</code> — host_net_info IPs <code>192.168.1.5 → .50</code>, lidar IP <code>.12 → .161</code>. Atlas_bridge can override at runtime via the <code>host_ip</code> / <code>lidar_ip</code> config keys; the JSON file just provides the baseline.</li>
+<li><code>launch_ROS2/msg_MID360_launch.py</code> — <code>xfer_format</code> default <code>1 → 2</code> (PointCloud2 XYZIT instead of Livox CustomMsg). Now also reads <code>LIVOX_XFER_FORMAT</code> / <code>LIVOX_PUBLISH_FREQ</code> / <code>LIVOX_FRAME_ID</code> from the env so atlas_bridge can pass config through.</li>
+<li><code>src/lddc.cpp</code> — global publisher topic <code>livox/lidar → scanner/cloud</code>. <code>multi_topic=1</code> keeps publishing per-lidar topics under <code>livox/lidar_*</code> unchanged.</li>
+</ol>
+<h2>Config (passed via <code>Driver(CMD_INIT, config_json)</code>)</h2>
+<pre><code class="language-json">{
+  &quot;lidar_topic&quot;: &quot;/scanner/cloud&quot;,
+  &quot;lidar_ip&quot;: &quot;192.168.1.161&quot;,
+  &quot;host_ip&quot;: &quot;&quot;,
+  &quot;xfer_format&quot;: 2,
+  &quot;publish_freq&quot;: 10.0,
+  &quot;frame_id&quot;: &quot;livox_frame&quot;,
+  &quot;sentinel_timeout_s&quot;: 30.0
+}
+</code></pre>
+<p><code>host_ip: ""</code> triggers auto-detect via <code>ip route get &lt;lidar_ip&gt;</code>. Override only when route resolution can't pick the right interface (e.g. the Jetson has multiple Ethernet ports and the route picks the wrong one).</p>
+<h2>Build / run standalone</h2>
+<pre><code class="language-bash">bash scripts/build.sh           # or:  rbnx build -p .
+bash scripts/start.sh           # or:  rbnx boot  -p .
+# the driver gRPC will sit awaiting Driver(CMD_INIT). For a smoke test
+# without rbnx boot, drive it manually with grpcurl or a local Python script.
+</code></pre>
+<p>After Init the lidar should appear on:</p>
+<pre><code class="language-bash">ros2 topic hz /scanner/cloud   # ~10 Hz PointCloud2
+ros2 topic hz /livox/imu       # ~200 Hz sensor_msgs/Imu (consumed by mid360_imu_rbnx)
+</code></pre>
+<h2>Network — host-side prereqs</h2>
+<p>The lidar's IP is config-driven; the host's IP is not. Whatever the lidar's configured IP is (we ship <code>192.168.1.161</code> as default; flash to a different value via Livox Viewer 2 if your network policy dictates), the host's NIC must live on the same /24 subnet (e.g. <code>192.168.1.50/24</code> for a <code>192.168.1.0/24</code> lidar) and have a route to the lidar IP. How you set that up is host-specific — <code>nmcli</code>, <code>systemd-networkd</code>, plain <code>ip addr</code>, whatever your distro standardises on. The package can't subsume that step because Ethernet IP config is inherently host-state.</p>
+<h2>License</h2>
+<p>This package: MulanPSL-2.0. Vendored <code>livox_ros_driver2/</code>: see <code>src/livox_ros_driver2/LICENSE</code> (BSD).</p>
+        </article>
       </section>
       <aside class="panel detail-side">
         <h2>Package</h2>
@@ -199,6 +317,12 @@
           <div>JSON API</div><div><a href="../../api/packages/robonix.primitive.livox.mid360.lidar.json">package json</a></div>
         </div>
         <div class="tags"><button class="tag tag-blue" data-tag="primitive">primitive</button> <button class="tag tag-purple" data-tag="lidar">lidar</button> <button class="tag tag-gray" data-tag="livox">livox</button> <button class="tag tag-gray" data-tag="mid360">mid360</button> <button class="tag tag-gray" data-tag="pointcloud">pointcloud</button></div>
+        <h2>Capabilities</h2>
+        <ul class="cap-list">
+          <li>robonix/primitive/lidar/driver</li>
+<li>robonix/primitive/lidar/lidar3d</li>
+<li>robonix/primitive/lidar/lidar_snapshot</li>
+        </ul>
       </aside>
     </div>
   </main>
