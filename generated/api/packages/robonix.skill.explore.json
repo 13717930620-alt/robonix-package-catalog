@@ -1,0 +1,21 @@
+{
+  "name": "robonix.skill.explore",
+  "version": "0.1.0",
+  "description": "Frontier-based autonomous exploration skill.",
+  "tags": [
+    "skill",
+    "explore",
+    "frontier",
+    "navigation",
+    "mapping"
+  ],
+  "repo": "https://github.com/syswonder/skill-explore-rbnx",
+  "default_branch": "main",
+  "kind": "skill",
+  "capabilities": [
+    "robonix/skill/explore/driver",
+    "robonix/skill/explore/explore",
+    "robonix/skill/explore/explore/status",
+    "robonix/skill/explore/explore/cancel"
+  ]
+}

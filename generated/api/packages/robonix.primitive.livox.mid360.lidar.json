@@ -1,0 +1,20 @@
+{
+  "name": "robonix.primitive.livox.mid360.lidar",
+  "version": "0.1.0",
+  "description": "Livox MID-360 lidar driver wrapper.",
+  "tags": [
+    "primitive",
+    "lidar",
+    "livox",
+    "mid360",
+    "pointcloud"
+  ],
+  "repo": "https://github.com/syswonder/primitive-livox-mid360-lidar-rbnx",
+  "default_branch": "main",
+  "kind": "primitive",
+  "capabilities": [
+    "robonix/primitive/lidar/driver",
+    "robonix/primitive/lidar/lidar3d",
+    "robonix/primitive/lidar/lidar_snapshot"
+  ]
+}

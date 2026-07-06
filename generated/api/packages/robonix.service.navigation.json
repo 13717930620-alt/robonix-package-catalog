@@ -1,0 +1,20 @@
+{
+  "name": "robonix.service.navigation",
+  "version": "0.1.0",
+  "description": "Nav2 service wrapper exposing service/navigation/* over gRPC.",
+  "tags": [
+    "service",
+    "navigation",
+    "nav2",
+    "ros2"
+  ],
+  "repo": "https://github.com/syswonder/service-navigation-rbnx",
+  "default_branch": "main",
+  "kind": "service",
+  "capabilities": [
+    "robonix/service/navigation/driver",
+    "robonix/service/navigation/navigate",
+    "robonix/service/navigation/navigate/status",
+    "robonix/service/navigation/navigate/cancel"
+  ]
+}

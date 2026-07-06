@@ -1,0 +1,60 @@
+name: Package Catalog
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - catalog.yaml
+      - scripts/build_catalog.py
+      - .github/workflows/catalog.yml
+  pull_request:
+    paths:
+      - catalog.yaml
+      - scripts/build_catalog.py
+      - .github/workflows/catalog.yml
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+
+concurrency:
+  group: package-catalog-pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    name: Build package catalog
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: python -m pip install pyyaml
+      - name: Generate catalog
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: python scripts/build_catalog.py
+      - name: Commit generated catalog
+        if: github.event_name != 'pull_request'
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add README.md generated public
+          if git diff --cached --quiet; then
+            echo "generated catalog unchanged"
+            exit 0
+          fi
+          git commit -m "catalog: update generated package index [skip ci]"
+          git push
+      - uses: actions/configure-pages@v5
+        if: github.event_name != 'pull_request'
+      - uses: actions/upload-pages-artifact@v3
+        if: github.event_name != 'pull_request'
+        with:
+          path: public
+      - uses: actions/deploy-pages@v4
+        if: github.event_name != 'pull_request'

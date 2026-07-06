@@ -1,0 +1,153 @@
+{
+  "generated_at": "2026-07-06T11:34:59+00:00",
+  "packages": [
+    {
+      "name": "robonix.primitive.agilex.ranger_mini_v3.chassis",
+      "version": "0.1.0",
+      "description": "AgileX Ranger Mini chassis driver wrapper.",
+      "tags": [
+        "primitive",
+        "chassis",
+        "agilex",
+        "ranger_mini_v3",
+        "ros2"
+      ],
+      "repo": "https://github.com/syswonder/primitive-agilex-ranger_mini_v3-chassis-rbnx",
+      "default_branch": "main",
+      "kind": "primitive",
+      "capabilities": [
+        "robonix/primitive/chassis/driver",
+        "robonix/primitive/chassis/odom",
+        "robonix/primitive/chassis/twist_in"
+      ]
+    },
+    {
+      "name": "robonix.primitive.intel.realsense_d435i.camera",
+      "version": "0.1.0",
+      "description": "Intel RealSense D435i driver wrapper — declares RGB + depth + extrinsics contracts.",
+      "tags": [
+        "primitive",
+        "camera",
+        "intel",
+        "realsense_d435i",
+        "rgbd"
+      ],
+      "repo": "https://github.com/syswonder/primitive-intel-realsense_d435i-camera-rbnx",
+      "default_branch": "main",
+      "kind": "primitive",
+      "capabilities": [
+        "robonix/primitive/camera/driver",
+        "robonix/primitive/camera/rgb",
+        "robonix/primitive/camera/depth",
+        "robonix/primitive/camera/extrinsics",
+        "robonix/primitive/camera/snapshot",
+        "robonix/primitive/camera/depth_snapshot"
+      ]
+    },
+    {
+      "name": "robonix.primitive.livox.mid360.imu",
+      "version": "0.1.0",
+      "description": "Livox MID-360 IMU atlas wrapper — depends on mid360_lidar_rbnx.",
+      "tags": [
+        "primitive",
+        "imu",
+        "livox",
+        "mid360"
+      ],
+      "repo": "https://github.com/syswonder/primitive-livox-mid360-imu-rbnx",
+      "default_branch": "main",
+      "kind": "primitive",
+      "capabilities": [
+        "robonix/primitive/imu/driver",
+        "robonix/primitive/imu/imu"
+      ]
+    },
+    {
+      "name": "robonix.primitive.livox.mid360.lidar",
+      "version": "0.1.0",
+      "description": "Livox MID-360 lidar driver wrapper.",
+      "tags": [
+        "primitive",
+        "lidar",
+        "livox",
+        "mid360",
+        "pointcloud"
+      ],
+      "repo": "https://github.com/syswonder/primitive-livox-mid360-lidar-rbnx",
+      "default_branch": "main",
+      "kind": "primitive",
+      "capabilities": [
+        "robonix/primitive/lidar/driver",
+        "robonix/primitive/lidar/lidar3d",
+        "robonix/primitive/lidar/lidar_snapshot"
+      ]
+    },
+    {
+      "name": "robonix.service.mapping",
+      "version": "0.4.0",
+      "description": "SLAM mapping service. Algo + sensor inputs config-driven.",
+      "tags": [
+        "service",
+        "mapping",
+        "slam",
+        "rtabmap",
+        "ros2"
+      ],
+      "repo": "https://github.com/syswonder/service-map-rbnx",
+      "default_branch": "main",
+      "kind": "service",
+      "capabilities": [
+        "robonix/service/map/driver",
+        "robonix/service/map/occupancy_grid",
+        "robonix/service/map/pointcloud",
+        "robonix/service/map/pose",
+        "robonix/service/map/odom",
+        "robonix/service/map/save_map",
+        "robonix/service/map/load_map",
+        "robonix/service/map/pose_estimate",
+        "robonix/service/map/switch_mode"
+      ]
+    },
+    {
+      "name": "robonix.service.navigation",
+      "version": "0.1.0",
+      "description": "Nav2 service wrapper exposing service/navigation/* over gRPC.",
+      "tags": [
+        "service",
+        "navigation",
+        "nav2",
+        "ros2"
+      ],
+      "repo": "https://github.com/syswonder/service-navigation-rbnx",
+      "default_branch": "main",
+      "kind": "service",
+      "capabilities": [
+        "robonix/service/navigation/driver",
+        "robonix/service/navigation/navigate",
+        "robonix/service/navigation/navigate/status",
+        "robonix/service/navigation/navigate/cancel"
+      ]
+    },
+    {
+      "name": "robonix.skill.explore",
+      "version": "0.1.0",
+      "description": "Frontier-based autonomous exploration skill.",
+      "tags": [
+        "skill",
+        "explore",
+        "frontier",
+        "navigation",
+        "mapping"
+      ],
+      "repo": "https://github.com/syswonder/skill-explore-rbnx",
+      "default_branch": "main",
+      "kind": "skill",
+      "capabilities": [
+        "robonix/skill/explore/driver",
+        "robonix/skill/explore/explore",
+        "robonix/skill/explore/explore/status",
+        "robonix/skill/explore/explore/cancel"
+      ]
+    }
+  ]
+}

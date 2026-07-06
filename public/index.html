@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Robonix Package Catalog</title>
+  <style>
+    :root { color-scheme: light; }
+    body { font-family: Arial, sans-serif; margin: 0; color: #1f2933; background: #f6f7f9; }
+    header { background: #20252d; color: white; padding: 28px 32px; border-bottom: 4px solid #d2a64a; }
+    header h1 { font-size: 30px; margin: 0 0 6px; }
+    header p { margin: 0; color: #cbd5e1; }
+    main { margin: 24px auto 40px; max-width: 1180px; padding: 0 20px; }
+    .panel { background: white; border: 1px solid #d0d7de; border-radius: 6px; padding: 16px; }
+    .meta { color: #667085; margin-bottom: 12px; }
+    .api { display: flex; gap: 8px; flex-wrap: wrap; margin: 12px 0 16px; }
+    .api a { background: #eef2f6; color: #1f2933; text-decoration: none; padding: 5px 8px; border-radius: 4px; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 12px; }
+    input { width: min(720px, 100%); padding: 9px 11px; font-size: 14px; border: 1px solid #b8c0cc; border-radius: 4px; }
+    table { border-collapse: collapse; width: 100%; margin-top: 14px; font-size: 14px; background: white; }
+    th, td { border-bottom: 1px solid #d0d7de; padding: 9px; text-align: left; vertical-align: top; }
+    th { background: #f0f2f5; font-weight: 700; }
+    tr:hover { background: #fbfcfe; }
+    .tags span { display: inline-block; margin: 0 4px 4px 0; padding: 1px 6px; background: #eef2f6; border-radius: 3px; font-size: 12px; }
+    code { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Robonix Package Catalog</h1>
+    <p>Search Robonix packages by name, tag, capability, and repository.</p>
+  </header>
+  <main>
+    <section class="panel">
+      <div class="meta">Generated on 2026-07-06T11:34:59+00:00.</div>
+      <div class="api">
+        <a href="api/packages.json">api/packages.json</a>
+        <a href="api/search.json">api/search.json</a>
+      </div>
+      <input id="q" placeholder="Search by name, tag, description, capability, or repo">
+      <table id="packages">
+        <thead>
+          <tr><th>Name</th><th>Version</th><th>Kind</th><th>Description</th><th>Tags</th><th>Caps</th><th>Repo</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><a href="api/packages/robonix.primitive.agilex.ranger_mini_v3.chassis.json">robonix.primitive.agilex.ranger_mini_v3.chassis</a></td><td>0.1.0</td><td>primitive</td><td>AgileX Ranger Mini chassis driver wrapper.</td><td class="tags"><span>primitive</span> <span>chassis</span> <span>agilex</span> <span>ranger_mini_v3</span> <span>ros2</span></td><td>3</td><td><a href="https://github.com/syswonder/primitive-agilex-ranger_mini_v3-chassis-rbnx">repo</a></td></tr><tr><td><a href="api/packages/robonix.primitive.intel.realsense_d435i.camera.json">robonix.primitive.intel.realsense_d435i.camera</a></td><td>0.1.0</td><td>primitive</td><td>Intel RealSense D435i driver wrapper — declares RGB + depth + extrinsics contracts.</td><td class="tags"><span>primitive</span> <span>camera</span> <span>intel</span> <span>realsense_d435i</span> <span>rgbd</span></td><td>6</td><td><a href="https://github.com/syswonder/primitive-intel-realsense_d435i-camera-rbnx">repo</a></td></tr><tr><td><a href="api/packages/robonix.primitive.livox.mid360.imu.json">robonix.primitive.livox.mid360.imu</a></td><td>0.1.0</td><td>primitive</td><td>Livox MID-360 IMU atlas wrapper — depends on mid360_lidar_rbnx.</td><td class="tags"><span>primitive</span> <span>imu</span> <span>livox</span> <span>mid360</span></td><td>2</td><td><a href="https://github.com/syswonder/primitive-livox-mid360-imu-rbnx">repo</a></td></tr><tr><td><a href="api/packages/robonix.primitive.livox.mid360.lidar.json">robonix.primitive.livox.mid360.lidar</a></td><td>0.1.0</td><td>primitive</td><td>Livox MID-360 lidar driver wrapper.</td><td class="tags"><span>primitive</span> <span>lidar</span> <span>livox</span> <span>mid360</span> <span>pointcloud</span></td><td>3</td><td><a href="https://github.com/syswonder/primitive-livox-mid360-lidar-rbnx">repo</a></td></tr><tr><td><a href="api/packages/robonix.service.mapping.json">robonix.service.mapping</a></td><td>0.4.0</td><td>service</td><td>SLAM mapping service. Algo + sensor inputs config-driven.</td><td class="tags"><span>service</span> <span>mapping</span> <span>slam</span> <span>rtabmap</span> <span>ros2</span></td><td>9</td><td><a href="https://github.com/syswonder/service-map-rbnx">repo</a></td></tr><tr><td><a href="api/packages/robonix.service.navigation.json">robonix.service.navigation</a></td><td>0.1.0</td><td>service</td><td>Nav2 service wrapper exposing service/navigation/* over gRPC.</td><td class="tags"><span>service</span> <span>navigation</span> <span>nav2</span> <span>ros2</span></td><td>4</td><td><a href="https://github.com/syswonder/service-navigation-rbnx">repo</a></td></tr><tr><td><a href="api/packages/robonix.skill.explore.json">robonix.skill.explore</a></td><td>0.1.0</td><td>skill</td><td>Frontier-based autonomous exploration skill.</td><td class="tags"><span>skill</span> <span>explore</span> <span>frontier</span> <span>navigation</span> <span>mapping</span></td><td>4</td><td><a href="https://github.com/syswonder/skill-explore-rbnx">repo</a></td></tr>
+        </tbody>
+      </table>
+    </section>
+  </main>
+  <script>
+    const input = document.getElementById('q');
+    const rows = Array.from(document.querySelectorAll('#packages tbody tr'));
+    input.addEventListener('input', () => {
+      const q = input.value.toLowerCase();
+      for (const row of rows) {
+        row.style.display = row.textContent.toLowerCase().includes(q) ? '' : 'none';
+      }
+    });
+  </script>
+</body>
+</html>

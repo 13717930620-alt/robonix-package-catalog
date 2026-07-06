@@ -1,0 +1,15 @@
+packages:
+  - name: robonix.primitive.agilex.ranger_mini_v3.chassis
+    repo: https://github.com/syswonder/primitive-agilex-ranger_mini_v3-chassis-rbnx
+  - name: robonix.primitive.intel.realsense_d435i.camera
+    repo: https://github.com/syswonder/primitive-intel-realsense_d435i-camera-rbnx
+  - name: robonix.primitive.livox.mid360.lidar
+    repo: https://github.com/syswonder/primitive-livox-mid360-lidar-rbnx
+  - name: robonix.primitive.livox.mid360.imu
+    repo: https://github.com/syswonder/primitive-livox-mid360-imu-rbnx
+  - name: robonix.service.mapping
+    repo: https://github.com/syswonder/service-map-rbnx
+  - name: robonix.service.navigation
+    repo: https://github.com/syswonder/service-navigation-rbnx
+  - name: robonix.skill.explore
+    repo: https://github.com/syswonder/skill-explore-rbnx
