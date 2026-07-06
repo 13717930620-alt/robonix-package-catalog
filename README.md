@@ -13,7 +13,7 @@ Naming convention:
 
 | Repository | Robot / Deploy | Contract namespace | Notes |
 | --- | --- | --- | --- |
-| [robot-agilex-rangerminiv3](https://github.com/syswonder/robot-agilex-rangerminiv3) | AgileX Ranger Mini v3 deploy | deploy | Deploy manifest for Ranger Mini v3 with MID-360, RealSense D435i, mapping, navigation, and explore packages. |
+| [robot-wheeltec-r550](https://github.com/syswonder/robot-wheeltec-r550) | WHEELTEC R550 deploy | deploy | Deploy manifest for WHEELTEC R550 with MID-360, RealSense D435i, mapping, navigation, and explore packages. |
 | [robot-deeprobotics-lite3](https://github.com/syswonder/robot-deeprobotics-lite3) | DeepRobotics Lite3 deploy | deploy | Repository exists; deploy content is not populated yet. |
 
 ## Primitive Packages
