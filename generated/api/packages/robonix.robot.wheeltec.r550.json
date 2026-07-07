@@ -1,0 +1,98 @@
+{
+  "name": "robonix.robot.wheeltec.r550",
+  "version": "0.1.0",
+  "description": "Robonix deploy manifest for the WHEELTEC R550 robot.",
+  "tags": [
+    "robot",
+    "deploy",
+    "wheeltec",
+    "r550",
+    "lidar",
+    "camera",
+    "navigation",
+    "mapping"
+  ],
+  "repo": "https://github.com/syswonder/robot-wheeltec-r550",
+  "maintainers": [
+    "wheatfox <wheatfox17@icloud.com>"
+  ],
+  "repo_name": "robot-wheeltec-r550",
+  "default_branch": "main",
+  "kind": "robot",
+  "catalog_type": "robot",
+  "manifest": "robonix_manifest.yaml",
+  "capabilities": [],
+  "deploy_dependencies": [
+    {
+      "section": "primitive",
+      "name": "mid360_lidar",
+      "repo": "https://github.com/syswonder/primitive-livox-mid360-lidar-rbnx",
+      "path": "",
+      "branch": "main",
+      "manifest": "",
+      "package_name": "robonix.primitive.livox.mid360.lidar",
+      "package_url": "../robonix.primitive.livox.mid360.lidar/"
+    },
+    {
+      "section": "primitive",
+      "name": "mid360_imu",
+      "repo": "https://github.com/syswonder/primitive-livox-mid360-imu-rbnx",
+      "path": "",
+      "branch": "main",
+      "manifest": "",
+      "package_name": "robonix.primitive.livox.mid360.imu",
+      "package_url": "../robonix.primitive.livox.mid360.imu/"
+    },
+    {
+      "section": "primitive",
+      "name": "realsense_camera",
+      "repo": "https://github.com/syswonder/primitive-intel-realsense_d435i-camera-rbnx",
+      "path": "",
+      "branch": "main",
+      "manifest": "",
+      "package_name": "robonix.primitive.intel.realsense_d435i.camera",
+      "package_url": "../robonix.primitive.intel.realsense_d435i.camera/"
+    },
+    {
+      "section": "primitive",
+      "name": "wheeltec_chassis",
+      "repo": "https://github.com/syswonder/primitive-wheeltec-r550-chassis-rbnx",
+      "path": "",
+      "branch": "main",
+      "manifest": "",
+      "package_name": "",
+      "package_url": ""
+    },
+    {
+      "section": "service",
+      "name": "mapping",
+      "repo": "https://github.com/syswonder/service-map-rbnx",
+      "path": "",
+      "branch": "main",
+      "manifest": "",
+      "package_name": "robonix.service.mapping",
+      "package_url": "../robonix.service.mapping/"
+    },
+    {
+      "section": "service",
+      "name": "nav2",
+      "repo": "https://github.com/syswonder/service-navigation-rbnx",
+      "path": "",
+      "branch": "main",
+      "manifest": "",
+      "package_name": "robonix.service.navigation",
+      "package_url": "../robonix.service.navigation/"
+    },
+    {
+      "section": "skill",
+      "name": "explore",
+      "repo": "https://github.com/syswonder/skill-explore-rbnx",
+      "path": "",
+      "branch": "main",
+      "manifest": "",
+      "package_name": "robonix.skill.explore",
+      "package_url": "../robonix.skill.explore/"
+    }
+  ],
+  "readme_url": "https://github.com/syswonder/robot-wheeltec-r550/blob/main/README.md"
+}

@@ -16,6 +16,8 @@
   "repo_name": "primitive-intel-realsense_d435i-camera-rbnx",
   "default_branch": "main",
   "kind": "primitive",
+  "catalog_type": "package",
+  "manifest": "package_manifest.yaml",
   "capabilities": [
     "robonix/primitive/camera/driver",
     "robonix/primitive/camera/rgb",
@@ -24,5 +26,6 @@
     "robonix/primitive/camera/snapshot",
     "robonix/primitive/camera/depth_snapshot"
   ],
+  "deploy_dependencies": [],
   "readme_url": "https://github.com/syswonder/primitive-intel-realsense_d435i-camera-rbnx/blob/main/README.md"
 }

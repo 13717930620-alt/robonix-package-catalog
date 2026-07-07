@@ -105,16 +105,20 @@
     .api-reference {
       margin-top: 14px;
       padding: 18px;
+      font-size: 14px;
+      line-height: 1.45;
     }
-    .api-reference h2 { margin: 0 0 8px; }
-    .api-reference p { margin: 0 0 10px; }
+    .api-reference h2 { margin: 0 0 8px; font-size: 16px; line-height: 1.3; }
+    .api-reference p { margin: 0 0 10px; font-size: 14px; line-height: 1.45; }
     .api-reference table {
       margin: 10px 0 12px;
       width: 100%;
+      font-size: 13px;
     }
     .api-reference td,
     .api-reference th {
       vertical-align: top;
+      padding: 7px 8px;
     }
     .api-reference pre {
       margin: 0;
@@ -122,8 +126,11 @@
       border: 1px solid var(--line);
       background: #f8fafc;
       border-radius: 6px;
-      padding: 12px;
+      padding: 10px;
+      font-size: 12px;
+      line-height: 1.45;
     }
+    .api-reference code { font-size: 0.92em; }
     .muted { color: var(--muted); }
     .toolbar { display: flex; justify-content: flex-end; align-items: center; margin-bottom: 10px; }
     .search {
@@ -225,6 +232,11 @@
       overflow-wrap: anywhere;
       margin: 0;
     }
+    .cap-list li span {
+      color: var(--muted);
+      display: inline-block;
+      min-width: 64px;
+    }
     .back { display: inline-block; margin: 14px 0; color: var(--accent); }
     .generated { color: var(--muted); margin-top: 12px; font-size: 13px; }
     footer {
@@ -273,7 +285,7 @@
 </head>
 <body>
   <header class="shell">
-    <a class="back" href="../../">Back to catalog</a>
+    <a class="back" href="../">Back to packages</a>
     <h1>robonix.skill.explore</h1>
     <p class="lede">Frontier-based autonomous exploration skill.</p>
   </header>
@@ -325,9 +337,11 @@ will include <code>robonix/skill/explore/{explore, status, cancel}</code>.</p>
         <div class="kv">
           <div>Version</div><div><code>0.1.0</code></div>
           <div>Kind</div><div>skill</div>
+          <div>Type</div><div>package</div>
           <div>Maintainers</div><div>wheatfox &lt;wheatfox17@icloud.com&gt;</div>
           <div>Repository</div><div><a href="https://github.com/syswonder/skill-explore-rbnx">skill-explore-rbnx</a></div>
           <div>Branch</div><div><code>main</code></div>
+          <div>Manifest</div><div><code>package_manifest.yaml</code></div>
           <div>API</div><div><a href="../../api/v1/package/robonix.skill.explore">package metadata</a></div>
         </div>
         <div class="tags"><button class="tag tag-gold" data-tag="skill">skill</button> <button class="tag tag-gold" data-tag="explore">explore</button> <button class="tag tag-gray" data-tag="frontier">frontier</button> <button class="tag tag-green" data-tag="navigation">navigation</button> <button class="tag tag-blue" data-tag="mapping">mapping</button></div>
@@ -341,6 +355,6 @@ will include <code>robonix/skill/explore/{explore, status, cancel}</code>.</p>
       </aside>
     </div>
   </main>
-  <footer class="shell">Generated on 2026-07-06T13:45:48+00:00.</footer>
+  <footer class="shell">Generated on 2026-07-07T08:13:26+00:00.</footer>
 </body>
 </html>

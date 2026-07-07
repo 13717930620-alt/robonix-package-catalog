@@ -1,0 +1,408 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>robonix.robot.wheeltec.r550 - Robonix Package Catalog</title>
+  <link rel="stylesheet" href="../../assets/vendor/pico/pico.classless.min.css">
+  <style>
+
+    :root {
+      color-scheme: light;
+      --pico-font-family: Arial, Helvetica, sans-serif;
+      --pico-border-radius: 6px;
+      --pico-spacing: 0.75rem;
+      --bg: #ffffff;
+      --paper: #ffffff;
+      --soft: #f7f7f8;
+      --ink: #111827;
+      --muted: #667085;
+      --line: #e5e7eb;
+      --line-strong: #d0d5dd;
+      --accent: #2563eb;
+      --shadow: 0 1px 2px rgba(16, 24, 40, 0.04);
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      color: var(--ink);
+      background: var(--bg);
+      font-family: Arial, Helvetica, sans-serif;
+      font-size: 15px;
+      letter-spacing: 0;
+    }
+    a { color: var(--accent); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    .shell {
+      width: min(100% - 48px, 1180px);
+      max-width: 1180px;
+      margin: 0 auto;
+    }
+    header {
+      color: var(--ink);
+      border-bottom: 1px solid var(--line);
+      margin-bottom: 0;
+    }
+    header.shell { padding-block: 14px; }
+    .topline { display: flex; justify-content: space-between; gap: 16px; align-items: center; }
+    .brand { font-weight: 700; font-size: 18px; letter-spacing: 0; }
+    .api-links { display: flex; gap: 8px; flex-wrap: wrap; justify-content: flex-end; }
+    .api-links a {
+      color: #344054;
+      border: 1px solid var(--line);
+      background: var(--soft);
+      border-radius: 6px;
+      padding: 7px 9px;
+      font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      font-size: 12px;
+    }
+    h1 {
+      margin: 0;
+      font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      font-size: 22px;
+      line-height: 1.35;
+      letter-spacing: 0;
+      overflow-wrap: anywhere;
+      word-break: break-word;
+    }
+    .lede { color: var(--muted); max-width: 720px; margin: 8px 0 0; line-height: 1.55; font-size: 15px; }
+    main.shell { padding-block: 0 34px; }
+    .search-strip { padding: 16px 0 14px; }
+    .catalog-frame {
+      display: grid;
+      grid-template-columns: 265px 1fr;
+      gap: 14px;
+      align-items: start;
+    }
+    .panel {
+      background: var(--paper);
+      border: 1px solid var(--line);
+      box-shadow: var(--shadow);
+      border-radius: 8px;
+      overflow: hidden;
+      margin-bottom: 0;
+    }
+    .filters { padding: 14px; position: sticky; top: 14px; }
+    .filters h2, .content h2 { margin: 0 0 9px; font-size: 15px; }
+    .stat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 7px; margin-bottom: 14px; }
+    .stat { border: 1px solid var(--line); border-radius: 6px; padding: 8px; background: var(--soft); }
+    .stat strong { display: block; font-size: 20px; line-height: 1.15; }
+    .stat span { color: var(--muted); font-size: 12px; }
+    .filter-group { border-top: 1px solid var(--line); padding-top: 11px; margin-top: 11px; }
+    .filter-buttons { display: flex; gap: 6px; flex-wrap: wrap; }
+    .filter-button {
+      border: 1px solid var(--line);
+      background: #fff;
+      color: var(--ink);
+      border-radius: 999px;
+      padding: 5px 9px;
+      cursor: pointer;
+      font-size: 13px;
+      margin: 0;
+    }
+    .filter-button.active { background: #1f2933; color: #fff; border-color: #1f2933; }
+    .content { padding: 14px; min-width: 0; }
+    .api-reference {
+      margin-top: 14px;
+      padding: 18px;
+      font-size: 14px;
+      line-height: 1.45;
+    }
+    .api-reference h2 { margin: 0 0 8px; font-size: 16px; line-height: 1.3; }
+    .api-reference p { margin: 0 0 10px; font-size: 14px; line-height: 1.45; }
+    .api-reference table {
+      margin: 10px 0 12px;
+      width: 100%;
+      font-size: 13px;
+    }
+    .api-reference td,
+    .api-reference th {
+      vertical-align: top;
+      padding: 7px 8px;
+    }
+    .api-reference pre {
+      margin: 0;
+      overflow-x: auto;
+      border: 1px solid var(--line);
+      background: #f8fafc;
+      border-radius: 6px;
+      padding: 10px;
+      font-size: 12px;
+      line-height: 1.45;
+    }
+    .api-reference code { font-size: 0.92em; }
+    .muted { color: var(--muted); }
+    .toolbar { display: flex; justify-content: flex-end; align-items: center; margin-bottom: 10px; }
+    .search {
+      width: min(620px, 100%);
+      border: 1px solid var(--line-strong);
+      background: #fff;
+      border-radius: 6px;
+      padding: 9px 11px;
+      font-size: 15px;
+      margin: 0;
+    }
+    .count { color: var(--muted); white-space: nowrap; }
+    .package-list { display: grid; gap: 9px; }
+    .package-card {
+      border: 1px solid var(--line);
+      background: #fff;
+      border-radius: 7px;
+      padding: 12px;
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 12px;
+      margin: 0;
+    }
+    .package-title { display: flex; gap: 8px; align-items: baseline; flex-wrap: wrap; margin-bottom: 5px; }
+    .package-title a {
+      font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      font-size: 16px;
+      font-weight: 700;
+      color: #152238;
+    }
+    .version {
+      font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      color: var(--muted);
+      font-size: 12px;
+      border: 1px solid var(--line);
+      border-radius: 4px;
+      padding: 2px 5px;
+      background: var(--soft);
+    }
+    .description { color: #343941; margin: 0 0 8px; line-height: 1.38; }
+    .meta-line { color: var(--muted); font-size: 13px; display: flex; gap: 14px; flex-wrap: wrap; }
+    .meta-line code { font-size: 12px; }
+    .card-actions { display: flex; gap: 8px; align-items: start; }
+    .card-actions a {
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      padding: 6px 8px;
+      background: var(--soft);
+      color: #29303a;
+      font-size: 13px;
+      margin: 0;
+    }
+    .tags { display: flex; gap: 5px; flex-wrap: wrap; margin-top: 8px; }
+    .tag {
+      border: 0;
+      border-radius: 999px;
+      padding: 3px 7px;
+      font-size: 12px;
+      cursor: pointer;
+      color: #1c2732;
+      margin: 0;
+    }
+    .tag-blue { background: #dcecf7; color: #164965; }
+    .tag-green { background: #dff0df; color: #23562a; }
+    .tag-gold { background: #f3e6bd; color: #6b4b10; }
+    .tag-cyan { background: #d8f0f0; color: #165456; }
+    .tag-purple { background: #eadff4; color: #4d2d68; }
+    .tag-slate { background: #e4e8ee; color: #344052; }
+    .tag-red { background: #f5ded8; color: #7b2c1f; }
+    .tag-gray { background: #ece8df; color: #4a4b4d; }
+    .detail-layout {
+      display: grid;
+      grid-template-columns: 1fr 340px;
+      gap: 14px;
+      align-items: start;
+      margin-top: 16px;
+    }
+    .detail-main, .detail-side { padding: 14px; }
+    .detail-main h2, .detail-side h2 { margin: 0 0 10px; font-size: 18px; }
+    .detail-side h2:not(:first-child) { margin-top: 16px; }
+    .kv {
+      display: grid;
+      grid-template-columns: 92px minmax(0, 1fr);
+      gap: 4px 10px;
+      font-size: 14px;
+      line-height: 1.32;
+      margin: 0 0 10px;
+    }
+    .kv div:nth-child(odd) { color: var(--muted); }
+    .kv div:nth-child(even) { min-width: 0; overflow-wrap: anywhere; }
+    .cap-list { margin: 0; padding-left: 0; list-style: none; display: grid; gap: 5px; }
+    .cap-list li {
+      font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      font-size: 13px;
+      border: 1px solid var(--line);
+      background: var(--soft);
+      border-radius: 5px;
+      padding: 6px 7px;
+      overflow-wrap: anywhere;
+      margin: 0;
+    }
+    .cap-list li span {
+      color: var(--muted);
+      display: inline-block;
+      min-width: 64px;
+    }
+    .back { display: inline-block; margin: 14px 0; color: var(--accent); }
+    .generated { color: var(--muted); margin-top: 12px; font-size: 13px; }
+    footer {
+      color: var(--muted);
+      font-size: 12px;
+    }
+    footer.shell { padding-block: 18px 28px; }
+    .readme {
+      line-height: 1.58;
+      color: #1f2937;
+      overflow-wrap: anywhere;
+    }
+    .readme h1 { font-size: 24px; margin-bottom: 10px; }
+    .readme h2 { font-size: 19px; border-bottom: 1px solid var(--line); padding-bottom: 6px; margin: 22px 0 10px; }
+    .readme h3 { font-size: 16px; margin: 18px 0 8px; }
+    .readme p, .readme ul, .readme ol { margin-bottom: 10px; }
+    .readme pre {
+      overflow: auto;
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      background: #f8fafc;
+      padding: 10px;
+      max-width: 100%;
+    }
+    .readme code {
+      background: #f1f5f9;
+      border-radius: 4px;
+      padding: 1px 4px;
+      font-size: 0.92em;
+    }
+    .readme pre code { background: transparent; padding: 0; }
+    .readme table { border-collapse: collapse; width: 100%; display: block; overflow-x: auto; }
+    .readme th, .readme td { border: 1px solid var(--line); padding: 6px 8px; }
+    code { font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
+    @media (max-width: 860px) {
+      .shell { width: min(100% - 28px, 1180px); }
+      .catalog-frame, .detail-layout { grid-template-columns: 1fr; }
+      .filters { position: static; }
+      .toolbar { align-items: stretch; flex-direction: column; }
+      .package-card { grid-template-columns: 1fr; }
+      .card-actions { justify-content: flex-start; }
+      .api-reference { padding: 16px; }
+    }
+    
+  </style>
+</head>
+<body>
+  <header class="shell">
+    <a class="back" href="../">Back to robots</a>
+    <h1>robonix.robot.wheeltec.r550</h1>
+    <p class="lede">Robonix deploy manifest for the WHEELTEC R550 robot.</p>
+  </header>
+  <main class="shell">
+    <div class="detail-layout">
+      <section class="panel detail-main">
+        <h2>README</h2>
+        <article class="readme">
+          <h1>wheeltec_r550_deploy</h1>
+<p>Robonix deploy manifest for the WHEELTEC R550 robot at SysWonder lab.</p>
+<p>Hardware: Jetson Orin (aarch64, Tegra-special CUDA stack), WHEELTEC R550 chassis, Livox MID-360 3D LiDAR + integrated 6-axis IMU (Ethernet), Intel RealSense D435i RGBD camera (USB 3.0, with internal IMU).</p>
+<h2>Packages</h2>
+<p>All package URLs in <code>robonix_manifest.yaml</code> resolve from the SysWonder GitHub organization:</p>
+<table>
+<thead>
+<tr>
+<th>Package</th>
+<th>Repo</th>
+<th>Owns</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>mid360_lidar_rbnx</code></td>
+<td>syswonder/primitive-livox-mid360-lidar-rbnx</td>
+<td>primitive/lidar/*</td>
+</tr>
+<tr>
+<td><code>mid360_imu_rbnx</code></td>
+<td>syswonder/primitive-livox-mid360-imu-rbnx</td>
+<td>primitive/imu/*</td>
+</tr>
+<tr>
+<td><code>realsense_camera_rbnx</code></td>
+<td>syswonder/primitive-intel-realsense_d435i-camera-rbnx</td>
+<td>primitive/camera/*</td>
+</tr>
+<tr>
+<td><code>wheeltec_chassis_rbnx</code></td>
+<td>syswonder/primitive-wheeltec-r550-chassis-rbnx</td>
+<td>primitive/chassis/*</td>
+</tr>
+<tr>
+<td><code>mapping_rbnx</code></td>
+<td>syswonder/service-map-rbnx</td>
+<td>service/map/*</td>
+</tr>
+</tbody>
+</table>
+<pre><code class="language-bash"># on the Jetson, in this directory:
+rbnx build .         # clones each url: package and runs its build.sh
+rbnx boot  .         # spawns each one and runs Driver(CMD_INIT, config)
+</code></pre>
+<p><code>rbnx build</code> writes everything to <code>rbnx-build/cache/&lt;name&gt;/</code> so the original working dir on the Jetson is never touched.</p>
+<h2>URDF — required, not shipped</h2>
+<p>Soma needs a WHEELTEC R550 URDF (<code>urdf_path</code> in the system.soma block). The URDF must include <code>base_link</code> (chassis frame; convention: ground projection of the geometric centre, X forward, Z up), <code>livox_frame</code> mount transform from <code>base_link</code>, and <code>camera_link</code> + <code>camera_color_optical_frame</code> mount transforms.</p>
+<p>Until a calibrated URDF is in hand, an interim path is to launch <code>static_transform_publisher</code> for each frame manually. Sketch (drop in a side-launch, replace x y z and roll pitch yaw with your measured mount values):</p>
+<pre><code class="language-xml">&lt;launch&gt;
+  &lt;node pkg=&quot;tf2_ros&quot; exec=&quot;static_transform_publisher&quot; name=&quot;tf_lidar&quot;
+        args=&quot;0.20 0 0.40  0 0 0  base_link livox_frame&quot;/&gt;
+  &lt;node pkg=&quot;tf2_ros&quot; exec=&quot;static_transform_publisher&quot; name=&quot;tf_camera&quot;
+        args=&quot;0.30 0 0.35  0 0 0  base_link camera_link&quot;/&gt;
+&lt;/launch&gt;
+</code></pre>
+<p>Then leave <code>system.soma</code> commented out in the manifest until the URDF is ready, and run that side-launch in another shell.</p>
+<h2>Verifying the bring-up</h2>
+<p>After <code>rbnx boot</code>:</p>
+<pre><code class="language-bash">ros2 topic hz /scanner/cloud   # ~10 Hz lidar PointCloud2
+ros2 topic hz /livox/imu       # ~200 Hz sensor_msgs/Imu
+ros2 topic hz /camera_435i/color/image_raw                    # ~30 Hz
+ros2 topic hz /camera_435i/aligned_depth_to_color/image_raw   # ~30 Hz
+ros2 topic hz /map             # 1 Hz-ish OccupancyGrid (from rtabmap)
+ros2 topic echo /robonix/map/pose --once
+rbnx caps                      # all the contracts above should be listed
+</code></pre>
+<p>Open RViz and load the rtabmap visualization config to see the map build up.</p>
+<h2>Defer / boot sequencing</h2>
+<p>The deploy manifest is an unordered list. Boot ordering happens at runtime via the defer protocol: a package whose dep isn't ready returns <code>Driver_Response(state="deferred")</code> and <code>rbnx boot</code> retries it periodically until the system reaches steady state. There's no explicit dep graph in the manifest — each package only declares what it needs at the moment its Init runs.</p>
+<p>Concretely, the cascade for this stack:</p>
+<pre><code>mid360_lidar.Init    →  spawns livox driver, declares lidar3d
+                        (also makes /livox/imu live on the bus)
+mid360_imu.Init      →  defers if /livox/imu silent; succeeds on retry
+                        once mid360_lidar's launch is publishing
+realsense_camera.Init→  spawns realsense, declares rgb + depth
+mapping.Init         →  queries atlas for lidar3d, rgb, depth, imu;
+                        defers any not yet present; succeeds when all are
+</code></pre>
+<h2>License</h2>
+<p>Manifest + this README: MulanPSL-2.0. Each <code>url:</code> package retains its own license.</p>
+        </article>
+      </section>
+      <aside class="panel detail-side">
+        <h2>Package</h2>
+        <div class="kv">
+          <div>Version</div><div><code>0.1.0</code></div>
+          <div>Kind</div><div>robot</div>
+          <div>Type</div><div>robot</div>
+          <div>Maintainers</div><div>wheatfox &lt;wheatfox17@icloud.com&gt;</div>
+          <div>Repository</div><div><a href="https://github.com/syswonder/robot-wheeltec-r550">robot-wheeltec-r550</a></div>
+          <div>Branch</div><div><code>main</code></div>
+          <div>Manifest</div><div><code>robonix_manifest.yaml</code></div>
+          <div>API</div><div><a href="../../api/v1/package/robonix.robot.wheeltec.r550">package metadata</a></div>
+        </div>
+        <div class="tags"><button class="tag tag-red" data-tag="robot">robot</button> <button class="tag tag-slate" data-tag="deploy">deploy</button> <button class="tag tag-gray" data-tag="wheeltec">wheeltec</button> <button class="tag tag-gray" data-tag="r550">r550</button> <button class="tag tag-purple" data-tag="lidar">lidar</button> <button class="tag tag-cyan" data-tag="camera">camera</button> <button class="tag tag-green" data-tag="navigation">navigation</button> <button class="tag tag-blue" data-tag="mapping">mapping</button></div>
+        <h2>Deployment Packages</h2>
+        <ul class="cap-list">
+          <li><span>primitive</span> <code>mid360_lidar</code><br><a href="../../packages/robonix.primitive.livox.mid360.lidar/">robonix.primitive.livox.mid360.lidar</a></li>
+<li><span>primitive</span> <code>mid360_imu</code><br><a href="../../packages/robonix.primitive.livox.mid360.imu/">robonix.primitive.livox.mid360.imu</a></li>
+<li><span>primitive</span> <code>realsense_camera</code><br><a href="../../packages/robonix.primitive.intel.realsense_d435i.camera/">robonix.primitive.intel.realsense_d435i.camera</a></li>
+<li><span>primitive</span> <code>wheeltec_chassis</code><br><a href="https://github.com/syswonder/primitive-wheeltec-r550-chassis-rbnx">https://github.com/syswonder/primitive-wheeltec-r550-chassis-rbnx</a></li>
+<li><span>service</span> <code>mapping</code><br><a href="../../packages/robonix.service.mapping/">robonix.service.mapping</a></li>
+<li><span>service</span> <code>nav2</code><br><a href="../../packages/robonix.service.navigation/">robonix.service.navigation</a></li>
+<li><span>skill</span> <code>explore</code><br><a href="../../packages/robonix.skill.explore/">robonix.skill.explore</a></li>
+        </ul>
+      </aside>
+    </div>
+  </main>
+  <footer class="shell">Generated on 2026-07-07T08:13:26+00:00.</footer>
+</body>
+</html>

@@ -1,6 +1,6 @@
 {
   "api_version": "1",
-  "generated_at": "2026-07-06T13:45:48+00:00",
+  "generated_at": "2026-07-07T08:13:26+00:00",
   "packages": [
     {
       "name": "robonix.primitive.agilex.ranger_mini_v3.chassis",
@@ -20,11 +20,14 @@
       "repo_name": "primitive-agilex-ranger_mini_v3-chassis-rbnx",
       "default_branch": "main",
       "kind": "primitive",
+      "catalog_type": "package",
+      "manifest": "package_manifest.yaml",
       "capabilities": [
         "robonix/primitive/chassis/driver",
         "robonix/primitive/chassis/odom",
         "robonix/primitive/chassis/twist_in"
       ],
+      "deploy_dependencies": [],
       "readme_url": "https://github.com/syswonder/primitive-agilex-ranger_mini_v3-chassis-rbnx/blob/main/README.md"
     },
     {
@@ -45,6 +48,8 @@
       "repo_name": "primitive-intel-realsense_d435i-camera-rbnx",
       "default_branch": "main",
       "kind": "primitive",
+      "catalog_type": "package",
+      "manifest": "package_manifest.yaml",
       "capabilities": [
         "robonix/primitive/camera/driver",
         "robonix/primitive/camera/rgb",
@@ -53,6 +58,7 @@
         "robonix/primitive/camera/snapshot",
         "robonix/primitive/camera/depth_snapshot"
       ],
+      "deploy_dependencies": [],
       "readme_url": "https://github.com/syswonder/primitive-intel-realsense_d435i-camera-rbnx/blob/main/README.md"
     },
     {
@@ -72,10 +78,13 @@
       "repo_name": "primitive-livox-mid360-imu-rbnx",
       "default_branch": "main",
       "kind": "primitive",
+      "catalog_type": "package",
+      "manifest": "package_manifest.yaml",
       "capabilities": [
         "robonix/primitive/imu/driver",
         "robonix/primitive/imu/imu"
       ],
+      "deploy_dependencies": [],
       "readme_url": "https://github.com/syswonder/primitive-livox-mid360-imu-rbnx/blob/main/README.md"
     },
     {
@@ -96,11 +105,14 @@
       "repo_name": "primitive-livox-mid360-lidar-rbnx",
       "default_branch": "main",
       "kind": "primitive",
+      "catalog_type": "package",
+      "manifest": "package_manifest.yaml",
       "capabilities": [
         "robonix/primitive/lidar/driver",
         "robonix/primitive/lidar/lidar3d",
         "robonix/primitive/lidar/lidar_snapshot"
       ],
+      "deploy_dependencies": [],
       "readme_url": "https://github.com/syswonder/primitive-livox-mid360-lidar-rbnx/blob/main/README.md"
     },
     {
@@ -121,6 +133,8 @@
       "repo_name": "service-map-rbnx",
       "default_branch": "main",
       "kind": "service",
+      "catalog_type": "package",
+      "manifest": "package_manifest.yaml",
       "capabilities": [
         "robonix/service/map/driver",
         "robonix/service/map/occupancy_grid",
@@ -132,6 +146,7 @@
         "robonix/service/map/pose_estimate",
         "robonix/service/map/switch_mode"
       ],
+      "deploy_dependencies": [],
       "readme_url": "https://github.com/syswonder/service-map-rbnx/blob/main/README.md"
     },
     {
@@ -151,12 +166,15 @@
       "repo_name": "service-navigation-rbnx",
       "default_branch": "main",
       "kind": "service",
+      "catalog_type": "package",
+      "manifest": "package_manifest.yaml",
       "capabilities": [
         "robonix/service/navigation/driver",
         "robonix/service/navigation/navigate",
         "robonix/service/navigation/navigate/status",
         "robonix/service/navigation/navigate/cancel"
       ],
+      "deploy_dependencies": [],
       "readme_url": "https://github.com/syswonder/service-navigation-rbnx/blob/main/README.md"
     },
     {
@@ -177,12 +195,15 @@
       "repo_name": "skill-explore-rbnx",
       "default_branch": "main",
       "kind": "skill",
+      "catalog_type": "package",
+      "manifest": "package_manifest.yaml",
       "capabilities": [
         "robonix/skill/explore/driver",
         "robonix/skill/explore/explore",
         "robonix/skill/explore/explore/status",
         "robonix/skill/explore/explore/cancel"
       ],
+      "deploy_dependencies": [],
       "readme_url": "https://github.com/syswonder/skill-explore-rbnx/blob/main/README.md"
     }
   ]

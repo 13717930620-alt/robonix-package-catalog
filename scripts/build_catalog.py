@@ -69,17 +69,17 @@ def load_remote_text(owner: str, repo: str, path: str, branch: str, *, required:
     return base64.b64decode(content["content"]).decode("utf-8")
 
 
-def load_remote_package(repo_url: str) -> tuple[str, dict, str]:
+def load_remote_manifest(repo_url: str, manifest_path: str) -> tuple[str, dict, str]:
     owner, repo = parse_repo(repo_url)
     meta = github_json(f"https://api.github.com/repos/{owner}/{repo}")
     branch = meta.get("default_branch")
     if not branch:
         fail(f"{repo_url}: missing default_branch")
-    raw = load_remote_text(owner, repo, "package_manifest.yaml", branch, required=True)
+    raw = load_remote_text(owner, repo, manifest_path, branch, required=True)
     try:
         manifest = yaml.safe_load(raw) or {}
     except yaml.YAMLError as e:
-        fail(f"{repo_url}: invalid package_manifest.yaml: {e}")
+        fail(f"{repo_url}: invalid {manifest_path}: {e}")
     readme = load_remote_text(owner, repo, "README.md", branch, required=False)
     return branch, manifest, readme
 
@@ -93,7 +93,19 @@ def read_catalog(path: Path) -> list[dict]:
     packages = raw.get("packages")
     if not isinstance(packages, list):
         fail("catalog.yaml must contain a top-level packages list")
-    return packages
+    robots = raw.get("robots") or []
+    if not isinstance(robots, list):
+        fail("catalog.yaml robots must be a list when present")
+    entries = []
+    for entry in packages:
+        if isinstance(entry, dict):
+            entry = {**entry, "_catalog_type": "package"}
+        entries.append(entry)
+    for entry in robots:
+        if isinstance(entry, dict):
+            entry = {**entry, "_catalog_type": "robot", "manifest": entry.get("manifest", "robonix_manifest.yaml")}
+        entries.append(entry)
+    return entries
 
 
 def norm_list(value, field: str, package_name: str) -> list[str]:
@@ -102,6 +114,71 @@ def norm_list(value, field: str, package_name: str) -> list[str]:
     if not isinstance(value, list) or not all(isinstance(x, str) for x in value):
         fail(f"{package_name}: {field} must be a list of strings")
     return value
+
+
+def validate_catalog_metadata(package_name: str, meta: dict, expected_name: str) -> tuple[str, str, list[str], list[str]]:
+    if not isinstance(meta, dict):
+        fail(f"{package_name}: catalog metadata must be a mapping")
+    manifest_name = meta.get("name")
+    version = meta.get("version")
+    description = meta.get("description")
+    tags = meta.get("tags")
+    maintainers = meta.get("maintainers")
+    if manifest_name != expected_name:
+        fail(f"{package_name}: manifest catalog name is {manifest_name!r}, expected {expected_name!r}")
+    if not isinstance(version, str) or not version.strip():
+        fail(f"{package_name}: version is required")
+    if not isinstance(description, str) or not description.strip():
+        fail(f"{package_name}: description is required")
+    tags = norm_list(tags, "tags", package_name)
+    maintainers = norm_list(maintainers, "maintainers", package_name)
+    if not maintainers:
+        fail(f"{package_name}: maintainers is required")
+    for maintainer in maintainers:
+        if not MAINTAINER_RE.match(maintainer):
+            fail(
+                f"{package_name}: maintainers entries must use 'Name <email@domain>' format: {maintainer!r}"
+            )
+    return version, description, tags, maintainers
+
+
+def collect_capabilities(package_name: str, manifest: dict) -> list[str]:
+    capabilities = manifest.get("capabilities") or []
+    cap_names = []
+    if not isinstance(capabilities, list):
+        fail(f"{package_name}: capabilities must be a list")
+    for cap in capabilities:
+        if isinstance(cap, dict) and isinstance(cap.get("name"), str):
+            cap_names.append(cap["name"])
+        else:
+            fail(f"{package_name}: each capability must contain name")
+    return cap_names
+
+
+def collect_deploy_dependencies(package_name: str, manifest: dict) -> list[dict]:
+    deps = []
+    for section in ("primitive", "service", "skill"):
+        entries = manifest.get(section) or []
+        if not isinstance(entries, list):
+            fail(f"{package_name}: deploy section {section} must be a list")
+        for item in entries:
+            if not isinstance(item, dict):
+                fail(f"{package_name}: deploy section {section} entries must be mappings")
+            local_name = item.get("name")
+            repo = item.get("url")
+            path = item.get("path")
+            if not isinstance(local_name, str) or not local_name.strip():
+                fail(f"{package_name}: deploy dependency in {section} missing name")
+            dep = {
+                "section": section,
+                "name": local_name,
+                "repo": repo if isinstance(repo, str) else "",
+                "path": path if isinstance(path, str) else "",
+                "branch": item.get("branch") if isinstance(item.get("branch"), str) else "",
+                "manifest": item.get("manifest") if isinstance(item.get("manifest"), str) else "",
+            }
+            deps.append(dep)
+    return deps
 
 
 def collect(catalog_path: Path) -> list[dict]:
@@ -126,39 +203,25 @@ def collect(catalog_path: Path) -> list[dict]:
         seen_repos.add(repo)
 
         _, repo_name = parse_repo(repo)
-        branch, manifest, readme = load_remote_package(repo)
-        package = manifest.get("package")
-        if not isinstance(package, dict):
-            fail(f"{name}: package_manifest.yaml missing package mapping")
-        manifest_name = package.get("name")
-        version = package.get("version")
-        description = package.get("description")
-        tags = package.get("tags")
-        maintainers = package.get("maintainers")
-        if manifest_name != name:
-            fail(f"{name}: manifest package.name is {manifest_name!r}, expected {name!r}")
-        if not isinstance(version, str) or not version.strip():
-            fail(f"{name}: package.version is required")
-        if not isinstance(description, str) or not description.strip():
-            fail(f"{name}: package.description is required")
-        tags = norm_list(tags, "package.tags", name)
-        maintainers = norm_list(maintainers, "package.maintainers", name)
-        if not maintainers:
-            fail(f"{name}: package.maintainers is required")
-        for maintainer in maintainers:
-            if not MAINTAINER_RE.match(maintainer):
-                fail(
-                    f"{name}: package.maintainers entries must use 'Name <email@domain>' format: {maintainer!r}"
-                )
-        capabilities = manifest.get("capabilities") or []
-        cap_names = []
-        if not isinstance(capabilities, list):
-            fail(f"{name}: capabilities must be a list")
-        for cap in capabilities:
-            if isinstance(cap, dict) and isinstance(cap.get("name"), str):
-                cap_names.append(cap["name"])
-            else:
-                fail(f"{name}: each capability must contain name")
+        manifest_path = entry.get("manifest")
+        if manifest_path is None:
+            manifest_path = "robonix_manifest.yaml" if name.startswith("robonix.robot.") else "package_manifest.yaml"
+        if not isinstance(manifest_path, str) or not manifest_path.strip():
+            fail(f"{name}: manifest must be a non-empty string")
+        branch, manifest, readme = load_remote_manifest(repo, manifest_path)
+        catalog_type = entry.get("_catalog_type") or ("robot" if manifest_path == "robonix_manifest.yaml" or name.startswith("robonix.robot.") else "package")
+        if catalog_type == "robot":
+            meta = manifest.get("catalog")
+            version, description, tags, maintainers = validate_catalog_metadata(name, meta, name)
+            cap_names = []
+            deploy_dependencies = collect_deploy_dependencies(name, manifest)
+        else:
+            package = manifest.get("package")
+            if not isinstance(package, dict):
+                fail(f"{name}: package_manifest.yaml missing package mapping")
+            version, description, tags, maintainers = validate_catalog_metadata(name, package, name)
+            cap_names = collect_capabilities(name, manifest)
+            deploy_dependencies = []
         kind = name.split(".")[1] if name.startswith("robonix.") and "." in name else ""
         out.append(
             {
@@ -171,11 +234,21 @@ def collect(catalog_path: Path) -> list[dict]:
                 "repo_name": repo_name,
                 "default_branch": branch,
                 "kind": kind,
+                "catalog_type": catalog_type,
+                "manifest": manifest_path,
                 "capabilities": cap_names,
+                "deploy_dependencies": deploy_dependencies,
                 "readme_url": f"{repo}/blob/{branch}/README.md",
                 "_readme_markdown": readme,
             }
         )
+    repo_to_package = {p["repo"]: p["name"] for p in out}
+    name_to_slug = {p["name"]: package_slug(p["name"]) for p in out}
+    for package in out:
+        for dep in package.get("deploy_dependencies", []):
+            dep_name = repo_to_package.get(dep.get("repo", ""))
+            dep["package_name"] = dep_name or ""
+            dep["package_url"] = f"../{name_to_slug[dep_name]}/" if dep_name else ""
     out.sort(key=lambda x: x["name"])
     return out
 
@@ -200,6 +273,8 @@ def copy_assets(public_dir: Path) -> None:
 def tag_class(tag: str) -> str:
     known = {
         "primitive": "tag-blue",
+        "robot": "tag-red",
+        "deploy": "tag-slate",
         "service": "tag-green",
         "skill": "tag-gold",
         "camera": "tag-cyan",
@@ -321,16 +396,20 @@ def render_css() -> str:
     .api-reference {
       margin-top: 14px;
       padding: 18px;
+      font-size: 14px;
+      line-height: 1.45;
     }
-    .api-reference h2 { margin: 0 0 8px; }
-    .api-reference p { margin: 0 0 10px; }
+    .api-reference h2 { margin: 0 0 8px; font-size: 16px; line-height: 1.3; }
+    .api-reference p { margin: 0 0 10px; font-size: 14px; line-height: 1.45; }
     .api-reference table {
       margin: 10px 0 12px;
       width: 100%;
+      font-size: 13px;
     }
     .api-reference td,
     .api-reference th {
       vertical-align: top;
+      padding: 7px 8px;
     }
     .api-reference pre {
       margin: 0;
@@ -338,8 +417,11 @@ def render_css() -> str:
       border: 1px solid var(--line);
       background: #f8fafc;
       border-radius: 6px;
-      padding: 12px;
+      padding: 10px;
+      font-size: 12px;
+      line-height: 1.45;
     }
+    .api-reference code { font-size: 0.92em; }
     .muted { color: var(--muted); }
     .toolbar { display: flex; justify-content: flex-end; align-items: center; margin-bottom: 10px; }
     .search {
@@ -441,6 +523,11 @@ def render_css() -> str:
       overflow-wrap: anywhere;
       margin: 0;
     }
+    .cap-list li span {
+      color: var(--muted);
+      display: inline-block;
+      min-width: 64px;
+    }
     .back { display: inline-block; margin: 14px 0; color: var(--accent); }
     .generated { color: var(--muted); margin-top: 12px; font-size: 13px; }
     footer {
@@ -487,12 +574,18 @@ def render_css() -> str:
     """
 
 
-def render_site(public_dir: Path, generated_at: str, packages: list[dict]) -> None:
+def detail_base(package: dict) -> str:
+    return "robots" if package.get("catalog_type") == "robot" else "packages"
+
+
+def render_listing_page(public_dir: Path, generated_at: str, packages: list[dict], *, page: str, title: str, empty_label: str) -> None:
     cards = []
     kinds = sorted({p["kind"] for p in packages if p["kind"]})
     all_tags = sorted({t for p in packages for t in p["tags"]})
     for p in packages:
-        detail_href = f"packages/{html.escape(package_slug(p['name']))}/"
+        detail_href = f"{html.escape(package_slug(p['name']))}/"
+        unit_label = "dependencies" if p.get("catalog_type") == "robot" else "capabilities"
+        unit_count = len(p.get("deploy_dependencies", [])) if p.get("catalog_type") == "robot" else len(p.get("capabilities", []))
         search_text = " ".join(
             [
                 p["name"],
@@ -504,6 +597,7 @@ def render_site(public_dir: Path, generated_at: str, packages: list[dict]) -> No
             ]
             + p["tags"]
             + p["capabilities"]
+            + [d.get("name", "") for d in p.get("deploy_dependencies", [])]
         )
         cards.append(
             f"""<article class="package-card" data-kind="{html.escape(p['kind'])}" data-tags="{html.escape(' '.join(p['tags']))}" data-search="{html.escape(search_text.lower())}">
@@ -515,7 +609,7 @@ def render_site(public_dir: Path, generated_at: str, packages: list[dict]) -> No
           <p class="description">{html.escape(p['description'])}</p>
           <div class="meta-line">
             <span>maintainers <strong>{html.escape(', '.join(p['maintainers']))}</strong></span>
-            <span>{html.escape(str(len(p['capabilities'])))} capabilities</span>
+            <span>{html.escape(str(unit_count))} {html.escape(unit_label)}</span>
             <span><code>{html.escape(p['repo_name'])}</code></span>
           </div>
           <div class="tags">{render_tags(p['tags'])}</div>
@@ -536,14 +630,16 @@ def render_site(public_dir: Path, generated_at: str, packages: list[dict]) -> No
     )
     public_dir.mkdir(parents=True, exist_ok=True)
     copy_assets(public_dir)
-    (public_dir / "index.html").write_text(
+    page_dir = public_dir / page
+    page_dir.mkdir(parents=True, exist_ok=True)
+    page_dir.joinpath("index.html").write_text(
         f"""<!doctype html>
 <html lang="en" data-theme="light">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Robonix Package Catalog</title>
-  <link rel="stylesheet" href="assets/vendor/pico/pico.classless.min.css">
+  <title>{html.escape(title)} - Robonix Package Catalog</title>
+  <link rel="stylesheet" href="../assets/vendor/pico/pico.classless.min.css">
   <style>
 {render_css()}
   </style>
@@ -551,22 +647,23 @@ def render_site(public_dir: Path, generated_at: str, packages: list[dict]) -> No
 <body>
   <header class="shell">
     <div class="topline">
-      <div class="brand">Robonix Package Catalog</div>
+      <div class="brand"><a href="../">Robonix Package Catalog</a> / {html.escape(title)}</div>
       <nav class="api-links">
-        <a href="api/v1/packages">API: packages</a>
-        <a href="api/v1/search">API: search</a>
+        <a href="../packages/">Packages</a>
+        <a href="../robots/">Robot deployments</a>
+        <a href="../api/v1/packages">API</a>
       </nav>
     </div>
   </header>
   <main class="shell">
     <section class="search-strip">
-      <input class="search" id="q" placeholder="Search packages, capabilities, tags, maintainers">
+      <input class="search" id="q" placeholder="Search {html.escape(empty_label)}, tags, maintainers">
     </section>
     <div class="catalog-frame">
       <aside class="panel filters">
         <div class="stat-grid">
-          <div class="stat"><strong>{len(packages)}</strong><span>packages</span></div>
-          <div class="stat"><strong>{sum(len(p["capabilities"]) for p in packages)}</strong><span>capabilities</span></div>
+          <div class="stat"><strong>{len(packages)}</strong><span>{html.escape(empty_label)}</span></div>
+          <div class="stat"><strong>{sum(len(p.get("deploy_dependencies", [])) if p.get("catalog_type") == "robot" else len(p.get("capabilities", [])) for p in packages)}</strong><span>indexed items</span></div>
         </div>
         <div class="filter-group">
           <h2>Kind</h2>
@@ -632,7 +729,7 @@ const detail = await fetch(`${{base}}/package/${{encodeURIComponent('robonix.ser
         card.style.display = visible ? '' : 'none';
         if (visible) shown += 1;
       }}
-      count.textContent = shown + ' / ' + cards.length + ' packages';
+      count.textContent = shown + ' / ' + cards.length + ' {empty_label}';
     }}
     input.addEventListener('input', applyFilters);
     document.getElementById('kindFilters').addEventListener('click', (event) => {{
@@ -659,6 +756,78 @@ const detail = await fetch(`${{base}}/package/${{encodeURIComponent('robonix.ser
     }});
     applyFilters();
   </script>
+</body>
+</html>
+""",
+        encoding="utf-8",
+    )
+
+
+def render_site(public_dir: Path, generated_at: str, packages: list[dict]) -> None:
+    package_entries = [p for p in packages if p.get("catalog_type") != "robot"]
+    robot_entries = [p for p in packages if p.get("catalog_type") == "robot"]
+    public_dir.mkdir(parents=True, exist_ok=True)
+    copy_assets(public_dir)
+    render_listing_page(public_dir, generated_at, package_entries, page="packages", title="Packages", empty_label="packages")
+    render_listing_page(public_dir, generated_at, robot_entries, page="robots", title="Robot deployments", empty_label="robot deployments")
+    (public_dir / "index.html").write_text(
+        f"""<!doctype html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Robonix Package Catalog</title>
+  <link rel="stylesheet" href="assets/vendor/pico/pico.classless.min.css">
+  <style>
+{render_css()}
+  .entry-grid {{ display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; padding-top: 16px; }}
+  .entry-card {{ display: block; padding: 18px; color: var(--ink); }}
+  .entry-card:hover {{ text-decoration: none; border-color: var(--line-strong); }}
+  .entry-card h2 {{ margin: 0 0 8px; font-size: 18px; }}
+  .entry-card strong {{ font-size: 28px; line-height: 1; }}
+  @media (max-width: 760px) {{ .entry-grid {{ grid-template-columns: 1fr; }} }}
+  </style>
+</head>
+<body>
+  <header class="shell">
+    <div class="topline">
+      <div class="brand">Robonix Package Catalog</div>
+      <nav class="api-links">
+        <a href="packages/">Packages</a>
+        <a href="robots/">Robot deployments</a>
+        <a href="api/v1/packages">API: packages</a>
+      </nav>
+    </div>
+  </header>
+  <main class="shell">
+    <section class="entry-grid">
+      <a class="panel entry-card" href="packages/">
+        <h2>Packages</h2>
+        <p class="muted">Primitive, service, and skill repositories with capability contracts.</p>
+        <strong>{len(package_entries)}</strong>
+      </a>
+      <a class="panel entry-card" href="robots/">
+        <h2>Robot deployments</h2>
+        <p class="muted">Whole-robot deploy repositories built around robonix_manifest.yaml.</p>
+        <strong>{len(robot_entries)}</strong>
+      </a>
+    </section>
+    <section class="panel api-reference">
+      <h2>API Reference</h2>
+      <p class="muted">Static JSON API hosted by GitHub Pages. Use <code>GET</code>; no API key is required.</p>
+      <table>
+        <thead><tr><th>Method</th><th>Path</th><th>Response</th></tr></thead>
+        <tbody>
+          <tr><td><code>GET</code></td><td><code>/api/v1/packages</code></td><td>ordinary primitive/service/skill package entries</td></tr>
+          <tr><td><code>GET</code></td><td><code>/api/v1/robots</code></td><td>robot deployment entries parsed from robonix_manifest.yaml</td></tr>
+          <tr><td><code>GET</code></td><td><code>/api/v1/catalog</code></td><td>combined catalog object</td></tr>
+          <tr><td><code>GET</code></td><td><code>/api/v1/search</code></td><td>plain combined catalog array for client-side filtering</td></tr>
+          <tr><td><code>GET</code></td><td><code>/api/v1/package/&lt;name&gt;</code></td><td>one package or robot deployment object</td></tr>
+        </tbody>
+      </table>
+    </section>
+  </main>
+  <footer class="shell">Generated on {html.escape(generated_at)}.</footer>
 </body>
 </html>
 """,
@@ -706,9 +875,27 @@ def render_markdown(md: str) -> str:
 
 def render_package_pages(public_dir: Path, generated_at: str, packages: list[dict]) -> None:
     for p in packages:
-        package_dir = public_dir / "packages" / package_slug(p["name"])
+        base = detail_base(p)
+        package_dir = public_dir / base / package_slug(p["name"])
         package_dir.mkdir(parents=True, exist_ok=True)
-        cap_items = "\n".join(f"<li>{html.escape(cap)}</li>" for cap in p["capabilities"])
+        if p.get("catalog_type") == "robot":
+            cap_title = "Deployment Packages"
+            dep_items = []
+            for dep in p.get("deploy_dependencies", []):
+                dep_name = dep.get("package_name") or dep.get("repo") or dep.get("path") or dep.get("name")
+                if dep.get("package_name"):
+                    dep_label = f"<a href=\"../../packages/{html.escape(package_slug(dep['package_name']))}/\">{html.escape(dep['package_name'])}</a>"
+                elif dep.get("repo"):
+                    dep_label = f"<a href=\"{html.escape(dep['repo'])}\">{html.escape(dep['repo'])}</a>"
+                else:
+                    dep_label = html.escape(dep_name)
+                dep_items.append(
+                    f"<li><span>{html.escape(dep.get('section', ''))}</span> <code>{html.escape(dep.get('name', ''))}</code><br>{dep_label}</li>"
+                )
+            cap_items = "\n".join(dep_items)
+        else:
+            cap_title = "Capabilities"
+            cap_items = "\n".join(f"<li>{html.escape(cap)}</li>" for cap in p["capabilities"])
         readme_html = render_markdown(p.get("_readme_markdown", ""))
         package_dir.joinpath("index.html").write_text(
             f"""<!doctype html>
@@ -724,7 +911,7 @@ def render_package_pages(public_dir: Path, generated_at: str, packages: list[dic
 </head>
 <body>
   <header class="shell">
-    <a class="back" href="../../">Back to catalog</a>
+    <a class="back" href="../">Back to {html.escape(base)}</a>
     <h1>{html.escape(p['name'])}</h1>
     <p class="lede">{html.escape(p['description'])}</p>
   </header>
@@ -741,13 +928,15 @@ def render_package_pages(public_dir: Path, generated_at: str, packages: list[dic
         <div class="kv">
           <div>Version</div><div><code>{html.escape(p['version'])}</code></div>
           <div>Kind</div><div>{html.escape(p['kind'])}</div>
+          <div>Type</div><div>{html.escape(p['catalog_type'])}</div>
           <div>Maintainers</div><div>{html.escape(', '.join(p['maintainers']))}</div>
           <div>Repository</div><div><a href="{html.escape(p['repo'])}">{html.escape(p['repo_name'])}</a></div>
           <div>Branch</div><div><code>{html.escape(p['default_branch'])}</code></div>
+          <div>Manifest</div><div><code>{html.escape(p['manifest'])}</code></div>
           <div>API</div><div><a href="../../api/v1/package/{html.escape(p['name'])}">package metadata</a></div>
         </div>
         <div class="tags">{render_tags(p['tags'])}</div>
-        <h2>Capabilities</h2>
+        <h2>{html.escape(cap_title)}</h2>
         <ul class="cap-list">
           {cap_items}
         </ul>
@@ -770,25 +959,36 @@ def render_readme(path: Path, generated_at: str, packages: list[dict]) -> None:
         "",
         "This repository is the Robonix community package catalog.",
         "",
-        "Package source stays in each package's own GitHub repository. The only",
-        "manual catalog input is [`catalog.yaml`](catalog.yaml):",
+        "Package source and robot deployment manifests stay in their own GitHub",
+        "repositories. The only manual catalog input is the root-level",
+        "[`catalog.yaml`](catalog.yaml). Ordinary packages go under `packages:`;",
+        "whole-robot deploy repositories go under `robots:`:",
         "",
         "```yaml",
         "packages:",
         "  - name: robonix.service.mapping",
         "    repo: https://github.com/syswonder/service-map-rbnx",
+        "",
+        "robots:",
+        "  - name: robonix.robot.agilex.ranger_mini_v3",
+        "    repo: https://github.com/syswonder/robot-agilex-ranger_mini_v3",
         "```",
         "",
-        "To submit a community package, add one `name` + `repo` entry to",
-        "`catalog.yaml`. Do not edit generated files by hand.",
+        "To submit a community package or robot deployment, add one `name` + `repo`",
+        "entry to the correct section in `catalog.yaml`. Do not edit generated files by hand.",
         "",
         "## Website",
         "",
         "- Homepage: https://syswonder.github.io/robonix-package-catalog/",
+        "- Package page: https://syswonder.github.io/robonix-package-catalog/packages/",
+        "- Robot deployment page: https://syswonder.github.io/robonix-package-catalog/robots/",
+        "- Full catalog API: `GET https://syswonder.github.io/robonix-package-catalog/api/v1/catalog`",
         "- Package list API: `GET https://syswonder.github.io/robonix-package-catalog/api/v1/packages`",
+        "- Robot deployment API: `GET https://syswonder.github.io/robonix-package-catalog/api/v1/robots`",
         "- Search index API: `GET https://syswonder.github.io/robonix-package-catalog/api/v1/search`",
         "- Package detail API: `GET https://syswonder.github.io/robonix-package-catalog/api/v1/package/<package-name>`",
         "- Package detail page: `https://syswonder.github.io/robonix-package-catalog/packages/<package-name>/`",
+        "- Robot detail page: `https://syswonder.github.io/robonix-package-catalog/robots/<robot-name>/`",
         "",
         "The catalog is hosted on GitHub Pages, so these are static JSON resources",
         "with stable API-style paths. Clients should treat the shape below as the v1",
@@ -803,9 +1003,11 @@ def render_readme(path: Path, generated_at: str, packages: list[dict]) -> None:
         "",
         "| Method | Path | Parameters | Response |",
         "| --- | --- | --- | --- |",
-        "| `GET` | `/api/v1/packages` | none | catalog object with `api_version`, `generated_at`, and `packages[]` |",
-        "| `GET` | `/api/v1/search` | none | plain package array, intended for client-side search/filter indexes |",
-        "| `GET` | `/api/v1/package/<package-name>` | `package-name`: exact `package.name`, URL-encoded | one package object; missing packages return GitHub Pages `404` |",
+        "| `GET` | `/api/v1/catalog` | none | combined catalog object with both ordinary packages and robot deployments |",
+        "| `GET` | `/api/v1/packages` | none | ordinary primitive/service/skill packages only |",
+        "| `GET` | `/api/v1/robots` | none | robot deployment entries only |",
+        "| `GET` | `/api/v1/search` | none | plain combined catalog array, intended for client-side search/filter indexes |",
+        "| `GET` | `/api/v1/package/<package-name>` | `package-name`: exact catalog `name`, URL-encoded | one ordinary package or robot deployment object; missing entries return GitHub Pages `404` |",
         "",
         "Package object fields:",
         "",
@@ -819,8 +1021,11 @@ def render_readme(path: Path, generated_at: str, packages: list[dict]) -> None:
         "| `repo` | string | GitHub repository URL |",
         "| `repo_name` | string | repository name without owner |",
         "| `default_branch` | string | package repository default branch used for indexing |",
-        "| `kind` | string | `primitive`, `service`, or `skill` inferred from `package.name` |",
+        "| `kind` | string | `primitive`, `service`, `skill`, or `robot` inferred from catalog name |",
+        "| `catalog_type` | string | `package` for ordinary packages, `robot` for whole-robot deployments |",
+        "| `manifest` | string | source manifest path, usually `package_manifest.yaml` or `robonix_manifest.yaml` |",
         "| `capabilities` | string[] | declared Robonix contract IDs |",
+        "| `deploy_dependencies` | object[] | robot deployment dependencies parsed from `robonix_manifest.yaml` |",
         "| `readme_url` | string | GitHub README URL for the indexed branch |",
         "",
         "### JavaScript",
@@ -879,7 +1084,9 @@ def render_readme(path: Path, generated_at: str, packages: list[dict]) -> None:
         "}",
         "```",
         "",
-        "`GET /api/v1/search` returns the same package objects as a plain array.",
+        "`GET /api/v1/robots` returns robot deployments under a top-level `robots[]` field.",
+        "",
+        "`GET /api/v1/search` returns the combined catalog entries as a plain array.",
         "",
         "`GET /api/v1/package/<package-name>` returns one package object.",
         "",
@@ -898,16 +1105,43 @@ def render_readme(path: Path, generated_at: str, packages: list[dict]) -> None:
         "The `package.name` in `package_manifest.yaml` must exactly match the name in",
         "`catalog.yaml`.",
         "",
+        "## Robot Deployment Manifest",
+        "",
+        "Robot deployment repositories are indexed from root-level `robonix_manifest.yaml`.",
+        "They do not need a separate `package_manifest.yaml`. The catalog metadata lives",
+        "under a top-level `catalog:` block with the same fields as package metadata:",
+        "",
+        "```yaml",
+        "manifestVersion: 1",
+        "name: robonix-ranger-mini-deploy",
+        "catalog:",
+        "  name: robonix.robot.agilex.ranger_mini_v3",
+        "  version: 0.1.0",
+        "  description: Robonix deploy manifest for the AgileX Ranger Mini v3 robot.",
+        "  tags: [robot, deploy, agilex, ranger_mini_v3]",
+        "  maintainers:",
+        "    - wheatfox <wheatfox17@icloud.com>",
+        "```",
+        "",
+        "The builder also parses `primitive:`, `service:`, and `skill:` entries from",
+        "`robonix_manifest.yaml` into `deploy_dependencies[]`, linking dependencies",
+        "back to cataloged ordinary packages when their repository is known.",
+        "",
         "## Generated Outputs",
         "",
         "CI validates `catalog.yaml`, fetches every package manifest through the GitHub",
         "API, and generates:",
         "",
         "- `generated/api/v1/packages`",
+        "- `generated/api/v1/robots`",
+        "- `generated/api/v1/catalog`",
         "- `generated/api/v1/search`",
         "- `generated/api/v1/package/<package-name>`",
         "- `public/index.html`",
+        "- `public/packages/index.html`",
         "- `public/packages/<package-name>/index.html`",
+        "- `public/robots/index.html`",
+        "- `public/robots/<robot-name>/index.html`",
         "- `public/api/...`",
         "",
         "For compatibility, CI also writes `.json` aliases under `api/`, but new",
@@ -925,8 +1159,9 @@ def render_readme(path: Path, generated_at: str, packages: list[dict]) -> None:
     ]
     for package in packages:
         tags = ", ".join(package["tags"])
+        page_base = "robots" if package.get("catalog_type") == "robot" else "packages"
         lines.append(
-            f"| [`{package['name']}`](https://syswonder.github.io/robonix-package-catalog/packages/{package_slug(package['name'])}/) | `{package['version']}` | `{package['kind']}` | {', '.join(package['maintainers'])} | {tags} | [repo]({package['repo']}) |"
+            f"| [`{package['name']}`](https://syswonder.github.io/robonix-package-catalog/{page_base}/{package_slug(package['name'])}/) | `{package['version']}` | `{package['kind']}` | {', '.join(package['maintainers'])} | {tags} | [repo]({package['repo']}) |"
         )
     lines.append("")
     path.write_text("\n".join(lines), encoding="utf-8")
@@ -943,20 +1178,35 @@ def main() -> None:
     packages = collect(Path(args.catalog))
     out = Path(args.out)
     public = Path(args.public)
+    if out.exists():
+        shutil.rmtree(out)
+    if public.exists():
+        shutil.rmtree(public)
     api = out / "api"
     public_api = public / "api"
-    payload = {"generated_at": generated_at, "packages": packages}
     public_packages = [
         {k: v for k, v in package.items() if not k.startswith("_")} for package in packages
     ]
-    payload = {"api_version": "1", "generated_at": generated_at, "packages": public_packages}
-    write_json(api / "packages.json", payload)
+    package_entries = [p for p in public_packages if p.get("catalog_type") != "robot"]
+    robot_entries = [p for p in public_packages if p.get("catalog_type") == "robot"]
+    catalog_payload = {"api_version": "1", "generated_at": generated_at, "packages": public_packages}
+    package_payload = {"api_version": "1", "generated_at": generated_at, "packages": package_entries}
+    robot_payload = {"api_version": "1", "generated_at": generated_at, "robots": robot_entries}
+    write_json(api / "catalog.json", catalog_payload)
+    write_json(api / "packages.json", package_payload)
+    write_json(api / "robots.json", robot_payload)
     write_json(api / "search.json", public_packages)
-    write_json(public_api / "packages.json", payload)
+    write_json(public_api / "catalog.json", catalog_payload)
+    write_json(public_api / "packages.json", package_payload)
+    write_json(public_api / "robots.json", robot_payload)
     write_json(public_api / "search.json", public_packages)
-    write_api(api / "v1" / "packages", payload)
+    write_api(api / "v1" / "catalog", catalog_payload)
+    write_api(api / "v1" / "packages", package_payload)
+    write_api(api / "v1" / "robots", robot_payload)
     write_api(api / "v1" / "search", public_packages)
-    write_api(public_api / "v1" / "packages", payload)
+    write_api(public_api / "v1" / "catalog", catalog_payload)
+    write_api(public_api / "v1" / "packages", package_payload)
+    write_api(public_api / "v1" / "robots", robot_payload)
     write_api(public_api / "v1" / "search", public_packages)
     for package in public_packages:
         write_json(api / "packages" / f"{package['name']}.json", package)

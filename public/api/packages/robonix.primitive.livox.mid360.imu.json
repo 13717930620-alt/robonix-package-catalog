@@ -15,9 +15,12 @@
   "repo_name": "primitive-livox-mid360-imu-rbnx",
   "default_branch": "main",
   "kind": "primitive",
+  "catalog_type": "package",
+  "manifest": "package_manifest.yaml",
   "capabilities": [
     "robonix/primitive/imu/driver",
     "robonix/primitive/imu/imu"
   ],
+  "deploy_dependencies": [],
   "readme_url": "https://github.com/syswonder/primitive-livox-mid360-imu-rbnx/blob/main/README.md"
 }

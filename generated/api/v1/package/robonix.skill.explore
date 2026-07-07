@@ -16,11 +16,14 @@
   "repo_name": "skill-explore-rbnx",
   "default_branch": "main",
   "kind": "skill",
+  "catalog_type": "package",
+  "manifest": "package_manifest.yaml",
   "capabilities": [
     "robonix/skill/explore/driver",
     "robonix/skill/explore/explore",
     "robonix/skill/explore/explore/status",
     "robonix/skill/explore/explore/cancel"
   ],
+  "deploy_dependencies": [],
   "readme_url": "https://github.com/syswonder/skill-explore-rbnx/blob/main/README.md"
 }

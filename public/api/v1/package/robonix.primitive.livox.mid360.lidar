@@ -16,10 +16,13 @@
   "repo_name": "primitive-livox-mid360-lidar-rbnx",
   "default_branch": "main",
   "kind": "primitive",
+  "catalog_type": "package",
+  "manifest": "package_manifest.yaml",
   "capabilities": [
     "robonix/primitive/lidar/driver",
     "robonix/primitive/lidar/lidar3d",
     "robonix/primitive/lidar/lidar_snapshot"
   ],
+  "deploy_dependencies": [],
   "readme_url": "https://github.com/syswonder/primitive-livox-mid360-lidar-rbnx/blob/main/README.md"
 }

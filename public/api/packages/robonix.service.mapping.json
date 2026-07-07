@@ -16,6 +16,8 @@
   "repo_name": "service-map-rbnx",
   "default_branch": "main",
   "kind": "service",
+  "catalog_type": "package",
+  "manifest": "package_manifest.yaml",
   "capabilities": [
     "robonix/service/map/driver",
     "robonix/service/map/occupancy_grid",
@@ -27,5 +29,6 @@
     "robonix/service/map/pose_estimate",
     "robonix/service/map/switch_mode"
   ],
+  "deploy_dependencies": [],
   "readme_url": "https://github.com/syswonder/service-map-rbnx/blob/main/README.md"
 }

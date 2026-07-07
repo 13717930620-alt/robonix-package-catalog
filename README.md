@@ -4,25 +4,36 @@
 
 This repository is the Robonix community package catalog.
 
-Package source stays in each package's own GitHub repository. The only
-manual catalog input is [`catalog.yaml`](catalog.yaml):
+Package source and robot deployment manifests stay in their own GitHub
+repositories. The only manual catalog input is the root-level
+[`catalog.yaml`](catalog.yaml). Ordinary packages go under `packages:`;
+whole-robot deploy repositories go under `robots:`:
 
 ```yaml
 packages:
   - name: robonix.service.mapping
     repo: https://github.com/syswonder/service-map-rbnx
+
+robots:
+  - name: robonix.robot.agilex.ranger_mini_v3
+    repo: https://github.com/syswonder/robot-agilex-ranger_mini_v3
 ```
 
-To submit a community package, add one `name` + `repo` entry to
-`catalog.yaml`. Do not edit generated files by hand.
+To submit a community package or robot deployment, add one `name` + `repo`
+entry to the correct section in `catalog.yaml`. Do not edit generated files by hand.
 
 ## Website
 
 - Homepage: https://syswonder.github.io/robonix-package-catalog/
+- Package page: https://syswonder.github.io/robonix-package-catalog/packages/
+- Robot deployment page: https://syswonder.github.io/robonix-package-catalog/robots/
+- Full catalog API: `GET https://syswonder.github.io/robonix-package-catalog/api/v1/catalog`
 - Package list API: `GET https://syswonder.github.io/robonix-package-catalog/api/v1/packages`
+- Robot deployment API: `GET https://syswonder.github.io/robonix-package-catalog/api/v1/robots`
 - Search index API: `GET https://syswonder.github.io/robonix-package-catalog/api/v1/search`
 - Package detail API: `GET https://syswonder.github.io/robonix-package-catalog/api/v1/package/<package-name>`
 - Package detail page: `https://syswonder.github.io/robonix-package-catalog/packages/<package-name>/`
+- Robot detail page: `https://syswonder.github.io/robonix-package-catalog/robots/<robot-name>/`
 
 The catalog is hosted on GitHub Pages, so these are static JSON resources
 with stable API-style paths. Clients should treat the shape below as the v1
@@ -37,9 +48,11 @@ capability on the client using the returned JSON.
 
 | Method | Path | Parameters | Response |
 | --- | --- | --- | --- |
-| `GET` | `/api/v1/packages` | none | catalog object with `api_version`, `generated_at`, and `packages[]` |
-| `GET` | `/api/v1/search` | none | plain package array, intended for client-side search/filter indexes |
-| `GET` | `/api/v1/package/<package-name>` | `package-name`: exact `package.name`, URL-encoded | one package object; missing packages return GitHub Pages `404` |
+| `GET` | `/api/v1/catalog` | none | combined catalog object with both ordinary packages and robot deployments |
+| `GET` | `/api/v1/packages` | none | ordinary primitive/service/skill packages only |
+| `GET` | `/api/v1/robots` | none | robot deployment entries only |
+| `GET` | `/api/v1/search` | none | plain combined catalog array, intended for client-side search/filter indexes |
+| `GET` | `/api/v1/package/<package-name>` | `package-name`: exact catalog `name`, URL-encoded | one ordinary package or robot deployment object; missing entries return GitHub Pages `404` |
 
 Package object fields:
 
@@ -53,8 +66,11 @@ Package object fields:
 | `repo` | string | GitHub repository URL |
 | `repo_name` | string | repository name without owner |
 | `default_branch` | string | package repository default branch used for indexing |
-| `kind` | string | `primitive`, `service`, or `skill` inferred from `package.name` |
+| `kind` | string | `primitive`, `service`, `skill`, or `robot` inferred from catalog name |
+| `catalog_type` | string | `package` for ordinary packages, `robot` for whole-robot deployments |
+| `manifest` | string | source manifest path, usually `package_manifest.yaml` or `robonix_manifest.yaml` |
 | `capabilities` | string[] | declared Robonix contract IDs |
+| `deploy_dependencies` | object[] | robot deployment dependencies parsed from `robonix_manifest.yaml` |
 | `readme_url` | string | GitHub README URL for the indexed branch |
 
 ### JavaScript
@@ -113,7 +129,9 @@ detail = json.load(urllib.request.urlopen(f"{base}/package/{mapping['name']}"))
 }
 ```
 
-`GET /api/v1/search` returns the same package objects as a plain array.
+`GET /api/v1/robots` returns robot deployments under a top-level `robots[]` field.
+
+`GET /api/v1/search` returns the combined catalog entries as a plain array.
 
 `GET /api/v1/package/<package-name>` returns one package object.
 
@@ -132,16 +150,43 @@ The catalog builder reads these fields from that file:
 The `package.name` in `package_manifest.yaml` must exactly match the name in
 `catalog.yaml`.
 
+## Robot Deployment Manifest
+
+Robot deployment repositories are indexed from root-level `robonix_manifest.yaml`.
+They do not need a separate `package_manifest.yaml`. The catalog metadata lives
+under a top-level `catalog:` block with the same fields as package metadata:
+
+```yaml
+manifestVersion: 1
+name: robonix-ranger-mini-deploy
+catalog:
+  name: robonix.robot.agilex.ranger_mini_v3
+  version: 0.1.0
+  description: Robonix deploy manifest for the AgileX Ranger Mini v3 robot.
+  tags: [robot, deploy, agilex, ranger_mini_v3]
+  maintainers:
+    - wheatfox <wheatfox17@icloud.com>
+```
+
+The builder also parses `primitive:`, `service:`, and `skill:` entries from
+`robonix_manifest.yaml` into `deploy_dependencies[]`, linking dependencies
+back to cataloged ordinary packages when their repository is known.
+
 ## Generated Outputs
 
 CI validates `catalog.yaml`, fetches every package manifest through the GitHub
 API, and generates:
 
 - `generated/api/v1/packages`
+- `generated/api/v1/robots`
+- `generated/api/v1/catalog`
 - `generated/api/v1/search`
 - `generated/api/v1/package/<package-name>`
 - `public/index.html`
+- `public/packages/index.html`
 - `public/packages/<package-name>/index.html`
+- `public/robots/index.html`
+- `public/robots/<robot-name>/index.html`
 - `public/api/...`
 
 For compatibility, CI also writes `.json` aliases under `api/`, but new
@@ -150,7 +195,7 @@ integrations should use the `/api/v1/...` paths above.
 The generated commit uses `[skip ci]`; normal CI only triggers from
 `catalog.yaml`, the builder script, the workflow, or manual dispatch.
 
-Generated on `2026-07-06T13:45:48+00:00`.
+Generated on `2026-07-07T08:13:26+00:00`.
 
 ## Packages
 
@@ -160,6 +205,8 @@ Generated on `2026-07-06T13:45:48+00:00`.
 | [`robonix.primitive.intel.realsense_d435i.camera`](https://syswonder.github.io/robonix-package-catalog/packages/robonix.primitive.intel.realsense_d435i.camera/) | `0.1.0` | `primitive` | wheatfox <wheatfox17@icloud.com> | primitive, camera, intel, realsense_d435i, rgbd | [repo](https://github.com/syswonder/primitive-intel-realsense_d435i-camera-rbnx) |
 | [`robonix.primitive.livox.mid360.imu`](https://syswonder.github.io/robonix-package-catalog/packages/robonix.primitive.livox.mid360.imu/) | `0.1.0` | `primitive` | wheatfox <wheatfox17@icloud.com> | primitive, imu, livox, mid360 | [repo](https://github.com/syswonder/primitive-livox-mid360-imu-rbnx) |
 | [`robonix.primitive.livox.mid360.lidar`](https://syswonder.github.io/robonix-package-catalog/packages/robonix.primitive.livox.mid360.lidar/) | `0.1.0` | `primitive` | wheatfox <wheatfox17@icloud.com> | primitive, lidar, livox, mid360, pointcloud | [repo](https://github.com/syswonder/primitive-livox-mid360-lidar-rbnx) |
+| [`robonix.robot.agilex.ranger_mini_v3`](https://syswonder.github.io/robonix-package-catalog/robots/robonix.robot.agilex.ranger_mini_v3/) | `0.1.0` | `robot` | wheatfox <wheatfox17@icloud.com> | robot, deploy, agilex, ranger_mini_v3, lidar, camera, navigation, mapping | [repo](https://github.com/syswonder/robot-agilex-ranger_mini_v3) |
+| [`robonix.robot.wheeltec.r550`](https://syswonder.github.io/robonix-package-catalog/robots/robonix.robot.wheeltec.r550/) | `0.1.0` | `robot` | wheatfox <wheatfox17@icloud.com> | robot, deploy, wheeltec, r550, lidar, camera, navigation, mapping | [repo](https://github.com/syswonder/robot-wheeltec-r550) |
 | [`robonix.service.mapping`](https://syswonder.github.io/robonix-package-catalog/packages/robonix.service.mapping/) | `0.4.0` | `service` | wheatfox <wheatfox17@icloud.com> | service, mapping, slam, rtabmap, ros2 | [repo](https://github.com/syswonder/service-map-rbnx) |
 | [`robonix.service.navigation`](https://syswonder.github.io/robonix-package-catalog/packages/robonix.service.navigation/) | `0.1.0` | `service` | wheatfox <wheatfox17@icloud.com> | service, navigation, nav2, ros2 | [repo](https://github.com/syswonder/service-navigation-rbnx) |
 | [`robonix.skill.explore`](https://syswonder.github.io/robonix-package-catalog/packages/robonix.skill.explore/) | `0.1.0` | `skill` | wheatfox <wheatfox17@icloud.com> | skill, explore, frontier, navigation, mapping | [repo](https://github.com/syswonder/skill-explore-rbnx) |

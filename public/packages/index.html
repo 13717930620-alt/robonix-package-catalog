@@ -1,0 +1,525 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Packages - Robonix Package Catalog</title>
+  <link rel="stylesheet" href="../assets/vendor/pico/pico.classless.min.css">
+  <style>
+
+    :root {
+      color-scheme: light;
+      --pico-font-family: Arial, Helvetica, sans-serif;
+      --pico-border-radius: 6px;
+      --pico-spacing: 0.75rem;
+      --bg: #ffffff;
+      --paper: #ffffff;
+      --soft: #f7f7f8;
+      --ink: #111827;
+      --muted: #667085;
+      --line: #e5e7eb;
+      --line-strong: #d0d5dd;
+      --accent: #2563eb;
+      --shadow: 0 1px 2px rgba(16, 24, 40, 0.04);
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      color: var(--ink);
+      background: var(--bg);
+      font-family: Arial, Helvetica, sans-serif;
+      font-size: 15px;
+      letter-spacing: 0;
+    }
+    a { color: var(--accent); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    .shell {
+      width: min(100% - 48px, 1180px);
+      max-width: 1180px;
+      margin: 0 auto;
+    }
+    header {
+      color: var(--ink);
+      border-bottom: 1px solid var(--line);
+      margin-bottom: 0;
+    }
+    header.shell { padding-block: 14px; }
+    .topline { display: flex; justify-content: space-between; gap: 16px; align-items: center; }
+    .brand { font-weight: 700; font-size: 18px; letter-spacing: 0; }
+    .api-links { display: flex; gap: 8px; flex-wrap: wrap; justify-content: flex-end; }
+    .api-links a {
+      color: #344054;
+      border: 1px solid var(--line);
+      background: var(--soft);
+      border-radius: 6px;
+      padding: 7px 9px;
+      font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      font-size: 12px;
+    }
+    h1 {
+      margin: 0;
+      font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      font-size: 22px;
+      line-height: 1.35;
+      letter-spacing: 0;
+      overflow-wrap: anywhere;
+      word-break: break-word;
+    }
+    .lede { color: var(--muted); max-width: 720px; margin: 8px 0 0; line-height: 1.55; font-size: 15px; }
+    main.shell { padding-block: 0 34px; }
+    .search-strip { padding: 16px 0 14px; }
+    .catalog-frame {
+      display: grid;
+      grid-template-columns: 265px 1fr;
+      gap: 14px;
+      align-items: start;
+    }
+    .panel {
+      background: var(--paper);
+      border: 1px solid var(--line);
+      box-shadow: var(--shadow);
+      border-radius: 8px;
+      overflow: hidden;
+      margin-bottom: 0;
+    }
+    .filters { padding: 14px; position: sticky; top: 14px; }
+    .filters h2, .content h2 { margin: 0 0 9px; font-size: 15px; }
+    .stat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 7px; margin-bottom: 14px; }
+    .stat { border: 1px solid var(--line); border-radius: 6px; padding: 8px; background: var(--soft); }
+    .stat strong { display: block; font-size: 20px; line-height: 1.15; }
+    .stat span { color: var(--muted); font-size: 12px; }
+    .filter-group { border-top: 1px solid var(--line); padding-top: 11px; margin-top: 11px; }
+    .filter-buttons { display: flex; gap: 6px; flex-wrap: wrap; }
+    .filter-button {
+      border: 1px solid var(--line);
+      background: #fff;
+      color: var(--ink);
+      border-radius: 999px;
+      padding: 5px 9px;
+      cursor: pointer;
+      font-size: 13px;
+      margin: 0;
+    }
+    .filter-button.active { background: #1f2933; color: #fff; border-color: #1f2933; }
+    .content { padding: 14px; min-width: 0; }
+    .api-reference {
+      margin-top: 14px;
+      padding: 18px;
+      font-size: 14px;
+      line-height: 1.45;
+    }
+    .api-reference h2 { margin: 0 0 8px; font-size: 16px; line-height: 1.3; }
+    .api-reference p { margin: 0 0 10px; font-size: 14px; line-height: 1.45; }
+    .api-reference table {
+      margin: 10px 0 12px;
+      width: 100%;
+      font-size: 13px;
+    }
+    .api-reference td,
+    .api-reference th {
+      vertical-align: top;
+      padding: 7px 8px;
+    }
+    .api-reference pre {
+      margin: 0;
+      overflow-x: auto;
+      border: 1px solid var(--line);
+      background: #f8fafc;
+      border-radius: 6px;
+      padding: 10px;
+      font-size: 12px;
+      line-height: 1.45;
+    }
+    .api-reference code { font-size: 0.92em; }
+    .muted { color: var(--muted); }
+    .toolbar { display: flex; justify-content: flex-end; align-items: center; margin-bottom: 10px; }
+    .search {
+      width: min(620px, 100%);
+      border: 1px solid var(--line-strong);
+      background: #fff;
+      border-radius: 6px;
+      padding: 9px 11px;
+      font-size: 15px;
+      margin: 0;
+    }
+    .count { color: var(--muted); white-space: nowrap; }
+    .package-list { display: grid; gap: 9px; }
+    .package-card {
+      border: 1px solid var(--line);
+      background: #fff;
+      border-radius: 7px;
+      padding: 12px;
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 12px;
+      margin: 0;
+    }
+    .package-title { display: flex; gap: 8px; align-items: baseline; flex-wrap: wrap; margin-bottom: 5px; }
+    .package-title a {
+      font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      font-size: 16px;
+      font-weight: 700;
+      color: #152238;
+    }
+    .version {
+      font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      color: var(--muted);
+      font-size: 12px;
+      border: 1px solid var(--line);
+      border-radius: 4px;
+      padding: 2px 5px;
+      background: var(--soft);
+    }
+    .description { color: #343941; margin: 0 0 8px; line-height: 1.38; }
+    .meta-line { color: var(--muted); font-size: 13px; display: flex; gap: 14px; flex-wrap: wrap; }
+    .meta-line code { font-size: 12px; }
+    .card-actions { display: flex; gap: 8px; align-items: start; }
+    .card-actions a {
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      padding: 6px 8px;
+      background: var(--soft);
+      color: #29303a;
+      font-size: 13px;
+      margin: 0;
+    }
+    .tags { display: flex; gap: 5px; flex-wrap: wrap; margin-top: 8px; }
+    .tag {
+      border: 0;
+      border-radius: 999px;
+      padding: 3px 7px;
+      font-size: 12px;
+      cursor: pointer;
+      color: #1c2732;
+      margin: 0;
+    }
+    .tag-blue { background: #dcecf7; color: #164965; }
+    .tag-green { background: #dff0df; color: #23562a; }
+    .tag-gold { background: #f3e6bd; color: #6b4b10; }
+    .tag-cyan { background: #d8f0f0; color: #165456; }
+    .tag-purple { background: #eadff4; color: #4d2d68; }
+    .tag-slate { background: #e4e8ee; color: #344052; }
+    .tag-red { background: #f5ded8; color: #7b2c1f; }
+    .tag-gray { background: #ece8df; color: #4a4b4d; }
+    .detail-layout {
+      display: grid;
+      grid-template-columns: 1fr 340px;
+      gap: 14px;
+      align-items: start;
+      margin-top: 16px;
+    }
+    .detail-main, .detail-side { padding: 14px; }
+    .detail-main h2, .detail-side h2 { margin: 0 0 10px; font-size: 18px; }
+    .detail-side h2:not(:first-child) { margin-top: 16px; }
+    .kv {
+      display: grid;
+      grid-template-columns: 92px minmax(0, 1fr);
+      gap: 4px 10px;
+      font-size: 14px;
+      line-height: 1.32;
+      margin: 0 0 10px;
+    }
+    .kv div:nth-child(odd) { color: var(--muted); }
+    .kv div:nth-child(even) { min-width: 0; overflow-wrap: anywhere; }
+    .cap-list { margin: 0; padding-left: 0; list-style: none; display: grid; gap: 5px; }
+    .cap-list li {
+      font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      font-size: 13px;
+      border: 1px solid var(--line);
+      background: var(--soft);
+      border-radius: 5px;
+      padding: 6px 7px;
+      overflow-wrap: anywhere;
+      margin: 0;
+    }
+    .cap-list li span {
+      color: var(--muted);
+      display: inline-block;
+      min-width: 64px;
+    }
+    .back { display: inline-block; margin: 14px 0; color: var(--accent); }
+    .generated { color: var(--muted); margin-top: 12px; font-size: 13px; }
+    footer {
+      color: var(--muted);
+      font-size: 12px;
+    }
+    footer.shell { padding-block: 18px 28px; }
+    .readme {
+      line-height: 1.58;
+      color: #1f2937;
+      overflow-wrap: anywhere;
+    }
+    .readme h1 { font-size: 24px; margin-bottom: 10px; }
+    .readme h2 { font-size: 19px; border-bottom: 1px solid var(--line); padding-bottom: 6px; margin: 22px 0 10px; }
+    .readme h3 { font-size: 16px; margin: 18px 0 8px; }
+    .readme p, .readme ul, .readme ol { margin-bottom: 10px; }
+    .readme pre {
+      overflow: auto;
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      background: #f8fafc;
+      padding: 10px;
+      max-width: 100%;
+    }
+    .readme code {
+      background: #f1f5f9;
+      border-radius: 4px;
+      padding: 1px 4px;
+      font-size: 0.92em;
+    }
+    .readme pre code { background: transparent; padding: 0; }
+    .readme table { border-collapse: collapse; width: 100%; display: block; overflow-x: auto; }
+    .readme th, .readme td { border: 1px solid var(--line); padding: 6px 8px; }
+    code { font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
+    @media (max-width: 860px) {
+      .shell { width: min(100% - 28px, 1180px); }
+      .catalog-frame, .detail-layout { grid-template-columns: 1fr; }
+      .filters { position: static; }
+      .toolbar { align-items: stretch; flex-direction: column; }
+      .package-card { grid-template-columns: 1fr; }
+      .card-actions { justify-content: flex-start; }
+      .api-reference { padding: 16px; }
+    }
+    
+  </style>
+</head>
+<body>
+  <header class="shell">
+    <div class="topline">
+      <div class="brand"><a href="../">Robonix Package Catalog</a> / Packages</div>
+      <nav class="api-links">
+        <a href="../packages/">Packages</a>
+        <a href="../robots/">Robot deployments</a>
+        <a href="../api/v1/packages">API</a>
+      </nav>
+    </div>
+  </header>
+  <main class="shell">
+    <section class="search-strip">
+      <input class="search" id="q" placeholder="Search packages, tags, maintainers">
+    </section>
+    <div class="catalog-frame">
+      <aside class="panel filters">
+        <div class="stat-grid">
+          <div class="stat"><strong>7</strong><span>packages</span></div>
+          <div class="stat"><strong>31</strong><span>indexed items</span></div>
+        </div>
+        <div class="filter-group">
+          <h2>Kind</h2>
+          <div class="filter-buttons" id="kindFilters">
+            <button class="filter-button active" data-kind="">All</button>
+            <button class="filter-button" data-kind="primitive">primitive</button><button class="filter-button" data-kind="service">service</button><button class="filter-button" data-kind="skill">skill</button>
+          </div>
+        </div>
+        <div class="filter-group">
+          <h2>Tags</h2>
+          <div class="filter-buttons" id="tagFilters">
+            <button class="filter-button active" data-tag-filter="">All</button>
+            <button class="filter-button" data-tag-filter="agilex">agilex</button><button class="filter-button" data-tag-filter="camera">camera</button><button class="filter-button" data-tag-filter="chassis">chassis</button><button class="filter-button" data-tag-filter="explore">explore</button><button class="filter-button" data-tag-filter="frontier">frontier</button><button class="filter-button" data-tag-filter="imu">imu</button><button class="filter-button" data-tag-filter="intel">intel</button><button class="filter-button" data-tag-filter="lidar">lidar</button><button class="filter-button" data-tag-filter="livox">livox</button><button class="filter-button" data-tag-filter="mapping">mapping</button><button class="filter-button" data-tag-filter="mid360">mid360</button><button class="filter-button" data-tag-filter="nav2">nav2</button><button class="filter-button" data-tag-filter="navigation">navigation</button><button class="filter-button" data-tag-filter="pointcloud">pointcloud</button><button class="filter-button" data-tag-filter="primitive">primitive</button><button class="filter-button" data-tag-filter="ranger_mini_v3">ranger_mini_v3</button><button class="filter-button" data-tag-filter="realsense_d435i">realsense_d435i</button><button class="filter-button" data-tag-filter="rgbd">rgbd</button><button class="filter-button" data-tag-filter="ros2">ros2</button><button class="filter-button" data-tag-filter="rtabmap">rtabmap</button><button class="filter-button" data-tag-filter="service">service</button><button class="filter-button" data-tag-filter="skill">skill</button><button class="filter-button" data-tag-filter="slam">slam</button>
+          </div>
+        </div>
+      </aside>
+      <section class="panel content">
+        <div class="toolbar">
+          <div class="count" id="count"></div>
+        </div>
+        <div class="package-list" id="packages">
+          <article class="package-card" data-kind="primitive" data-tags="primitive chassis agilex ranger_mini_v3 ros2" data-search="robonix.primitive.agilex.ranger_mini_v3.chassis 0.1.0 primitive agilex ranger mini chassis driver wrapper. https://github.com/syswonder/primitive-agilex-ranger_mini_v3-chassis-rbnx wheatfox &lt;wheatfox17@icloud.com&gt; primitive chassis agilex ranger_mini_v3 ros2 robonix/primitive/chassis/driver robonix/primitive/chassis/odom robonix/primitive/chassis/twist_in">
+        <div>
+          <div class="package-title">
+            <a href="robonix.primitive.agilex.ranger_mini_v3.chassis/">robonix.primitive.agilex.ranger_mini_v3.chassis</a>
+            <span class="version">v0.1.0</span>
+          </div>
+          <p class="description">AgileX Ranger Mini chassis driver wrapper.</p>
+          <div class="meta-line">
+            <span>maintainers <strong>wheatfox &lt;wheatfox17@icloud.com&gt;</strong></span>
+            <span>3 capabilities</span>
+            <span><code>primitive-agilex-ranger_mini_v3-chassis-rbnx</code></span>
+          </div>
+          <div class="tags"><button class="tag tag-blue" data-tag="primitive">primitive</button> <button class="tag tag-red" data-tag="chassis">chassis</button> <button class="tag tag-gray" data-tag="agilex">agilex</button> <button class="tag tag-gray" data-tag="ranger_mini_v3">ranger_mini_v3</button> <button class="tag tag-gray" data-tag="ros2">ros2</button></div>
+        </div>
+        <div class="card-actions">
+          <a href="robonix.primitive.agilex.ranger_mini_v3.chassis/">Details</a>
+          <a href="https://github.com/syswonder/primitive-agilex-ranger_mini_v3-chassis-rbnx">GitHub</a>
+        </div>
+      </article><article class="package-card" data-kind="primitive" data-tags="primitive camera intel realsense_d435i rgbd" data-search="robonix.primitive.intel.realsense_d435i.camera 0.1.0 primitive intel realsense d435i driver wrapper — declares rgb + depth + extrinsics contracts. https://github.com/syswonder/primitive-intel-realsense_d435i-camera-rbnx wheatfox &lt;wheatfox17@icloud.com&gt; primitive camera intel realsense_d435i rgbd robonix/primitive/camera/driver robonix/primitive/camera/rgb robonix/primitive/camera/depth robonix/primitive/camera/extrinsics robonix/primitive/camera/snapshot robonix/primitive/camera/depth_snapshot">
+        <div>
+          <div class="package-title">
+            <a href="robonix.primitive.intel.realsense_d435i.camera/">robonix.primitive.intel.realsense_d435i.camera</a>
+            <span class="version">v0.1.0</span>
+          </div>
+          <p class="description">Intel RealSense D435i driver wrapper — declares RGB + depth + extrinsics contracts.</p>
+          <div class="meta-line">
+            <span>maintainers <strong>wheatfox &lt;wheatfox17@icloud.com&gt;</strong></span>
+            <span>6 capabilities</span>
+            <span><code>primitive-intel-realsense_d435i-camera-rbnx</code></span>
+          </div>
+          <div class="tags"><button class="tag tag-blue" data-tag="primitive">primitive</button> <button class="tag tag-cyan" data-tag="camera">camera</button> <button class="tag tag-gray" data-tag="intel">intel</button> <button class="tag tag-gray" data-tag="realsense_d435i">realsense_d435i</button> <button class="tag tag-gray" data-tag="rgbd">rgbd</button></div>
+        </div>
+        <div class="card-actions">
+          <a href="robonix.primitive.intel.realsense_d435i.camera/">Details</a>
+          <a href="https://github.com/syswonder/primitive-intel-realsense_d435i-camera-rbnx">GitHub</a>
+        </div>
+      </article><article class="package-card" data-kind="primitive" data-tags="primitive imu livox mid360" data-search="robonix.primitive.livox.mid360.imu 0.1.0 primitive livox mid-360 imu atlas wrapper — depends on mid360_lidar_rbnx. https://github.com/syswonder/primitive-livox-mid360-imu-rbnx wheatfox &lt;wheatfox17@icloud.com&gt; primitive imu livox mid360 robonix/primitive/imu/driver robonix/primitive/imu/imu">
+        <div>
+          <div class="package-title">
+            <a href="robonix.primitive.livox.mid360.imu/">robonix.primitive.livox.mid360.imu</a>
+            <span class="version">v0.1.0</span>
+          </div>
+          <p class="description">Livox MID-360 IMU atlas wrapper — depends on mid360_lidar_rbnx.</p>
+          <div class="meta-line">
+            <span>maintainers <strong>wheatfox &lt;wheatfox17@icloud.com&gt;</strong></span>
+            <span>2 capabilities</span>
+            <span><code>primitive-livox-mid360-imu-rbnx</code></span>
+          </div>
+          <div class="tags"><button class="tag tag-blue" data-tag="primitive">primitive</button> <button class="tag tag-slate" data-tag="imu">imu</button> <button class="tag tag-gray" data-tag="livox">livox</button> <button class="tag tag-gray" data-tag="mid360">mid360</button></div>
+        </div>
+        <div class="card-actions">
+          <a href="robonix.primitive.livox.mid360.imu/">Details</a>
+          <a href="https://github.com/syswonder/primitive-livox-mid360-imu-rbnx">GitHub</a>
+        </div>
+      </article><article class="package-card" data-kind="primitive" data-tags="primitive lidar livox mid360 pointcloud" data-search="robonix.primitive.livox.mid360.lidar 0.1.0 primitive livox mid-360 lidar driver wrapper. https://github.com/syswonder/primitive-livox-mid360-lidar-rbnx wheatfox &lt;wheatfox17@icloud.com&gt; primitive lidar livox mid360 pointcloud robonix/primitive/lidar/driver robonix/primitive/lidar/lidar3d robonix/primitive/lidar/lidar_snapshot">
+        <div>
+          <div class="package-title">
+            <a href="robonix.primitive.livox.mid360.lidar/">robonix.primitive.livox.mid360.lidar</a>
+            <span class="version">v0.1.0</span>
+          </div>
+          <p class="description">Livox MID-360 lidar driver wrapper.</p>
+          <div class="meta-line">
+            <span>maintainers <strong>wheatfox &lt;wheatfox17@icloud.com&gt;</strong></span>
+            <span>3 capabilities</span>
+            <span><code>primitive-livox-mid360-lidar-rbnx</code></span>
+          </div>
+          <div class="tags"><button class="tag tag-blue" data-tag="primitive">primitive</button> <button class="tag tag-purple" data-tag="lidar">lidar</button> <button class="tag tag-gray" data-tag="livox">livox</button> <button class="tag tag-gray" data-tag="mid360">mid360</button> <button class="tag tag-gray" data-tag="pointcloud">pointcloud</button></div>
+        </div>
+        <div class="card-actions">
+          <a href="robonix.primitive.livox.mid360.lidar/">Details</a>
+          <a href="https://github.com/syswonder/primitive-livox-mid360-lidar-rbnx">GitHub</a>
+        </div>
+      </article><article class="package-card" data-kind="service" data-tags="service mapping slam rtabmap ros2" data-search="robonix.service.mapping 0.4.0 service slam mapping service. algo + sensor inputs config-driven. https://github.com/syswonder/service-map-rbnx wheatfox &lt;wheatfox17@icloud.com&gt; service mapping slam rtabmap ros2 robonix/service/map/driver robonix/service/map/occupancy_grid robonix/service/map/pointcloud robonix/service/map/pose robonix/service/map/odom robonix/service/map/save_map robonix/service/map/load_map robonix/service/map/pose_estimate robonix/service/map/switch_mode">
+        <div>
+          <div class="package-title">
+            <a href="robonix.service.mapping/">robonix.service.mapping</a>
+            <span class="version">v0.4.0</span>
+          </div>
+          <p class="description">SLAM mapping service. Algo + sensor inputs config-driven.</p>
+          <div class="meta-line">
+            <span>maintainers <strong>wheatfox &lt;wheatfox17@icloud.com&gt;</strong></span>
+            <span>9 capabilities</span>
+            <span><code>service-map-rbnx</code></span>
+          </div>
+          <div class="tags"><button class="tag tag-green" data-tag="service">service</button> <button class="tag tag-blue" data-tag="mapping">mapping</button> <button class="tag tag-blue" data-tag="slam">slam</button> <button class="tag tag-gray" data-tag="rtabmap">rtabmap</button> <button class="tag tag-gray" data-tag="ros2">ros2</button></div>
+        </div>
+        <div class="card-actions">
+          <a href="robonix.service.mapping/">Details</a>
+          <a href="https://github.com/syswonder/service-map-rbnx">GitHub</a>
+        </div>
+      </article><article class="package-card" data-kind="service" data-tags="service navigation nav2 ros2" data-search="robonix.service.navigation 0.1.0 service nav2 service wrapper exposing service/navigation/* over grpc. https://github.com/syswonder/service-navigation-rbnx wheatfox &lt;wheatfox17@icloud.com&gt; service navigation nav2 ros2 robonix/service/navigation/driver robonix/service/navigation/navigate robonix/service/navigation/navigate/status robonix/service/navigation/navigate/cancel">
+        <div>
+          <div class="package-title">
+            <a href="robonix.service.navigation/">robonix.service.navigation</a>
+            <span class="version">v0.1.0</span>
+          </div>
+          <p class="description">Nav2 service wrapper exposing service/navigation/* over gRPC.</p>
+          <div class="meta-line">
+            <span>maintainers <strong>wheatfox &lt;wheatfox17@icloud.com&gt;</strong></span>
+            <span>4 capabilities</span>
+            <span><code>service-navigation-rbnx</code></span>
+          </div>
+          <div class="tags"><button class="tag tag-green" data-tag="service">service</button> <button class="tag tag-green" data-tag="navigation">navigation</button> <button class="tag tag-gray" data-tag="nav2">nav2</button> <button class="tag tag-gray" data-tag="ros2">ros2</button></div>
+        </div>
+        <div class="card-actions">
+          <a href="robonix.service.navigation/">Details</a>
+          <a href="https://github.com/syswonder/service-navigation-rbnx">GitHub</a>
+        </div>
+      </article><article class="package-card" data-kind="skill" data-tags="skill explore frontier navigation mapping" data-search="robonix.skill.explore 0.1.0 skill frontier-based autonomous exploration skill. https://github.com/syswonder/skill-explore-rbnx wheatfox &lt;wheatfox17@icloud.com&gt; skill explore frontier navigation mapping robonix/skill/explore/driver robonix/skill/explore/explore robonix/skill/explore/explore/status robonix/skill/explore/explore/cancel">
+        <div>
+          <div class="package-title">
+            <a href="robonix.skill.explore/">robonix.skill.explore</a>
+            <span class="version">v0.1.0</span>
+          </div>
+          <p class="description">Frontier-based autonomous exploration skill.</p>
+          <div class="meta-line">
+            <span>maintainers <strong>wheatfox &lt;wheatfox17@icloud.com&gt;</strong></span>
+            <span>4 capabilities</span>
+            <span><code>skill-explore-rbnx</code></span>
+          </div>
+          <div class="tags"><button class="tag tag-gold" data-tag="skill">skill</button> <button class="tag tag-gold" data-tag="explore">explore</button> <button class="tag tag-gray" data-tag="frontier">frontier</button> <button class="tag tag-green" data-tag="navigation">navigation</button> <button class="tag tag-blue" data-tag="mapping">mapping</button></div>
+        </div>
+        <div class="card-actions">
+          <a href="robonix.skill.explore/">Details</a>
+          <a href="https://github.com/syswonder/skill-explore-rbnx">GitHub</a>
+        </div>
+      </article>
+        </div>
+      </section>
+    </div>
+    <section class="panel api-reference">
+      <h2>API Reference</h2>
+      <p class="muted">Static JSON API hosted by GitHub Pages. Use <code>GET</code>; no API key is required.</p>
+      <table>
+        <thead><tr><th>Method</th><th>Path</th><th>Parameters</th><th>Response</th></tr></thead>
+        <tbody>
+          <tr><td><code>GET</code></td><td><code>/api/v1/packages</code></td><td>none</td><td>catalog object with <code>api_version</code>, <code>generated_at</code>, and <code>packages[]</code></td></tr>
+          <tr><td><code>GET</code></td><td><code>/api/v1/search</code></td><td>none</td><td>plain package array for client-side filtering</td></tr>
+          <tr><td><code>GET</code></td><td><code>/api/v1/package/&lt;package-name&gt;</code></td><td><code>package-name</code>: exact <code>package.name</code>, URL-encoded</td><td>one package object; missing packages return GitHub Pages 404</td></tr>
+        </tbody>
+      </table>
+      <pre><code>const base = 'https://syswonder.github.io/robonix-package-catalog/api/v1';
+const catalog = await fetch(`${base}/packages`).then(r => r.json());
+const detail = await fetch(`${base}/package/${encodeURIComponent('robonix.service.mapping')}`).then(r => r.json());</code></pre>
+    </section>
+  </main>
+  <footer class="shell">Generated on 2026-07-07T08:13:26+00:00.</footer>
+  <script>
+    const input = document.getElementById('q');
+    const cards = Array.from(document.querySelectorAll('.package-card'));
+    const count = document.getElementById('count');
+    let kind = '';
+    let tag = '';
+    function setActive(group, selector, value) {
+      for (const button of document.querySelectorAll(group + ' .filter-button')) {
+        button.classList.toggle('active', button.getAttribute(selector) === value);
+      }
+    }
+    function applyFilters() {
+      const q = input.value.trim().toLowerCase();
+      let shown = 0;
+      for (const card of cards) {
+        const matchesText = !q || card.dataset.search.includes(q);
+        const matchesKind = !kind || card.dataset.kind === kind;
+        const tags = (card.dataset.tags || '').split(' ');
+        const matchesTag = !tag || tags.includes(tag);
+        const visible = matchesText && matchesKind && matchesTag;
+        card.style.display = visible ? '' : 'none';
+        if (visible) shown += 1;
+      }
+      count.textContent = shown + ' / ' + cards.length + ' packages';
+    }
+    input.addEventListener('input', applyFilters);
+    document.getElementById('kindFilters').addEventListener('click', (event) => {
+      const button = event.target.closest('[data-kind]');
+      if (!button) return;
+      kind = button.dataset.kind;
+      setActive('#kindFilters', 'data-kind', kind);
+      applyFilters();
+    });
+    document.getElementById('tagFilters').addEventListener('click', (event) => {
+      const button = event.target.closest('[data-tag-filter]');
+      if (!button) return;
+      tag = button.dataset.tagFilter;
+      setActive('#tagFilters', 'data-tag-filter', tag);
+      applyFilters();
+    });
+    document.getElementById('packages').addEventListener('click', (event) => {
+      const button = event.target.closest('[data-tag]');
+      if (!button) return;
+      event.preventDefault();
+      tag = button.dataset.tag;
+      setActive('#tagFilters', 'data-tag-filter', tag);
+      applyFilters();
+    });
+    applyFilters();
+  </script>
+</body>
+</html>

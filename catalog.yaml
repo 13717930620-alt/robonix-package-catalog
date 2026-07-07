@@ -13,3 +13,9 @@ packages:
     repo: https://github.com/syswonder/service-navigation-rbnx
   - name: robonix.skill.explore
     repo: https://github.com/syswonder/skill-explore-rbnx
+
+robots:
+  - name: robonix.robot.agilex.ranger_mini_v3
+    repo: https://github.com/syswonder/robot-agilex-ranger_mini_v3
+  - name: robonix.robot.wheeltec.r550
+    repo: https://github.com/syswonder/robot-wheeltec-r550
