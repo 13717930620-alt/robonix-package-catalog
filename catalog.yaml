@@ -13,6 +13,24 @@ packages:
     repo: https://github.com/syswonder/service-navigation-rbnx
   - name: robonix.skill.explore
     repo: https://github.com/syswonder/skill-explore-rbnx
+  - name: robonix.primitive.orbbec.dabai_dcw.camera
+    repo: https://github.com/syswonder/primitive-orbbec-dabai_dcw-camera-rbnx
+  - name: robonix.primitive.agilex.piper.arm
+    repo: https://github.com/syswonder/primitive-agilex-piper-arm-rbnx
+  - name: robonix.primitive.agilex.piper.description
+    repo: https://github.com/syswonder/primitive-agilex-piper-description-rbnx
+  - name: robonix.primitive.agilex.piper.handeye
+    repo: https://github.com/syswonder/primitive-agilex-piper-handeye-rbnx
+  - name: robonix.service.object_detect
+    repo: https://github.com/syswonder/service-object-detect-rbnx
+  - name: robonix.service.grasp_pose
+    repo: https://github.com/syswonder/service-grasp-pose-rbnx
+  - name: robonix.service.piper_moveit
+    repo: https://github.com/syswonder/service-piper-moveit-rbnx
+  - name: robonix.skill.pick.vertical_grasp
+    repo: https://github.com/syswonder/skill-pick-vertical-grasp-rbnx
+  - name: robonix.skill.vla.openvla
+    repo: https://github.com/syswonder/skill-vla-openvla-rbnx
 
 robots:
   - name: robonix.robot.agilex.ranger_mini_v3
