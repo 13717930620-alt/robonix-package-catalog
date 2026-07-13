@@ -352,16 +352,27 @@ SLAM engine.</p>
        # manifest: package_manifest.jetson-native.yaml   # x86+docker is default
        config:
          algo: rtabmap
-         sensors: { lidar3d: true, rgbd: true, odom: true, imu: true }
+         sensors: { lidar3d: true, rgb: true, depth: true, odom: true, imu: true }
+         rtabmap_inputs: [lidar, odom]
+         occupancy_sources: [lidar]
+         deskew_lidar: true    # requires per-point timestamps (MID-360 format 0)
          base_frame: base_link
          use_sim_time: false
-         map_id: lab_3f          # optional; enables persistence
-         map_mode: mapping       # or: localization</code>
+         rtabmap_profile: ranger_mini_v3
+         map_mode: mapping       # fresh runtime session; or localization</code>
 3. <code>rbnx build -f robonix_manifest.yaml</code> then <code>rbnx boot -f robonix_manifest.yaml</code>.
 4. Consume the map: subscribe to <code>robonix/service/map/occupancy_grid</code> /
    <code>.../pointcloud</code> / <code>.../pose</code> (resolve them via atlas).</p>
-<p>There is no robot-specific code to edit — sensors come from atlas, frames and
-SLAM mode come from config.</p>
+<p>For Ranger Mini v3, select <code>occupancy_sources: [lidar]</code> and use the named
+profile instead of copying slash-named parameters into every deploy. Together
+they match the two known-good v0.1 map databases: lidar-only occupancy
+(<code>Grid/Sensor=0</code>), 5 Hz detection, 0.05 m/rad node thresholds, and retained
+unlinked nodes. <code>rtabmap_params</code> remains an explicit per-parameter override.</p>
+<p>With external odometry, <code>deskew_lidar</code> compensates each PointCloud2 point in
+the odom frame before SLAM. Without external odometry, it enables ICP's
+constant-velocity deskewing; include <code>imu</code> in <code>rtabmap_inputs</code> to initialize
+the ICP orientation from the selected IMU provider. Raw Livox gyro/accel is
+first converted to an orientation estimate by <code>imu_filter_madgwick</code>.</p>
 <h2>Deployment targets</h2>
 <p>One package, three targets (selected by the deploy <code>manifest:</code> field — see
 <a href="CAPABILITY.md#deployment-targets">CAPABILITY.md</a>):</p>
@@ -394,20 +405,20 @@ SLAM mode come from config.</p>
 <p>Add a target by adding a <code>package_manifest.&lt;target&gt;.yaml</code> plus a case branch
 in <code>scripts/build.sh</code> — the rest of the package is unchanged.</p>
 <h2>Saving &amp; re-using a map</h2>
-<p>Set <code>map_id</code> to persist. A named map lives under <code>{MAPPING_MAPS_DIR}/{map_id}/</code>
+<p>Mapping starts with a fresh runtime database. Call <code>save_map(map_id)</code> after
+coverage is complete; the named map lives under <code>{MAPPING_MAPS_DIR}/{map_id}/</code>
 (default: the package's <code>maps/</code> dir, which survives container restarts):</p>
 <pre><code>maps/lab_3f/rtabmap.db  occupancy.pgm  occupancy.yaml  occupancy.png  cloud.pcd  meta.yaml
 </code></pre>
 <ul>
-<li><strong>Build a map:</strong> <code>map_mode: mapping</code>. Drive the robot around; the db is
-  written live, and on shutdown the offline-previewable artifacts
-  (pgm/png/pcd/meta) are exported. Open <code>occupancy.png</code> to eyeball it without
-  rtabmap's database viewer.</li>
-<li><strong>Re-use a map:</strong> <code>map_mode: localization</code>. mapping loads the saved db and
-  re-localizes against it; the <strong>map frame is stable across restarts</strong>, so a
-  <code>scene</code> configured with the same <code>map_id</code> re-anchors its semantic objects
-  correctly. (<code>scene</code>'s object store keys on <code>map_id</code> — set it consistently.)</li>
-<li><strong>Start fresh:</strong> <code>map_mode: mapping</code> + <code>reset_map: true</code>.</li>
+<li><strong>Build a map:</strong> <code>map_mode: mapping</code>. Drive the robot around, then call
+  <code>save_map(map_id)</code> to publish an immutable database and previews.</li>
+<li><strong>Re-use a map:</strong> set <code>map_id</code> plus <code>map_mode: localization</code>. Mapping copies
+  the saved db to a private runtime path and re-localizes against it; the
+  <strong>map frame is stable across restarts</strong>, so Scene can load semantic state for
+  the same id.</li>
+<li><strong>Start fresh:</strong> <code>map_mode: mapping</code> (the default). It never writes an
+  existing saved map.</li>
 </ul>
 <blockquote>
 <p>Localization-mode persistence only re-anchors correctly because the map
@@ -499,6 +510,7 @@ untrusted network.</p>
 <li>robonix/service/map/pose</li>
 <li>robonix/service/map/odom</li>
 <li>robonix/service/map/save_map</li>
+<li>robonix/service/map/list_maps</li>
 <li>robonix/service/map/load_map</li>
 <li>robonix/service/map/pose_estimate</li>
 <li>robonix/service/map/switch_mode</li>
@@ -506,6 +518,6 @@ untrusted network.</p>
       </aside>
     </div>
   </main>
-  <footer class="shell">Generated on 2026-07-07T08:16:00+00:00.</footer>
+  <footer class="shell">Generated on 2026-07-13T13:31:01+00:00.</footer>
 </body>
 </html>

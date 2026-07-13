@@ -1,0 +1,30 @@
+{
+  "name": "robonix.primitive.orbbec.dabai_dcw.camera",
+  "version": "0.1.0",
+  "description": "Orbbec Dabai DCW RGBD primitive — declares rgb + depth + camera_info.",
+  "tags": [
+    "primitive",
+    "camera",
+    "orbbec",
+    "dabai_dcw",
+    "rgbd",
+    "ros2"
+  ],
+  "repo": "https://github.com/syswonder/primitive-orbbec-dabai_dcw-camera-rbnx",
+  "maintainers": [
+    "lhw2002426 <lhw2002426@users.noreply.github.com>"
+  ],
+  "repo_name": "primitive-orbbec-dabai_dcw-camera-rbnx",
+  "default_branch": "main",
+  "kind": "primitive",
+  "catalog_type": "package",
+  "manifest": "package_manifest.yaml",
+  "capabilities": [
+    "robonix/primitive/camera/driver",
+    "robonix/primitive/camera/rgb",
+    "robonix/primitive/camera/depth",
+    "robonix/primitive/camera/camera_info"
+  ],
+  "deploy_dependencies": [],
+  "readme_url": "https://github.com/syswonder/primitive-orbbec-dabai_dcw-camera-rbnx/blob/main/README.md"
+}

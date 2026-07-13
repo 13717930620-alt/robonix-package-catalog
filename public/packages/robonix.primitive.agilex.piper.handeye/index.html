@@ -1,0 +1,511 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>robonix.primitive.agilex.piper.handeye - Robonix Package Catalog</title>
+  <link rel="stylesheet" href="../../assets/vendor/pico/pico.classless.min.css">
+  <style>
+
+    :root {
+      color-scheme: light;
+      --pico-font-family: Arial, Helvetica, sans-serif;
+      --pico-border-radius: 6px;
+      --pico-spacing: 0.75rem;
+      --bg: #ffffff;
+      --paper: #ffffff;
+      --soft: #f7f7f8;
+      --ink: #111827;
+      --muted: #667085;
+      --line: #e5e7eb;
+      --line-strong: #d0d5dd;
+      --accent: #2563eb;
+      --shadow: 0 1px 2px rgba(16, 24, 40, 0.04);
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      color: var(--ink);
+      background: var(--bg);
+      font-family: Arial, Helvetica, sans-serif;
+      font-size: 15px;
+      letter-spacing: 0;
+    }
+    a { color: var(--accent); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    .shell {
+      width: min(100% - 48px, 1180px);
+      max-width: 1180px;
+      margin: 0 auto;
+    }
+    header {
+      color: var(--ink);
+      border-bottom: 1px solid var(--line);
+      margin-bottom: 0;
+    }
+    header.shell { padding-block: 14px; }
+    .topline { display: flex; justify-content: space-between; gap: 16px; align-items: center; }
+    .brand { font-weight: 700; font-size: 18px; letter-spacing: 0; }
+    .api-links { display: flex; gap: 8px; flex-wrap: wrap; justify-content: flex-end; }
+    .api-links a {
+      color: #344054;
+      border: 1px solid var(--line);
+      background: var(--soft);
+      border-radius: 6px;
+      padding: 7px 9px;
+      font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      font-size: 12px;
+    }
+    h1 {
+      margin: 0;
+      font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      font-size: 22px;
+      line-height: 1.35;
+      letter-spacing: 0;
+      overflow-wrap: anywhere;
+      word-break: break-word;
+    }
+    .lede { color: var(--muted); max-width: 720px; margin: 8px 0 0; line-height: 1.55; font-size: 15px; }
+    main.shell { padding-block: 0 34px; }
+    .search-strip { padding: 16px 0 14px; }
+    .catalog-frame {
+      display: grid;
+      grid-template-columns: 265px 1fr;
+      gap: 14px;
+      align-items: start;
+    }
+    .panel {
+      background: var(--paper);
+      border: 1px solid var(--line);
+      box-shadow: var(--shadow);
+      border-radius: 8px;
+      overflow: hidden;
+      margin-bottom: 0;
+    }
+    .filters { padding: 14px; position: sticky; top: 14px; }
+    .filters h2, .content h2 { margin: 0 0 9px; font-size: 15px; }
+    .stat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 7px; margin-bottom: 14px; }
+    .stat { border: 1px solid var(--line); border-radius: 6px; padding: 8px; background: var(--soft); }
+    .stat strong { display: block; font-size: 20px; line-height: 1.15; }
+    .stat span { color: var(--muted); font-size: 12px; }
+    .filter-group { border-top: 1px solid var(--line); padding-top: 11px; margin-top: 11px; }
+    .filter-buttons { display: flex; gap: 6px; flex-wrap: wrap; }
+    .filter-button {
+      border: 1px solid var(--line);
+      background: #fff;
+      color: var(--ink);
+      border-radius: 999px;
+      padding: 5px 9px;
+      cursor: pointer;
+      font-size: 13px;
+      margin: 0;
+    }
+    .filter-button.active { background: #1f2933; color: #fff; border-color: #1f2933; }
+    .content { padding: 14px; min-width: 0; }
+    .api-reference {
+      margin-top: 14px;
+      padding: 18px;
+      font-size: 14px;
+      line-height: 1.45;
+    }
+    .api-reference h2 { margin: 0 0 8px; font-size: 16px; line-height: 1.3; }
+    .api-reference p { margin: 0 0 10px; font-size: 14px; line-height: 1.45; }
+    .api-reference table {
+      margin: 10px 0 12px;
+      width: 100%;
+      font-size: 13px;
+    }
+    .api-reference td,
+    .api-reference th {
+      vertical-align: top;
+      padding: 7px 8px;
+    }
+    .api-reference pre {
+      margin: 0;
+      overflow-x: auto;
+      border: 1px solid var(--line);
+      background: #f8fafc;
+      border-radius: 6px;
+      padding: 10px;
+      font-size: 12px;
+      line-height: 1.45;
+    }
+    .api-reference code { font-size: 0.92em; }
+    .muted { color: var(--muted); }
+    .toolbar { display: flex; justify-content: flex-end; align-items: center; margin-bottom: 10px; }
+    .search {
+      width: min(620px, 100%);
+      border: 1px solid var(--line-strong);
+      background: #fff;
+      border-radius: 6px;
+      padding: 9px 11px;
+      font-size: 15px;
+      margin: 0;
+    }
+    .count { color: var(--muted); white-space: nowrap; }
+    .package-list { display: grid; gap: 9px; }
+    .package-card {
+      border: 1px solid var(--line);
+      background: #fff;
+      border-radius: 7px;
+      padding: 12px;
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 12px;
+      margin: 0;
+    }
+    .package-title { display: flex; gap: 8px; align-items: baseline; flex-wrap: wrap; margin-bottom: 5px; }
+    .package-title a {
+      font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      font-size: 16px;
+      font-weight: 700;
+      color: #152238;
+    }
+    .version {
+      font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      color: var(--muted);
+      font-size: 12px;
+      border: 1px solid var(--line);
+      border-radius: 4px;
+      padding: 2px 5px;
+      background: var(--soft);
+    }
+    .description { color: #343941; margin: 0 0 8px; line-height: 1.38; }
+    .meta-line { color: var(--muted); font-size: 13px; display: flex; gap: 14px; flex-wrap: wrap; }
+    .meta-line code { font-size: 12px; }
+    .card-actions { display: flex; gap: 8px; align-items: start; }
+    .card-actions a {
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      padding: 6px 8px;
+      background: var(--soft);
+      color: #29303a;
+      font-size: 13px;
+      margin: 0;
+    }
+    .tags { display: flex; gap: 5px; flex-wrap: wrap; margin-top: 8px; }
+    .tag {
+      border: 0;
+      border-radius: 999px;
+      padding: 3px 7px;
+      font-size: 12px;
+      cursor: pointer;
+      color: #1c2732;
+      margin: 0;
+    }
+    .tag-blue { background: #dcecf7; color: #164965; }
+    .tag-green { background: #dff0df; color: #23562a; }
+    .tag-gold { background: #f3e6bd; color: #6b4b10; }
+    .tag-cyan { background: #d8f0f0; color: #165456; }
+    .tag-purple { background: #eadff4; color: #4d2d68; }
+    .tag-slate { background: #e4e8ee; color: #344052; }
+    .tag-red { background: #f5ded8; color: #7b2c1f; }
+    .tag-gray { background: #ece8df; color: #4a4b4d; }
+    .detail-layout {
+      display: grid;
+      grid-template-columns: 1fr 340px;
+      gap: 14px;
+      align-items: start;
+      margin-top: 16px;
+    }
+    .detail-main, .detail-side { padding: 14px; }
+    .detail-main h2, .detail-side h2 { margin: 0 0 10px; font-size: 18px; }
+    .detail-side h2:not(:first-child) { margin-top: 16px; }
+    .kv {
+      display: grid;
+      grid-template-columns: 92px minmax(0, 1fr);
+      gap: 4px 10px;
+      font-size: 14px;
+      line-height: 1.32;
+      margin: 0 0 10px;
+    }
+    .kv div:nth-child(odd) { color: var(--muted); }
+    .kv div:nth-child(even) { min-width: 0; overflow-wrap: anywhere; }
+    .cap-list { margin: 0; padding-left: 0; list-style: none; display: grid; gap: 5px; }
+    .cap-list li {
+      font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      font-size: 13px;
+      border: 1px solid var(--line);
+      background: var(--soft);
+      border-radius: 5px;
+      padding: 6px 7px;
+      overflow-wrap: anywhere;
+      margin: 0;
+    }
+    .cap-list li span {
+      color: var(--muted);
+      display: inline-block;
+      min-width: 64px;
+    }
+    .back { display: inline-block; margin: 14px 0; color: var(--accent); }
+    .generated { color: var(--muted); margin-top: 12px; font-size: 13px; }
+    footer {
+      color: var(--muted);
+      font-size: 12px;
+    }
+    footer.shell { padding-block: 18px 28px; }
+    .readme {
+      line-height: 1.58;
+      color: #1f2937;
+      overflow-wrap: anywhere;
+    }
+    .readme h1 { font-size: 24px; margin-bottom: 10px; }
+    .readme h2 { font-size: 19px; border-bottom: 1px solid var(--line); padding-bottom: 6px; margin: 22px 0 10px; }
+    .readme h3 { font-size: 16px; margin: 18px 0 8px; }
+    .readme p, .readme ul, .readme ol { margin-bottom: 10px; }
+    .readme pre {
+      overflow: auto;
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      background: #f8fafc;
+      padding: 10px;
+      max-width: 100%;
+    }
+    .readme code {
+      background: #f1f5f9;
+      border-radius: 4px;
+      padding: 1px 4px;
+      font-size: 0.92em;
+    }
+    .readme pre code { background: transparent; padding: 0; }
+    .readme table { border-collapse: collapse; width: 100%; display: block; overflow-x: auto; }
+    .readme th, .readme td { border: 1px solid var(--line); padding: 6px 8px; }
+    code { font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
+    @media (max-width: 860px) {
+      .shell { width: min(100% - 28px, 1180px); }
+      .catalog-frame, .detail-layout { grid-template-columns: 1fr; }
+      .filters { position: static; }
+      .toolbar { align-items: stretch; flex-direction: column; }
+      .package-card { grid-template-columns: 1fr; }
+      .card-actions { justify-content: flex-start; }
+      .api-reference { padding: 16px; }
+    }
+    
+  </style>
+</head>
+<body>
+  <header class="shell">
+    <a class="back" href="../">Back to packages</a>
+    <h1>robonix.primitive.agilex.piper.handeye</h1>
+    <p class="lede">Hand-eye calibration TF publisher (vendored easy_handeye2 0.5.0).</p>
+  </header>
+  <main class="shell">
+    <div class="detail-layout">
+      <section class="panel detail-main">
+        <h2>README</h2>
+        <article class="readme">
+          <h1>primitive-agilex-piper-handeye-rbnx</h1>
+<p>Robonix package for hand-eye calibration TF publishing on the Piper + Orbbec Dabai DCW grasp pipeline. Vendors <code>easy_handeye2</code> 0.5.0.</p>
+<p>Catalog name: <code>robonix.primitive.agilex.piper.handeye</code>.</p>
+<blockquote>
+<p>⚠️  <strong>THE VENDORED CALIB IS A PLACEHOLDER (identity transform).</strong>
+Pick-and-place will silently miss every grasp until you replace <code>config/calibrations/my_eih_calib.calib</code> with a real calibration result. See <a href="#replacing-the-calibration">Replacing the calibration</a>.</p>
+</blockquote>
+<h2>What it does</h2>
+<p>Runs upstream <code>easy_handeye2</code>'s <code>handeye_publisher</code> node, which broadcasts a single static TF on <code>/tf_static</code> based on a calibration YAML. In eye-in-hand mode (the default we ship), that's:</p>
+<pre><code>link6 → camera_color_optical_frame
+</code></pre>
+<ul>
+<li><code>link6</code> is published by <code>primitive-agilex-piper-description-rbnx</code>.</li>
+<li><code>camera_color_optical_frame</code> is published by <code>primitive-orbbec-dabai_dcw-camera-rbnx</code> once the camera is up.</li>
+</ul>
+<p>With this package running, the chain <code>base_link → link1..link6 → camera_color_optical_frame</code> is complete and downstream consumers (<code>service-grasp-pose-rbnx</code>, <code>skill-pick-rbnx</code>) can transform pixel detections into base-frame poses.</p>
+<h2>Capability surface</h2>
+<pre><code class="language-yaml">capabilities: []
+</code></pre>
+<p>Nothing routed on atlas. TF is a global ROS 2 side-channel (<code>/tf_static</code>); atlas-routing would add indirection with no benefit — every consumer uses <code>tf2_ros::Buffer</code> to look up transforms, not an atlas-routed RPC. This package just <code>RegisterPrimitive</code> on atlas so <code>rbnx boot</code>'s <code>wait_for_registration</code> loop unblocks.</p>
+<h2>Driver-init lifecycle</h2>
+<p>There is <strong>no <code>Driver(CMD_INIT)</code> handler</strong>. The package registers a provider on atlas so <code>rbnx boot</code> proceeds, but does not receive a config JSON. <code>start.sh</code>:</p>
+<ol>
+<li>stages the calibration file into <code>~/.ros2/easy_handeye2/calibrations/&lt;name&gt;.calib</code> (upstream hardcodes that path);</li>
+<li>runs <code>ros2 launch easy_handeye2 publish.launch.py name:=&lt;name&gt;</code>.</li>
+</ol>
+<h3>Calib staging quirk (important for debugging)</h3>
+<p>Upstream's <code>easy_handeye2/easy_handeye2/__init__.py</code> hardcodes:</p>
+<pre><code class="language-python">CALIBRATIONS_DIRECTORY = pathlib.Path(
+    os.path.expanduser('~/.ros2/easy_handeye2/calibrations'))
+</code></pre>
+<p>…and <code>handeye_publisher</code> reads <code>&lt;CALIBRATIONS_DIRECTORY&gt;/&lt;name&gt;.calib</code> where <code>&lt;name&gt;</code> is the launch arg. We do not modify upstream (stays vendor-clean for future re-imports), so at start time <code>atlas_register_and_launch.py</code> copies <code>config/calibrations/&lt;name&gt;.calib</code> into <code>~/.ros2/easy_handeye2/calibrations/&lt;name&gt;.calib</code> and then runs the launch.</p>
+<p>If <code>~/.ros2/easy_handeye2/calibrations/&lt;name&gt;.calib</code> already exists (operator placed a fresh calib there directly via the upstream calibration GUI), we leave it alone and warn — overwriting would clobber the operator's most recent calibration with a stale vendored copy. Set <code>EASY_HANDEYE2_FORCE_STAGE=1</code> if you really do want to overwrite (i.e. you've intentionally committed a new calib to this package and want it to win).</p>
+<h2>Boot ordering</h2>
+<p>Independent of <code>primitive-agilex-piper-description-rbnx</code> — the two publish disjoint <code>/tf_static</code> subtrees. Recommend listing this <strong>after</strong> description just for readability.</p>
+<h2>Layout</h2>
+<pre><code>primitive-agilex-piper-handeye-rbnx/
+├── package_manifest.yaml
+├── config/calibrations/
+│   └── my_eih_calib.calib              # ← YAML serialization of
+│                                       #    HandeyeCalibration msg
+│                                       #    (currently identity!)
+├── scripts/
+│   ├── build.sh                        # rbnx codegen + colcon build
+│   ├── start.sh                        # source ROS + overlay, exec ↓
+│   └── atlas_register_and_launch.py    # register + stage calib +
+│                                       # spawn `ros2 launch easy_handeye2
+│                                       # publish.launch.py`
+└── src/
+    ├── easy_handeye2/                  # upstream 0.5.0 (vendored)
+    └── easy_handeye2_msgs/             # upstream 0.5.0 (vendored)
+</code></pre>
+<h2>Config / overrides</h2>
+<p>This package has <strong>no <code>*/driver</code> capability</strong>, so <code>rbnx boot v0.1</code> cannot deliver per-package config via <code>Driver(CMD_INIT, config_json)</code>. <strong>The <code>config:</code> block in the deploy manifest is ignored.</strong> Use the top-level <code>env:</code> block instead:</p>
+<pre><code class="language-yaml">env:
+  EASY_HANDEYE2_CALIB_NAME:    my_eih_calib                # default
+  EASY_HANDEYE2_CALIB_PATH:    /abs/path/to.calib          # absolute (wins)
+  EASY_HANDEYE2_FORCE_STAGE:   &quot;0&quot;                         # overwrite ~/.ros2 staged
+</code></pre>
+<table>
+<thead>
+<tr>
+<th>env var</th>
+<th>resolution priority</th>
+<th>default</th>
+<th>meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>EASY_HANDEYE2_CALIB_PATH</code></td>
+<td>1 (highest)</td>
+<td>unset</td>
+<td>absolute path to a <code>.calib</code> file. Basename (minus <code>.calib</code>) becomes the launch <code>name:=</code>.</td>
+</tr>
+<tr>
+<td><code>EASY_HANDEYE2_CALIB_NAME</code></td>
+<td>2</td>
+<td><code>my_eih_calib</code></td>
+<td>resolves to <code>&lt;pkg&gt;/config/calibrations/&lt;name&gt;.calib</code>.</td>
+</tr>
+<tr>
+<td><code>EASY_HANDEYE2_FORCE_STAGE</code></td>
+<td>—</td>
+<td><code>0</code></td>
+<td><code>1</code> = overwrite <code>~/.ros2/easy_handeye2/calibrations/&lt;name&gt;.calib</code>.</td>
+</tr>
+<tr>
+<td><code>ROBONIX_ATLAS</code></td>
+<td>—</td>
+<td><code>127.0.0.1:50051</code></td>
+<td>atlas gRPC endpoint.</td>
+</tr>
+</tbody>
+</table>
+<h2>Replacing the calibration</h2>
+<p>The shipped <code>config/calibrations/my_eih_calib.calib</code> is an <strong>identity transform with eye-in-hand metadata</strong> — <code>robot_effector_frame: link6</code> / <code>tracking_base_frame: camera_color_optical_frame</code>. The TF it publishes will be zero-translation, identity-rotation. <strong>You must replace it.</strong></p>
+<h3>Option A — Calibrate fresh on the real hardware (recommended)</h3>
+<p>Standard <code>easy_handeye2</code> workflow. Requires the camera to actually see an ArUco marker mounted at <code>tracking_marker_frame</code>.</p>
+<pre><code class="language-bash"># 1. Bring up Piper + Orbbec + Piper URDF.
+cd &lt;deploy_dir&gt;
+rbnx boot
+
+# 2. In another shell — run the upstream calibration GUI.
+ros2 launch easy_handeye2 calibrate.launch.py \
+    calibration_type:=eye_in_hand \
+    name:=my_eih_calib \
+    robot_base_frame:=base_link \
+    robot_effector_frame:=link6 \
+    tracking_base_frame:=camera_color_optical_frame \
+    tracking_marker_frame:=tracking_marker
+
+# 3. Take 10-20 samples (move arm to varied poses, click &quot;Take
+#    Sample&quot;), then &quot;Compute&quot; → &quot;Save&quot;. Upstream writes:
+#      ~/.ros2/easy_handeye2/calibrations/my_eih_calib.calib
+
+# 4. Copy that result back into this package:
+cp ~/.ros2/easy_handeye2/calibrations/my_eih_calib.calib \
+   &lt;this_package&gt;/config/calibrations/
+
+# 5. git commit + push. Other deploy machines pick up the new calib
+#    automatically next time they pull + rebuild.
+</code></pre>
+<h3>Option B — Swap in a pre-existing calib file</h3>
+<pre><code class="language-bash">cp my_existing.calib \
+   &lt;this_package&gt;/config/calibrations/my_eih_calib.calib
+</code></pre>
+<p>…or point at it via env (no copy needed):</p>
+<pre><code class="language-yaml">env:
+  EASY_HANDEYE2_CALIB_PATH: /home/user/calibrations/my_existing.calib
+</code></pre>
+<p>The basename (minus <code>.calib</code>) becomes the launch <code>name:=</code>.</p>
+<h2>Verification</h2>
+<pre><code class="language-bash">rbnx caps | grep easy_handeye2
+# expect: easy_handeye2 provider, 0 capabilities
+
+ros2 run tf2_ros tf2_echo link6 camera_color_optical_frame
+# expect: a constant transform (the static calibration result)
+# - with the placeholder calib, this is identity (translation 0,
+#   quaternion (0,0,0,1)) which means &quot;camera at the center of
+#   link6 with no rotation&quot; — physically wrong.
+
+# Full chain check:
+ros2 run tf2_ros tf2_echo base_link camera_color_optical_frame
+# expect: a transform that varies as the arm moves (joint TF
+# from RSP) but with the calibration step constant.
+</code></pre>
+<h2>Frame contract</h2>
+<table>
+<thead>
+<tr>
+<th>frame</th>
+<th>published by</th>
+<th>role</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>base_link</code></td>
+<td><code>primitive-agilex-piper-description-rbnx</code></td>
+<td>arm root</td>
+</tr>
+<tr>
+<td><code>link1</code>..<code>link6</code></td>
+<td><code>primitive-agilex-piper-description-rbnx</code></td>
+<td>joint-driven</td>
+</tr>
+<tr>
+<td><code>camera_color_optical_frame</code></td>
+<td><code>primitive-orbbec-dabai_dcw-camera-rbnx</code></td>
+<td>RGB sensor frame</td>
+</tr>
+<tr>
+<td><code>link6 → camera_color_optical_frame</code></td>
+<td><strong>this package</strong></td>
+<td>static hand-eye TF</td>
+</tr>
+</tbody>
+</table>
+<p>If <code>tracking_base_frame</code> in the calib differs from <code>camera_color_optical_frame</code> (e.g. you use the depth sensor frame instead), update both this calib AND the grasp-pose consumer's frame expectation.</p>
+<h2>Why we vendor instead of <code>apt install ros-humble-easy-handeye2</code></h2>
+<ol>
+<li><strong>Reproducibility across deploy machines</strong> — vendoring guarantees byte-for-byte the same publisher behavior across different Jetsons.</li>
+<li><strong>Calib file format pinning</strong> — the YAML schema is upstream's <code>HandeyeCalibration</code> msg with <code>set_message_fields</code>. If upstream adds a field and we apt-upgrade, our placeholder + operator's old <code>.calib</code> files break. Vendoring isolates us from that.</li>
+<li><strong>No build surprises</strong> — upstream's <code>package.xml</code> declares <code>python-transforms3d-pip</code>, <code>python3-opencv</code>, <code>rqt_gui</code> as <code>exec_depend</code> for the calibration GUI. We only run <code>handeye_publisher</code> (which does not import any of those), so we silently tolerate them being absent on the build machine.</li>
+</ol>
+<h2>Multi-arm note</h2>
+<p>If two arms are present (future), each must have its own calib file with a unique <code>name</code>. Spawn this package twice in the deploy manifest with different <code>EASY_HANDEYE2_CALIB_NAME</code> per instance. The <code>link6</code> / <code>camera_color_optical_frame</code> frame names will need to differ between instances too — that is a <code>piper_description</code> / OrbbecSDK URDF/namespace issue, outside this package's scope.</p>
+<h2>License</h2>
+<p>This package: MulanPSL-2.0. Vendored <code>easy_handeye2</code> / <code>easy_handeye2_msgs</code>: see their respective LICENSE files.</p>
+        </article>
+      </section>
+      <aside class="panel detail-side">
+        <h2>Package</h2>
+        <div class="kv">
+          <div>Version</div><div><code>0.1.0</code></div>
+          <div>Kind</div><div>primitive</div>
+          <div>Type</div><div>package</div>
+          <div>Maintainers</div><div>lhw2002426 &lt;lhw2002426@users.noreply.github.com&gt;</div>
+          <div>Repository</div><div><a href="https://github.com/syswonder/primitive-agilex-piper-handeye-rbnx">primitive-agilex-piper-handeye-rbnx</a></div>
+          <div>Branch</div><div><code>main</code></div>
+          <div>Manifest</div><div><code>package_manifest.yaml</code></div>
+          <div>API</div><div><a href="../../api/v1/package/robonix.primitive.agilex.piper.handeye">package metadata</a></div>
+        </div>
+        <div class="tags"><button class="tag tag-blue" data-tag="primitive">primitive</button> <button class="tag tag-gray" data-tag="calibration">calibration</button> <button class="tag tag-gray" data-tag="handeye">handeye</button> <button class="tag tag-gray" data-tag="easy_handeye2">easy_handeye2</button> <button class="tag tag-gray" data-tag="agilex">agilex</button> <button class="tag tag-gray" data-tag="piper">piper</button> <button class="tag tag-gray" data-tag="ros2">ros2</button></div>
+        <h2>Capabilities</h2>
+        <ul class="cap-list">
+          
+        </ul>
+      </aside>
+    </div>
+  </main>
+  <footer class="shell">Generated on 2026-07-13T13:31:01+00:00.</footer>
+</body>
+</html>

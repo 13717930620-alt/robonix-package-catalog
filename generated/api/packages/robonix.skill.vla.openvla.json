@@ -1,0 +1,26 @@
+{
+  "name": "robonix.skill.vla.openvla",
+  "version": "0.2.0",
+  "description": "VLA client skill — LLM-callable entry point for vision-language-action inference and JOINT-SPACE execution.",
+  "tags": [
+    "skill",
+    "vla",
+    "manipulation",
+    "llm"
+  ],
+  "repo": "https://github.com/syswonder/skill-vla-openvla-rbnx",
+  "maintainers": [
+    "lhw2002426 <lhw2002426@users.noreply.github.com>"
+  ],
+  "repo_name": "skill-vla-openvla-rbnx",
+  "default_branch": "main",
+  "kind": "skill",
+  "catalog_type": "package",
+  "manifest": "package_manifest.yaml",
+  "capabilities": [
+    "robonix/skill/vla/driver",
+    "robonix/skill/vla/execute"
+  ],
+  "deploy_dependencies": [],
+  "readme_url": "https://github.com/syswonder/skill-vla-openvla-rbnx/blob/main/README.md"
+}

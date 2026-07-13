@@ -302,7 +302,7 @@
       <aside class="panel filters">
         <div class="stat-grid">
           <div class="stat"><strong>2</strong><span>robot deployments</span></div>
-          <div class="stat"><strong>14</strong><span>indexed items</span></div>
+          <div class="stat"><strong>27</strong><span>indexed items</span></div>
         </div>
         <div class="filter-group">
           <h2>Kind</h2>
@@ -315,7 +315,7 @@
           <h2>Tags</h2>
           <div class="filter-buttons" id="tagFilters">
             <button class="filter-button active" data-tag-filter="">All</button>
-            <button class="filter-button" data-tag-filter="agilex">agilex</button><button class="filter-button" data-tag-filter="camera">camera</button><button class="filter-button" data-tag-filter="deploy">deploy</button><button class="filter-button" data-tag-filter="lidar">lidar</button><button class="filter-button" data-tag-filter="mapping">mapping</button><button class="filter-button" data-tag-filter="navigation">navigation</button><button class="filter-button" data-tag-filter="r550">r550</button><button class="filter-button" data-tag-filter="ranger_mini_v3">ranger_mini_v3</button><button class="filter-button" data-tag-filter="robot">robot</button><button class="filter-button" data-tag-filter="wheeltec">wheeltec</button>
+            <button class="filter-button" data-tag-filter="agilex">agilex</button><button class="filter-button" data-tag-filter="camera">camera</button><button class="filter-button" data-tag-filter="deploy">deploy</button><button class="filter-button" data-tag-filter="jetson">jetson</button><button class="filter-button" data-tag-filter="lidar">lidar</button><button class="filter-button" data-tag-filter="mapping">mapping</button><button class="filter-button" data-tag-filter="navigation">navigation</button><button class="filter-button" data-tag-filter="r550">r550</button><button class="filter-button" data-tag-filter="ranger_mini_v3">ranger_mini_v3</button><button class="filter-button" data-tag-filter="rgbd">rgbd</button><button class="filter-button" data-tag-filter="robot">robot</button><button class="filter-button" data-tag-filter="scene">scene</button><button class="filter-button" data-tag-filter="wheeltec">wheeltec</button>
           </div>
         </div>
       </aside>
@@ -324,19 +324,19 @@
           <div class="count" id="count"></div>
         </div>
         <div class="package-list" id="packages">
-          <article class="package-card" data-kind="robot" data-tags="robot deploy agilex ranger_mini_v3 lidar camera navigation mapping" data-search="robonix.robot.agilex.ranger_mini_v3 0.1.0 robot robonix deploy manifest for the agilex ranger mini v3 robot. https://github.com/syswonder/robot-agilex-ranger_mini_v3 wheatfox &lt;wheatfox17@icloud.com&gt; robot deploy agilex ranger_mini_v3 lidar camera navigation mapping mid360_lidar mid360_imu realsense_camera ranger_chassis mapping nav2 explore">
+          <article class="package-card" data-kind="robot" data-tags="robot deploy agilex ranger_mini_v3 jetson lidar rgbd scene mapping navigation" data-search="robonix.robot.agilex.ranger_mini_v3 0.2.0 robot robonix deployment for the agilex ranger mini v3 robot. https://github.com/syswonder/robot-agilex-ranger_mini_v3 wheatfox &lt;wheatfox17@icloud.com&gt; robot deploy agilex ranger_mini_v3 jetson lidar rgbd scene mapping navigation robot_description mid360_lidar mid360_imu realsense_camera orbbec_camera ranger_chassis piper_ctl audio_driver audio_client_bridge memory speech voiceprint llm_detect grasp_pose roboarm_ik mapping nav2 explore greet pick">
         <div>
           <div class="package-title">
             <a href="robonix.robot.agilex.ranger_mini_v3/">robonix.robot.agilex.ranger_mini_v3</a>
-            <span class="version">v0.1.0</span>
+            <span class="version">v0.2.0</span>
           </div>
-          <p class="description">Robonix deploy manifest for the AgileX Ranger Mini v3 robot.</p>
+          <p class="description">Robonix deployment for the AgileX Ranger Mini v3 robot.</p>
           <div class="meta-line">
             <span>maintainers <strong>wheatfox &lt;wheatfox17@icloud.com&gt;</strong></span>
-            <span>7 dependencies</span>
+            <span>20 dependencies</span>
             <span><code>robot-agilex-ranger_mini_v3</code></span>
           </div>
-          <div class="tags"><button class="tag tag-red" data-tag="robot">robot</button> <button class="tag tag-slate" data-tag="deploy">deploy</button> <button class="tag tag-gray" data-tag="agilex">agilex</button> <button class="tag tag-gray" data-tag="ranger_mini_v3">ranger_mini_v3</button> <button class="tag tag-purple" data-tag="lidar">lidar</button> <button class="tag tag-cyan" data-tag="camera">camera</button> <button class="tag tag-green" data-tag="navigation">navigation</button> <button class="tag tag-blue" data-tag="mapping">mapping</button></div>
+          <div class="tags"><button class="tag tag-red" data-tag="robot">robot</button> <button class="tag tag-slate" data-tag="deploy">deploy</button> <button class="tag tag-gray" data-tag="agilex">agilex</button> <button class="tag tag-gray" data-tag="ranger_mini_v3">ranger_mini_v3</button> <button class="tag tag-gray" data-tag="jetson">jetson</button> <button class="tag tag-purple" data-tag="lidar">lidar</button> <button class="tag tag-gray" data-tag="rgbd">rgbd</button> <button class="tag tag-gray" data-tag="scene">scene</button> <button class="tag tag-blue" data-tag="mapping">mapping</button> <button class="tag tag-green" data-tag="navigation">navigation</button></div>
         </div>
         <div class="card-actions">
           <a href="robonix.robot.agilex.ranger_mini_v3/">Details</a>
@@ -380,7 +380,7 @@ const catalog = await fetch(`${base}/packages`).then(r => r.json());
 const detail = await fetch(`${base}/package/${encodeURIComponent('robonix.service.mapping')}`).then(r => r.json());</code></pre>
     </section>
   </main>
-  <footer class="shell">Generated on 2026-07-07T08:16:00+00:00.</footer>
+  <footer class="shell">Generated on 2026-07-13T13:31:01+00:00.</footer>
   <script>
     const input = document.getElementById('q');
     const cards = Array.from(document.querySelectorAll('.package-card'));

@@ -385,7 +385,7 @@ time — obstacles populate the costmaps straight from the SLAM grid, and the
 owns <code>map→odom</code> (rtabmap in the Webots example); no AMCL or pre-built map.</p>
 <h2>Deployment targets</h2>
 <p>Nav2 itself is large and the upstream <code>apt</code> packages build cleanly on Humble, so
-this package vendors only the YAML params in <code>config/</code>. Three targets cover the
+this package vendors YAML plus one small Ranger terminal plugin. Three targets cover the
 common deployments; the target is selected by <code>RBNX_BUILD_TARGET</code> (build) and the
 matching per-target package manifest (<code>rbnx boot -f … --manifest</code>):</p>
 <table>
@@ -425,7 +425,7 @@ matching per-target package manifest (<code>rbnx boot -f … --manifest</code>):
 </ul>
 <p><code>bash
   sudo apt install ros-humble-nav2-bringup ros-humble-navigation2 \
-                   ros-humble-pointcloud-to-laserscan</code></p>
+                   ros-humble-pointcloud-to-laserscan ros-humble-rtabmap-util</code></p>
 <p><code>scripts/build.sh</code> verifies the host packages; <code>scripts/start_native.sh</code>
   sources the host ROS2 and runs the bridge directly. The dispatch honours
   <code>ROBONIX_NAV2_FORCE</code> / <code>ROBONIX_NAV2_PLATFORM</code> overrides.</p>
@@ -475,8 +475,29 @@ an operator's tuning lives outside the package.</p>
 <td>AMCL + map</td>
 <td>Generic map-based navigation</td>
 </tr>
+<tr>
+<td><code>ranger_mini_v3</code></td>
+<td><code>map</code></td>
+<td>external SLAM</td>
+<td>Ranger Mini v3 with bounded, replan-persistent terminal rotation</td>
+</tr>
 </tbody>
 </table>
+<p>The Ranger profile keeps DWB for path tracking but replaces Humble's stock
+terminal state. <code>ControllerServer</code> resets the goal checker and DWB critics each
+time a replanned path arrives; at 5 Hz this clears the normal <code>RotateToGoal</code>
+XY latch and can re-enable translation after skid-steer rotation drifts XY.
+<code>PersistentGoalChecker</code> and <code>PersistentRotateToGoalCritic</code> reset only when the
+actual goal changes. Once the robot enters 0.30 m, translation stays disabled;
+0.45 m XY drift, 15 seconds, three seconds without yaw progress, or excessive
+cumulative rotation stops the controller with an actionable failure. Terminal
+angular velocity is capped at 0.30 rad/s. The Ranger recovery tree has no spin
+or backup motion.</p>
+<p>Daytime acceptance uses <code>scripts/ranger_acceptance.py PLAN.yaml</code>. It is a dry
+run by default; sending goals requires both <code>--execute</code> and
+<code>--i-understand-robot-will-move</code>. Each goal is sent once with no automatic
+retry. The JSON report records terminal XY drift, accumulated rotation,
+commands, stopped velocity, duration, and the Nav2 action result.</p>
 <h2>Atlas contract dependencies</h2>
 <p>The wrapper resolves every topic it consumes through atlas
 (<code>ATLAS.find_capability</code> + <code>connect_capability</code>) — it does NOT know which package
@@ -536,9 +557,9 @@ body-description provider owns <code>base_link → sensor_*</code> via <code>rob
 Under <code>sim</code>, an online-SLAM provider (rtabmap in the Webots example) supplies
 both <code>map → odom</code> and the <code>/map</code> the costmaps' static layer consumes.</p>
 <p>If your costmap references <code>/scan</code> but only <code>primitive/lidar/lidar3d</code>
-(PointCloud2) is on atlas, the image ships <code>pointcloud_to_laserscan</code> — add it to
-the launch, or switch the costmap layer to <code>VoxelLayer</code> with
-<code>data_type: PointCloud2</code>.</p>
+(PointCloud2) is on atlas, the Ranger profile owns the adapter. Set
+<code>scan_deskewing: true</code> only when the cloud has per-point timestamps; it runs
+RTAB-Map's lidar deskewing against the chassis odom TF before projection.</p>
 <h2>DDS / sysctl tuning (multi-container deploys)</h2>
 <p>The docker targets run Nav2 with <code>--network host</code> and a UDP-only FastDDS profile
 (<code>docker/no_shm_profile.xml</code>) — SHM is disabled because cross-container SHM
@@ -566,6 +587,7 @@ sudo sysctl -w net.core.wmem_max=2147483647
 │   ├── build.sh                           codegen + per-target build (RBNX_BUILD_TARGET)
 │   ├── start.sh                           docker ↔ native dispatch
 │   └── start_native.sh                    host ROS2 path
+├── terminal_controller/                   persistent goal checker + DWB critic
 ├── docker/
 │   ├── Dockerfile                         ROS2 Humble + Nav2 + pointcloud_to_laserscan
 │   ├── entrypoint.sh
@@ -602,6 +624,6 @@ sudo sysctl -w net.core.wmem_max=2147483647
       </aside>
     </div>
   </main>
-  <footer class="shell">Generated on 2026-07-07T08:16:00+00:00.</footer>
+  <footer class="shell">Generated on 2026-07-13T13:31:01+00:00.</footer>
 </body>
 </html>
