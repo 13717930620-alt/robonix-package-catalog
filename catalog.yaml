@@ -28,9 +28,9 @@ packages:
   - name: robonix.service.piper_moveit
     repo: https://github.com/syswonder/service-piper-moveit-rbnx
   - name: robonix.skill.pick.vertical_grasp
-    repo: https://github.com/syswonder/skill-pick-rbnx
+    repo: https://github.com/syswonder/skill-pick-vertical-grasp-rbnx
   - name: robonix.skill.vla.openvla
-    repo: https://github.com/syswonder/skill-vla-rbnx
+    repo: https://github.com/syswonder/skill-vla-openvla-rbnx
 
 robots:
   - name: robonix.robot.agilex.ranger_mini_v3
