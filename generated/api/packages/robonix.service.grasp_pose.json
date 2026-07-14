@@ -24,5 +24,6 @@
     "robonix/service/perception/grasp_pose/grasps"
   ],
   "deploy_dependencies": [],
-  "readme_url": "https://github.com/syswonder/service-grasp-pose-rbnx/blob/main/README.md"
+  "readme_url": "https://github.com/syswonder/service-grasp-pose-rbnx/blob/main/README.md",
+  "preview_image_url": ""
 }

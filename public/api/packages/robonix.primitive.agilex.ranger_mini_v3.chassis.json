@@ -24,5 +24,6 @@
     "robonix/primitive/chassis/twist_in"
   ],
   "deploy_dependencies": [],
-  "readme_url": "https://github.com/syswonder/primitive-agilex-ranger_mini_v3-chassis-rbnx/blob/main/README.md"
+  "readme_url": "https://github.com/syswonder/primitive-agilex-ranger_mini_v3-chassis-rbnx/blob/main/README.md",
+  "preview_image_url": ""
 }

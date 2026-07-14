@@ -26,5 +26,6 @@
     "robonix/primitive/arm/pos_cmd"
   ],
   "deploy_dependencies": [],
-  "readme_url": "https://github.com/syswonder/primitive-agilex-piper-arm-rbnx/blob/main/README.md"
+  "readme_url": "https://github.com/syswonder/primitive-agilex-piper-arm-rbnx/blob/main/README.md",
+  "preview_image_url": ""
 }

@@ -72,6 +72,7 @@ Package object fields:
 | `capabilities` | string[] | declared Robonix contract IDs |
 | `deploy_dependencies` | object[] | robot deployment dependencies parsed from `robonix_manifest.yaml` |
 | `readme_url` | string | GitHub README URL for the indexed branch |
+| `preview_image_url` | string | optional robot preview discovered at `assets/robot.jpg`; empty when absent |
 
 ### JavaScript
 
@@ -168,6 +169,11 @@ catalog:
     - wheatfox <wheatfox17@icloud.com>
 ```
 
+A robot deployment repository may add `assets/robot.jpg`. When present,
+the catalog exposes its raw URL as `preview_image_url` and displays the
+photo in the robot deployment list. Repositories without the file keep
+the same metadata and layout without an image placeholder.
+
 The builder also parses `primitive:`, `service:`, and `skill:` entries from
 `robonix_manifest.yaml` into `deploy_dependencies[]`, linking dependencies
 back to cataloged ordinary packages when their repository is known.
@@ -195,7 +201,7 @@ integrations should use the `/api/v1/...` paths above.
 The generated commit uses `[skip ci]`; normal CI only triggers from
 `catalog.yaml`, the builder script, the workflow, or manual dispatch.
 
-Generated on `2026-07-13T13:31:01+00:00`.
+Generated on `2026-07-14T07:25:17+00:00`.
 
 ## Packages
 

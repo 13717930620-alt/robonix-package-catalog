@@ -183,6 +183,21 @@
       font-size: 13px;
       margin: 0;
     }
+    .card-side {
+      display: grid;
+      gap: 10px;
+      justify-items: end;
+      align-content: start;
+    }
+    .card-preview {
+      display: block;
+      width: 190px;
+      aspect-ratio: 4 / 3;
+      object-fit: cover;
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      background: var(--soft);
+    }
     .tags { display: flex; gap: 5px; flex-wrap: wrap; margin-top: 8px; }
     .tag {
       border: 0;
@@ -268,6 +283,9 @@
       font-size: 0.92em;
     }
     .readme pre code { background: transparent; padding: 0; }
+    .readme .highlight { margin: 10px 0; }
+    .readme .highlight pre { margin: 0; }
+    .readme img { display: block; max-width: 100%; height: auto; border-radius: 7px; }
     .readme table { border-collapse: collapse; width: 100%; display: block; overflow-x: auto; }
     .readme th, .readme td { border: 1px solid var(--line); padding: 6px 8px; }
     code { font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
@@ -277,10 +295,87 @@
       .filters { position: static; }
       .toolbar { align-items: stretch; flex-direction: column; }
       .package-card { grid-template-columns: 1fr; }
+      .card-side { justify-items: start; }
       .card-actions { justify-content: flex-start; }
+      .card-preview { width: min(100%, 360px); }
       .api-reference { padding: 16px; }
     }
     
+pre { line-height: 125%; }
+td.linenos .normal { color: #666666; background-color: transparent; padding-left: 5px; padding-right: 5px; }
+span.linenos { color: #666666; background-color: transparent; padding-left: 5px; padding-right: 5px; }
+td.linenos .special { color: #000000; background-color: #ffffc0; padding-left: 5px; padding-right: 5px; }
+span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 5px; padding-right: 5px; }
+.highlight .hll { background-color: #ffffcc }
+.highlight { background: #f0f0f0; }
+.highlight .c { color: #60A0B0; font-style: italic } /* Comment */
+.highlight .err { border: 1px solid #F00 } /* Error */
+.highlight .k { color: #007020; font-weight: bold } /* Keyword */
+.highlight .o { color: #666 } /* Operator */
+.highlight .ch { color: #60A0B0; font-style: italic } /* Comment.Hashbang */
+.highlight .cm { color: #60A0B0; font-style: italic } /* Comment.Multiline */
+.highlight .cp { color: #007020 } /* Comment.Preproc */
+.highlight .cpf { color: #60A0B0; font-style: italic } /* Comment.PreprocFile */
+.highlight .c1 { color: #60A0B0; font-style: italic } /* Comment.Single */
+.highlight .cs { color: #60A0B0; background-color: #FFF0F0 } /* Comment.Special */
+.highlight .gd { color: #A00000 } /* Generic.Deleted */
+.highlight .ge { font-style: italic } /* Generic.Emph */
+.highlight .ges { font-weight: bold; font-style: italic } /* Generic.EmphStrong */
+.highlight .gr { color: #F00 } /* Generic.Error */
+.highlight .gh { color: #000080; font-weight: bold } /* Generic.Heading */
+.highlight .gi { color: #00A000 } /* Generic.Inserted */
+.highlight .go { color: #888 } /* Generic.Output */
+.highlight .gp { color: #C65D09; font-weight: bold } /* Generic.Prompt */
+.highlight .gs { font-weight: bold } /* Generic.Strong */
+.highlight .gu { color: #800080; font-weight: bold } /* Generic.Subheading */
+.highlight .gt { color: #04D } /* Generic.Traceback */
+.highlight .kc { color: #007020; font-weight: bold } /* Keyword.Constant */
+.highlight .kd { color: #007020; font-weight: bold } /* Keyword.Declaration */
+.highlight .kn { color: #007020; font-weight: bold } /* Keyword.Namespace */
+.highlight .kp { color: #007020 } /* Keyword.Pseudo */
+.highlight .kr { color: #007020; font-weight: bold } /* Keyword.Reserved */
+.highlight .kt { color: #902000 } /* Keyword.Type */
+.highlight .m { color: #40A070 } /* Literal.Number */
+.highlight .s { color: #4070A0 } /* Literal.String */
+.highlight .na { color: #4070A0 } /* Name.Attribute */
+.highlight .nb { color: #007020 } /* Name.Builtin */
+.highlight .nc { color: #0E84B5; font-weight: bold } /* Name.Class */
+.highlight .no { color: #60ADD5 } /* Name.Constant */
+.highlight .nd { color: #555; font-weight: bold } /* Name.Decorator */
+.highlight .ni { color: #D55537; font-weight: bold } /* Name.Entity */
+.highlight .ne { color: #007020 } /* Name.Exception */
+.highlight .nf { color: #06287E } /* Name.Function */
+.highlight .nl { color: #002070; font-weight: bold } /* Name.Label */
+.highlight .nn { color: #0E84B5; font-weight: bold } /* Name.Namespace */
+.highlight .nt { color: #062873; font-weight: bold } /* Name.Tag */
+.highlight .nv { color: #BB60D5 } /* Name.Variable */
+.highlight .ow { color: #007020; font-weight: bold } /* Operator.Word */
+.highlight .w { color: #BBB } /* Text.Whitespace */
+.highlight .mb { color: #40A070 } /* Literal.Number.Bin */
+.highlight .mf { color: #40A070 } /* Literal.Number.Float */
+.highlight .mh { color: #40A070 } /* Literal.Number.Hex */
+.highlight .mi { color: #40A070 } /* Literal.Number.Integer */
+.highlight .mo { color: #40A070 } /* Literal.Number.Oct */
+.highlight .sa { color: #4070A0 } /* Literal.String.Affix */
+.highlight .sb { color: #4070A0 } /* Literal.String.Backtick */
+.highlight .sc { color: #4070A0 } /* Literal.String.Char */
+.highlight .dl { color: #4070A0 } /* Literal.String.Delimiter */
+.highlight .sd { color: #4070A0; font-style: italic } /* Literal.String.Doc */
+.highlight .s2 { color: #4070A0 } /* Literal.String.Double */
+.highlight .se { color: #4070A0; font-weight: bold } /* Literal.String.Escape */
+.highlight .sh { color: #4070A0 } /* Literal.String.Heredoc */
+.highlight .si { color: #70A0D0; font-style: italic } /* Literal.String.Interpol */
+.highlight .sx { color: #C65D09 } /* Literal.String.Other */
+.highlight .sr { color: #235388 } /* Literal.String.Regex */
+.highlight .s1 { color: #4070A0 } /* Literal.String.Single */
+.highlight .ss { color: #517918 } /* Literal.String.Symbol */
+.highlight .bp { color: #007020 } /* Name.Builtin.Pseudo */
+.highlight .fm { color: #06287E } /* Name.Function.Magic */
+.highlight .vc { color: #BB60D5 } /* Name.Variable.Class */
+.highlight .vg { color: #BB60D5 } /* Name.Variable.Global */
+.highlight .vi { color: #BB60D5 } /* Name.Variable.Instance */
+.highlight .vm { color: #BB60D5 } /* Name.Variable.Magic */
+.highlight .il { color: #40A070 } /* Literal.Number.Integer.Long */
   </style>
 </head>
 <body>
@@ -299,7 +394,7 @@
 <p>Catalog name: <code>robonix.skill.pick.vertical_grasp</code>.</p>
 <h2>What it does</h2>
 <p>Exposes a single MCP tool — <code>robonix/skill/pick/pick(object_name)</code> — that orchestrates three upstream services into one synchronous "pick the X" call:</p>
-<pre><code>                 Pilot LLM
+<div class="highlight"><pre><span></span><code>                 Pilot LLM
                      │
              pick(&quot;the comb&quot;)           (MCP)
                      │
@@ -317,7 +412,7 @@
         ▼            ▼             ▼
        2D bbox    grasp pose     arm motion
        + 3D ctr   + width        + gripper close
-</code></pre>
+</code></pre></div>
 <p>All three upstream calls are <strong>MCP HTTP</strong> (FastMCP Client). Atlas resolves the URLs at <code>on_activate</code> time. There is <strong>no fallback</strong> to legacy ROS service paths — this skill speaks robonix contracts only.</p>
 <h2>Capability surface</h2>
 <table>
@@ -346,10 +441,10 @@
 </table>
 <h2>Lifecycle (lazy activate)</h2>
 <p>Skills differ from primitives / services here — they do not auto-bring-up on <code>rbnx boot</code>:</p>
-<pre><code>boot:
+<div class="highlight"><pre><span></span><code>boot:
   CMD_INIT     ── light: parse cfg, log defaults. State = INITIALIZED.
                   (No atlas resolution — upstream services may still be
-                   warming up, and we don't want to deadlock boot order.)
+                   warming up, and we don&#39;t want to deadlock boot order.)
 
 first MCP call:
   CMD_ACTIVATE ── heavy: block up to 60 s waiting for atlas to
@@ -358,8 +453,8 @@ first MCP call:
 idle:
   CMD_DEACTIVATE ── drop endpoint cache + FastMCP client cache.
                     Re-ACTIVATE rebuilds. (Eviction policy is
-                    executor's, not ours.)
-</code></pre>
+                    executor&#39;s, not ours.)
+</code></pre></div>
 <h2>Boot ordering</h2>
 <p>Skills are launched by soma stage 2 after all primitives and services. <code>skill-pick-rbnx</code> has no boot-time dependency on its upstreams (lazy activate covers that) — but <code>service-object-detect-rbnx</code>, <code>service-grasp-pose-rbnx</code>, and <code>service-piper-moveit-rbnx</code> <strong>MUST be <code>ACTIVE</code></strong> before the first <code>pick()</code> call. If any is missing at that moment, <code>pick()</code> fails fast with a clear "missing dependencies" message rather than silently timing out mid-motion.</p>
 <h2>Pipeline implementation</h2>
@@ -390,7 +485,7 @@ idle:
 </ul>
 <p>If the caller passes <code>timeout_s=0</code>, we use <code>default_timeout_s</code> (60 s by default; tunable via deploy manifest config).</p>
 <h2>Layout</h2>
-<pre><code>skill-pick-rbnx/
+<div class="highlight"><pre><span></span><code>skill-pick-rbnx/
 ├── package_manifest.yaml
 ├── capabilities/
 │   ├── driver.v1.toml             # rpc, lifecycle/srv/Driver.srv
@@ -404,46 +499,46 @@ idle:
 │   ├── build.sh                   # rbnx codegen --mcp ONLY (no colcon!)
 │   └── start.sh                   # source ROS, exec atlas_bridge
 └── (no src/ — pure Python, no vendored ROS packages)
-</code></pre>
+</code></pre></div>
 <p><code>src/</code> is intentionally absent. Unlike primitives / services we do not vendor any ROS source: the skill talks to upstream services exclusively over MCP HTTP, and our own surfaces (<code>Pick.srv</code> codegen) only need Python dataclasses. Build is significantly faster (~2 s vs ~30–60 s for the moveit package).</p>
 <h2>Config (passed via <code>Driver(CMD_INIT, config_json)</code>)</h2>
-<pre><code class="language-yaml">default_timeout_s:    60.0      # used when caller passes 0
-default_max_retries:  5         # used when caller passes 0
-</code></pre>
+<div class="highlight"><pre><span></span><code><span class="nt">default_timeout_s</span><span class="p">:</span><span class="w">    </span><span class="l l-Scalar l-Scalar-Plain">60.0</span><span class="w">      </span><span class="c1"># used when caller passes 0</span>
+<span class="nt">default_max_retries</span><span class="p">:</span><span class="w">  </span><span class="l l-Scalar l-Scalar-Plain">5</span><span class="w">         </span><span class="c1"># used when caller passes 0</span>
+</code></pre></div>
 <p>Both optional. <code>pick(timeout_s, max_retries)</code> arguments override these per-call.</p>
 <h2>Build / run standalone</h2>
-<pre><code class="language-bash">bash scripts/build.sh                                 # rbnx codegen --mcp (fast, ~2 s)
-ROBONIX_ATLAS=127.0.0.1:50051 \
-    bash scripts/start.sh
-</code></pre>
+<div class="highlight"><pre><span></span><code>bash<span class="w"> </span>scripts/build.sh<span class="w">                                 </span><span class="c1"># rbnx codegen --mcp (fast, ~2 s)</span>
+<span class="nv">ROBONIX_ATLAS</span><span class="o">=</span><span class="m">127</span>.0.0.1:50051<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>bash<span class="w"> </span>scripts/start.sh
+</code></pre></div>
 <h2>Verification</h2>
-<pre><code class="language-bash"># 1. atlas-side: provider visible, INITIALIZED at boot
-rbnx caps | grep pick
-# expect: pick  robonix.skill.pick.vertical_grasp  INITIALIZED
-#   robonix/skill/pick/driver  (rpc/grpc)
-#   robonix/skill/pick/pick    (rpc/mcp)
+<div class="highlight"><pre><span></span><code><span class="c1"># 1. atlas-side: provider visible, INITIALIZED at boot</span>
+rbnx<span class="w"> </span>caps<span class="w"> </span><span class="p">|</span><span class="w"> </span>grep<span class="w"> </span>pick
+<span class="c1"># expect: pick  robonix.skill.pick.vertical_grasp  INITIALIZED</span>
+<span class="c1">#   robonix/skill/pick/driver  (rpc/grpc)</span>
+<span class="c1">#   robonix/skill/pick/pick    (rpc/mcp)</span>
 
-# 2. End-to-end via Pilot LLM (design intent):
-rbnx ask &quot;请帮我把那个 comb 抓起来&quot;
-# pilot should:
-#   * pick the `pick` MCP tool
-#   * call it with object_name=&quot;comb&quot;
-#   * return the grasp result to the user
+<span class="c1"># 2. End-to-end via Pilot LLM (design intent):</span>
+rbnx<span class="w"> </span>ask<span class="w"> </span><span class="s2">&quot;请帮我把那个 comb 抓起来&quot;</span>
+<span class="c1"># pilot should:</span>
+<span class="c1">#   * pick the `pick` MCP tool</span>
+<span class="c1">#   * call it with object_name=&quot;comb&quot;</span>
+<span class="c1">#   * return the grasp result to the user</span>
 
-# 3. Direct MCP test (skip pilot):
-curl -s http://127.0.0.1:&lt;pick_skill_port&gt;/mcp/ \
-    -H &quot;Content-Type: application/json&quot; \
-    -H &quot;Accept: application/json, text/event-stream&quot; \
-    -d '{
-      &quot;jsonrpc&quot;:&quot;2.0&quot;, &quot;id&quot;:1,
-      &quot;method&quot;:&quot;tools/call&quot;,
-      &quot;params&quot;:{
-        &quot;name&quot;:&quot;pick&quot;,
-        &quot;arguments&quot;:{&quot;object_name&quot;:&quot;comb&quot;,&quot;timeout_s&quot;:60.0,&quot;max_retries&quot;:5}
-      }
-    }'
-# Find the port via `rbnx caps -v` or the package's start log.
-</code></pre>
+<span class="c1"># 3. Direct MCP test (skip pilot):</span>
+curl<span class="w"> </span>-s<span class="w"> </span>http://127.0.0.1:&lt;pick_skill_port&gt;/mcp/<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>-H<span class="w"> </span><span class="s2">&quot;Content-Type: application/json&quot;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>-H<span class="w"> </span><span class="s2">&quot;Accept: application/json, text/event-stream&quot;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>-d<span class="w"> </span><span class="s1">&#39;{</span>
+<span class="s1">      &quot;jsonrpc&quot;:&quot;2.0&quot;, &quot;id&quot;:1,</span>
+<span class="s1">      &quot;method&quot;:&quot;tools/call&quot;,</span>
+<span class="s1">      &quot;params&quot;:{</span>
+<span class="s1">        &quot;name&quot;:&quot;pick&quot;,</span>
+<span class="s1">        &quot;arguments&quot;:{&quot;object_name&quot;:&quot;comb&quot;,&quot;timeout_s&quot;:60.0,&quot;max_retries&quot;:5}</span>
+<span class="s1">      }</span>
+<span class="s1">    }&#39;</span>
+<span class="c1"># Find the port via `rbnx caps -v` or the package&#39;s start log.</span>
+</code></pre></div>
 <h2>Failure modes</h2>
 <table>
 <thead>
@@ -518,6 +613,6 @@ curl -s http://127.0.0.1:&lt;pick_skill_port&gt;/mcp/ \
       </aside>
     </div>
   </main>
-  <footer class="shell">Generated on 2026-07-13T13:31:01+00:00.</footer>
+  <footer class="shell">Generated on 2026-07-14T07:25:17+00:00.</footer>
 </body>
 </html>

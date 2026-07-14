@@ -183,6 +183,21 @@
       font-size: 13px;
       margin: 0;
     }
+    .card-side {
+      display: grid;
+      gap: 10px;
+      justify-items: end;
+      align-content: start;
+    }
+    .card-preview {
+      display: block;
+      width: 190px;
+      aspect-ratio: 4 / 3;
+      object-fit: cover;
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      background: var(--soft);
+    }
     .tags { display: flex; gap: 5px; flex-wrap: wrap; margin-top: 8px; }
     .tag {
       border: 0;
@@ -268,6 +283,9 @@
       font-size: 0.92em;
     }
     .readme pre code { background: transparent; padding: 0; }
+    .readme .highlight { margin: 10px 0; }
+    .readme .highlight pre { margin: 0; }
+    .readme img { display: block; max-width: 100%; height: auto; border-radius: 7px; }
     .readme table { border-collapse: collapse; width: 100%; display: block; overflow-x: auto; }
     .readme th, .readme td { border: 1px solid var(--line); padding: 6px 8px; }
     code { font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
@@ -277,10 +295,87 @@
       .filters { position: static; }
       .toolbar { align-items: stretch; flex-direction: column; }
       .package-card { grid-template-columns: 1fr; }
+      .card-side { justify-items: start; }
       .card-actions { justify-content: flex-start; }
+      .card-preview { width: min(100%, 360px); }
       .api-reference { padding: 16px; }
     }
     
+pre { line-height: 125%; }
+td.linenos .normal { color: #666666; background-color: transparent; padding-left: 5px; padding-right: 5px; }
+span.linenos { color: #666666; background-color: transparent; padding-left: 5px; padding-right: 5px; }
+td.linenos .special { color: #000000; background-color: #ffffc0; padding-left: 5px; padding-right: 5px; }
+span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 5px; padding-right: 5px; }
+.highlight .hll { background-color: #ffffcc }
+.highlight { background: #f0f0f0; }
+.highlight .c { color: #60A0B0; font-style: italic } /* Comment */
+.highlight .err { border: 1px solid #F00 } /* Error */
+.highlight .k { color: #007020; font-weight: bold } /* Keyword */
+.highlight .o { color: #666 } /* Operator */
+.highlight .ch { color: #60A0B0; font-style: italic } /* Comment.Hashbang */
+.highlight .cm { color: #60A0B0; font-style: italic } /* Comment.Multiline */
+.highlight .cp { color: #007020 } /* Comment.Preproc */
+.highlight .cpf { color: #60A0B0; font-style: italic } /* Comment.PreprocFile */
+.highlight .c1 { color: #60A0B0; font-style: italic } /* Comment.Single */
+.highlight .cs { color: #60A0B0; background-color: #FFF0F0 } /* Comment.Special */
+.highlight .gd { color: #A00000 } /* Generic.Deleted */
+.highlight .ge { font-style: italic } /* Generic.Emph */
+.highlight .ges { font-weight: bold; font-style: italic } /* Generic.EmphStrong */
+.highlight .gr { color: #F00 } /* Generic.Error */
+.highlight .gh { color: #000080; font-weight: bold } /* Generic.Heading */
+.highlight .gi { color: #00A000 } /* Generic.Inserted */
+.highlight .go { color: #888 } /* Generic.Output */
+.highlight .gp { color: #C65D09; font-weight: bold } /* Generic.Prompt */
+.highlight .gs { font-weight: bold } /* Generic.Strong */
+.highlight .gu { color: #800080; font-weight: bold } /* Generic.Subheading */
+.highlight .gt { color: #04D } /* Generic.Traceback */
+.highlight .kc { color: #007020; font-weight: bold } /* Keyword.Constant */
+.highlight .kd { color: #007020; font-weight: bold } /* Keyword.Declaration */
+.highlight .kn { color: #007020; font-weight: bold } /* Keyword.Namespace */
+.highlight .kp { color: #007020 } /* Keyword.Pseudo */
+.highlight .kr { color: #007020; font-weight: bold } /* Keyword.Reserved */
+.highlight .kt { color: #902000 } /* Keyword.Type */
+.highlight .m { color: #40A070 } /* Literal.Number */
+.highlight .s { color: #4070A0 } /* Literal.String */
+.highlight .na { color: #4070A0 } /* Name.Attribute */
+.highlight .nb { color: #007020 } /* Name.Builtin */
+.highlight .nc { color: #0E84B5; font-weight: bold } /* Name.Class */
+.highlight .no { color: #60ADD5 } /* Name.Constant */
+.highlight .nd { color: #555; font-weight: bold } /* Name.Decorator */
+.highlight .ni { color: #D55537; font-weight: bold } /* Name.Entity */
+.highlight .ne { color: #007020 } /* Name.Exception */
+.highlight .nf { color: #06287E } /* Name.Function */
+.highlight .nl { color: #002070; font-weight: bold } /* Name.Label */
+.highlight .nn { color: #0E84B5; font-weight: bold } /* Name.Namespace */
+.highlight .nt { color: #062873; font-weight: bold } /* Name.Tag */
+.highlight .nv { color: #BB60D5 } /* Name.Variable */
+.highlight .ow { color: #007020; font-weight: bold } /* Operator.Word */
+.highlight .w { color: #BBB } /* Text.Whitespace */
+.highlight .mb { color: #40A070 } /* Literal.Number.Bin */
+.highlight .mf { color: #40A070 } /* Literal.Number.Float */
+.highlight .mh { color: #40A070 } /* Literal.Number.Hex */
+.highlight .mi { color: #40A070 } /* Literal.Number.Integer */
+.highlight .mo { color: #40A070 } /* Literal.Number.Oct */
+.highlight .sa { color: #4070A0 } /* Literal.String.Affix */
+.highlight .sb { color: #4070A0 } /* Literal.String.Backtick */
+.highlight .sc { color: #4070A0 } /* Literal.String.Char */
+.highlight .dl { color: #4070A0 } /* Literal.String.Delimiter */
+.highlight .sd { color: #4070A0; font-style: italic } /* Literal.String.Doc */
+.highlight .s2 { color: #4070A0 } /* Literal.String.Double */
+.highlight .se { color: #4070A0; font-weight: bold } /* Literal.String.Escape */
+.highlight .sh { color: #4070A0 } /* Literal.String.Heredoc */
+.highlight .si { color: #70A0D0; font-style: italic } /* Literal.String.Interpol */
+.highlight .sx { color: #C65D09 } /* Literal.String.Other */
+.highlight .sr { color: #235388 } /* Literal.String.Regex */
+.highlight .s1 { color: #4070A0 } /* Literal.String.Single */
+.highlight .ss { color: #517918 } /* Literal.String.Symbol */
+.highlight .bp { color: #007020 } /* Name.Builtin.Pseudo */
+.highlight .fm { color: #06287E } /* Name.Function.Magic */
+.highlight .vc { color: #BB60D5 } /* Name.Variable.Class */
+.highlight .vg { color: #BB60D5 } /* Name.Variable.Global */
+.highlight .vi { color: #BB60D5 } /* Name.Variable.Instance */
+.highlight .vm { color: #BB60D5 } /* Name.Variable.Magic */
+.highlight .il { color: #40A070 } /* Literal.Number.Integer.Long */
   </style>
 </head>
 <body>
@@ -366,16 +461,16 @@ in the environment — the config dict arrives only over this gRPC channel.</p>
 <p>A minimal deploy that proves nav2 navigates the Webots Tiago lives in the
 robonix repo at <code>examples/webots/nav2_test.yaml</code> (atlas + executor + chassis +
 lidar + mapping + nav2). With the Webots sim already running:</p>
-<pre><code class="language-bash"># 1. one-time: build the nav2 docker image (x86 + docker is the default target)
-rbnx build -p /path/to/nav2_wrapper_rbnx        # builds image `robonix-nav2`
+<div class="highlight"><pre><span></span><code><span class="c1"># 1. one-time: build the nav2 docker image (x86 + docker is the default target)</span>
+rbnx<span class="w"> </span>build<span class="w"> </span>-p<span class="w"> </span>/path/to/nav2_wrapper_rbnx<span class="w">        </span><span class="c1"># builds image `robonix-nav2`</span>
 
-# 2. boot the stack
-cd &lt;robonix&gt;/examples/webots
-rbnx boot -f nav2_test.yaml                      # nav2 reaches ACTIVE
+<span class="c1"># 2. boot the stack</span>
+<span class="nb">cd</span><span class="w"> </span>&lt;robonix&gt;/examples/webots
+rbnx<span class="w"> </span>boot<span class="w"> </span>-f<span class="w"> </span>nav2_test.yaml<span class="w">                      </span><span class="c1"># nav2 reaches ACTIVE</span>
 
-# 3. send a goal over the navigate gRPC and watch /cmd_vel move the robot
-#    (goal in the map frame for the sim profile; see Params profiles)
-</code></pre>
+<span class="c1"># 3. send a goal over the navigate gRPC and watch /cmd_vel move the robot</span>
+<span class="c1">#    (goal in the map frame for the sim profile; see Params profiles)</span>
+</code></pre></div>
 <p>The <code>sim</code> params profile navigates in the <strong>map frame with online SLAM</strong>: an
 rtabmap mapping provider publishes both a live <code>/map</code> and a <code>map→odom</code> TF. Both
 costmaps anchor in <code>map</code> and a <code>StaticLayer</code> tracks <code>/map</code> as it grows
@@ -423,9 +518,9 @@ matching per-target package manifest (<code>rbnx boot -f … --manifest</code>):
 <li><strong>Native target</strong> (<code>jetson-native</code>) requires <code>ros-humble-nav2-bringup</code> +
   <code>ros-humble-navigation2</code> on the host:</li>
 </ul>
-<p><code>bash
-  sudo apt install ros-humble-nav2-bringup ros-humble-navigation2 \
-                   ros-humble-pointcloud-to-laserscan ros-humble-rtabmap-util</code></p>
+<div class="highlight"><pre><span></span><code>sudo<span class="w"> </span>apt<span class="w"> </span>install<span class="w"> </span>ros-humble-nav2-bringup<span class="w"> </span>ros-humble-navigation2<span class="w"> </span><span class="se">\</span>
+<span class="w">                 </span>ros-humble-pointcloud-to-laserscan<span class="w"> </span>ros-humble-rtabmap-util
+</code></pre></div>
 <p><code>scripts/build.sh</code> verifies the host packages; <code>scripts/start_native.sh</code>
   sources the host ROS2 and runs the bridge directly. The dispatch honours
   <code>ROBONIX_NAV2_FORCE</code> / <code>ROBONIX_NAV2_PLATFORM</code> overrides.</p>
@@ -433,16 +528,16 @@ matching per-target package manifest (<code>rbnx boot -f … --manifest</code>):
 <code>start:</code> lines set <code>RBNX_BUILD_TARGET</code> and run the right scripts; the dispatch in
 <code>build.sh</code> / <code>start.sh</code> already keys off that variable.</p>
 <h2>Config (passed via <code>Driver(CMD_INIT, config_json)</code>)</h2>
-<pre><code class="language-yaml">- name: nav2
-  url: https://github.com/syswonder/service-navigation-rbnx
-  branch: main
-  config:
-    params_profile: sim       # sim | slam | default  → config/nav2_params_&lt;profile&gt;.yml
-    params_file: &quot;&quot;           # absolute / package-relative path to override entirely
-    use_sim_time: true        # true under a simulator that publishes /clock
-    action_wait_s: 90.0       # how long to wait for navigate_to_pose to advertise
-    topic_remap: {}           # per-key override of atlas-resolved bindings
-</code></pre>
+<div class="highlight"><pre><span></span><code><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">nav2</span>
+<span class="w">  </span><span class="nt">url</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">https://github.com/syswonder/service-navigation-rbnx</span>
+<span class="w">  </span><span class="nt">branch</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">main</span>
+<span class="w">  </span><span class="nt">config</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">params_profile</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">sim</span><span class="w">       </span><span class="c1"># sim | slam | default  → config/nav2_params_&lt;profile&gt;.yml</span>
+<span class="w">    </span><span class="nt">params_file</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;&quot;</span><span class="w">           </span><span class="c1"># absolute / package-relative path to override entirely</span>
+<span class="w">    </span><span class="nt">use_sim_time</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span><span class="w">        </span><span class="c1"># true under a simulator that publishes /clock</span>
+<span class="w">    </span><span class="nt">action_wait_s</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">90.0</span><span class="w">       </span><span class="c1"># how long to wait for navigate_to_pose to advertise</span>
+<span class="w">    </span><span class="nt">topic_remap</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">{}</span><span class="w">           </span><span class="c1"># per-key override of atlas-resolved bindings</span>
+</code></pre></div>
 <p><code>params_profile</code> selects <code>config/nav2_params_&lt;profile&gt;.yml</code>. <code>params_file</code>
 (absolute, or relative to the package root) overrides it entirely — useful when
 an operator's tuning lives outside the package.</p>
@@ -493,6 +588,12 @@ actual goal changes. Once the robot enters 0.30 m, translation stays disabled;
 cumulative rotation stops the controller with an actionable failure. Terminal
 angular velocity is capped at 0.30 rad/s. The Ranger recovery tree has no spin
 or backup motion.</p>
+<p>The Ranger global planner also treats map coverage as a safety boundary. For a
+goal in known space it first requests a path with unknown cells forbidden. Only
+when no such path exists does it evaluate an unknown-enabled fallback, which is
+accepted only when unknown exposure is at most 5% and 0.75 m in total, with no
+continuous unknown segment longer than 0.40 m. A goal that is itself unknown is
+logged and handled by the explicit unknown-goal planner mode.</p>
 <p>Daytime acceptance uses <code>scripts/ranger_acceptance.py PLAN.yaml</code>. It is a dry
 run by default; sending goals requires both <code>--execute</code> and
 <code>--i-understand-robot-will-move</code>. Each goal is sent once with no automatic
@@ -543,11 +644,11 @@ as a launch remap.</p>
 </table>
 <p>Override any binding via the manifest's <code>topic_remap</code> block (e.g. to pin one of
 several providers, or tap a downstream filter):</p>
-<pre><code class="language-yaml">config:
-  topic_remap:
-    map: /robonix/map/occupancy_grid
-    scan: /scanner_normalized
-</code></pre>
+<div class="highlight"><pre><span></span><code><span class="nt">config</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">topic_remap</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">map</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/robonix/map/occupancy_grid</span>
+<span class="w">    </span><span class="nt">scan</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/scanner_normalized</span>
+</code></pre></div>
 <h2>TF prerequisites</h2>
 <p>Nav2 needs a healthy <code>odom → base_link → sensor</code> TF chain plus <code>map → odom</code> for
 all three profiles (<code>sim</code> included — it navigates in the map frame). TF is still
@@ -571,13 +672,13 @@ drop Nav2's lifecycle <code>change_state</code> replies, stalling bring-up
 ("failed to send response … timeout"). If you see Nav2 nodes stuck
 <code>unconfigured</code> / <code>inactive</code>, raise the host UDP buffers — the same fix used for
 high-rate lidar:</p>
-<pre><code class="language-bash">sudo sysctl -w net.core.rmem_max=2147483647
-sudo sysctl -w net.core.wmem_max=2147483647
-# persist: echo 'net.core.rmem_max=2147483647' | sudo tee /etc/sysctl.d/10-dds.conf
-</code></pre>
+<div class="highlight"><pre><span></span><code>sudo<span class="w"> </span>sysctl<span class="w"> </span>-w<span class="w"> </span>net.core.rmem_max<span class="o">=</span><span class="m">2147483647</span>
+sudo<span class="w"> </span>sysctl<span class="w"> </span>-w<span class="w"> </span>net.core.wmem_max<span class="o">=</span><span class="m">2147483647</span>
+<span class="c1"># persist: echo &#39;net.core.rmem_max=2147483647&#39; | sudo tee /etc/sysctl.d/10-dds.conf</span>
+</code></pre></div>
 <p>On a robot with a quiet network and tuned buffers this is unnecessary.</p>
 <h2>Layout</h2>
-<pre><code>nav2_wrapper_rbnx/
+<div class="highlight"><pre><span></span><code>nav2_wrapper_rbnx/
 ├── package_manifest.yaml                 x86-docker (default)
 ├── package_manifest.jetson-docker.yaml
 ├── package_manifest.jetson-native.yaml
@@ -596,7 +697,7 @@ sudo sysctl -w net.core.wmem_max=2147483647
     ├── nav2_params.yml
     ├── nav2_params_slam.yml
     └── nav2_params_sim.yml
-</code></pre>
+</code></pre></div>
 <h2>License</h2>
 <p>This package: Apache-2.0 (matches Nav2 upstream).</p>
         </article>
@@ -624,6 +725,6 @@ sudo sysctl -w net.core.wmem_max=2147483647
       </aside>
     </div>
   </main>
-  <footer class="shell">Generated on 2026-07-13T13:31:01+00:00.</footer>
+  <footer class="shell">Generated on 2026-07-14T07:25:17+00:00.</footer>
 </body>
 </html>

@@ -183,6 +183,21 @@
       font-size: 13px;
       margin: 0;
     }
+    .card-side {
+      display: grid;
+      gap: 10px;
+      justify-items: end;
+      align-content: start;
+    }
+    .card-preview {
+      display: block;
+      width: 190px;
+      aspect-ratio: 4 / 3;
+      object-fit: cover;
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      background: var(--soft);
+    }
     .tags { display: flex; gap: 5px; flex-wrap: wrap; margin-top: 8px; }
     .tag {
       border: 0;
@@ -268,6 +283,9 @@
       font-size: 0.92em;
     }
     .readme pre code { background: transparent; padding: 0; }
+    .readme .highlight { margin: 10px 0; }
+    .readme .highlight pre { margin: 0; }
+    .readme img { display: block; max-width: 100%; height: auto; border-radius: 7px; }
     .readme table { border-collapse: collapse; width: 100%; display: block; overflow-x: auto; }
     .readme th, .readme td { border: 1px solid var(--line); padding: 6px 8px; }
     code { font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
@@ -277,10 +295,87 @@
       .filters { position: static; }
       .toolbar { align-items: stretch; flex-direction: column; }
       .package-card { grid-template-columns: 1fr; }
+      .card-side { justify-items: start; }
       .card-actions { justify-content: flex-start; }
+      .card-preview { width: min(100%, 360px); }
       .api-reference { padding: 16px; }
     }
     
+pre { line-height: 125%; }
+td.linenos .normal { color: #666666; background-color: transparent; padding-left: 5px; padding-right: 5px; }
+span.linenos { color: #666666; background-color: transparent; padding-left: 5px; padding-right: 5px; }
+td.linenos .special { color: #000000; background-color: #ffffc0; padding-left: 5px; padding-right: 5px; }
+span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 5px; padding-right: 5px; }
+.highlight .hll { background-color: #ffffcc }
+.highlight { background: #f0f0f0; }
+.highlight .c { color: #60A0B0; font-style: italic } /* Comment */
+.highlight .err { border: 1px solid #F00 } /* Error */
+.highlight .k { color: #007020; font-weight: bold } /* Keyword */
+.highlight .o { color: #666 } /* Operator */
+.highlight .ch { color: #60A0B0; font-style: italic } /* Comment.Hashbang */
+.highlight .cm { color: #60A0B0; font-style: italic } /* Comment.Multiline */
+.highlight .cp { color: #007020 } /* Comment.Preproc */
+.highlight .cpf { color: #60A0B0; font-style: italic } /* Comment.PreprocFile */
+.highlight .c1 { color: #60A0B0; font-style: italic } /* Comment.Single */
+.highlight .cs { color: #60A0B0; background-color: #FFF0F0 } /* Comment.Special */
+.highlight .gd { color: #A00000 } /* Generic.Deleted */
+.highlight .ge { font-style: italic } /* Generic.Emph */
+.highlight .ges { font-weight: bold; font-style: italic } /* Generic.EmphStrong */
+.highlight .gr { color: #F00 } /* Generic.Error */
+.highlight .gh { color: #000080; font-weight: bold } /* Generic.Heading */
+.highlight .gi { color: #00A000 } /* Generic.Inserted */
+.highlight .go { color: #888 } /* Generic.Output */
+.highlight .gp { color: #C65D09; font-weight: bold } /* Generic.Prompt */
+.highlight .gs { font-weight: bold } /* Generic.Strong */
+.highlight .gu { color: #800080; font-weight: bold } /* Generic.Subheading */
+.highlight .gt { color: #04D } /* Generic.Traceback */
+.highlight .kc { color: #007020; font-weight: bold } /* Keyword.Constant */
+.highlight .kd { color: #007020; font-weight: bold } /* Keyword.Declaration */
+.highlight .kn { color: #007020; font-weight: bold } /* Keyword.Namespace */
+.highlight .kp { color: #007020 } /* Keyword.Pseudo */
+.highlight .kr { color: #007020; font-weight: bold } /* Keyword.Reserved */
+.highlight .kt { color: #902000 } /* Keyword.Type */
+.highlight .m { color: #40A070 } /* Literal.Number */
+.highlight .s { color: #4070A0 } /* Literal.String */
+.highlight .na { color: #4070A0 } /* Name.Attribute */
+.highlight .nb { color: #007020 } /* Name.Builtin */
+.highlight .nc { color: #0E84B5; font-weight: bold } /* Name.Class */
+.highlight .no { color: #60ADD5 } /* Name.Constant */
+.highlight .nd { color: #555; font-weight: bold } /* Name.Decorator */
+.highlight .ni { color: #D55537; font-weight: bold } /* Name.Entity */
+.highlight .ne { color: #007020 } /* Name.Exception */
+.highlight .nf { color: #06287E } /* Name.Function */
+.highlight .nl { color: #002070; font-weight: bold } /* Name.Label */
+.highlight .nn { color: #0E84B5; font-weight: bold } /* Name.Namespace */
+.highlight .nt { color: #062873; font-weight: bold } /* Name.Tag */
+.highlight .nv { color: #BB60D5 } /* Name.Variable */
+.highlight .ow { color: #007020; font-weight: bold } /* Operator.Word */
+.highlight .w { color: #BBB } /* Text.Whitespace */
+.highlight .mb { color: #40A070 } /* Literal.Number.Bin */
+.highlight .mf { color: #40A070 } /* Literal.Number.Float */
+.highlight .mh { color: #40A070 } /* Literal.Number.Hex */
+.highlight .mi { color: #40A070 } /* Literal.Number.Integer */
+.highlight .mo { color: #40A070 } /* Literal.Number.Oct */
+.highlight .sa { color: #4070A0 } /* Literal.String.Affix */
+.highlight .sb { color: #4070A0 } /* Literal.String.Backtick */
+.highlight .sc { color: #4070A0 } /* Literal.String.Char */
+.highlight .dl { color: #4070A0 } /* Literal.String.Delimiter */
+.highlight .sd { color: #4070A0; font-style: italic } /* Literal.String.Doc */
+.highlight .s2 { color: #4070A0 } /* Literal.String.Double */
+.highlight .se { color: #4070A0; font-weight: bold } /* Literal.String.Escape */
+.highlight .sh { color: #4070A0 } /* Literal.String.Heredoc */
+.highlight .si { color: #70A0D0; font-style: italic } /* Literal.String.Interpol */
+.highlight .sx { color: #C65D09 } /* Literal.String.Other */
+.highlight .sr { color: #235388 } /* Literal.String.Regex */
+.highlight .s1 { color: #4070A0 } /* Literal.String.Single */
+.highlight .ss { color: #517918 } /* Literal.String.Symbol */
+.highlight .bp { color: #007020 } /* Name.Builtin.Pseudo */
+.highlight .fm { color: #06287E } /* Name.Function.Magic */
+.highlight .vc { color: #BB60D5 } /* Name.Variable.Class */
+.highlight .vg { color: #BB60D5 } /* Name.Variable.Global */
+.highlight .vi { color: #BB60D5 } /* Name.Variable.Instance */
+.highlight .vm { color: #BB60D5 } /* Name.Variable.Magic */
+.highlight .il { color: #40A070 } /* Literal.Number.Integer.Long */
   </style>
 </head>
 <body>
@@ -298,14 +393,14 @@
 <p>Robonix package wrapping the <strong>AgileX Piper</strong> arm URDF + <code>robot_state_publisher</code>. Stand-in for <code>system.soma</code> (URDF + RSP), which is on robonix's v0.2 roadmap. Until soma ships that responsibility natively, this package owns the joint-driven TF tree for the Piper arm.</p>
 <p>Catalog name: <code>robonix.primitive.agilex.piper.description</code>.</p>
 <h2>What this package publishes</h2>
-<pre><code>base_link → link1 → link2 → link3 → link4 → link5 → link6 (→ gripper links)
-</code></pre>
+<div class="highlight"><pre><span></span><code>base_link → link1 → link2 → link3 → link4 → link5 → link6 (→ gripper links)
+</code></pre></div>
 <p>driven from <code>/arm/joint_states_single</code> via <code>robot_state_publisher</code>.</p>
 <p>The static <strong>hand-eye</strong> edge <code>link6 → camera_color_optical_frame</code> lives in the sibling package <code>primitive-agilex-piper-handeye-rbnx</code> (different lifecycle: URDF tracks code, calibration tracks physical re-mounts).</p>
 <h2>Capability surface</h2>
 <p><strong>Empty on purpose</strong>:</p>
-<pre><code class="language-yaml">capabilities: []
-</code></pre>
+<div class="highlight"><pre><span></span><code><span class="nt">capabilities</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[]</span>
+</code></pre></div>
 <p>The package registers a provider on atlas (so <code>rbnx boot</code> proceeds through the primitive block) but declares no routed contracts.</p>
 <p>TF is a global ROS 2 side-channel — every tf2-aware node joins <code>/tf</code> + <code>/tf_static</code> automatically — so atlas-routing it would only add indirection. With <code>capabilities: []</code>, <code>rbnx boot</code>'s <code>spawn_and_init</code> walks <code>wait_for_registration</code> → finds <code>driver_contract=None</code> → marks the package ACTIVE without trying to drive INIT / ACTIVATE.</p>
 <h2>Driver-init lifecycle</h2>
@@ -319,7 +414,7 @@
 <p>⚠️ <strong>Future moving-platform conflict</strong>: if the Piper ever sits on a Ranger Mini / mobile chassis whose own URDF also defines <code>base_link</code>, the two TF roots collide. Resolution then will be to fork the URDF and add a <code>tf_prefix</code> (e.g. <code>arm/</code>) to all link/joint names, AND update <code>primitive-agilex-piper-arm-rbnx</code>'s <code>JointState.name</code> accordingly. For the current fixed-arm grasp deploy no chassis is involved, so collision is impossible.</p>
 </blockquote>
 <h2>Layout</h2>
-<pre><code>primitive-agilex-piper-description-rbnx/
+<div class="highlight"><pre><span></span><code>primitive-agilex-piper-description-rbnx/
 ├── package_manifest.yaml        # capabilities: []
 ├── launch/
 │   └── piper_urdf.launch.py     # robot_state_publisher + remap
@@ -335,7 +430,7 @@
         ├── meshes/              # *.STL (~9 MB)
         └── urdf/                # piper_description.urdf (with-gripper, default)
                                  # piper_no_gripper_description.urdf (override via env)
-</code></pre>
+</code></pre></div>
 <h2>Build</h2>
 <p><code>scripts/build.sh</code> does two things, both fast:</p>
 <ol>
@@ -363,9 +458,9 @@
 </tbody>
 </table>
 <p>Example override to switch to the no-gripper variant:</p>
-<pre><code class="language-yaml">env:
-  PIPER_URDF_PATH: ${RBNX_INVOCATION_CWD}/../packages/piper_description/src/piper_description/urdf/piper_no_gripper_description.urdf
-</code></pre>
+<div class="highlight"><pre><span></span><code><span class="nt">env</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">PIPER_URDF_PATH</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">${RBNX_INVOCATION_CWD}/../packages/piper_description/src/piper_description/urdf/piper_no_gripper_description.urdf</span>
+</code></pre></div>
 <h2>Choosing the URDF variant</h2>
 <table>
 <thead>
@@ -390,23 +485,23 @@
 </table>
 <p>Override via <code>PIPER_URDF_PATH</code>, or by editing <code>atlas_register_and_launch.py::_resolve_urdf_path</code>.</p>
 <h2>Run standalone</h2>
-<pre><code class="language-bash">bash scripts/build.sh
-ROBONIX_ATLAS=127.0.0.1:50051 \
-    bash scripts/start.sh
-</code></pre>
+<div class="highlight"><pre><span></span><code>bash<span class="w"> </span>scripts/build.sh
+<span class="nv">ROBONIX_ATLAS</span><span class="o">=</span><span class="m">127</span>.0.0.1:50051<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>bash<span class="w"> </span>scripts/start.sh
+</code></pre></div>
 <p>The script exits if atlas is unreachable (5s RPC timeout). Once the launch is running, <code>/tf</code> should carry <code>base_link → link6</code> <strong>iff</strong> <code>primitive-agilex-piper-arm-rbnx</code> is also up and publishing JointState.</p>
 <h2>Verification</h2>
-<pre><code class="language-bash">rbnx caps | grep piper_description
-# Expected: piper_description provider, no caps
+<div class="highlight"><pre><span></span><code>rbnx<span class="w"> </span>caps<span class="w"> </span><span class="p">|</span><span class="w"> </span>grep<span class="w"> </span>piper_description
+<span class="c1"># Expected: piper_description provider, no caps</span>
 
-ros2 run tf2_ros tf2_echo base_link link6
-# Should report a transform that moves when you ros2 topic pub to
-# /arm/pos_cmd or wiggle the arm by hand.
+ros2<span class="w"> </span>run<span class="w"> </span>tf2_ros<span class="w"> </span>tf2_echo<span class="w"> </span>base_link<span class="w"> </span>link6
+<span class="c1"># Should report a transform that moves when you ros2 topic pub to</span>
+<span class="c1"># /arm/pos_cmd or wiggle the arm by hand.</span>
 
-# Optional: if primitive-agilex-piper-handeye-rbnx is up too, the chain
-# base_link → link6 → camera_color_optical_frame should resolve:
-ros2 run tf2_ros tf2_echo base_link camera_color_optical_frame
-</code></pre>
+<span class="c1"># Optional: if primitive-agilex-piper-handeye-rbnx is up too, the chain</span>
+<span class="c1"># base_link → link6 → camera_color_optical_frame should resolve:</span>
+ros2<span class="w"> </span>run<span class="w"> </span>tf2_ros<span class="w"> </span>tf2_echo<span class="w"> </span>base_link<span class="w"> </span>camera_color_optical_frame
+</code></pre></div>
 <h2>Vendor / upstream</h2>
 <p><code>src/piper_description/</code> is a verbatim subset of <a href="https://github.com/agilexrobotics/piper_ros">agilexrobotics/piper_ros</a> <code>src/piper_description/</code>, with the following stripped (none needed for TF publishing in a robonix deploy):</p>
 <ul>
@@ -438,6 +533,6 @@ ros2 run tf2_ros tf2_echo base_link camera_color_optical_frame
       </aside>
     </div>
   </main>
-  <footer class="shell">Generated on 2026-07-13T13:31:01+00:00.</footer>
+  <footer class="shell">Generated on 2026-07-14T07:25:17+00:00.</footer>
 </body>
 </html>

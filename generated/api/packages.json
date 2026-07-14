@@ -1,6 +1,6 @@
 {
   "api_version": "1",
-  "generated_at": "2026-07-13T13:31:01+00:00",
+  "generated_at": "2026-07-14T07:25:17+00:00",
   "packages": [
     {
       "name": "robonix.primitive.agilex.piper.arm",
@@ -30,7 +30,8 @@
         "robonix/primitive/arm/pos_cmd"
       ],
       "deploy_dependencies": [],
-      "readme_url": "https://github.com/syswonder/primitive-agilex-piper-arm-rbnx/blob/main/README.md"
+      "readme_url": "https://github.com/syswonder/primitive-agilex-piper-arm-rbnx/blob/main/README.md",
+      "preview_image_url": ""
     },
     {
       "name": "robonix.primitive.agilex.piper.description",
@@ -55,7 +56,8 @@
       "manifest": "package_manifest.yaml",
       "capabilities": [],
       "deploy_dependencies": [],
-      "readme_url": "https://github.com/syswonder/primitive-agilex-piper-description-rbnx/blob/main/README.md"
+      "readme_url": "https://github.com/syswonder/primitive-agilex-piper-description-rbnx/blob/main/README.md",
+      "preview_image_url": ""
     },
     {
       "name": "robonix.primitive.agilex.piper.handeye",
@@ -81,7 +83,8 @@
       "manifest": "package_manifest.yaml",
       "capabilities": [],
       "deploy_dependencies": [],
-      "readme_url": "https://github.com/syswonder/primitive-agilex-piper-handeye-rbnx/blob/main/README.md"
+      "readme_url": "https://github.com/syswonder/primitive-agilex-piper-handeye-rbnx/blob/main/README.md",
+      "preview_image_url": ""
     },
     {
       "name": "robonix.primitive.agilex.ranger_mini_v3.chassis",
@@ -109,7 +112,8 @@
         "robonix/primitive/chassis/twist_in"
       ],
       "deploy_dependencies": [],
-      "readme_url": "https://github.com/syswonder/primitive-agilex-ranger_mini_v3-chassis-rbnx/blob/main/README.md"
+      "readme_url": "https://github.com/syswonder/primitive-agilex-ranger_mini_v3-chassis-rbnx/blob/main/README.md",
+      "preview_image_url": ""
     },
     {
       "name": "robonix.primitive.intel.realsense_d435i.camera",
@@ -140,7 +144,8 @@
         "robonix/primitive/camera/depth_snapshot"
       ],
       "deploy_dependencies": [],
-      "readme_url": "https://github.com/syswonder/primitive-intel-realsense_d435i-camera-rbnx/blob/main/README.md"
+      "readme_url": "https://github.com/syswonder/primitive-intel-realsense_d435i-camera-rbnx/blob/main/README.md",
+      "preview_image_url": ""
     },
     {
       "name": "robonix.primitive.livox.mid360.imu",
@@ -166,7 +171,8 @@
         "robonix/primitive/imu/imu"
       ],
       "deploy_dependencies": [],
-      "readme_url": "https://github.com/syswonder/primitive-livox-mid360-imu-rbnx/blob/main/README.md"
+      "readme_url": "https://github.com/syswonder/primitive-livox-mid360-imu-rbnx/blob/main/README.md",
+      "preview_image_url": ""
     },
     {
       "name": "robonix.primitive.livox.mid360.lidar",
@@ -194,7 +200,8 @@
         "robonix/primitive/lidar/lidar_snapshot"
       ],
       "deploy_dependencies": [],
-      "readme_url": "https://github.com/syswonder/primitive-livox-mid360-lidar-rbnx/blob/main/README.md"
+      "readme_url": "https://github.com/syswonder/primitive-livox-mid360-lidar-rbnx/blob/main/README.md",
+      "preview_image_url": ""
     },
     {
       "name": "robonix.primitive.orbbec.dabai_dcw.camera",
@@ -224,7 +231,8 @@
         "robonix/primitive/camera/camera_info"
       ],
       "deploy_dependencies": [],
-      "readme_url": "https://github.com/syswonder/primitive-orbbec-dabai_dcw-camera-rbnx/blob/main/README.md"
+      "readme_url": "https://github.com/syswonder/primitive-orbbec-dabai_dcw-camera-rbnx/blob/main/README.md",
+      "preview_image_url": ""
     },
     {
       "name": "robonix.service.grasp_pose",
@@ -252,7 +260,8 @@
         "robonix/service/perception/grasp_pose/grasps"
       ],
       "deploy_dependencies": [],
-      "readme_url": "https://github.com/syswonder/service-grasp-pose-rbnx/blob/main/README.md"
+      "readme_url": "https://github.com/syswonder/service-grasp-pose-rbnx/blob/main/README.md",
+      "preview_image_url": ""
     },
     {
       "name": "robonix.service.mapping",
@@ -287,7 +296,8 @@
         "robonix/service/map/switch_mode"
       ],
       "deploy_dependencies": [],
-      "readme_url": "https://github.com/syswonder/service-map-rbnx/blob/main/README.md"
+      "readme_url": "https://github.com/syswonder/service-map-rbnx/blob/main/README.md",
+      "preview_image_url": ""
     },
     {
       "name": "robonix.service.navigation",
@@ -315,7 +325,8 @@
         "robonix/service/navigation/navigate/cancel"
       ],
       "deploy_dependencies": [],
-      "readme_url": "https://github.com/syswonder/service-navigation-rbnx/blob/main/README.md"
+      "readme_url": "https://github.com/syswonder/service-navigation-rbnx/blob/main/README.md",
+      "preview_image_url": ""
     },
     {
       "name": "robonix.service.object_detect",
@@ -343,7 +354,8 @@
         "robonix/service/perception/object_detect/detect_object"
       ],
       "deploy_dependencies": [],
-      "readme_url": "https://github.com/syswonder/service-object-detect-rbnx/blob/main/README.md"
+      "readme_url": "https://github.com/syswonder/service-object-detect-rbnx/blob/main/README.md",
+      "preview_image_url": ""
     },
     {
       "name": "robonix.service.piper_moveit",
@@ -372,7 +384,8 @@
         "robonix/service/manipulation/reset"
       ],
       "deploy_dependencies": [],
-      "readme_url": "https://github.com/syswonder/service-piper-moveit-rbnx/blob/main/README.md"
+      "readme_url": "https://github.com/syswonder/service-piper-moveit-rbnx/blob/main/README.md",
+      "preview_image_url": ""
     },
     {
       "name": "robonix.skill.explore",
@@ -401,7 +414,8 @@
         "robonix/skill/explore/explore/cancel"
       ],
       "deploy_dependencies": [],
-      "readme_url": "https://github.com/syswonder/skill-explore-rbnx/blob/main/README.md"
+      "readme_url": "https://github.com/syswonder/skill-explore-rbnx/blob/main/README.md",
+      "preview_image_url": ""
     },
     {
       "name": "robonix.skill.pick.vertical_grasp",
@@ -427,7 +441,8 @@
         "robonix/skill/pick/pick"
       ],
       "deploy_dependencies": [],
-      "readme_url": "https://github.com/syswonder/skill-pick-vertical-grasp-rbnx/blob/main/README.md"
+      "readme_url": "https://github.com/syswonder/skill-pick-vertical-grasp-rbnx/blob/main/README.md",
+      "preview_image_url": ""
     },
     {
       "name": "robonix.skill.vla.openvla",
@@ -453,7 +468,8 @@
         "robonix/skill/vla/execute"
       ],
       "deploy_dependencies": [],
-      "readme_url": "https://github.com/syswonder/skill-vla-openvla-rbnx/blob/main/README.md"
+      "readme_url": "https://github.com/syswonder/skill-vla-openvla-rbnx/blob/main/README.md",
+      "preview_image_url": ""
     }
   ]
 }

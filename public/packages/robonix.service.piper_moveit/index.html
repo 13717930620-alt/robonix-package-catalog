@@ -183,6 +183,21 @@
       font-size: 13px;
       margin: 0;
     }
+    .card-side {
+      display: grid;
+      gap: 10px;
+      justify-items: end;
+      align-content: start;
+    }
+    .card-preview {
+      display: block;
+      width: 190px;
+      aspect-ratio: 4 / 3;
+      object-fit: cover;
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      background: var(--soft);
+    }
     .tags { display: flex; gap: 5px; flex-wrap: wrap; margin-top: 8px; }
     .tag {
       border: 0;
@@ -268,6 +283,9 @@
       font-size: 0.92em;
     }
     .readme pre code { background: transparent; padding: 0; }
+    .readme .highlight { margin: 10px 0; }
+    .readme .highlight pre { margin: 0; }
+    .readme img { display: block; max-width: 100%; height: auto; border-radius: 7px; }
     .readme table { border-collapse: collapse; width: 100%; display: block; overflow-x: auto; }
     .readme th, .readme td { border: 1px solid var(--line); padding: 6px 8px; }
     code { font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
@@ -277,10 +295,87 @@
       .filters { position: static; }
       .toolbar { align-items: stretch; flex-direction: column; }
       .package-card { grid-template-columns: 1fr; }
+      .card-side { justify-items: start; }
       .card-actions { justify-content: flex-start; }
+      .card-preview { width: min(100%, 360px); }
       .api-reference { padding: 16px; }
     }
     
+pre { line-height: 125%; }
+td.linenos .normal { color: #666666; background-color: transparent; padding-left: 5px; padding-right: 5px; }
+span.linenos { color: #666666; background-color: transparent; padding-left: 5px; padding-right: 5px; }
+td.linenos .special { color: #000000; background-color: #ffffc0; padding-left: 5px; padding-right: 5px; }
+span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 5px; padding-right: 5px; }
+.highlight .hll { background-color: #ffffcc }
+.highlight { background: #f0f0f0; }
+.highlight .c { color: #60A0B0; font-style: italic } /* Comment */
+.highlight .err { border: 1px solid #F00 } /* Error */
+.highlight .k { color: #007020; font-weight: bold } /* Keyword */
+.highlight .o { color: #666 } /* Operator */
+.highlight .ch { color: #60A0B0; font-style: italic } /* Comment.Hashbang */
+.highlight .cm { color: #60A0B0; font-style: italic } /* Comment.Multiline */
+.highlight .cp { color: #007020 } /* Comment.Preproc */
+.highlight .cpf { color: #60A0B0; font-style: italic } /* Comment.PreprocFile */
+.highlight .c1 { color: #60A0B0; font-style: italic } /* Comment.Single */
+.highlight .cs { color: #60A0B0; background-color: #FFF0F0 } /* Comment.Special */
+.highlight .gd { color: #A00000 } /* Generic.Deleted */
+.highlight .ge { font-style: italic } /* Generic.Emph */
+.highlight .ges { font-weight: bold; font-style: italic } /* Generic.EmphStrong */
+.highlight .gr { color: #F00 } /* Generic.Error */
+.highlight .gh { color: #000080; font-weight: bold } /* Generic.Heading */
+.highlight .gi { color: #00A000 } /* Generic.Inserted */
+.highlight .go { color: #888 } /* Generic.Output */
+.highlight .gp { color: #C65D09; font-weight: bold } /* Generic.Prompt */
+.highlight .gs { font-weight: bold } /* Generic.Strong */
+.highlight .gu { color: #800080; font-weight: bold } /* Generic.Subheading */
+.highlight .gt { color: #04D } /* Generic.Traceback */
+.highlight .kc { color: #007020; font-weight: bold } /* Keyword.Constant */
+.highlight .kd { color: #007020; font-weight: bold } /* Keyword.Declaration */
+.highlight .kn { color: #007020; font-weight: bold } /* Keyword.Namespace */
+.highlight .kp { color: #007020 } /* Keyword.Pseudo */
+.highlight .kr { color: #007020; font-weight: bold } /* Keyword.Reserved */
+.highlight .kt { color: #902000 } /* Keyword.Type */
+.highlight .m { color: #40A070 } /* Literal.Number */
+.highlight .s { color: #4070A0 } /* Literal.String */
+.highlight .na { color: #4070A0 } /* Name.Attribute */
+.highlight .nb { color: #007020 } /* Name.Builtin */
+.highlight .nc { color: #0E84B5; font-weight: bold } /* Name.Class */
+.highlight .no { color: #60ADD5 } /* Name.Constant */
+.highlight .nd { color: #555; font-weight: bold } /* Name.Decorator */
+.highlight .ni { color: #D55537; font-weight: bold } /* Name.Entity */
+.highlight .ne { color: #007020 } /* Name.Exception */
+.highlight .nf { color: #06287E } /* Name.Function */
+.highlight .nl { color: #002070; font-weight: bold } /* Name.Label */
+.highlight .nn { color: #0E84B5; font-weight: bold } /* Name.Namespace */
+.highlight .nt { color: #062873; font-weight: bold } /* Name.Tag */
+.highlight .nv { color: #BB60D5 } /* Name.Variable */
+.highlight .ow { color: #007020; font-weight: bold } /* Operator.Word */
+.highlight .w { color: #BBB } /* Text.Whitespace */
+.highlight .mb { color: #40A070 } /* Literal.Number.Bin */
+.highlight .mf { color: #40A070 } /* Literal.Number.Float */
+.highlight .mh { color: #40A070 } /* Literal.Number.Hex */
+.highlight .mi { color: #40A070 } /* Literal.Number.Integer */
+.highlight .mo { color: #40A070 } /* Literal.Number.Oct */
+.highlight .sa { color: #4070A0 } /* Literal.String.Affix */
+.highlight .sb { color: #4070A0 } /* Literal.String.Backtick */
+.highlight .sc { color: #4070A0 } /* Literal.String.Char */
+.highlight .dl { color: #4070A0 } /* Literal.String.Delimiter */
+.highlight .sd { color: #4070A0; font-style: italic } /* Literal.String.Doc */
+.highlight .s2 { color: #4070A0 } /* Literal.String.Double */
+.highlight .se { color: #4070A0; font-weight: bold } /* Literal.String.Escape */
+.highlight .sh { color: #4070A0 } /* Literal.String.Heredoc */
+.highlight .si { color: #70A0D0; font-style: italic } /* Literal.String.Interpol */
+.highlight .sx { color: #C65D09 } /* Literal.String.Other */
+.highlight .sr { color: #235388 } /* Literal.String.Regex */
+.highlight .s1 { color: #4070A0 } /* Literal.String.Single */
+.highlight .ss { color: #517918 } /* Literal.String.Symbol */
+.highlight .bp { color: #007020 } /* Name.Builtin.Pseudo */
+.highlight .fm { color: #06287E } /* Name.Function.Magic */
+.highlight .vc { color: #BB60D5 } /* Name.Variable.Class */
+.highlight .vg { color: #BB60D5 } /* Name.Variable.Global */
+.highlight .vi { color: #BB60D5 } /* Name.Variable.Instance */
+.highlight .vm { color: #BB60D5 } /* Name.Variable.Magic */
+.highlight .il { color: #40A070 } /* Literal.Number.Integer.Long */
   </style>
 </head>
 <body>
@@ -363,7 +458,7 @@
 </tbody>
 </table>
 <h3>Signalling flow</h3>
-<pre><code>                 Pilot LLM (or skill-pick-rbnx)
+<div class="highlight"><pre><span></span><code>                 Pilot LLM (or skill-pick-rbnx)
                           │
                           ▼
           MCP   manipulation/execute_grasp  (PoseStamped + width)
@@ -386,13 +481,14 @@
                           │
                           ▼
    ◄─── execute_grasp polls busy → idle, returns success/elapsed
-</code></pre>
+</code></pre></div>
 <h2>Launch fork (<code>launch/piper_moveit_rbnx.launch.py</code>)</h2>
 <p>Four deltas from upstream <code>piper_moveit.launch.py</code>:</p>
 <ol>
 <li><strong>Removed fake <code>ros2_control_node</code></strong> — upstream's launch spawns a simulated joint driver publishing <code>/arm/joint_states</code>. With <code>primitive-agilex-piper-arm-rbnx</code> already publishing real hardware joint states, running both = two publishers fighting on the topic = MoveIt plans against garbage.</li>
 <li><strong>Removed RViz</strong> — robonix-managed deploy is headless. Bring up RViz manually in another shell if needed:
-   <code>ros2 launch piper_with_gripper_moveit moveit_rviz.launch.py</code></li>
+   <div class="highlight"><pre><span></span><code>ros2 launch piper_with_gripper_moveit moveit_rviz.launch.py
+</code></pre></div></li>
 <li><strong><code>move_group joint_states</code> remap target switched</strong> from <code>/arm/joint_states</code> (which had no real publisher after we removed the fake controller) to <code>/arm/joint_states_single</code> (what <code>primitive-agilex-piper-arm-rbnx</code> actually publishes).</li>
 <li><strong>Added <code>link6 → arm/link6</code> static TF bridge</strong> to glue the unprefixed TF tree (<code>primitive-agilex-piper-description-rbnx</code> publishes; <code>primitive-agilex-piper-handeye-rbnx</code> publishes <code>link6 → camera_color_optical_frame</code> into) onto the prefixed one (this launch publishes via <code>frame_prefix="arm/"</code> for MoveIt's planning frame). Without the bridge, the C++ node's <code>tf_buffer_-&gt;transform(grasp_pose_in_camera_frame, "arm/base_link")</code> call fails because the camera frame and <code>arm/base_link</code> are in different subtrees.</li>
 </ol>
@@ -401,14 +497,14 @@
 <p>Upstream uses <code>spawn_controllers</code> to start <code>joint_trajectory_controller</code> + <code>gripper_controller</code> ros2_control instances. Those drive the fake <code>controller_manager</code> we removed. The C++ node does not talk to <code>controller_manager</code> — it submits <code>FollowJointTrajectory</code> action goals directly to whoever advertises the action server. <code>primitive-agilex-piper-arm-rbnx</code> must advertise that action server for the real-hardware path to work.</p>
 <h2>Frame tree (post-boot)</h2>
 <p>Two parallel subtrees, joined at <code>link6 ↔ arm/link6</code>:</p>
-<pre><code>unprefixed (piper_description + easy_handeye2):    prefixed (this package):
+<div class="highlight"><pre><span></span><code>unprefixed (piper_description + easy_handeye2):    prefixed (this package):
     base_link                                          arm/world  ──┐
        └── link1 ── ... ── link6                       arm/base_link │ static
                               ├── camera_*             arm/link1     │ joints
                               │                        ...           │ from URDF
                               └── arm/link6 ◄═════════ arm/link6 ────┘
                                   (identity static TF — the bridge)
-</code></pre>
+</code></pre></div>
 <p>Both subtrees describe the <strong>same physical robot</strong>, just under different frame-name conventions. The bridge means <code>tf_buffer_-&gt;transform(camera_color_optical_frame_pose, arm/base_link)</code> walks: <code>camera_* → link6 → arm/link6 → arm/base_link</code>, and works.</p>
 <h2>Boot ordering</h2>
 <ul>
@@ -418,7 +514,7 @@
 <li>Independent of <code>service-object-detect-rbnx</code> / <code>service-grasp-pose-rbnx</code> at boot time (no perception dep during Init).</li>
 </ul>
 <h2>Driver-init lifecycle</h2>
-<pre><code>on_init ── parse cfg
+<div class="highlight"><pre><span></span><code>on_init ── parse cfg
        ── log atlas deps (informational)
        ── spawn rclpy bridge thread
             (publisher /graspnet/grasps,
@@ -429,7 +525,7 @@
             (proves piper_ctl_rbnx is alive)
 
 on_deactivate ── kill launch group + stop rclpy thread
-</code></pre>
+</code></pre></div>
 <p><code>on_init</code> is heavy — sentinel timeout default 60 s because launch takes ~5–10 s to bring up <code>move_group</code>, and we need real piper joint feedback to flow before we declare ourselves ACTIVE.</p>
 <h2><code>execute_grasp</code> semantics — two-phase wait</h2>
 <ol>
@@ -438,7 +534,7 @@ on_deactivate ── kill launch group + stop rclpy thread
 </ol>
 <p><code>success=True</code> iff both phases complete in budget.</p>
 <h2>Layout</h2>
-<pre><code>service-piper-moveit-rbnx/
+<div class="highlight"><pre><span></span><code>service-piper-moveit-rbnx/
 ├── package_manifest.yaml
 ├── capabilities/
 │   ├── service/manipulation/{driver,execute_grasp,reset,demo,demo_place}.v1.toml
@@ -457,40 +553,40 @@ on_deactivate ── kill launch group + stop rclpy thread
     ├── piper_humble/                 # empty shell (referenced by cmakelists)
     ├── piper_msgs/                   # PiperStatusMsg etc.
     └── graspnet_msgs/                # GraspPose etc. (full version)
-</code></pre>
+</code></pre></div>
 <h2>Config (passed via <code>Driver(CMD_INIT, config_json)</code>)</h2>
-<pre><code class="language-yaml">arm_group_name:       arm                              # MoveIt SRDF group
-end_effector_link:    arm/link6                        # in prefixed tree
-gripper_action_name:  /gripper_controller/follow_joint_trajectory
-sentinel_timeout_s:   60.0                             # wait for /arm/arm_status
-</code></pre>
+<div class="highlight"><pre><span></span><code><span class="nt">arm_group_name</span><span class="p">:</span><span class="w">       </span><span class="l l-Scalar l-Scalar-Plain">arm</span><span class="w">                              </span><span class="c1"># MoveIt SRDF group</span>
+<span class="nt">end_effector_link</span><span class="p">:</span><span class="w">    </span><span class="l l-Scalar l-Scalar-Plain">arm/link6</span><span class="w">                        </span><span class="c1"># in prefixed tree</span>
+<span class="nt">gripper_action_name</span><span class="p">:</span><span class="w">  </span><span class="l l-Scalar l-Scalar-Plain">/gripper_controller/follow_joint_trajectory</span>
+<span class="nt">sentinel_timeout_s</span><span class="p">:</span><span class="w">   </span><span class="l l-Scalar l-Scalar-Plain">60.0</span><span class="w">                             </span><span class="c1"># wait for /arm/arm_status</span>
+</code></pre></div>
 <p>All four are optional (defaults match upstream). <code>end_effector_link</code> intentionally uses the prefixed <code>arm/link6</code> — MoveIt's planning frame is <code>arm/world</code>, so the EE link lives in the prefixed subtree.</p>
 <h2>Build / run standalone</h2>
-<pre><code class="language-bash">bash scripts/build.sh                                 # colcon (~30–60 s)
-ROBONIX_ATLAS=127.0.0.1:50051 \
-    bash scripts/start.sh
-</code></pre>
+<div class="highlight"><pre><span></span><code>bash<span class="w"> </span>scripts/build.sh<span class="w">                                 </span><span class="c1"># colcon (~30–60 s)</span>
+<span class="nv">ROBONIX_ATLAS</span><span class="o">=</span><span class="m">127</span>.0.0.1:50051<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>bash<span class="w"> </span>scripts/start.sh
+</code></pre></div>
 <h2>Verification</h2>
-<pre><code class="language-bash"># 1. atlas-side
-rbnx caps | grep manipulation
-# expect: piper_moveit ACTIVE, contracts:
-#   robonix/service/manipulation/{driver, execute_grasp, reset}
+<div class="highlight"><pre><span></span><code><span class="c1"># 1. atlas-side</span>
+rbnx<span class="w"> </span>caps<span class="w"> </span><span class="p">|</span><span class="w"> </span>grep<span class="w"> </span>manipulation
+<span class="c1"># expect: piper_moveit ACTIVE, contracts:</span>
+<span class="c1">#   robonix/service/manipulation/{driver, execute_grasp, reset}</span>
 
-# 2. ROS-side (the cpp bridge is up)
-ros2 topic info /graspnet/grasps                 # expect 1+ subscribers (cpp node)
-ros2 node list | grep moveit_control             # the cpp node
+<span class="c1"># 2. ROS-side (the cpp bridge is up)</span>
+ros2<span class="w"> </span>topic<span class="w"> </span>info<span class="w"> </span>/graspnet/grasps<span class="w">                 </span><span class="c1"># expect 1+ subscribers (cpp node)</span>
+ros2<span class="w"> </span>node<span class="w"> </span>list<span class="w"> </span><span class="p">|</span><span class="w"> </span>grep<span class="w"> </span>moveit_control<span class="w">             </span><span class="c1"># the cpp node</span>
 
-# 3. TF bridge
-ros2 run tf2_ros tf2_echo arm/base_link camera_color_optical_frame
-# Expect a transform composed of:
-#   arm/base_link ← arm/joint{1..6} ← arm/link6  (RSP, prefixed)
-#   arm/link6 ←IDENTITY← link6                   (the bridge)
-#   link6 ← &lt;calib&gt; ← camera_color_optical_frame (easy_handeye2)
+<span class="c1"># 3. TF bridge</span>
+ros2<span class="w"> </span>run<span class="w"> </span>tf2_ros<span class="w"> </span>tf2_echo<span class="w"> </span>arm/base_link<span class="w"> </span>camera_color_optical_frame
+<span class="c1"># Expect a transform composed of:</span>
+<span class="c1">#   arm/base_link ← arm/joint{1..6} ← arm/link6  (RSP, prefixed)</span>
+<span class="c1">#   arm/link6 ←IDENTITY← link6                   (the bridge)</span>
+<span class="c1">#   link6 ← &lt;calib&gt; ← camera_color_optical_frame (easy_handeye2)</span>
 
-# 4. Direct execute_grasp test (CAREFUL — this moves the real arm).
-#    Park the arm in safe position first.
-rbnx ask &quot;move the arm 30cm up, no rotation&quot;
-</code></pre>
+<span class="c1"># 4. Direct execute_grasp test (CAREFUL — this moves the real arm).</span>
+<span class="c1">#    Park the arm in safe position first.</span>
+rbnx<span class="w"> </span>ask<span class="w"> </span><span class="s2">&quot;move the arm 30cm up, no rotation&quot;</span>
+</code></pre></div>
 <h2>Failure modes</h2>
 <table>
 <thead>
@@ -554,6 +650,6 @@ rbnx ask &quot;move the arm 30cm up, no rotation&quot;
       </aside>
     </div>
   </main>
-  <footer class="shell">Generated on 2026-07-13T13:31:01+00:00.</footer>
+  <footer class="shell">Generated on 2026-07-14T07:25:17+00:00.</footer>
 </body>
 </html>

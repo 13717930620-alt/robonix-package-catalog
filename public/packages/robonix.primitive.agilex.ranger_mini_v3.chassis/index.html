@@ -183,6 +183,21 @@
       font-size: 13px;
       margin: 0;
     }
+    .card-side {
+      display: grid;
+      gap: 10px;
+      justify-items: end;
+      align-content: start;
+    }
+    .card-preview {
+      display: block;
+      width: 190px;
+      aspect-ratio: 4 / 3;
+      object-fit: cover;
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      background: var(--soft);
+    }
     .tags { display: flex; gap: 5px; flex-wrap: wrap; margin-top: 8px; }
     .tag {
       border: 0;
@@ -268,6 +283,9 @@
       font-size: 0.92em;
     }
     .readme pre code { background: transparent; padding: 0; }
+    .readme .highlight { margin: 10px 0; }
+    .readme .highlight pre { margin: 0; }
+    .readme img { display: block; max-width: 100%; height: auto; border-radius: 7px; }
     .readme table { border-collapse: collapse; width: 100%; display: block; overflow-x: auto; }
     .readme th, .readme td { border: 1px solid var(--line); padding: 6px 8px; }
     code { font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
@@ -277,10 +295,87 @@
       .filters { position: static; }
       .toolbar { align-items: stretch; flex-direction: column; }
       .package-card { grid-template-columns: 1fr; }
+      .card-side { justify-items: start; }
       .card-actions { justify-content: flex-start; }
+      .card-preview { width: min(100%, 360px); }
       .api-reference { padding: 16px; }
     }
     
+pre { line-height: 125%; }
+td.linenos .normal { color: #666666; background-color: transparent; padding-left: 5px; padding-right: 5px; }
+span.linenos { color: #666666; background-color: transparent; padding-left: 5px; padding-right: 5px; }
+td.linenos .special { color: #000000; background-color: #ffffc0; padding-left: 5px; padding-right: 5px; }
+span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 5px; padding-right: 5px; }
+.highlight .hll { background-color: #ffffcc }
+.highlight { background: #f0f0f0; }
+.highlight .c { color: #60A0B0; font-style: italic } /* Comment */
+.highlight .err { border: 1px solid #F00 } /* Error */
+.highlight .k { color: #007020; font-weight: bold } /* Keyword */
+.highlight .o { color: #666 } /* Operator */
+.highlight .ch { color: #60A0B0; font-style: italic } /* Comment.Hashbang */
+.highlight .cm { color: #60A0B0; font-style: italic } /* Comment.Multiline */
+.highlight .cp { color: #007020 } /* Comment.Preproc */
+.highlight .cpf { color: #60A0B0; font-style: italic } /* Comment.PreprocFile */
+.highlight .c1 { color: #60A0B0; font-style: italic } /* Comment.Single */
+.highlight .cs { color: #60A0B0; background-color: #FFF0F0 } /* Comment.Special */
+.highlight .gd { color: #A00000 } /* Generic.Deleted */
+.highlight .ge { font-style: italic } /* Generic.Emph */
+.highlight .ges { font-weight: bold; font-style: italic } /* Generic.EmphStrong */
+.highlight .gr { color: #F00 } /* Generic.Error */
+.highlight .gh { color: #000080; font-weight: bold } /* Generic.Heading */
+.highlight .gi { color: #00A000 } /* Generic.Inserted */
+.highlight .go { color: #888 } /* Generic.Output */
+.highlight .gp { color: #C65D09; font-weight: bold } /* Generic.Prompt */
+.highlight .gs { font-weight: bold } /* Generic.Strong */
+.highlight .gu { color: #800080; font-weight: bold } /* Generic.Subheading */
+.highlight .gt { color: #04D } /* Generic.Traceback */
+.highlight .kc { color: #007020; font-weight: bold } /* Keyword.Constant */
+.highlight .kd { color: #007020; font-weight: bold } /* Keyword.Declaration */
+.highlight .kn { color: #007020; font-weight: bold } /* Keyword.Namespace */
+.highlight .kp { color: #007020 } /* Keyword.Pseudo */
+.highlight .kr { color: #007020; font-weight: bold } /* Keyword.Reserved */
+.highlight .kt { color: #902000 } /* Keyword.Type */
+.highlight .m { color: #40A070 } /* Literal.Number */
+.highlight .s { color: #4070A0 } /* Literal.String */
+.highlight .na { color: #4070A0 } /* Name.Attribute */
+.highlight .nb { color: #007020 } /* Name.Builtin */
+.highlight .nc { color: #0E84B5; font-weight: bold } /* Name.Class */
+.highlight .no { color: #60ADD5 } /* Name.Constant */
+.highlight .nd { color: #555; font-weight: bold } /* Name.Decorator */
+.highlight .ni { color: #D55537; font-weight: bold } /* Name.Entity */
+.highlight .ne { color: #007020 } /* Name.Exception */
+.highlight .nf { color: #06287E } /* Name.Function */
+.highlight .nl { color: #002070; font-weight: bold } /* Name.Label */
+.highlight .nn { color: #0E84B5; font-weight: bold } /* Name.Namespace */
+.highlight .nt { color: #062873; font-weight: bold } /* Name.Tag */
+.highlight .nv { color: #BB60D5 } /* Name.Variable */
+.highlight .ow { color: #007020; font-weight: bold } /* Operator.Word */
+.highlight .w { color: #BBB } /* Text.Whitespace */
+.highlight .mb { color: #40A070 } /* Literal.Number.Bin */
+.highlight .mf { color: #40A070 } /* Literal.Number.Float */
+.highlight .mh { color: #40A070 } /* Literal.Number.Hex */
+.highlight .mi { color: #40A070 } /* Literal.Number.Integer */
+.highlight .mo { color: #40A070 } /* Literal.Number.Oct */
+.highlight .sa { color: #4070A0 } /* Literal.String.Affix */
+.highlight .sb { color: #4070A0 } /* Literal.String.Backtick */
+.highlight .sc { color: #4070A0 } /* Literal.String.Char */
+.highlight .dl { color: #4070A0 } /* Literal.String.Delimiter */
+.highlight .sd { color: #4070A0; font-style: italic } /* Literal.String.Doc */
+.highlight .s2 { color: #4070A0 } /* Literal.String.Double */
+.highlight .se { color: #4070A0; font-weight: bold } /* Literal.String.Escape */
+.highlight .sh { color: #4070A0 } /* Literal.String.Heredoc */
+.highlight .si { color: #70A0D0; font-style: italic } /* Literal.String.Interpol */
+.highlight .sx { color: #C65D09 } /* Literal.String.Other */
+.highlight .sr { color: #235388 } /* Literal.String.Regex */
+.highlight .s1 { color: #4070A0 } /* Literal.String.Single */
+.highlight .ss { color: #517918 } /* Literal.String.Symbol */
+.highlight .bp { color: #007020 } /* Name.Builtin.Pseudo */
+.highlight .fm { color: #06287E } /* Name.Function.Magic */
+.highlight .vc { color: #BB60D5 } /* Name.Variable.Class */
+.highlight .vg { color: #BB60D5 } /* Name.Variable.Global */
+.highlight .vi { color: #BB60D5 } /* Name.Variable.Instance */
+.highlight .vm { color: #BB60D5 } /* Name.Variable.Magic */
+.highlight .il { color: #40A070 } /* Literal.Number.Integer.Long */
   </style>
 </head>
 <body>
@@ -333,7 +428,7 @@
 <p>When <code>rbnx boot</code> calls Init, the handler parses config (CAN port, robot model, frames, update rate), spawns <code>ros2 launch ranger_bringup ranger_mini_v2.launch.xml</code>, waits for the first <code>nav_msgs/Odometry</code> on <code>/&lt;odom_topic_name&gt;</code>, and declares <code>chassis/odom</code> + <code>chassis/twist_in</code> on atlas.</p>
 <p>If the chassis isn't powered or CAN isn't up, the sentinel times out and Init returns <code>state="error"</code> (NOT deferred — the chassis owns its process; we know it's stuck if we just spawned it and got nothing).</p>
 <h2>Layout</h2>
-<pre><code>ranger_chassis_rbnx/
+<div class="highlight"><pre><span></span><code>ranger_chassis_rbnx/
 ├── package_manifest.yaml
 ├── ranger_chassis/atlas_bridge.py
 ├── scripts/
@@ -342,23 +437,23 @@
 └── src/
     ├── ranger_ros2/    VENDORED agilexrobotics/ranger_ros2
     └── ugv_sdk/        VENDORED agilexrobotics/ugv_sdk (CAN bus client)
-</code></pre>
+</code></pre></div>
 <h2>CAN bus naming</h2>
 <p>The CAN interface name is config-driven — set <code>port_name:</code> in your deploy manifest's <code>config:</code> block to whatever the host calls its CAN device (<code>can0</code>, <code>can_ranger</code>, <code>can_chassis</code>, …). The package never hardcodes a device name, so it works on any host regardless of how its CAN interfaces are named.</p>
 <p>When multiple CAN devices share a host you may want to rename the Ranger's interface to something stable via <code>udev</code> / <code>systemd-networkd</code> so the name doesn't shift across boots, then point <code>port_name:</code> at the rename. That's a host-side operation — the package only sees the name you give it via config.</p>
 <h2>Config (passed via <code>Driver(CMD_INIT, config_json)</code>)</h2>
-<pre><code class="language-json">{
-  &quot;port_name&quot;:         &quot;can0&quot;,
-  &quot;robot_model&quot;:       &quot;ranger_mini_v2&quot;,
-  &quot;odom_frame&quot;:        &quot;odom&quot;,
-  &quot;base_frame&quot;:        &quot;base_link&quot;,
-  &quot;update_rate&quot;:       50,
-  &quot;odom_topic_name&quot;:   &quot;odom&quot;,
-  &quot;publish_odom_tf&quot;:   false,
-  &quot;twist_in_topic&quot;:    &quot;/cmd_vel&quot;,
-  &quot;sentinel_timeout_s&quot;: 30.0
-}
-</code></pre>
+<div class="highlight"><pre><span></span><code><span class="p">{</span>
+<span class="w">  </span><span class="nt">&quot;port_name&quot;</span><span class="p">:</span><span class="w">         </span><span class="s2">&quot;can0&quot;</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">&quot;robot_model&quot;</span><span class="p">:</span><span class="w">       </span><span class="s2">&quot;ranger_mini_v2&quot;</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">&quot;odom_frame&quot;</span><span class="p">:</span><span class="w">        </span><span class="s2">&quot;odom&quot;</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">&quot;base_frame&quot;</span><span class="p">:</span><span class="w">        </span><span class="s2">&quot;base_link&quot;</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">&quot;update_rate&quot;</span><span class="p">:</span><span class="w">       </span><span class="mi">50</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">&quot;odom_topic_name&quot;</span><span class="p">:</span><span class="w">   </span><span class="s2">&quot;odom&quot;</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">&quot;publish_odom_tf&quot;</span><span class="p">:</span><span class="w">   </span><span class="kc">false</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">&quot;twist_in_topic&quot;</span><span class="p">:</span><span class="w">    </span><span class="s2">&quot;/cmd_vel&quot;</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">&quot;sentinel_timeout_s&quot;</span><span class="p">:</span><span class="w"> </span><span class="mf">30.0</span>
+<span class="p">}</span>
+</code></pre></div>
 <p><code>publish_odom_tf</code> defaults to false; the canonical <code>base_link → odom</code> TF should come from soma's robot_state_publisher chain (URDF). Setting this to true here means competing publishers on <code>/tf</code> — only useful if soma isn't deployed.</p>
 <h2>License</h2>
 <p>This package: Apache-2.0. Vendored ranger_ros2 / ugv_sdk: see their respective LICENSE files.</p>
@@ -386,6 +481,6 @@
       </aside>
     </div>
   </main>
-  <footer class="shell">Generated on 2026-07-13T13:31:01+00:00.</footer>
+  <footer class="shell">Generated on 2026-07-14T07:25:17+00:00.</footer>
 </body>
 </html>

@@ -183,6 +183,21 @@
       font-size: 13px;
       margin: 0;
     }
+    .card-side {
+      display: grid;
+      gap: 10px;
+      justify-items: end;
+      align-content: start;
+    }
+    .card-preview {
+      display: block;
+      width: 190px;
+      aspect-ratio: 4 / 3;
+      object-fit: cover;
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      background: var(--soft);
+    }
     .tags { display: flex; gap: 5px; flex-wrap: wrap; margin-top: 8px; }
     .tag {
       border: 0;
@@ -268,6 +283,9 @@
       font-size: 0.92em;
     }
     .readme pre code { background: transparent; padding: 0; }
+    .readme .highlight { margin: 10px 0; }
+    .readme .highlight pre { margin: 0; }
+    .readme img { display: block; max-width: 100%; height: auto; border-radius: 7px; }
     .readme table { border-collapse: collapse; width: 100%; display: block; overflow-x: auto; }
     .readme th, .readme td { border: 1px solid var(--line); padding: 6px 8px; }
     code { font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
@@ -277,10 +295,87 @@
       .filters { position: static; }
       .toolbar { align-items: stretch; flex-direction: column; }
       .package-card { grid-template-columns: 1fr; }
+      .card-side { justify-items: start; }
       .card-actions { justify-content: flex-start; }
+      .card-preview { width: min(100%, 360px); }
       .api-reference { padding: 16px; }
     }
     
+pre { line-height: 125%; }
+td.linenos .normal { color: #666666; background-color: transparent; padding-left: 5px; padding-right: 5px; }
+span.linenos { color: #666666; background-color: transparent; padding-left: 5px; padding-right: 5px; }
+td.linenos .special { color: #000000; background-color: #ffffc0; padding-left: 5px; padding-right: 5px; }
+span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 5px; padding-right: 5px; }
+.highlight .hll { background-color: #ffffcc }
+.highlight { background: #f0f0f0; }
+.highlight .c { color: #60A0B0; font-style: italic } /* Comment */
+.highlight .err { border: 1px solid #F00 } /* Error */
+.highlight .k { color: #007020; font-weight: bold } /* Keyword */
+.highlight .o { color: #666 } /* Operator */
+.highlight .ch { color: #60A0B0; font-style: italic } /* Comment.Hashbang */
+.highlight .cm { color: #60A0B0; font-style: italic } /* Comment.Multiline */
+.highlight .cp { color: #007020 } /* Comment.Preproc */
+.highlight .cpf { color: #60A0B0; font-style: italic } /* Comment.PreprocFile */
+.highlight .c1 { color: #60A0B0; font-style: italic } /* Comment.Single */
+.highlight .cs { color: #60A0B0; background-color: #FFF0F0 } /* Comment.Special */
+.highlight .gd { color: #A00000 } /* Generic.Deleted */
+.highlight .ge { font-style: italic } /* Generic.Emph */
+.highlight .ges { font-weight: bold; font-style: italic } /* Generic.EmphStrong */
+.highlight .gr { color: #F00 } /* Generic.Error */
+.highlight .gh { color: #000080; font-weight: bold } /* Generic.Heading */
+.highlight .gi { color: #00A000 } /* Generic.Inserted */
+.highlight .go { color: #888 } /* Generic.Output */
+.highlight .gp { color: #C65D09; font-weight: bold } /* Generic.Prompt */
+.highlight .gs { font-weight: bold } /* Generic.Strong */
+.highlight .gu { color: #800080; font-weight: bold } /* Generic.Subheading */
+.highlight .gt { color: #04D } /* Generic.Traceback */
+.highlight .kc { color: #007020; font-weight: bold } /* Keyword.Constant */
+.highlight .kd { color: #007020; font-weight: bold } /* Keyword.Declaration */
+.highlight .kn { color: #007020; font-weight: bold } /* Keyword.Namespace */
+.highlight .kp { color: #007020 } /* Keyword.Pseudo */
+.highlight .kr { color: #007020; font-weight: bold } /* Keyword.Reserved */
+.highlight .kt { color: #902000 } /* Keyword.Type */
+.highlight .m { color: #40A070 } /* Literal.Number */
+.highlight .s { color: #4070A0 } /* Literal.String */
+.highlight .na { color: #4070A0 } /* Name.Attribute */
+.highlight .nb { color: #007020 } /* Name.Builtin */
+.highlight .nc { color: #0E84B5; font-weight: bold } /* Name.Class */
+.highlight .no { color: #60ADD5 } /* Name.Constant */
+.highlight .nd { color: #555; font-weight: bold } /* Name.Decorator */
+.highlight .ni { color: #D55537; font-weight: bold } /* Name.Entity */
+.highlight .ne { color: #007020 } /* Name.Exception */
+.highlight .nf { color: #06287E } /* Name.Function */
+.highlight .nl { color: #002070; font-weight: bold } /* Name.Label */
+.highlight .nn { color: #0E84B5; font-weight: bold } /* Name.Namespace */
+.highlight .nt { color: #062873; font-weight: bold } /* Name.Tag */
+.highlight .nv { color: #BB60D5 } /* Name.Variable */
+.highlight .ow { color: #007020; font-weight: bold } /* Operator.Word */
+.highlight .w { color: #BBB } /* Text.Whitespace */
+.highlight .mb { color: #40A070 } /* Literal.Number.Bin */
+.highlight .mf { color: #40A070 } /* Literal.Number.Float */
+.highlight .mh { color: #40A070 } /* Literal.Number.Hex */
+.highlight .mi { color: #40A070 } /* Literal.Number.Integer */
+.highlight .mo { color: #40A070 } /* Literal.Number.Oct */
+.highlight .sa { color: #4070A0 } /* Literal.String.Affix */
+.highlight .sb { color: #4070A0 } /* Literal.String.Backtick */
+.highlight .sc { color: #4070A0 } /* Literal.String.Char */
+.highlight .dl { color: #4070A0 } /* Literal.String.Delimiter */
+.highlight .sd { color: #4070A0; font-style: italic } /* Literal.String.Doc */
+.highlight .s2 { color: #4070A0 } /* Literal.String.Double */
+.highlight .se { color: #4070A0; font-weight: bold } /* Literal.String.Escape */
+.highlight .sh { color: #4070A0 } /* Literal.String.Heredoc */
+.highlight .si { color: #70A0D0; font-style: italic } /* Literal.String.Interpol */
+.highlight .sx { color: #C65D09 } /* Literal.String.Other */
+.highlight .sr { color: #235388 } /* Literal.String.Regex */
+.highlight .s1 { color: #4070A0 } /* Literal.String.Single */
+.highlight .ss { color: #517918 } /* Literal.String.Symbol */
+.highlight .bp { color: #007020 } /* Name.Builtin.Pseudo */
+.highlight .fm { color: #06287E } /* Name.Function.Magic */
+.highlight .vc { color: #BB60D5 } /* Name.Variable.Class */
+.highlight .vg { color: #BB60D5 } /* Name.Variable.Global */
+.highlight .vi { color: #BB60D5 } /* Name.Variable.Instance */
+.highlight .vm { color: #BB60D5 } /* Name.Variable.Magic */
+.highlight .il { color: #40A070 } /* Literal.Number.Integer.Long */
   </style>
 </head>
 <body>
@@ -370,27 +465,27 @@
 <p>The Piper arm uses USB-CAN (MCP251xFD or similar). The CAN interface must be <strong>up</strong> and named <code>can_piper</code> (or whatever you set <code>can_port:</code> to) before <code>piper_ctrl_single_node</code> can talk to it. The CAN interface name is config-driven — the package never hardcodes a device name.</p>
 <h3>Path A — recommended for production (default)</h3>
 <p>Bring <code>can_piper</code> up <strong>outside <code>rbnx boot</code></strong>, ahead of time. On a Jetson with udev rules, this is once-per-boot:</p>
-<pre><code class="language-bash"># Run once per host boot, BEFORE `rbnx boot`:
-bash scripts/can_activate.sh can_piper 1000000 &quot;1-4.2:1.0&quot;
-# Replace &quot;1-4.2:1.0&quot; with the USB bus path of your Piper.
-# To list candidates:
-#   lsusb -t
-#   sudo ethtool -i can0 | grep bus-info
-</code></pre>
+<div class="highlight"><pre><span></span><code><span class="c1"># Run once per host boot, BEFORE `rbnx boot`:</span>
+bash<span class="w"> </span>scripts/can_activate.sh<span class="w"> </span>can_piper<span class="w"> </span><span class="m">1000000</span><span class="w"> </span><span class="s2">&quot;1-4.2:1.0&quot;</span>
+<span class="c1"># Replace &quot;1-4.2:1.0&quot; with the USB bus path of your Piper.</span>
+<span class="c1"># To list candidates:</span>
+<span class="c1">#   lsusb -t</span>
+<span class="c1">#   sudo ethtool -i can0 | grep bus-info</span>
+</code></pre></div>
 <p><code>auto_can_setup</code> stays <code>false</code> in the manifest. This path keeps the deploy free of sudo coupling — the operator approves the sudo prompt once, interactively, then <code>rbnx boot</code> runs unattended.</p>
 <h3>Path B — convenience for dev laptops</h3>
 <p>Set <code>auto_can_setup: true</code> in the manifest config block. <code>on_activate</code> will run <code>scripts/can_activate.sh</code> itself before spawning the driver. Requires <strong>passwordless sudo</strong> for the operator (otherwise the script blocks on the prompt and <code>Driver(CMD_INIT)</code> times out).</p>
-<pre><code class="language-yaml">- name: piper_ctl
-  path: ../packages/piper_ctl_rbnx
-  config:
-    can_port:        can_piper
-    can_bitrate:     1000000
-    can_usb_address: &quot;1-4.2:1.0&quot;
-    auto_can_setup:  true
-</code></pre>
+<div class="highlight"><pre><span></span><code><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">piper_ctl</span>
+<span class="w">  </span><span class="nt">path</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">../packages/piper_ctl_rbnx</span>
+<span class="w">  </span><span class="nt">config</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">can_port</span><span class="p">:</span><span class="w">        </span><span class="l l-Scalar l-Scalar-Plain">can_piper</span>
+<span class="w">    </span><span class="nt">can_bitrate</span><span class="p">:</span><span class="w">     </span><span class="l l-Scalar l-Scalar-Plain">1000000</span>
+<span class="w">    </span><span class="nt">can_usb_address</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;1-4.2:1.0&quot;</span>
+<span class="w">    </span><span class="nt">auto_can_setup</span><span class="p">:</span><span class="w">  </span><span class="l l-Scalar l-Scalar-Plain">true</span>
+</code></pre></div>
 <p>Path B is more convenient when the USB-CAN's bus path shifts between sessions, but couples the deploy to sudoers state — not ideal for production.</p>
 <h2>Layout</h2>
-<pre><code>primitive-agilex-piper-arm-rbnx/
+<div class="highlight"><pre><span></span><code>primitive-agilex-piper-arm-rbnx/
 ├── package_manifest.yaml
 ├── capabilities/
 │   ├── primitive/arm/
@@ -413,43 +508,43 @@ bash scripts/can_activate.sh can_piper 1000000 &quot;1-4.2:1.0&quot;
     ├── piper/                               # main ROS 2 driver (rclpy)
     ├── piper_msgs/                          # PiperStatusMsg + PosCmd + Enable.srv
     └── graspnet_msgs/                       # GraspPose.msg — required by piper/package.xml
-</code></pre>
+</code></pre></div>
 <h2>Config (passed via <code>Driver(CMD_INIT, config_json)</code>)</h2>
-<pre><code class="language-yaml">can_port:            can_piper        # CAN interface name
-can_bitrate:         1000000
-can_usb_address:     &quot;&quot;               # pin via USB bus path; &quot;&quot; = first detected
-auto_can_setup:      false            # see &quot;CAN bring-up&quot; above
-auto_enable:         true             # forwarded to start_single_piper auto_enable
-gripper_exist:       true
-gripper_val_mutiple: 2                # upstream typo preserved
-arm_namespace:       /arm             # see note in main.py docstring
-sentinel_timeout_s:  30.0             # max wait for first JointState in on_activate
-# Topic-name overrides (rarely needed; default derives from arm_namespace):
-# joint_states_topic: /arm/joint_states_single
-# arm_status_topic:   /arm/arm_status
-# end_pose_topic:     /arm/end_pose
-# pos_cmd_topic:      /arm/pos_cmd
-</code></pre>
+<div class="highlight"><pre><span></span><code><span class="nt">can_port</span><span class="p">:</span><span class="w">            </span><span class="l l-Scalar l-Scalar-Plain">can_piper</span><span class="w">        </span><span class="c1"># CAN interface name</span>
+<span class="nt">can_bitrate</span><span class="p">:</span><span class="w">         </span><span class="l l-Scalar l-Scalar-Plain">1000000</span>
+<span class="nt">can_usb_address</span><span class="p">:</span><span class="w">     </span><span class="s">&quot;&quot;</span><span class="w">               </span><span class="c1"># pin via USB bus path; &quot;&quot; = first detected</span>
+<span class="nt">auto_can_setup</span><span class="p">:</span><span class="w">      </span><span class="l l-Scalar l-Scalar-Plain">false</span><span class="w">            </span><span class="c1"># see &quot;CAN bring-up&quot; above</span>
+<span class="nt">auto_enable</span><span class="p">:</span><span class="w">         </span><span class="l l-Scalar l-Scalar-Plain">true</span><span class="w">             </span><span class="c1"># forwarded to start_single_piper auto_enable</span>
+<span class="nt">gripper_exist</span><span class="p">:</span><span class="w">       </span><span class="l l-Scalar l-Scalar-Plain">true</span>
+<span class="nt">gripper_val_mutiple</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">2</span><span class="w">                </span><span class="c1"># upstream typo preserved</span>
+<span class="nt">arm_namespace</span><span class="p">:</span><span class="w">       </span><span class="l l-Scalar l-Scalar-Plain">/arm</span><span class="w">             </span><span class="c1"># see note in main.py docstring</span>
+<span class="nt">sentinel_timeout_s</span><span class="p">:</span><span class="w">  </span><span class="l l-Scalar l-Scalar-Plain">30.0</span><span class="w">             </span><span class="c1"># max wait for first JointState in on_activate</span>
+<span class="c1"># Topic-name overrides (rarely needed; default derives from arm_namespace):</span>
+<span class="c1"># joint_states_topic: /arm/joint_states_single</span>
+<span class="c1"># arm_status_topic:   /arm/arm_status</span>
+<span class="c1"># end_pose_topic:     /arm/end_pose</span>
+<span class="c1"># pos_cmd_topic:      /arm/pos_cmd</span>
+</code></pre></div>
 <h2>Build / run standalone</h2>
-<pre><code class="language-bash">bash scripts/build.sh                                  # colcon + rbnx codegen
-ROBONIX_ATLAS=127.0.0.1:50051 \
-    bash scripts/start.sh                              # registers, awaits Init
-</code></pre>
+<div class="highlight"><pre><span></span><code>bash<span class="w"> </span>scripts/build.sh<span class="w">                                  </span><span class="c1"># colcon + rbnx codegen</span>
+<span class="nv">ROBONIX_ATLAS</span><span class="o">=</span><span class="m">127</span>.0.0.1:50051<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>bash<span class="w"> </span>scripts/start.sh<span class="w">                              </span><span class="c1"># registers, awaits Init</span>
+</code></pre></div>
 <p>To drive Init manually (without <code>rbnx boot</code>): from any robonix gRPC client, call the arm's <code>Driver</code> service with <code>command=0</code> (CMD_INIT) and a JSON config blob. The handler returns <code>ok=true</code> after the first JointState is observed, then declares the four data topics.</p>
 <h2>Verification</h2>
-<pre><code class="language-bash">rbnx caps | grep arm
-# Expected: piper_ctl provider with
-#   robonix/primitive/arm/{driver, joint_states, arm_status, end_pose, pos_cmd}
+<div class="highlight"><pre><span></span><code>rbnx<span class="w"> </span>caps<span class="w"> </span><span class="p">|</span><span class="w"> </span>grep<span class="w"> </span>arm
+<span class="c1"># Expected: piper_ctl provider with</span>
+<span class="c1">#   robonix/primitive/arm/{driver, joint_states, arm_status, end_pose, pos_cmd}</span>
 
-ros2 topic hz /arm/joint_states_single             # ~200 Hz
-ros2 topic echo /arm/arm_status --once             # PiperStatusMsg fields
-ros2 topic echo /arm/end_pose --once               # geometry_msgs/Pose
+ros2<span class="w"> </span>topic<span class="w"> </span>hz<span class="w"> </span>/arm/joint_states_single<span class="w">             </span><span class="c1"># ~200 Hz</span>
+ros2<span class="w"> </span>topic<span class="w"> </span><span class="nb">echo</span><span class="w"> </span>/arm/arm_status<span class="w"> </span>--once<span class="w">             </span><span class="c1"># PiperStatusMsg fields</span>
+ros2<span class="w"> </span>topic<span class="w"> </span><span class="nb">echo</span><span class="w"> </span>/arm/end_pose<span class="w"> </span>--once<span class="w">               </span><span class="c1"># geometry_msgs/Pose</span>
 
-# Reverse cmd path (CAREFUL — moves the arm; clear the workspace first):
-ros2 topic pub --once /arm/pos_cmd piper_msgs/msg/PosCmd \
-    &quot;{x: 0.30, y: 0.0, z: 0.25, roll: 0.0, pitch: 1.57, yaw: 0.0,
-      gripper: 0.05, mode1: 0, mode2: 0}&quot;
-</code></pre>
+<span class="c1"># Reverse cmd path (CAREFUL — moves the arm; clear the workspace first):</span>
+ros2<span class="w"> </span>topic<span class="w"> </span>pub<span class="w"> </span>--once<span class="w"> </span>/arm/pos_cmd<span class="w"> </span>piper_msgs/msg/PosCmd<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span><span class="s2">&quot;{x: 0.30, y: 0.0, z: 0.25, roll: 0.0, pitch: 1.57, yaw: 0.0,</span>
+<span class="s2">      gripper: 0.05, mode1: 0, mode2: 0}&quot;</span>
+</code></pre></div>
 <h2>Vendor / upstream</h2>
 <p><code>src/piper/</code>, <code>src/piper_msgs/</code>, <code>src/graspnet_msgs/</code> are verbatim copies from <a href="https://github.com/agilexrobotics/piper_ros">agilexrobotics/piper_ros</a>. The other packages in the upstream workspace are deliberately <strong>not</strong> vendored here and land in their own robonix packages:</p>
 <ul>
@@ -486,6 +581,6 @@ ros2 topic pub --once /arm/pos_cmd piper_msgs/msg/PosCmd \
       </aside>
     </div>
   </main>
-  <footer class="shell">Generated on 2026-07-13T13:31:01+00:00.</footer>
+  <footer class="shell">Generated on 2026-07-14T07:25:17+00:00.</footer>
 </body>
 </html>

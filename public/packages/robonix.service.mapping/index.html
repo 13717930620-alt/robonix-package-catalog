@@ -183,6 +183,21 @@
       font-size: 13px;
       margin: 0;
     }
+    .card-side {
+      display: grid;
+      gap: 10px;
+      justify-items: end;
+      align-content: start;
+    }
+    .card-preview {
+      display: block;
+      width: 190px;
+      aspect-ratio: 4 / 3;
+      object-fit: cover;
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      background: var(--soft);
+    }
     .tags { display: flex; gap: 5px; flex-wrap: wrap; margin-top: 8px; }
     .tag {
       border: 0;
@@ -268,6 +283,9 @@
       font-size: 0.92em;
     }
     .readme pre code { background: transparent; padding: 0; }
+    .readme .highlight { margin: 10px 0; }
+    .readme .highlight pre { margin: 0; }
+    .readme img { display: block; max-width: 100%; height: auto; border-radius: 7px; }
     .readme table { border-collapse: collapse; width: 100%; display: block; overflow-x: auto; }
     .readme th, .readme td { border: 1px solid var(--line); padding: 6px 8px; }
     code { font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
@@ -277,10 +295,87 @@
       .filters { position: static; }
       .toolbar { align-items: stretch; flex-direction: column; }
       .package-card { grid-template-columns: 1fr; }
+      .card-side { justify-items: start; }
       .card-actions { justify-content: flex-start; }
+      .card-preview { width: min(100%, 360px); }
       .api-reference { padding: 16px; }
     }
     
+pre { line-height: 125%; }
+td.linenos .normal { color: #666666; background-color: transparent; padding-left: 5px; padding-right: 5px; }
+span.linenos { color: #666666; background-color: transparent; padding-left: 5px; padding-right: 5px; }
+td.linenos .special { color: #000000; background-color: #ffffc0; padding-left: 5px; padding-right: 5px; }
+span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 5px; padding-right: 5px; }
+.highlight .hll { background-color: #ffffcc }
+.highlight { background: #f0f0f0; }
+.highlight .c { color: #60A0B0; font-style: italic } /* Comment */
+.highlight .err { border: 1px solid #F00 } /* Error */
+.highlight .k { color: #007020; font-weight: bold } /* Keyword */
+.highlight .o { color: #666 } /* Operator */
+.highlight .ch { color: #60A0B0; font-style: italic } /* Comment.Hashbang */
+.highlight .cm { color: #60A0B0; font-style: italic } /* Comment.Multiline */
+.highlight .cp { color: #007020 } /* Comment.Preproc */
+.highlight .cpf { color: #60A0B0; font-style: italic } /* Comment.PreprocFile */
+.highlight .c1 { color: #60A0B0; font-style: italic } /* Comment.Single */
+.highlight .cs { color: #60A0B0; background-color: #FFF0F0 } /* Comment.Special */
+.highlight .gd { color: #A00000 } /* Generic.Deleted */
+.highlight .ge { font-style: italic } /* Generic.Emph */
+.highlight .ges { font-weight: bold; font-style: italic } /* Generic.EmphStrong */
+.highlight .gr { color: #F00 } /* Generic.Error */
+.highlight .gh { color: #000080; font-weight: bold } /* Generic.Heading */
+.highlight .gi { color: #00A000 } /* Generic.Inserted */
+.highlight .go { color: #888 } /* Generic.Output */
+.highlight .gp { color: #C65D09; font-weight: bold } /* Generic.Prompt */
+.highlight .gs { font-weight: bold } /* Generic.Strong */
+.highlight .gu { color: #800080; font-weight: bold } /* Generic.Subheading */
+.highlight .gt { color: #04D } /* Generic.Traceback */
+.highlight .kc { color: #007020; font-weight: bold } /* Keyword.Constant */
+.highlight .kd { color: #007020; font-weight: bold } /* Keyword.Declaration */
+.highlight .kn { color: #007020; font-weight: bold } /* Keyword.Namespace */
+.highlight .kp { color: #007020 } /* Keyword.Pseudo */
+.highlight .kr { color: #007020; font-weight: bold } /* Keyword.Reserved */
+.highlight .kt { color: #902000 } /* Keyword.Type */
+.highlight .m { color: #40A070 } /* Literal.Number */
+.highlight .s { color: #4070A0 } /* Literal.String */
+.highlight .na { color: #4070A0 } /* Name.Attribute */
+.highlight .nb { color: #007020 } /* Name.Builtin */
+.highlight .nc { color: #0E84B5; font-weight: bold } /* Name.Class */
+.highlight .no { color: #60ADD5 } /* Name.Constant */
+.highlight .nd { color: #555; font-weight: bold } /* Name.Decorator */
+.highlight .ni { color: #D55537; font-weight: bold } /* Name.Entity */
+.highlight .ne { color: #007020 } /* Name.Exception */
+.highlight .nf { color: #06287E } /* Name.Function */
+.highlight .nl { color: #002070; font-weight: bold } /* Name.Label */
+.highlight .nn { color: #0E84B5; font-weight: bold } /* Name.Namespace */
+.highlight .nt { color: #062873; font-weight: bold } /* Name.Tag */
+.highlight .nv { color: #BB60D5 } /* Name.Variable */
+.highlight .ow { color: #007020; font-weight: bold } /* Operator.Word */
+.highlight .w { color: #BBB } /* Text.Whitespace */
+.highlight .mb { color: #40A070 } /* Literal.Number.Bin */
+.highlight .mf { color: #40A070 } /* Literal.Number.Float */
+.highlight .mh { color: #40A070 } /* Literal.Number.Hex */
+.highlight .mi { color: #40A070 } /* Literal.Number.Integer */
+.highlight .mo { color: #40A070 } /* Literal.Number.Oct */
+.highlight .sa { color: #4070A0 } /* Literal.String.Affix */
+.highlight .sb { color: #4070A0 } /* Literal.String.Backtick */
+.highlight .sc { color: #4070A0 } /* Literal.String.Char */
+.highlight .dl { color: #4070A0 } /* Literal.String.Delimiter */
+.highlight .sd { color: #4070A0; font-style: italic } /* Literal.String.Doc */
+.highlight .s2 { color: #4070A0 } /* Literal.String.Double */
+.highlight .se { color: #4070A0; font-weight: bold } /* Literal.String.Escape */
+.highlight .sh { color: #4070A0 } /* Literal.String.Heredoc */
+.highlight .si { color: #70A0D0; font-style: italic } /* Literal.String.Interpol */
+.highlight .sx { color: #C65D09 } /* Literal.String.Other */
+.highlight .sr { color: #235388 } /* Literal.String.Regex */
+.highlight .s1 { color: #4070A0 } /* Literal.String.Single */
+.highlight .ss { color: #517918 } /* Literal.String.Symbol */
+.highlight .bp { color: #007020 } /* Name.Builtin.Pseudo */
+.highlight .fm { color: #06287E } /* Name.Function.Magic */
+.highlight .vc { color: #BB60D5 } /* Name.Variable.Class */
+.highlight .vg { color: #BB60D5 } /* Name.Variable.Global */
+.highlight .vi { color: #BB60D5 } /* Name.Variable.Instance */
+.highlight .vm { color: #BB60D5 } /* Name.Variable.Magic */
+.highlight .il { color: #40A070 } /* Literal.Number.Integer.Long */
   </style>
 </head>
 <body>
@@ -305,7 +400,7 @@ sensor inputs by capability contract (never hardcoded topics), and is brought
 up by <code>rbnx boot</code>. Consumers (<code>scene</code>, <code>nav</code>) bind the contracts, not the
 SLAM engine.</p>
 <ul>
-<li>Capability surface, config schema, and persistence layout: <strong><a href="CAPABILITY.md">CAPABILITY.md</a></strong>.</li>
+<li>Capability surface, config schema, and persistence layout: <strong><a href="https://github.com/syswonder/service-map-rbnx/blob/main/CAPABILITY.md">CAPABILITY.md</a></strong>.</li>
 </ul>
 <h2>SLAM engines (<code>algo</code>)</h2>
 <table>
@@ -345,24 +440,24 @@ SLAM engine.</p>
 <li><strong>Pick a deployment target</strong> and reference the matching package manifest
    from your deploy <code>robonix_manifest.yaml</code>:</li>
 </ol>
-<p><code>yaml
-   service:
-     - name: mapping
-       url: https://github.com/syswonder/service-map-rbnx
-       # manifest: package_manifest.jetson-native.yaml   # x86+docker is default
-       config:
-         algo: rtabmap
-         sensors: { lidar3d: true, rgb: true, depth: true, odom: true, imu: true }
-         rtabmap_inputs: [lidar, odom]
-         occupancy_sources: [lidar]
-         deskew_lidar: true    # requires per-point timestamps (MID-360 format 0)
-         base_frame: base_link
-         use_sim_time: false
-         rtabmap_profile: ranger_mini_v3
-         map_mode: mapping       # fresh runtime session; or localization</code>
+<p></p><div class="highlight"><pre><span></span><code><span class="nt">service</span><span class="p">:</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">mapping</span>
+<span class="w">    </span><span class="nt">url</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">https://github.com/syswonder/service-map-rbnx</span>
+<span class="w">    </span><span class="c1"># manifest: package_manifest.jetson-native.yaml   # x86+docker is default</span>
+<span class="w">    </span><span class="nt">config</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">algo</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">rtabmap</span>
+<span class="w">      </span><span class="nt">sensors</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">{</span><span class="nt"> lidar3d</span><span class="p">:</span><span class="w"> </span><span class="nv">true</span><span class="p p-Indicator">,</span><span class="nt"> rgb</span><span class="p">:</span><span class="w"> </span><span class="nv">true</span><span class="p p-Indicator">,</span><span class="nt"> depth</span><span class="p">:</span><span class="w"> </span><span class="nv">true</span><span class="p p-Indicator">,</span><span class="nt"> odom</span><span class="p">:</span><span class="w"> </span><span class="nv">true</span><span class="p p-Indicator">,</span><span class="nt"> imu</span><span class="p">:</span><span class="w"> </span><span class="nv">true</span><span class="w"> </span><span class="p p-Indicator">}</span>
+<span class="w">      </span><span class="nt">rtabmap_inputs</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">lidar</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">odom</span><span class="p p-Indicator">]</span>
+<span class="w">      </span><span class="nt">occupancy_sources</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">lidar</span><span class="p p-Indicator">]</span>
+<span class="w">      </span><span class="nt">deskew_lidar</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span><span class="w">    </span><span class="c1"># requires per-point timestamps (MID-360 format 0)</span>
+<span class="w">      </span><span class="nt">base_frame</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">base_link</span>
+<span class="w">      </span><span class="nt">use_sim_time</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">false</span>
+<span class="w">      </span><span class="nt">rtabmap_profile</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">ranger_mini_v3</span>
+<span class="w">      </span><span class="nt">map_mode</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">mapping</span><span class="w">       </span><span class="c1"># fresh runtime session; or localization</span>
+</code></pre></div>
 3. <code>rbnx build -f robonix_manifest.yaml</code> then <code>rbnx boot -f robonix_manifest.yaml</code>.
 4. Consume the map: subscribe to <code>robonix/service/map/occupancy_grid</code> /
-   <code>.../pointcloud</code> / <code>.../pose</code> (resolve them via atlas).</p>
+   <code>.../pointcloud</code> / <code>.../pose</code> (resolve them via atlas).<p></p>
 <p>For Ranger Mini v3, select <code>occupancy_sources: [lidar]</code> and use the named
 profile instead of copying slash-named parameters into every deploy. Together
 they match the two known-good v0.1 map databases: lidar-only occupancy
@@ -375,7 +470,7 @@ the ICP orientation from the selected IMU provider. Raw Livox gyro/accel is
 first converted to an orientation estimate by <code>imu_filter_madgwick</code>.</p>
 <h2>Deployment targets</h2>
 <p>One package, three targets (selected by the deploy <code>manifest:</code> field — see
-<a href="CAPABILITY.md#deployment-targets">CAPABILITY.md</a>):</p>
+<a href="https://github.com/syswonder/service-map-rbnx/blob/main/CAPABILITY.md#deployment-targets">CAPABILITY.md</a>):</p>
 <table>
 <thead>
 <tr>
@@ -408,8 +503,8 @@ in <code>scripts/build.sh</code> — the rest of the package is unchanged.</p>
 <p>Mapping starts with a fresh runtime database. Call <code>save_map(map_id)</code> after
 coverage is complete; the named map lives under <code>{MAPPING_MAPS_DIR}/{map_id}/</code>
 (default: the package's <code>maps/</code> dir, which survives container restarts):</p>
-<pre><code>maps/lab_3f/rtabmap.db  occupancy.pgm  occupancy.yaml  occupancy.png  cloud.pcd  meta.yaml
-</code></pre>
+<div class="highlight"><pre><span></span><code>maps/lab_3f/rtabmap.db  occupancy.pgm  occupancy.yaml  occupancy.png  cloud.pcd  meta.yaml
+</code></pre></div>
 <ul>
 <li><strong>Build a map:</strong> <code>map_mode: mapping</code>. Drive the robot around, then call
   <code>save_map(map_id)</code> to publish an immutable database and previews.</li>
@@ -461,7 +556,7 @@ runtime services and fall back to a restart with the config's <code>map_mode</co
 untrusted network.</p>
 </blockquote>
 <h2>Layout</h2>
-<pre><code>mapping_rbnx/
+<div class="highlight"><pre><span></span><code>mapping_rbnx/
 ├── package_manifest.yaml                 x86+docker (default)
 ├── package_manifest.jetson-docker.yaml   arm64 Jetson + docker
 ├── package_manifest.jetson-native.yaml   arm64 Jetson + host ROS2
@@ -475,7 +570,7 @@ untrusted network.</p>
 │   ├── start_native.sh                   host-process launcher
 │   └── save_map.py                       offline map snapshot (pgm/png/pcd/meta)
 └── docker/                               Dockerfile, Dockerfile.jetson, compose
-</code></pre>
+</code></pre></div>
 <h2>Troubleshooting</h2>
 <ul>
 <li><strong><code>/map</code> never populates</strong> — no sensor enabled, or the wrong <code>sensors:</code>
@@ -518,6 +613,6 @@ untrusted network.</p>
       </aside>
     </div>
   </main>
-  <footer class="shell">Generated on 2026-07-13T13:31:01+00:00.</footer>
+  <footer class="shell">Generated on 2026-07-14T07:25:17+00:00.</footer>
 </body>
 </html>

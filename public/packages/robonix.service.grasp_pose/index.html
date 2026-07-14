@@ -183,6 +183,21 @@
       font-size: 13px;
       margin: 0;
     }
+    .card-side {
+      display: grid;
+      gap: 10px;
+      justify-items: end;
+      align-content: start;
+    }
+    .card-preview {
+      display: block;
+      width: 190px;
+      aspect-ratio: 4 / 3;
+      object-fit: cover;
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      background: var(--soft);
+    }
     .tags { display: flex; gap: 5px; flex-wrap: wrap; margin-top: 8px; }
     .tag {
       border: 0;
@@ -268,6 +283,9 @@
       font-size: 0.92em;
     }
     .readme pre code { background: transparent; padding: 0; }
+    .readme .highlight { margin: 10px 0; }
+    .readme .highlight pre { margin: 0; }
+    .readme img { display: block; max-width: 100%; height: auto; border-radius: 7px; }
     .readme table { border-collapse: collapse; width: 100%; display: block; overflow-x: auto; }
     .readme th, .readme td { border: 1px solid var(--line); padding: 6px 8px; }
     code { font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
@@ -277,10 +295,87 @@
       .filters { position: static; }
       .toolbar { align-items: stretch; flex-direction: column; }
       .package-card { grid-template-columns: 1fr; }
+      .card-side { justify-items: start; }
       .card-actions { justify-content: flex-start; }
+      .card-preview { width: min(100%, 360px); }
       .api-reference { padding: 16px; }
     }
     
+pre { line-height: 125%; }
+td.linenos .normal { color: #666666; background-color: transparent; padding-left: 5px; padding-right: 5px; }
+span.linenos { color: #666666; background-color: transparent; padding-left: 5px; padding-right: 5px; }
+td.linenos .special { color: #000000; background-color: #ffffc0; padding-left: 5px; padding-right: 5px; }
+span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 5px; padding-right: 5px; }
+.highlight .hll { background-color: #ffffcc }
+.highlight { background: #f0f0f0; }
+.highlight .c { color: #60A0B0; font-style: italic } /* Comment */
+.highlight .err { border: 1px solid #F00 } /* Error */
+.highlight .k { color: #007020; font-weight: bold } /* Keyword */
+.highlight .o { color: #666 } /* Operator */
+.highlight .ch { color: #60A0B0; font-style: italic } /* Comment.Hashbang */
+.highlight .cm { color: #60A0B0; font-style: italic } /* Comment.Multiline */
+.highlight .cp { color: #007020 } /* Comment.Preproc */
+.highlight .cpf { color: #60A0B0; font-style: italic } /* Comment.PreprocFile */
+.highlight .c1 { color: #60A0B0; font-style: italic } /* Comment.Single */
+.highlight .cs { color: #60A0B0; background-color: #FFF0F0 } /* Comment.Special */
+.highlight .gd { color: #A00000 } /* Generic.Deleted */
+.highlight .ge { font-style: italic } /* Generic.Emph */
+.highlight .ges { font-weight: bold; font-style: italic } /* Generic.EmphStrong */
+.highlight .gr { color: #F00 } /* Generic.Error */
+.highlight .gh { color: #000080; font-weight: bold } /* Generic.Heading */
+.highlight .gi { color: #00A000 } /* Generic.Inserted */
+.highlight .go { color: #888 } /* Generic.Output */
+.highlight .gp { color: #C65D09; font-weight: bold } /* Generic.Prompt */
+.highlight .gs { font-weight: bold } /* Generic.Strong */
+.highlight .gu { color: #800080; font-weight: bold } /* Generic.Subheading */
+.highlight .gt { color: #04D } /* Generic.Traceback */
+.highlight .kc { color: #007020; font-weight: bold } /* Keyword.Constant */
+.highlight .kd { color: #007020; font-weight: bold } /* Keyword.Declaration */
+.highlight .kn { color: #007020; font-weight: bold } /* Keyword.Namespace */
+.highlight .kp { color: #007020 } /* Keyword.Pseudo */
+.highlight .kr { color: #007020; font-weight: bold } /* Keyword.Reserved */
+.highlight .kt { color: #902000 } /* Keyword.Type */
+.highlight .m { color: #40A070 } /* Literal.Number */
+.highlight .s { color: #4070A0 } /* Literal.String */
+.highlight .na { color: #4070A0 } /* Name.Attribute */
+.highlight .nb { color: #007020 } /* Name.Builtin */
+.highlight .nc { color: #0E84B5; font-weight: bold } /* Name.Class */
+.highlight .no { color: #60ADD5 } /* Name.Constant */
+.highlight .nd { color: #555; font-weight: bold } /* Name.Decorator */
+.highlight .ni { color: #D55537; font-weight: bold } /* Name.Entity */
+.highlight .ne { color: #007020 } /* Name.Exception */
+.highlight .nf { color: #06287E } /* Name.Function */
+.highlight .nl { color: #002070; font-weight: bold } /* Name.Label */
+.highlight .nn { color: #0E84B5; font-weight: bold } /* Name.Namespace */
+.highlight .nt { color: #062873; font-weight: bold } /* Name.Tag */
+.highlight .nv { color: #BB60D5 } /* Name.Variable */
+.highlight .ow { color: #007020; font-weight: bold } /* Operator.Word */
+.highlight .w { color: #BBB } /* Text.Whitespace */
+.highlight .mb { color: #40A070 } /* Literal.Number.Bin */
+.highlight .mf { color: #40A070 } /* Literal.Number.Float */
+.highlight .mh { color: #40A070 } /* Literal.Number.Hex */
+.highlight .mi { color: #40A070 } /* Literal.Number.Integer */
+.highlight .mo { color: #40A070 } /* Literal.Number.Oct */
+.highlight .sa { color: #4070A0 } /* Literal.String.Affix */
+.highlight .sb { color: #4070A0 } /* Literal.String.Backtick */
+.highlight .sc { color: #4070A0 } /* Literal.String.Char */
+.highlight .dl { color: #4070A0 } /* Literal.String.Delimiter */
+.highlight .sd { color: #4070A0; font-style: italic } /* Literal.String.Doc */
+.highlight .s2 { color: #4070A0 } /* Literal.String.Double */
+.highlight .se { color: #4070A0; font-weight: bold } /* Literal.String.Escape */
+.highlight .sh { color: #4070A0 } /* Literal.String.Heredoc */
+.highlight .si { color: #70A0D0; font-style: italic } /* Literal.String.Interpol */
+.highlight .sx { color: #C65D09 } /* Literal.String.Other */
+.highlight .sr { color: #235388 } /* Literal.String.Regex */
+.highlight .s1 { color: #4070A0 } /* Literal.String.Single */
+.highlight .ss { color: #517918 } /* Literal.String.Symbol */
+.highlight .bp { color: #007020 } /* Name.Builtin.Pseudo */
+.highlight .fm { color: #06287E } /* Name.Function.Magic */
+.highlight .vc { color: #BB60D5 } /* Name.Variable.Class */
+.highlight .vg { color: #BB60D5 } /* Name.Variable.Global */
+.highlight .vi { color: #BB60D5 } /* Name.Variable.Instance */
+.highlight .vm { color: #BB60D5 } /* Name.Variable.Magic */
+.highlight .il { color: #40A070 } /* Literal.Number.Integer.Long */
   </style>
 </head>
 <body>
@@ -331,7 +426,7 @@
 <p>The legacy ROS service <code>/graspnet/grasp_request</code> (<code>graspnet_msgs/srv/GraspRequest</code>) is kept alive as a secondary surface. <code>_serve_grasp_request()</code> internally calls <code>service-object-detect-rbnx</code>'s <code>detect_object</code> when the caller does not provide a bbox.</p>
 <p>The C++ <code>piper_moveit_control</code> subscriber on <code>/graspnet/grasps</code> always gets a fire-and-forget message on success even when the caller used the MCP path — that way <code>service-piper-moveit-rbnx</code> does not have to track which surface produced the pose.</p>
 <h2>Two surfaces, one estimator</h2>
-<pre><code>       Pilot LLM               skill-pick-rbnx
+<div class="highlight"><pre><span></span><code>       Pilot LLM               skill-pick-rbnx
            │                        │
            ▼                        ▼
     atlas-routed MCP           ROS service
@@ -345,7 +440,7 @@
                           ▼              ┌─► topic /graspnet/grasps
                    GraspPose response ───┤   (C++ moveit_control subscriber)
                                          └─► (also returned synchronously)
-</code></pre>
+</code></pre></div>
 <h2>Boot ordering</h2>
 <p>Must come <strong>after</strong> <code>service-object-detect-rbnx</code> (consumes its detection output). Also requires the TF tree published by <code>primitive-agilex-piper-description-rbnx</code> + <code>primitive-agilex-piper-handeye-rbnx</code>.</p>
 <h2>Two algorithms shipped side-by-side</h2>
@@ -370,7 +465,7 @@
 </ol>
 <p>Output frame is <code>camera_color_optical_frame</code>; <code>primitive-agilex-piper-handeye-rbnx</code> supplies the <code>link6 → camera_color_optical_frame</code> static TF so <code>service-piper-moveit-rbnx</code> can transform to <code>base_link</code> without extra plumbing.</p>
 <h2>Driver-init lifecycle</h2>
-<pre><code>on_init ── parse cfg
+<div class="highlight"><pre><span></span><code>on_init ── parse cfg
         ── atlas resolve object_detect endpoint (informational)
         ── spawn rclpy thread
              (ROS service host
@@ -378,11 +473,11 @@
               + /yolo/detect_object client)
 
 on_deactivate ── stop rclpy thread.
-</code></pre>
+</code></pre></div>
 <p><code>on_init</code> does not depend on <code>detect_object</code> being up — we wait up to 30 s in the rclpy thread, log a warning if it never appears, and let <code>grasp_request</code> calls without a bbox fail cleanly afterwards. This keeps boot from deadlocking when the detection service is still warming up.</p>
 <h2>Auto-publish stream mode (default OFF — safety)</h2>
 <p>Independent of the <code>grasp_request</code> RPC surfaces, the package can run in "stream mode" — exactly what upstream <code>yolo_grasp.py</code> did:</p>
-<pre><code>object_detect publishes /yolo/detect_objects (DetectedObjects)
+<div class="highlight"><pre><span></span><code>object_detect publishes /yolo/detect_objects (DetectedObjects)
                   │
                   ▼
 grasp_pose subscribes; for each detection whose object_name is in
@@ -390,14 +485,14 @@ grasp_pose subscribes; for each detection whose object_name is in
                   │
                   ▼
 piper_moveit_control C++ subscriber receives → executes
-</code></pre>
+</code></pre></div>
 <p><strong>OFF by default.</strong> The C++ <code>moveit_control_node_yolo</code> triggers a real arm motion on the FIRST <code>/graspnet/grasps</code> message it sees while idle. With auto-publish ON, the moment the cpp node returns to idle (e.g. right after <code>/moveit_control/reset</code>), the next 1 Hz tick from the auto-publish stream will start an unsolicited grasp — exactly the kind of surprise we don't want for a hardware deploy. Enable explicitly only for the legacy demo:</p>
-<pre><code class="language-yaml">config:
-  auto_publish_topic: true
-</code></pre>
+<div class="highlight"><pre><span></span><code><span class="nt">config</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">auto_publish_topic</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
+</code></pre></div>
 <p>The candidates allowlist defaults to the upstream list (15 prompt-free YOLOE class names); override via <code>cfg.candidates</code> to scope to your scene.</p>
 <h2>Layout</h2>
-<pre><code>service-grasp-pose-rbnx/
+<div class="highlight"><pre><span></span><code>service-grasp-pose-rbnx/
 ├── package_manifest.yaml
 ├── capabilities/
 │   ├── service/perception/grasp_pose/{driver,grasp_request,grasps}.v1.toml
@@ -414,84 +509,84 @@ piper_moveit_control C++ subscriber receives → executes
 │   └── start.sh                    # source overlays, exec yolo_grasp.main
 └── src/
     └── graspnet_msgs/              # vendored (32 KB)
-</code></pre>
+</code></pre></div>
 <h2>Config (passed via <code>Driver(CMD_INIT, config_json)</code>)</h2>
 <p>All keys are optional. Defaults below.</p>
-<pre><code class="language-yaml"># ── Vertical-grasp parameters (feature/vertical-grasp branch) ──
-z_table:                -0.186           # measure on-site! see below
-z_offset:               0.0
-bias_x:                 0.0
-bias_y:                 0.025
-approach_dist:          0.10
-default_yaw_rad:        0.0
-radial_yaw:             true             # ignore default_yaw_rad if true
-radial_yaw_offset_rad:  0.0
-default_gripper_width:  0.04
-base_frame:             arm/base_link
-camera_frame:           camera_color_optical_frame
-camera_info_topic:      /camera/color/camera_info
-output_frame:           arm/base_link
+<div class="highlight"><pre><span></span><code><span class="c1"># ── Vertical-grasp parameters (feature/vertical-grasp branch) ──</span>
+<span class="nt">z_table</span><span class="p">:</span><span class="w">                </span><span class="l l-Scalar l-Scalar-Plain">-0.186</span><span class="w">           </span><span class="c1"># measure on-site! see below</span>
+<span class="nt">z_offset</span><span class="p">:</span><span class="w">               </span><span class="l l-Scalar l-Scalar-Plain">0.0</span>
+<span class="nt">bias_x</span><span class="p">:</span><span class="w">                 </span><span class="l l-Scalar l-Scalar-Plain">0.0</span>
+<span class="nt">bias_y</span><span class="p">:</span><span class="w">                 </span><span class="l l-Scalar l-Scalar-Plain">0.025</span>
+<span class="nt">approach_dist</span><span class="p">:</span><span class="w">          </span><span class="l l-Scalar l-Scalar-Plain">0.10</span>
+<span class="nt">default_yaw_rad</span><span class="p">:</span><span class="w">        </span><span class="l l-Scalar l-Scalar-Plain">0.0</span>
+<span class="nt">radial_yaw</span><span class="p">:</span><span class="w">             </span><span class="l l-Scalar l-Scalar-Plain">true</span><span class="w">             </span><span class="c1"># ignore default_yaw_rad if true</span>
+<span class="nt">radial_yaw_offset_rad</span><span class="p">:</span><span class="w">  </span><span class="l l-Scalar l-Scalar-Plain">0.0</span>
+<span class="nt">default_gripper_width</span><span class="p">:</span><span class="w">  </span><span class="l l-Scalar l-Scalar-Plain">0.04</span>
+<span class="nt">base_frame</span><span class="p">:</span><span class="w">             </span><span class="l l-Scalar l-Scalar-Plain">arm/base_link</span>
+<span class="nt">camera_frame</span><span class="p">:</span><span class="w">           </span><span class="l l-Scalar l-Scalar-Plain">camera_color_optical_frame</span>
+<span class="nt">camera_info_topic</span><span class="p">:</span><span class="w">      </span><span class="l l-Scalar l-Scalar-Plain">/camera/color/camera_info</span>
+<span class="nt">output_frame</span><span class="p">:</span><span class="w">           </span><span class="l l-Scalar l-Scalar-Plain">arm/base_link</span>
 
-# ── Depth-median estimator (main branch) ──
-median_grid:            7
-min_depth_m:            0.05
-max_depth_m:            3.0
-safe_height_m:          0.10
-gripper_width_default:  0.12
-gripper_width_min:      0.0
-gripper_width_max:      0.12
-orientation_xyzw:       [-0.1329, 0.1508, -0.6840, -0.7013]
+<span class="c1"># ── Depth-median estimator (main branch) ──</span>
+<span class="nt">median_grid</span><span class="p">:</span><span class="w">            </span><span class="l l-Scalar l-Scalar-Plain">7</span>
+<span class="nt">min_depth_m</span><span class="p">:</span><span class="w">            </span><span class="l l-Scalar l-Scalar-Plain">0.05</span>
+<span class="nt">max_depth_m</span><span class="p">:</span><span class="w">            </span><span class="l l-Scalar l-Scalar-Plain">3.0</span>
+<span class="nt">safe_height_m</span><span class="p">:</span><span class="w">          </span><span class="l l-Scalar l-Scalar-Plain">0.10</span>
+<span class="nt">gripper_width_default</span><span class="p">:</span><span class="w">  </span><span class="l l-Scalar l-Scalar-Plain">0.12</span>
+<span class="nt">gripper_width_min</span><span class="p">:</span><span class="w">      </span><span class="l l-Scalar l-Scalar-Plain">0.0</span>
+<span class="nt">gripper_width_max</span><span class="p">:</span><span class="w">      </span><span class="l l-Scalar l-Scalar-Plain">0.12</span>
+<span class="nt">orientation_xyzw</span><span class="p">:</span><span class="w">       </span><span class="p p-Indicator">[</span><span class="nv">-0.1329</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">0.1508</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">-0.6840</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">-0.7013</span><span class="p p-Indicator">]</span>
 
-# ── Auto-publish stream (legacy upstream behaviour) ──
-auto_publish_topic:          false        # default false — SAFETY
-auto_publish_min_interval_s: 0.0          # 0 = no rate limit
-candidates:                               # detection allowlist
-  - bookmark
-  - lamp
-  - paper
-  - document
-  - monitor
-  # …see _DEFAULT_CANDIDATES in main.py for full list
+<span class="c1"># ── Auto-publish stream (legacy upstream behaviour) ──</span>
+<span class="nt">auto_publish_topic</span><span class="p">:</span><span class="w">          </span><span class="l l-Scalar l-Scalar-Plain">false</span><span class="w">        </span><span class="c1"># default false — SAFETY</span>
+<span class="nt">auto_publish_min_interval_s</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.0</span><span class="w">          </span><span class="c1"># 0 = no rate limit</span>
+<span class="nt">candidates</span><span class="p">:</span><span class="w">                               </span><span class="c1"># detection allowlist</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">bookmark</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">lamp</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">paper</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">document</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">monitor</span>
+<span class="w">  </span><span class="c1"># …see _DEFAULT_CANDIDATES in main.py for full list</span>
 
-# ── ROS topic name overrides (rarely needed) ──
-depth_topic:          /camera/depth/image_raw
-detect_objects_topic: /yolo/detect_objects
-grasps_topic:         /graspnet/grasps
-</code></pre>
+<span class="c1"># ── ROS topic name overrides (rarely needed) ──</span>
+<span class="nt">depth_topic</span><span class="p">:</span><span class="w">          </span><span class="l l-Scalar l-Scalar-Plain">/camera/depth/image_raw</span>
+<span class="nt">detect_objects_topic</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/yolo/detect_objects</span>
+<span class="nt">grasps_topic</span><span class="p">:</span><span class="w">         </span><span class="l l-Scalar l-Scalar-Plain">/graspnet/grasps</span>
+</code></pre></div>
 <ul>
 <li><code>z_table</code> <strong>MUST</strong> be measured on-site with <code>ros2 run tf2_ros tf2_echo arm/base_link &lt;table_marker_link&gt;</code> or by direct physical measurement. Getting it wrong grabs air or crashes into the table.</li>
 <li><code>radial_yaw</code>: when true, ignore <code>default_yaw_rad</code> and use <code>atan2(y_base, x_base)</code> — the gripper opening aligns radially from base to target, avoiding wrist flips at j6 ± π. <code>radial_yaw_offset_rad</code> rotates the opening direction.</li>
 </ul>
 <h2>Build / run standalone</h2>
-<pre><code class="language-bash">bash scripts/build.sh                           # colcon graspnet_msgs + rbnx codegen --mcp
-ROBONIX_ATLAS=127.0.0.1:50051 \
-    bash scripts/start.sh                       # registers, awaits Init
-</code></pre>
+<div class="highlight"><pre><span></span><code>bash<span class="w"> </span>scripts/build.sh<span class="w">                           </span><span class="c1"># colcon graspnet_msgs + rbnx codegen --mcp</span>
+<span class="nv">ROBONIX_ATLAS</span><span class="o">=</span><span class="m">127</span>.0.0.1:50051<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>bash<span class="w"> </span>scripts/start.sh<span class="w">                       </span><span class="c1"># registers, awaits Init</span>
+</code></pre></div>
 <h3>Manual single-package debugging</h3>
 <p><code>scripts/dev_source.sh</code> is a helper for running this package by hand outside <code>rbnx boot</code> — useful for pdb / fast iter. It sources the same overlays / PYTHONPATH that <code>scripts/start.sh</code> would, and verifies that the vendored <code>graspnet_msgs</code> is the one importable in this shell.</p>
-<pre><code class="language-bash">source scripts/dev_source.sh
-python3 -u -m yolo_grasp.main
-</code></pre>
+<div class="highlight"><pre><span></span><code><span class="nb">source</span><span class="w"> </span>scripts/dev_source.sh
+python3<span class="w"> </span>-u<span class="w"> </span>-m<span class="w"> </span>yolo_grasp.main
+</code></pre></div>
 <p><strong>Do NOT add <code>source dev_source.sh</code> to <code>~/.bashrc</code>.</strong> The script spawns a child bash; if <code>.bashrc</code> re-sources the script, every child bash recurses, which manifests as N copies of "package root: …" in the rbnx-boot log followed by a 60 s registration timeout.</p>
 <h2>Verification</h2>
-<pre><code class="language-bash"># 1. atlas-side: provider + capabilities visible
-rbnx caps | grep grasp_pose
-# expect: robonix.service.grasp_pose  ACTIVE  with
-#   robonix/service/perception/grasp_pose/{driver, grasp_request, grasps}
+<div class="highlight"><pre><span></span><code><span class="c1"># 1. atlas-side: provider + capabilities visible</span>
+rbnx<span class="w"> </span>caps<span class="w"> </span><span class="p">|</span><span class="w"> </span>grep<span class="w"> </span>grasp_pose
+<span class="c1"># expect: robonix.service.grasp_pose  ACTIVE  with</span>
+<span class="c1">#   robonix/service/perception/grasp_pose/{driver, grasp_request, grasps}</span>
 
-# 2. End-to-end via Pilot LLM (MCP path):
-rbnx ask &quot;grasp the paper on the desk&quot;
+<span class="c1"># 2. End-to-end via Pilot LLM (MCP path):</span>
+rbnx<span class="w"> </span>ask<span class="w"> </span><span class="s2">&quot;grasp the paper on the desk&quot;</span>
 
-# 3. Legacy ROS service shape (with bbox supplied):
-ros2 service call /graspnet/grasp_request \
-    graspnet_msgs/srv/GraspRequest \
-    &quot;{object_name: 'paper', bbox_2d: [200.0, 100.0, 400.0, 300.0], retry: 0}&quot;
+<span class="c1"># 3. Legacy ROS service shape (with bbox supplied):</span>
+ros2<span class="w"> </span>service<span class="w"> </span>call<span class="w"> </span>/graspnet/grasp_request<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>graspnet_msgs/srv/GraspRequest<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span><span class="s2">&quot;{object_name: &#39;paper&#39;, bbox_2d: [200.0, 100.0, 400.0, 300.0], retry: 0}&quot;</span>
 
-# 4. Auto-publish stream mode (no manual call needed):
-ros2 topic echo /graspnet/grasps --once
-# expect: a GraspPose with non-trivial target_pose + gripper_width &gt; 0
-# whenever object_detect publishes a detection in `cfg.candidates`.
-</code></pre>
+<span class="c1"># 4. Auto-publish stream mode (no manual call needed):</span>
+ros2<span class="w"> </span>topic<span class="w"> </span><span class="nb">echo</span><span class="w"> </span>/graspnet/grasps<span class="w"> </span>--once
+<span class="c1"># expect: a GraspPose with non-trivial target_pose + gripper_width &gt; 0</span>
+<span class="c1"># whenever object_detect publishes a detection in `cfg.candidates`.</span>
+</code></pre></div>
 <h2>Failure modes</h2>
 <table>
 <thead>
@@ -578,6 +673,6 @@ ros2 topic echo /graspnet/grasps --once
       </aside>
     </div>
   </main>
-  <footer class="shell">Generated on 2026-07-13T13:31:01+00:00.</footer>
+  <footer class="shell">Generated on 2026-07-14T07:25:17+00:00.</footer>
 </body>
 </html>

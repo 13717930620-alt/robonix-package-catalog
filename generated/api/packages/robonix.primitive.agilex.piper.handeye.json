@@ -22,5 +22,6 @@
   "manifest": "package_manifest.yaml",
   "capabilities": [],
   "deploy_dependencies": [],
-  "readme_url": "https://github.com/syswonder/primitive-agilex-piper-handeye-rbnx/blob/main/README.md"
+  "readme_url": "https://github.com/syswonder/primitive-agilex-piper-handeye-rbnx/blob/main/README.md",
+  "preview_image_url": ""
 }

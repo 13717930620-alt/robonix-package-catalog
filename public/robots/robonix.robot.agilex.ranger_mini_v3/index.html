@@ -183,6 +183,21 @@
       font-size: 13px;
       margin: 0;
     }
+    .card-side {
+      display: grid;
+      gap: 10px;
+      justify-items: end;
+      align-content: start;
+    }
+    .card-preview {
+      display: block;
+      width: 190px;
+      aspect-ratio: 4 / 3;
+      object-fit: cover;
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      background: var(--soft);
+    }
     .tags { display: flex; gap: 5px; flex-wrap: wrap; margin-top: 8px; }
     .tag {
       border: 0;
@@ -268,6 +283,9 @@
       font-size: 0.92em;
     }
     .readme pre code { background: transparent; padding: 0; }
+    .readme .highlight { margin: 10px 0; }
+    .readme .highlight pre { margin: 0; }
+    .readme img { display: block; max-width: 100%; height: auto; border-radius: 7px; }
     .readme table { border-collapse: collapse; width: 100%; display: block; overflow-x: auto; }
     .readme th, .readme td { border: 1px solid var(--line); padding: 6px 8px; }
     code { font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
@@ -277,10 +295,87 @@
       .filters { position: static; }
       .toolbar { align-items: stretch; flex-direction: column; }
       .package-card { grid-template-columns: 1fr; }
+      .card-side { justify-items: start; }
       .card-actions { justify-content: flex-start; }
+      .card-preview { width: min(100%, 360px); }
       .api-reference { padding: 16px; }
     }
     
+pre { line-height: 125%; }
+td.linenos .normal { color: #666666; background-color: transparent; padding-left: 5px; padding-right: 5px; }
+span.linenos { color: #666666; background-color: transparent; padding-left: 5px; padding-right: 5px; }
+td.linenos .special { color: #000000; background-color: #ffffc0; padding-left: 5px; padding-right: 5px; }
+span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 5px; padding-right: 5px; }
+.highlight .hll { background-color: #ffffcc }
+.highlight { background: #f0f0f0; }
+.highlight .c { color: #60A0B0; font-style: italic } /* Comment */
+.highlight .err { border: 1px solid #F00 } /* Error */
+.highlight .k { color: #007020; font-weight: bold } /* Keyword */
+.highlight .o { color: #666 } /* Operator */
+.highlight .ch { color: #60A0B0; font-style: italic } /* Comment.Hashbang */
+.highlight .cm { color: #60A0B0; font-style: italic } /* Comment.Multiline */
+.highlight .cp { color: #007020 } /* Comment.Preproc */
+.highlight .cpf { color: #60A0B0; font-style: italic } /* Comment.PreprocFile */
+.highlight .c1 { color: #60A0B0; font-style: italic } /* Comment.Single */
+.highlight .cs { color: #60A0B0; background-color: #FFF0F0 } /* Comment.Special */
+.highlight .gd { color: #A00000 } /* Generic.Deleted */
+.highlight .ge { font-style: italic } /* Generic.Emph */
+.highlight .ges { font-weight: bold; font-style: italic } /* Generic.EmphStrong */
+.highlight .gr { color: #F00 } /* Generic.Error */
+.highlight .gh { color: #000080; font-weight: bold } /* Generic.Heading */
+.highlight .gi { color: #00A000 } /* Generic.Inserted */
+.highlight .go { color: #888 } /* Generic.Output */
+.highlight .gp { color: #C65D09; font-weight: bold } /* Generic.Prompt */
+.highlight .gs { font-weight: bold } /* Generic.Strong */
+.highlight .gu { color: #800080; font-weight: bold } /* Generic.Subheading */
+.highlight .gt { color: #04D } /* Generic.Traceback */
+.highlight .kc { color: #007020; font-weight: bold } /* Keyword.Constant */
+.highlight .kd { color: #007020; font-weight: bold } /* Keyword.Declaration */
+.highlight .kn { color: #007020; font-weight: bold } /* Keyword.Namespace */
+.highlight .kp { color: #007020 } /* Keyword.Pseudo */
+.highlight .kr { color: #007020; font-weight: bold } /* Keyword.Reserved */
+.highlight .kt { color: #902000 } /* Keyword.Type */
+.highlight .m { color: #40A070 } /* Literal.Number */
+.highlight .s { color: #4070A0 } /* Literal.String */
+.highlight .na { color: #4070A0 } /* Name.Attribute */
+.highlight .nb { color: #007020 } /* Name.Builtin */
+.highlight .nc { color: #0E84B5; font-weight: bold } /* Name.Class */
+.highlight .no { color: #60ADD5 } /* Name.Constant */
+.highlight .nd { color: #555; font-weight: bold } /* Name.Decorator */
+.highlight .ni { color: #D55537; font-weight: bold } /* Name.Entity */
+.highlight .ne { color: #007020 } /* Name.Exception */
+.highlight .nf { color: #06287E } /* Name.Function */
+.highlight .nl { color: #002070; font-weight: bold } /* Name.Label */
+.highlight .nn { color: #0E84B5; font-weight: bold } /* Name.Namespace */
+.highlight .nt { color: #062873; font-weight: bold } /* Name.Tag */
+.highlight .nv { color: #BB60D5 } /* Name.Variable */
+.highlight .ow { color: #007020; font-weight: bold } /* Operator.Word */
+.highlight .w { color: #BBB } /* Text.Whitespace */
+.highlight .mb { color: #40A070 } /* Literal.Number.Bin */
+.highlight .mf { color: #40A070 } /* Literal.Number.Float */
+.highlight .mh { color: #40A070 } /* Literal.Number.Hex */
+.highlight .mi { color: #40A070 } /* Literal.Number.Integer */
+.highlight .mo { color: #40A070 } /* Literal.Number.Oct */
+.highlight .sa { color: #4070A0 } /* Literal.String.Affix */
+.highlight .sb { color: #4070A0 } /* Literal.String.Backtick */
+.highlight .sc { color: #4070A0 } /* Literal.String.Char */
+.highlight .dl { color: #4070A0 } /* Literal.String.Delimiter */
+.highlight .sd { color: #4070A0; font-style: italic } /* Literal.String.Doc */
+.highlight .s2 { color: #4070A0 } /* Literal.String.Double */
+.highlight .se { color: #4070A0; font-weight: bold } /* Literal.String.Escape */
+.highlight .sh { color: #4070A0 } /* Literal.String.Heredoc */
+.highlight .si { color: #70A0D0; font-style: italic } /* Literal.String.Interpol */
+.highlight .sx { color: #C65D09 } /* Literal.String.Other */
+.highlight .sr { color: #235388 } /* Literal.String.Regex */
+.highlight .s1 { color: #4070A0 } /* Literal.String.Single */
+.highlight .ss { color: #517918 } /* Literal.String.Symbol */
+.highlight .bp { color: #007020 } /* Name.Builtin.Pseudo */
+.highlight .fm { color: #06287E } /* Name.Function.Magic */
+.highlight .vc { color: #BB60D5 } /* Name.Variable.Class */
+.highlight .vg { color: #BB60D5 } /* Name.Variable.Global */
+.highlight .vi { color: #BB60D5 } /* Name.Variable.Instance */
+.highlight .vm { color: #BB60D5 } /* Name.Variable.Magic */
+.highlight .il { color: #40A070 } /* Literal.Number.Integer.Long */
   </style>
 </head>
 <body>
@@ -300,29 +395,81 @@ MID-360, Intel RealSense D435i, RTAB-Map, Scene, Nav2, and Explore.</p>
 <p>The deployment uses native ROS 2 packages on Jetson. Zenoh RMW is the default;
 <code>start.sh</code> starts a local <code>rmw_zenohd</code> for the lifetime of the boot.
 Scene, Mapping, and Nav2 are explicitly selected for their Jetson-native paths.</p>
+<p><img alt="SysWonder AgileX Ranger Mini v3 robot" src="https://raw.githubusercontent.com/syswonder/robot-agilex-ranger_mini_v3/main/assets/robot.jpg"></p>
+<h2>Hardware</h2>
+<table>
+<thead>
+<tr>
+<th>Component</th>
+<th>Model</th>
+<th>Deployment configuration</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Mobile base</td>
+<td>AgileX Ranger Mini v3</td>
+<td>Four-wheel steer/drive chassis; <code>can_ranger</code> at 500 kbit/s; <code>base_link</code> footprint 0.74 m x 0.50 m</td>
+</tr>
+<tr>
+<td>Compute</td>
+<td>NVIDIA Jetson AGX Orin</td>
+<td>aarch64 Jetson-native packages, ROS 2 Humble, and <code>rmw_zenoh_cpp</code></td>
+</tr>
+<tr>
+<td>Manipulator</td>
+<td>AgileX Piper</td>
+<td>Six-axis arm with parallel gripper; <code>can_piper</code> at 1 Mbit/s</td>
+</tr>
+<tr>
+<td>3D lidar and IMU</td>
+<td>Livox MID-360</td>
+<td>Ethernet lidar at <code>192.168.1.161</code>; host interface <code>192.168.1.50</code>; lidar and integrated IMU are separate Robonix providers</td>
+</tr>
+<tr>
+<td>Front RGB-D camera</td>
+<td>Intel RealSense D435i</td>
+<td>640 x 480 at 30 FPS for RGB and aligned depth; spatial and temporal depth filters enabled; camera IMU disabled</td>
+</tr>
+<tr>
+<td>Wrist camera</td>
+<td>Orbbec Dabai DCW</td>
+<td>1280 x 720 YUYV color at 10 FPS; depth is disabled in the current pick pipeline</td>
+</tr>
+<tr>
+<td>Audio</td>
+<td>USB audio device</td>
+<td>16 kHz mono microphone and speaker through <code>plughw:CARD=Plus,DEV=0</code></td>
+</tr>
+</tbody>
+</table>
+<p>The exact provider IDs, device addresses, sensor profiles, and runtime options
+are defined in <a href="https://github.com/syswonder/robot-agilex-ranger_mini_v3/blob/main/robonix_manifest.yaml"><code>robonix_manifest.yaml</code></a>. The robot body,
+component hierarchy, footprint, and provider-to-component mapping are defined
+in <a href="https://github.com/syswonder/robot-agilex-ranger_mini_v3/blob/main/soma.yaml"><code>soma.yaml</code></a>.</p>
 <h2>Prepare</h2>
 <p>Install the Robonix <code>dev</code> toolchain from its source clone, then install the
 ROS dependencies once:</p>
-<pre><code class="language-bash">cd ~/wheatfox/robonix
-git switch dev
-git pull --ff-only origin dev
-make install
+<div class="highlight"><pre><span></span><code><span class="nb">cd</span><span class="w"> </span>~/wheatfox/robonix
+git<span class="w"> </span>switch<span class="w"> </span>dev
+git<span class="w"> </span>pull<span class="w"> </span>--ff-only<span class="w"> </span>origin<span class="w"> </span>dev
+make<span class="w"> </span>install
 
-sudo apt install ros-humble-rmw-zenoh-cpp \
-  ros-humble-rtabmap-ros ros-humble-navigation2 ros-humble-nav2-bringup
-</code></pre>
+sudo<span class="w"> </span>apt<span class="w"> </span>install<span class="w"> </span>ros-humble-rmw-zenoh-cpp<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>ros-humble-rtabmap-ros<span class="w"> </span>ros-humble-navigation2<span class="w"> </span>ros-humble-nav2-bringup
+</code></pre></div>
 <p>Create a private environment file; never commit credentials:</p>
-<pre><code class="language-bash">cp .env.example .env
-$EDITOR .env
-</code></pre>
+<div class="highlight"><pre><span></span><code>cp<span class="w"> </span>.env.example<span class="w"> </span>.env
+<span class="nv">$EDITOR</span><span class="w"> </span>.env
+</code></pre></div>
 <p><code>start.sh</code> loads this ignored file automatically and exports it to every
 Robonix child process. Keep VLM and Tencent SecretId/SecretKey here; keep
 non-secret backend, AppID, engine, voice, and region settings in
 <code>robonix_manifest.yaml</code>.</p>
 <h2>Build and boot</h2>
-<pre><code class="language-bash">bash build.sh
-bash start.sh
-</code></pre>
+<div class="highlight"><pre><span></span><code>bash<span class="w"> </span>build.sh
+bash<span class="w"> </span>start.sh
+</code></pre></div>
 <p>The wrappers set <code>ROBONIX_DEPLOY_DIR</code>, source ROS Humble, select the native
 Jetson build, and keep the Zenoh router lifecycle tied to <code>rbnx boot</code>.</p>
 <p>Operator pages:</p>
@@ -337,10 +484,10 @@ Jetson build, and keep the Zenoh router lifecycle tied to <code>rbnx boot</code>
 variant. The updated file preserves the original map, costmap, scan, path,
 goal, TF, particle-cloud, and footprint displays, and adds the Soma-backed
 RobotModel plus the live MID-360 <code>/scanner/cloud</code> display.</p>
-<pre><code class="language-bash">source /opt/ros/humble/setup.bash
-export RMW_IMPLEMENTATION=rmw_zenoh_cpp
-rviz2 -d rviz/ranger_mapping.rviz
-</code></pre>
+<div class="highlight"><pre><span></span><code><span class="nb">source</span><span class="w"> </span>/opt/ros/humble/setup.bash
+<span class="nb">export</span><span class="w"> </span><span class="nv">RMW_IMPLEMENTATION</span><span class="o">=</span>rmw_zenoh_cpp
+rviz2<span class="w"> </span>-d<span class="w"> </span>rviz/ranger_mapping.rviz
+</code></pre></div>
 <p>The unchanged historical configuration is <code>rviz/ranger_v0.1.rviz</code>.</p>
 <h2>Safety and bring-up order</h2>
 <p>Keep the chassis powered off while validating the passive stack. The chassis,
@@ -401,6 +548,6 @@ measurement rather than compensating in Scene or Mapping.</p>
       </aside>
     </div>
   </main>
-  <footer class="shell">Generated on 2026-07-13T13:31:01+00:00.</footer>
+  <footer class="shell">Generated on 2026-07-14T07:25:17+00:00.</footer>
 </body>
 </html>

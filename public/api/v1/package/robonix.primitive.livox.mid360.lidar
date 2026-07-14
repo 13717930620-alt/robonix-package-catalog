@@ -24,5 +24,6 @@
     "robonix/primitive/lidar/lidar_snapshot"
   ],
   "deploy_dependencies": [],
-  "readme_url": "https://github.com/syswonder/primitive-livox-mid360-lidar-rbnx/blob/main/README.md"
+  "readme_url": "https://github.com/syswonder/primitive-livox-mid360-lidar-rbnx/blob/main/README.md",
+  "preview_image_url": ""
 }

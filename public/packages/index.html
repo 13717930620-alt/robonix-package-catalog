@@ -183,6 +183,21 @@
       font-size: 13px;
       margin: 0;
     }
+    .card-side {
+      display: grid;
+      gap: 10px;
+      justify-items: end;
+      align-content: start;
+    }
+    .card-preview {
+      display: block;
+      width: 190px;
+      aspect-ratio: 4 / 3;
+      object-fit: cover;
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      background: var(--soft);
+    }
     .tags { display: flex; gap: 5px; flex-wrap: wrap; margin-top: 8px; }
     .tag {
       border: 0;
@@ -268,6 +283,9 @@
       font-size: 0.92em;
     }
     .readme pre code { background: transparent; padding: 0; }
+    .readme .highlight { margin: 10px 0; }
+    .readme .highlight pre { margin: 0; }
+    .readme img { display: block; max-width: 100%; height: auto; border-radius: 7px; }
     .readme table { border-collapse: collapse; width: 100%; display: block; overflow-x: auto; }
     .readme th, .readme td { border: 1px solid var(--line); padding: 6px 8px; }
     code { font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
@@ -277,10 +295,87 @@
       .filters { position: static; }
       .toolbar { align-items: stretch; flex-direction: column; }
       .package-card { grid-template-columns: 1fr; }
+      .card-side { justify-items: start; }
       .card-actions { justify-content: flex-start; }
+      .card-preview { width: min(100%, 360px); }
       .api-reference { padding: 16px; }
     }
     
+pre { line-height: 125%; }
+td.linenos .normal { color: #666666; background-color: transparent; padding-left: 5px; padding-right: 5px; }
+span.linenos { color: #666666; background-color: transparent; padding-left: 5px; padding-right: 5px; }
+td.linenos .special { color: #000000; background-color: #ffffc0; padding-left: 5px; padding-right: 5px; }
+span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 5px; padding-right: 5px; }
+.highlight .hll { background-color: #ffffcc }
+.highlight { background: #f0f0f0; }
+.highlight .c { color: #60A0B0; font-style: italic } /* Comment */
+.highlight .err { border: 1px solid #F00 } /* Error */
+.highlight .k { color: #007020; font-weight: bold } /* Keyword */
+.highlight .o { color: #666 } /* Operator */
+.highlight .ch { color: #60A0B0; font-style: italic } /* Comment.Hashbang */
+.highlight .cm { color: #60A0B0; font-style: italic } /* Comment.Multiline */
+.highlight .cp { color: #007020 } /* Comment.Preproc */
+.highlight .cpf { color: #60A0B0; font-style: italic } /* Comment.PreprocFile */
+.highlight .c1 { color: #60A0B0; font-style: italic } /* Comment.Single */
+.highlight .cs { color: #60A0B0; background-color: #FFF0F0 } /* Comment.Special */
+.highlight .gd { color: #A00000 } /* Generic.Deleted */
+.highlight .ge { font-style: italic } /* Generic.Emph */
+.highlight .ges { font-weight: bold; font-style: italic } /* Generic.EmphStrong */
+.highlight .gr { color: #F00 } /* Generic.Error */
+.highlight .gh { color: #000080; font-weight: bold } /* Generic.Heading */
+.highlight .gi { color: #00A000 } /* Generic.Inserted */
+.highlight .go { color: #888 } /* Generic.Output */
+.highlight .gp { color: #C65D09; font-weight: bold } /* Generic.Prompt */
+.highlight .gs { font-weight: bold } /* Generic.Strong */
+.highlight .gu { color: #800080; font-weight: bold } /* Generic.Subheading */
+.highlight .gt { color: #04D } /* Generic.Traceback */
+.highlight .kc { color: #007020; font-weight: bold } /* Keyword.Constant */
+.highlight .kd { color: #007020; font-weight: bold } /* Keyword.Declaration */
+.highlight .kn { color: #007020; font-weight: bold } /* Keyword.Namespace */
+.highlight .kp { color: #007020 } /* Keyword.Pseudo */
+.highlight .kr { color: #007020; font-weight: bold } /* Keyword.Reserved */
+.highlight .kt { color: #902000 } /* Keyword.Type */
+.highlight .m { color: #40A070 } /* Literal.Number */
+.highlight .s { color: #4070A0 } /* Literal.String */
+.highlight .na { color: #4070A0 } /* Name.Attribute */
+.highlight .nb { color: #007020 } /* Name.Builtin */
+.highlight .nc { color: #0E84B5; font-weight: bold } /* Name.Class */
+.highlight .no { color: #60ADD5 } /* Name.Constant */
+.highlight .nd { color: #555; font-weight: bold } /* Name.Decorator */
+.highlight .ni { color: #D55537; font-weight: bold } /* Name.Entity */
+.highlight .ne { color: #007020 } /* Name.Exception */
+.highlight .nf { color: #06287E } /* Name.Function */
+.highlight .nl { color: #002070; font-weight: bold } /* Name.Label */
+.highlight .nn { color: #0E84B5; font-weight: bold } /* Name.Namespace */
+.highlight .nt { color: #062873; font-weight: bold } /* Name.Tag */
+.highlight .nv { color: #BB60D5 } /* Name.Variable */
+.highlight .ow { color: #007020; font-weight: bold } /* Operator.Word */
+.highlight .w { color: #BBB } /* Text.Whitespace */
+.highlight .mb { color: #40A070 } /* Literal.Number.Bin */
+.highlight .mf { color: #40A070 } /* Literal.Number.Float */
+.highlight .mh { color: #40A070 } /* Literal.Number.Hex */
+.highlight .mi { color: #40A070 } /* Literal.Number.Integer */
+.highlight .mo { color: #40A070 } /* Literal.Number.Oct */
+.highlight .sa { color: #4070A0 } /* Literal.String.Affix */
+.highlight .sb { color: #4070A0 } /* Literal.String.Backtick */
+.highlight .sc { color: #4070A0 } /* Literal.String.Char */
+.highlight .dl { color: #4070A0 } /* Literal.String.Delimiter */
+.highlight .sd { color: #4070A0; font-style: italic } /* Literal.String.Doc */
+.highlight .s2 { color: #4070A0 } /* Literal.String.Double */
+.highlight .se { color: #4070A0; font-weight: bold } /* Literal.String.Escape */
+.highlight .sh { color: #4070A0 } /* Literal.String.Heredoc */
+.highlight .si { color: #70A0D0; font-style: italic } /* Literal.String.Interpol */
+.highlight .sx { color: #C65D09 } /* Literal.String.Other */
+.highlight .sr { color: #235388 } /* Literal.String.Regex */
+.highlight .s1 { color: #4070A0 } /* Literal.String.Single */
+.highlight .ss { color: #517918 } /* Literal.String.Symbol */
+.highlight .bp { color: #007020 } /* Name.Builtin.Pseudo */
+.highlight .fm { color: #06287E } /* Name.Function.Magic */
+.highlight .vc { color: #BB60D5 } /* Name.Variable.Class */
+.highlight .vg { color: #BB60D5 } /* Name.Variable.Global */
+.highlight .vi { color: #BB60D5 } /* Name.Variable.Instance */
+.highlight .vm { color: #BB60D5 } /* Name.Variable.Magic */
+.highlight .il { color: #40A070 } /* Literal.Number.Integer.Long */
   </style>
 </head>
 <body>
@@ -338,9 +433,12 @@
           </div>
           <div class="tags"><button class="tag tag-blue" data-tag="primitive">primitive</button> <button class="tag tag-gray" data-tag="arm">arm</button> <button class="tag tag-gray" data-tag="agilex">agilex</button> <button class="tag tag-gray" data-tag="piper">piper</button> <button class="tag tag-gray" data-tag="ros2">ros2</button></div>
         </div>
-        <div class="card-actions">
-          <a href="robonix.primitive.agilex.piper.arm/">Details</a>
-          <a href="https://github.com/syswonder/primitive-agilex-piper-arm-rbnx">GitHub</a>
+        <div class="card-side">
+          <div class="card-actions">
+            <a href="robonix.primitive.agilex.piper.arm/">Details</a>
+            <a href="https://github.com/syswonder/primitive-agilex-piper-arm-rbnx">GitHub</a>
+          </div>
+          
         </div>
       </article><article class="package-card" data-kind="primitive" data-tags="primitive description urdf agilex piper ros2" data-search="robonix.primitive.agilex.piper.description 0.1.0 primitive piper arm urdf + robot_state_publisher wrapper (tf stand-in until soma ships). https://github.com/syswonder/primitive-agilex-piper-description-rbnx lhw2002426 &lt;lhw2002426@users.noreply.github.com&gt; primitive description urdf agilex piper ros2">
         <div>
@@ -356,9 +454,12 @@
           </div>
           <div class="tags"><button class="tag tag-blue" data-tag="primitive">primitive</button> <button class="tag tag-gray" data-tag="description">description</button> <button class="tag tag-gray" data-tag="urdf">urdf</button> <button class="tag tag-gray" data-tag="agilex">agilex</button> <button class="tag tag-gray" data-tag="piper">piper</button> <button class="tag tag-gray" data-tag="ros2">ros2</button></div>
         </div>
-        <div class="card-actions">
-          <a href="robonix.primitive.agilex.piper.description/">Details</a>
-          <a href="https://github.com/syswonder/primitive-agilex-piper-description-rbnx">GitHub</a>
+        <div class="card-side">
+          <div class="card-actions">
+            <a href="robonix.primitive.agilex.piper.description/">Details</a>
+            <a href="https://github.com/syswonder/primitive-agilex-piper-description-rbnx">GitHub</a>
+          </div>
+          
         </div>
       </article><article class="package-card" data-kind="primitive" data-tags="primitive calibration handeye easy_handeye2 agilex piper ros2" data-search="robonix.primitive.agilex.piper.handeye 0.1.0 primitive hand-eye calibration tf publisher (vendored easy_handeye2 0.5.0). https://github.com/syswonder/primitive-agilex-piper-handeye-rbnx lhw2002426 &lt;lhw2002426@users.noreply.github.com&gt; primitive calibration handeye easy_handeye2 agilex piper ros2">
         <div>
@@ -374,9 +475,12 @@
           </div>
           <div class="tags"><button class="tag tag-blue" data-tag="primitive">primitive</button> <button class="tag tag-gray" data-tag="calibration">calibration</button> <button class="tag tag-gray" data-tag="handeye">handeye</button> <button class="tag tag-gray" data-tag="easy_handeye2">easy_handeye2</button> <button class="tag tag-gray" data-tag="agilex">agilex</button> <button class="tag tag-gray" data-tag="piper">piper</button> <button class="tag tag-gray" data-tag="ros2">ros2</button></div>
         </div>
-        <div class="card-actions">
-          <a href="robonix.primitive.agilex.piper.handeye/">Details</a>
-          <a href="https://github.com/syswonder/primitive-agilex-piper-handeye-rbnx">GitHub</a>
+        <div class="card-side">
+          <div class="card-actions">
+            <a href="robonix.primitive.agilex.piper.handeye/">Details</a>
+            <a href="https://github.com/syswonder/primitive-agilex-piper-handeye-rbnx">GitHub</a>
+          </div>
+          
         </div>
       </article><article class="package-card" data-kind="primitive" data-tags="primitive chassis agilex ranger_mini_v3 ros2" data-search="robonix.primitive.agilex.ranger_mini_v3.chassis 0.1.0 primitive agilex ranger mini chassis driver wrapper. https://github.com/syswonder/primitive-agilex-ranger_mini_v3-chassis-rbnx wheatfox &lt;wheatfox17@icloud.com&gt; primitive chassis agilex ranger_mini_v3 ros2 robonix/primitive/chassis/driver robonix/primitive/chassis/odom robonix/primitive/chassis/twist_in">
         <div>
@@ -392,9 +496,12 @@
           </div>
           <div class="tags"><button class="tag tag-blue" data-tag="primitive">primitive</button> <button class="tag tag-red" data-tag="chassis">chassis</button> <button class="tag tag-gray" data-tag="agilex">agilex</button> <button class="tag tag-gray" data-tag="ranger_mini_v3">ranger_mini_v3</button> <button class="tag tag-gray" data-tag="ros2">ros2</button></div>
         </div>
-        <div class="card-actions">
-          <a href="robonix.primitive.agilex.ranger_mini_v3.chassis/">Details</a>
-          <a href="https://github.com/syswonder/primitive-agilex-ranger_mini_v3-chassis-rbnx">GitHub</a>
+        <div class="card-side">
+          <div class="card-actions">
+            <a href="robonix.primitive.agilex.ranger_mini_v3.chassis/">Details</a>
+            <a href="https://github.com/syswonder/primitive-agilex-ranger_mini_v3-chassis-rbnx">GitHub</a>
+          </div>
+          
         </div>
       </article><article class="package-card" data-kind="primitive" data-tags="primitive camera intel realsense_d435i rgbd" data-search="robonix.primitive.intel.realsense_d435i.camera 0.1.0 primitive intel realsense d435i driver wrapper — declares rgb + depth + extrinsics contracts. https://github.com/syswonder/primitive-intel-realsense_d435i-camera-rbnx wheatfox &lt;wheatfox17@icloud.com&gt; primitive camera intel realsense_d435i rgbd robonix/primitive/camera/driver robonix/primitive/camera/rgb robonix/primitive/camera/depth robonix/primitive/camera/extrinsics robonix/primitive/camera/snapshot robonix/primitive/camera/depth_snapshot">
         <div>
@@ -410,9 +517,12 @@
           </div>
           <div class="tags"><button class="tag tag-blue" data-tag="primitive">primitive</button> <button class="tag tag-cyan" data-tag="camera">camera</button> <button class="tag tag-gray" data-tag="intel">intel</button> <button class="tag tag-gray" data-tag="realsense_d435i">realsense_d435i</button> <button class="tag tag-gray" data-tag="rgbd">rgbd</button></div>
         </div>
-        <div class="card-actions">
-          <a href="robonix.primitive.intel.realsense_d435i.camera/">Details</a>
-          <a href="https://github.com/syswonder/primitive-intel-realsense_d435i-camera-rbnx">GitHub</a>
+        <div class="card-side">
+          <div class="card-actions">
+            <a href="robonix.primitive.intel.realsense_d435i.camera/">Details</a>
+            <a href="https://github.com/syswonder/primitive-intel-realsense_d435i-camera-rbnx">GitHub</a>
+          </div>
+          
         </div>
       </article><article class="package-card" data-kind="primitive" data-tags="primitive imu livox mid360" data-search="robonix.primitive.livox.mid360.imu 0.1.0 primitive livox mid-360 imu atlas wrapper — depends on mid360_lidar_rbnx. https://github.com/syswonder/primitive-livox-mid360-imu-rbnx wheatfox &lt;wheatfox17@icloud.com&gt; primitive imu livox mid360 robonix/primitive/imu/driver robonix/primitive/imu/imu">
         <div>
@@ -428,9 +538,12 @@
           </div>
           <div class="tags"><button class="tag tag-blue" data-tag="primitive">primitive</button> <button class="tag tag-slate" data-tag="imu">imu</button> <button class="tag tag-gray" data-tag="livox">livox</button> <button class="tag tag-gray" data-tag="mid360">mid360</button></div>
         </div>
-        <div class="card-actions">
-          <a href="robonix.primitive.livox.mid360.imu/">Details</a>
-          <a href="https://github.com/syswonder/primitive-livox-mid360-imu-rbnx">GitHub</a>
+        <div class="card-side">
+          <div class="card-actions">
+            <a href="robonix.primitive.livox.mid360.imu/">Details</a>
+            <a href="https://github.com/syswonder/primitive-livox-mid360-imu-rbnx">GitHub</a>
+          </div>
+          
         </div>
       </article><article class="package-card" data-kind="primitive" data-tags="primitive lidar livox mid360 pointcloud" data-search="robonix.primitive.livox.mid360.lidar 0.1.0 primitive livox mid-360 lidar driver wrapper. https://github.com/syswonder/primitive-livox-mid360-lidar-rbnx wheatfox &lt;wheatfox17@icloud.com&gt; primitive lidar livox mid360 pointcloud robonix/primitive/lidar/driver robonix/primitive/lidar/lidar3d robonix/primitive/lidar/lidar_snapshot">
         <div>
@@ -446,9 +559,12 @@
           </div>
           <div class="tags"><button class="tag tag-blue" data-tag="primitive">primitive</button> <button class="tag tag-purple" data-tag="lidar">lidar</button> <button class="tag tag-gray" data-tag="livox">livox</button> <button class="tag tag-gray" data-tag="mid360">mid360</button> <button class="tag tag-gray" data-tag="pointcloud">pointcloud</button></div>
         </div>
-        <div class="card-actions">
-          <a href="robonix.primitive.livox.mid360.lidar/">Details</a>
-          <a href="https://github.com/syswonder/primitive-livox-mid360-lidar-rbnx">GitHub</a>
+        <div class="card-side">
+          <div class="card-actions">
+            <a href="robonix.primitive.livox.mid360.lidar/">Details</a>
+            <a href="https://github.com/syswonder/primitive-livox-mid360-lidar-rbnx">GitHub</a>
+          </div>
+          
         </div>
       </article><article class="package-card" data-kind="primitive" data-tags="primitive camera orbbec dabai_dcw rgbd ros2" data-search="robonix.primitive.orbbec.dabai_dcw.camera 0.1.0 primitive orbbec dabai dcw rgbd primitive — declares rgb + depth + camera_info. https://github.com/syswonder/primitive-orbbec-dabai_dcw-camera-rbnx lhw2002426 &lt;lhw2002426@users.noreply.github.com&gt; primitive camera orbbec dabai_dcw rgbd ros2 robonix/primitive/camera/driver robonix/primitive/camera/rgb robonix/primitive/camera/depth robonix/primitive/camera/camera_info">
         <div>
@@ -464,9 +580,12 @@
           </div>
           <div class="tags"><button class="tag tag-blue" data-tag="primitive">primitive</button> <button class="tag tag-cyan" data-tag="camera">camera</button> <button class="tag tag-gray" data-tag="orbbec">orbbec</button> <button class="tag tag-gray" data-tag="dabai_dcw">dabai_dcw</button> <button class="tag tag-gray" data-tag="rgbd">rgbd</button> <button class="tag tag-gray" data-tag="ros2">ros2</button></div>
         </div>
-        <div class="card-actions">
-          <a href="robonix.primitive.orbbec.dabai_dcw.camera/">Details</a>
-          <a href="https://github.com/syswonder/primitive-orbbec-dabai_dcw-camera-rbnx">GitHub</a>
+        <div class="card-side">
+          <div class="card-actions">
+            <a href="robonix.primitive.orbbec.dabai_dcw.camera/">Details</a>
+            <a href="https://github.com/syswonder/primitive-orbbec-dabai_dcw-camera-rbnx">GitHub</a>
+          </div>
+          
         </div>
       </article><article class="package-card" data-kind="service" data-tags="service perception grasp_pose grasp ros2" data-search="robonix.service.grasp_pose 0.1.0 service geometric grasp-pose estimator (atlas + ros dual surface). https://github.com/syswonder/service-grasp-pose-rbnx lhw2002426 &lt;lhw2002426@users.noreply.github.com&gt; service perception grasp_pose grasp ros2 robonix/service/perception/grasp_pose/driver robonix/service/perception/grasp_pose/grasp_request robonix/service/perception/grasp_pose/grasps">
         <div>
@@ -482,9 +601,12 @@
           </div>
           <div class="tags"><button class="tag tag-green" data-tag="service">service</button> <button class="tag tag-gray" data-tag="perception">perception</button> <button class="tag tag-gray" data-tag="grasp_pose">grasp_pose</button> <button class="tag tag-gray" data-tag="grasp">grasp</button> <button class="tag tag-gray" data-tag="ros2">ros2</button></div>
         </div>
-        <div class="card-actions">
-          <a href="robonix.service.grasp_pose/">Details</a>
-          <a href="https://github.com/syswonder/service-grasp-pose-rbnx">GitHub</a>
+        <div class="card-side">
+          <div class="card-actions">
+            <a href="robonix.service.grasp_pose/">Details</a>
+            <a href="https://github.com/syswonder/service-grasp-pose-rbnx">GitHub</a>
+          </div>
+          
         </div>
       </article><article class="package-card" data-kind="service" data-tags="service mapping slam rtabmap ros2" data-search="robonix.service.mapping 0.4.0 service slam mapping service. algo + sensor inputs config-driven. https://github.com/syswonder/service-map-rbnx wheatfox &lt;wheatfox17@icloud.com&gt; service mapping slam rtabmap ros2 robonix/service/map/driver robonix/service/map/occupancy_grid robonix/service/map/pointcloud robonix/service/map/pose robonix/service/map/odom robonix/service/map/save_map robonix/service/map/list_maps robonix/service/map/load_map robonix/service/map/pose_estimate robonix/service/map/switch_mode">
         <div>
@@ -500,9 +622,12 @@
           </div>
           <div class="tags"><button class="tag tag-green" data-tag="service">service</button> <button class="tag tag-blue" data-tag="mapping">mapping</button> <button class="tag tag-blue" data-tag="slam">slam</button> <button class="tag tag-gray" data-tag="rtabmap">rtabmap</button> <button class="tag tag-gray" data-tag="ros2">ros2</button></div>
         </div>
-        <div class="card-actions">
-          <a href="robonix.service.mapping/">Details</a>
-          <a href="https://github.com/syswonder/service-map-rbnx">GitHub</a>
+        <div class="card-side">
+          <div class="card-actions">
+            <a href="robonix.service.mapping/">Details</a>
+            <a href="https://github.com/syswonder/service-map-rbnx">GitHub</a>
+          </div>
+          
         </div>
       </article><article class="package-card" data-kind="service" data-tags="service navigation nav2 ros2" data-search="robonix.service.navigation 0.1.0 service nav2 service wrapper exposing service/navigation/* over grpc. https://github.com/syswonder/service-navigation-rbnx wheatfox &lt;wheatfox17@icloud.com&gt; service navigation nav2 ros2 robonix/service/navigation/driver robonix/service/navigation/navigate robonix/service/navigation/navigate/status robonix/service/navigation/navigate/cancel">
         <div>
@@ -518,9 +643,12 @@
           </div>
           <div class="tags"><button class="tag tag-green" data-tag="service">service</button> <button class="tag tag-green" data-tag="navigation">navigation</button> <button class="tag tag-gray" data-tag="nav2">nav2</button> <button class="tag tag-gray" data-tag="ros2">ros2</button></div>
         </div>
-        <div class="card-actions">
-          <a href="robonix.service.navigation/">Details</a>
-          <a href="https://github.com/syswonder/service-navigation-rbnx">GitHub</a>
+        <div class="card-side">
+          <div class="card-actions">
+            <a href="robonix.service.navigation/">Details</a>
+            <a href="https://github.com/syswonder/service-navigation-rbnx">GitHub</a>
+          </div>
+          
         </div>
       </article><article class="package-card" data-kind="service" data-tags="service perception object_detect llm vlm ros2" data-search="robonix.service.object_detect 0.1.0 service llm-based object detection — atlas + ros dual surface, drop-in replacement for yolo_world_rbnx. https://github.com/syswonder/service-object-detect-rbnx lhw2002426 &lt;lhw2002426@users.noreply.github.com&gt; service perception object_detect llm vlm ros2 robonix/service/perception/object_detect/driver robonix/service/perception/object_detect/detect_object">
         <div>
@@ -536,9 +664,12 @@
           </div>
           <div class="tags"><button class="tag tag-green" data-tag="service">service</button> <button class="tag tag-gray" data-tag="perception">perception</button> <button class="tag tag-gray" data-tag="object_detect">object_detect</button> <button class="tag tag-gray" data-tag="llm">llm</button> <button class="tag tag-gray" data-tag="vlm">vlm</button> <button class="tag tag-gray" data-tag="ros2">ros2</button></div>
         </div>
-        <div class="card-actions">
-          <a href="robonix.service.object_detect/">Details</a>
-          <a href="https://github.com/syswonder/service-object-detect-rbnx">GitHub</a>
+        <div class="card-side">
+          <div class="card-actions">
+            <a href="robonix.service.object_detect/">Details</a>
+            <a href="https://github.com/syswonder/service-object-detect-rbnx">GitHub</a>
+          </div>
+          
         </div>
       </article><article class="package-card" data-kind="service" data-tags="service manipulation moveit agilex piper ros2" data-search="robonix.service.piper_moveit 0.1.0 service moveit + grasp executor (atlas-routed manipulation service). https://github.com/syswonder/service-piper-moveit-rbnx lhw2002426 &lt;lhw2002426@users.noreply.github.com&gt; service manipulation moveit agilex piper ros2 robonix/service/manipulation/driver robonix/service/manipulation/execute_grasp robonix/service/manipulation/reset">
         <div>
@@ -554,9 +685,12 @@
           </div>
           <div class="tags"><button class="tag tag-green" data-tag="service">service</button> <button class="tag tag-gray" data-tag="manipulation">manipulation</button> <button class="tag tag-gray" data-tag="moveit">moveit</button> <button class="tag tag-gray" data-tag="agilex">agilex</button> <button class="tag tag-gray" data-tag="piper">piper</button> <button class="tag tag-gray" data-tag="ros2">ros2</button></div>
         </div>
-        <div class="card-actions">
-          <a href="robonix.service.piper_moveit/">Details</a>
-          <a href="https://github.com/syswonder/service-piper-moveit-rbnx">GitHub</a>
+        <div class="card-side">
+          <div class="card-actions">
+            <a href="robonix.service.piper_moveit/">Details</a>
+            <a href="https://github.com/syswonder/service-piper-moveit-rbnx">GitHub</a>
+          </div>
+          
         </div>
       </article><article class="package-card" data-kind="skill" data-tags="skill explore frontier navigation mapping" data-search="robonix.skill.explore 0.1.0 skill frontier-based autonomous exploration skill. https://github.com/syswonder/skill-explore-rbnx wheatfox &lt;wheatfox17@icloud.com&gt; skill explore frontier navigation mapping robonix/skill/explore/driver robonix/skill/explore/explore robonix/skill/explore/explore/status robonix/skill/explore/explore/cancel">
         <div>
@@ -572,9 +706,12 @@
           </div>
           <div class="tags"><button class="tag tag-gold" data-tag="skill">skill</button> <button class="tag tag-gold" data-tag="explore">explore</button> <button class="tag tag-gray" data-tag="frontier">frontier</button> <button class="tag tag-green" data-tag="navigation">navigation</button> <button class="tag tag-blue" data-tag="mapping">mapping</button></div>
         </div>
-        <div class="card-actions">
-          <a href="robonix.skill.explore/">Details</a>
-          <a href="https://github.com/syswonder/skill-explore-rbnx">GitHub</a>
+        <div class="card-side">
+          <div class="card-actions">
+            <a href="robonix.skill.explore/">Details</a>
+            <a href="https://github.com/syswonder/skill-explore-rbnx">GitHub</a>
+          </div>
+          
         </div>
       </article><article class="package-card" data-kind="skill" data-tags="skill pick manipulation grasp" data-search="robonix.skill.pick.vertical_grasp 0.1.0 skill pick-up-a-named-object skill — orchestrates perception + manipulation services. https://github.com/syswonder/skill-pick-vertical-grasp-rbnx lhw2002426 &lt;lhw2002426@users.noreply.github.com&gt; skill pick manipulation grasp robonix/skill/pick/driver robonix/skill/pick/pick">
         <div>
@@ -590,9 +727,12 @@
           </div>
           <div class="tags"><button class="tag tag-gold" data-tag="skill">skill</button> <button class="tag tag-gray" data-tag="pick">pick</button> <button class="tag tag-gray" data-tag="manipulation">manipulation</button> <button class="tag tag-gray" data-tag="grasp">grasp</button></div>
         </div>
-        <div class="card-actions">
-          <a href="robonix.skill.pick.vertical_grasp/">Details</a>
-          <a href="https://github.com/syswonder/skill-pick-vertical-grasp-rbnx">GitHub</a>
+        <div class="card-side">
+          <div class="card-actions">
+            <a href="robonix.skill.pick.vertical_grasp/">Details</a>
+            <a href="https://github.com/syswonder/skill-pick-vertical-grasp-rbnx">GitHub</a>
+          </div>
+          
         </div>
       </article><article class="package-card" data-kind="skill" data-tags="skill vla manipulation llm" data-search="robonix.skill.vla.openvla 0.2.0 skill vla client skill — llm-callable entry point for vision-language-action inference and joint-space execution. https://github.com/syswonder/skill-vla-openvla-rbnx lhw2002426 &lt;lhw2002426@users.noreply.github.com&gt; skill vla manipulation llm robonix/skill/vla/driver robonix/skill/vla/execute">
         <div>
@@ -608,9 +748,12 @@
           </div>
           <div class="tags"><button class="tag tag-gold" data-tag="skill">skill</button> <button class="tag tag-gray" data-tag="vla">vla</button> <button class="tag tag-gray" data-tag="manipulation">manipulation</button> <button class="tag tag-gray" data-tag="llm">llm</button></div>
         </div>
-        <div class="card-actions">
-          <a href="robonix.skill.vla.openvla/">Details</a>
-          <a href="https://github.com/syswonder/skill-vla-openvla-rbnx">GitHub</a>
+        <div class="card-side">
+          <div class="card-actions">
+            <a href="robonix.skill.vla.openvla/">Details</a>
+            <a href="https://github.com/syswonder/skill-vla-openvla-rbnx">GitHub</a>
+          </div>
+          
         </div>
       </article>
         </div>
@@ -632,7 +775,7 @@ const catalog = await fetch(`${base}/packages`).then(r => r.json());
 const detail = await fetch(`${base}/package/${encodeURIComponent('robonix.service.mapping')}`).then(r => r.json());</code></pre>
     </section>
   </main>
-  <footer class="shell">Generated on 2026-07-13T13:31:01+00:00.</footer>
+  <footer class="shell">Generated on 2026-07-14T07:25:17+00:00.</footer>
   <script>
     const input = document.getElementById('q');
     const cards = Array.from(document.querySelectorAll('.package-card'));

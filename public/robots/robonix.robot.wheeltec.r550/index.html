@@ -183,6 +183,21 @@
       font-size: 13px;
       margin: 0;
     }
+    .card-side {
+      display: grid;
+      gap: 10px;
+      justify-items: end;
+      align-content: start;
+    }
+    .card-preview {
+      display: block;
+      width: 190px;
+      aspect-ratio: 4 / 3;
+      object-fit: cover;
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      background: var(--soft);
+    }
     .tags { display: flex; gap: 5px; flex-wrap: wrap; margin-top: 8px; }
     .tag {
       border: 0;
@@ -268,6 +283,9 @@
       font-size: 0.92em;
     }
     .readme pre code { background: transparent; padding: 0; }
+    .readme .highlight { margin: 10px 0; }
+    .readme .highlight pre { margin: 0; }
+    .readme img { display: block; max-width: 100%; height: auto; border-radius: 7px; }
     .readme table { border-collapse: collapse; width: 100%; display: block; overflow-x: auto; }
     .readme th, .readme td { border: 1px solid var(--line); padding: 6px 8px; }
     code { font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
@@ -277,10 +295,87 @@
       .filters { position: static; }
       .toolbar { align-items: stretch; flex-direction: column; }
       .package-card { grid-template-columns: 1fr; }
+      .card-side { justify-items: start; }
       .card-actions { justify-content: flex-start; }
+      .card-preview { width: min(100%, 360px); }
       .api-reference { padding: 16px; }
     }
     
+pre { line-height: 125%; }
+td.linenos .normal { color: #666666; background-color: transparent; padding-left: 5px; padding-right: 5px; }
+span.linenos { color: #666666; background-color: transparent; padding-left: 5px; padding-right: 5px; }
+td.linenos .special { color: #000000; background-color: #ffffc0; padding-left: 5px; padding-right: 5px; }
+span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 5px; padding-right: 5px; }
+.highlight .hll { background-color: #ffffcc }
+.highlight { background: #f0f0f0; }
+.highlight .c { color: #60A0B0; font-style: italic } /* Comment */
+.highlight .err { border: 1px solid #F00 } /* Error */
+.highlight .k { color: #007020; font-weight: bold } /* Keyword */
+.highlight .o { color: #666 } /* Operator */
+.highlight .ch { color: #60A0B0; font-style: italic } /* Comment.Hashbang */
+.highlight .cm { color: #60A0B0; font-style: italic } /* Comment.Multiline */
+.highlight .cp { color: #007020 } /* Comment.Preproc */
+.highlight .cpf { color: #60A0B0; font-style: italic } /* Comment.PreprocFile */
+.highlight .c1 { color: #60A0B0; font-style: italic } /* Comment.Single */
+.highlight .cs { color: #60A0B0; background-color: #FFF0F0 } /* Comment.Special */
+.highlight .gd { color: #A00000 } /* Generic.Deleted */
+.highlight .ge { font-style: italic } /* Generic.Emph */
+.highlight .ges { font-weight: bold; font-style: italic } /* Generic.EmphStrong */
+.highlight .gr { color: #F00 } /* Generic.Error */
+.highlight .gh { color: #000080; font-weight: bold } /* Generic.Heading */
+.highlight .gi { color: #00A000 } /* Generic.Inserted */
+.highlight .go { color: #888 } /* Generic.Output */
+.highlight .gp { color: #C65D09; font-weight: bold } /* Generic.Prompt */
+.highlight .gs { font-weight: bold } /* Generic.Strong */
+.highlight .gu { color: #800080; font-weight: bold } /* Generic.Subheading */
+.highlight .gt { color: #04D } /* Generic.Traceback */
+.highlight .kc { color: #007020; font-weight: bold } /* Keyword.Constant */
+.highlight .kd { color: #007020; font-weight: bold } /* Keyword.Declaration */
+.highlight .kn { color: #007020; font-weight: bold } /* Keyword.Namespace */
+.highlight .kp { color: #007020 } /* Keyword.Pseudo */
+.highlight .kr { color: #007020; font-weight: bold } /* Keyword.Reserved */
+.highlight .kt { color: #902000 } /* Keyword.Type */
+.highlight .m { color: #40A070 } /* Literal.Number */
+.highlight .s { color: #4070A0 } /* Literal.String */
+.highlight .na { color: #4070A0 } /* Name.Attribute */
+.highlight .nb { color: #007020 } /* Name.Builtin */
+.highlight .nc { color: #0E84B5; font-weight: bold } /* Name.Class */
+.highlight .no { color: #60ADD5 } /* Name.Constant */
+.highlight .nd { color: #555; font-weight: bold } /* Name.Decorator */
+.highlight .ni { color: #D55537; font-weight: bold } /* Name.Entity */
+.highlight .ne { color: #007020 } /* Name.Exception */
+.highlight .nf { color: #06287E } /* Name.Function */
+.highlight .nl { color: #002070; font-weight: bold } /* Name.Label */
+.highlight .nn { color: #0E84B5; font-weight: bold } /* Name.Namespace */
+.highlight .nt { color: #062873; font-weight: bold } /* Name.Tag */
+.highlight .nv { color: #BB60D5 } /* Name.Variable */
+.highlight .ow { color: #007020; font-weight: bold } /* Operator.Word */
+.highlight .w { color: #BBB } /* Text.Whitespace */
+.highlight .mb { color: #40A070 } /* Literal.Number.Bin */
+.highlight .mf { color: #40A070 } /* Literal.Number.Float */
+.highlight .mh { color: #40A070 } /* Literal.Number.Hex */
+.highlight .mi { color: #40A070 } /* Literal.Number.Integer */
+.highlight .mo { color: #40A070 } /* Literal.Number.Oct */
+.highlight .sa { color: #4070A0 } /* Literal.String.Affix */
+.highlight .sb { color: #4070A0 } /* Literal.String.Backtick */
+.highlight .sc { color: #4070A0 } /* Literal.String.Char */
+.highlight .dl { color: #4070A0 } /* Literal.String.Delimiter */
+.highlight .sd { color: #4070A0; font-style: italic } /* Literal.String.Doc */
+.highlight .s2 { color: #4070A0 } /* Literal.String.Double */
+.highlight .se { color: #4070A0; font-weight: bold } /* Literal.String.Escape */
+.highlight .sh { color: #4070A0 } /* Literal.String.Heredoc */
+.highlight .si { color: #70A0D0; font-style: italic } /* Literal.String.Interpol */
+.highlight .sx { color: #C65D09 } /* Literal.String.Other */
+.highlight .sr { color: #235388 } /* Literal.String.Regex */
+.highlight .s1 { color: #4070A0 } /* Literal.String.Single */
+.highlight .ss { color: #517918 } /* Literal.String.Symbol */
+.highlight .bp { color: #007020 } /* Name.Builtin.Pseudo */
+.highlight .fm { color: #06287E } /* Name.Function.Magic */
+.highlight .vc { color: #BB60D5 } /* Name.Variable.Class */
+.highlight .vg { color: #BB60D5 } /* Name.Variable.Global */
+.highlight .vi { color: #BB60D5 } /* Name.Variable.Instance */
+.highlight .vm { color: #BB60D5 } /* Name.Variable.Magic */
+.highlight .il { color: #40A070 } /* Literal.Number.Integer.Long */
   </style>
 </head>
 <body>
@@ -294,7 +389,87 @@
       <section class="panel detail-main">
         <h2>README</h2>
         <article class="readme">
-          <p>No README.md was found in this package repository.</p>
+          <h1>wheeltec_r550_deploy</h1>
+<p>Robonix deploy manifest for the WHEELTEC R550 robot at SysWonder lab.</p>
+<p>Hardware: Jetson Orin (aarch64, Tegra-special CUDA stack), WHEELTEC R550 chassis, Livox MID-360 3D LiDAR + integrated 6-axis IMU (Ethernet), Intel RealSense D435i RGBD camera (USB 3.0, with internal IMU).</p>
+<h2>Packages</h2>
+<p>All package URLs in <code>robonix_manifest.yaml</code> resolve from the SysWonder GitHub organization:</p>
+<table>
+<thead>
+<tr>
+<th>Package</th>
+<th>Repo</th>
+<th>Owns</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>mid360_lidar_rbnx</code></td>
+<td>syswonder/primitive-livox-mid360-lidar-rbnx</td>
+<td>primitive/lidar/*</td>
+</tr>
+<tr>
+<td><code>mid360_imu_rbnx</code></td>
+<td>syswonder/primitive-livox-mid360-imu-rbnx</td>
+<td>primitive/imu/*</td>
+</tr>
+<tr>
+<td><code>realsense_camera_rbnx</code></td>
+<td>syswonder/primitive-intel-realsense_d435i-camera-rbnx</td>
+<td>primitive/camera/*</td>
+</tr>
+<tr>
+<td><code>wheeltec_chassis_rbnx</code></td>
+<td>syswonder/primitive-wheeltec-r550-chassis-rbnx</td>
+<td>primitive/chassis/*</td>
+</tr>
+<tr>
+<td><code>mapping_rbnx</code></td>
+<td>syswonder/service-map-rbnx</td>
+<td>service/map/*</td>
+</tr>
+</tbody>
+</table>
+<div class="highlight"><pre><span></span><code><span class="c1"># on the Jetson, in this directory:</span>
+rbnx<span class="w"> </span>build<span class="w"> </span>.<span class="w">         </span><span class="c1"># clones each url: package and runs its build.sh</span>
+rbnx<span class="w"> </span>boot<span class="w">  </span>.<span class="w">         </span><span class="c1"># spawns each one and runs Driver(CMD_INIT, config)</span>
+</code></pre></div>
+<p><code>rbnx build</code> writes everything to <code>rbnx-build/cache/&lt;name&gt;/</code> so the original working dir on the Jetson is never touched.</p>
+<h2>URDF — required, not shipped</h2>
+<p>Soma needs a WHEELTEC R550 URDF (<code>urdf_path</code> in the system.soma block). The URDF must include <code>base_link</code> (chassis frame; convention: ground projection of the geometric centre, X forward, Z up), <code>livox_frame</code> mount transform from <code>base_link</code>, and <code>camera_link</code> + <code>camera_color_optical_frame</code> mount transforms.</p>
+<p>Until a calibrated URDF is in hand, an interim path is to launch <code>static_transform_publisher</code> for each frame manually. Sketch (drop in a side-launch, replace x y z and roll pitch yaw with your measured mount values):</p>
+<div class="highlight"><pre><span></span><code><span class="nt">&lt;launch&gt;</span>
+<span class="w">  </span><span class="nt">&lt;node</span><span class="w"> </span><span class="na">pkg=</span><span class="s">&quot;tf2_ros&quot;</span><span class="w"> </span><span class="na">exec=</span><span class="s">&quot;static_transform_publisher&quot;</span><span class="w"> </span><span class="na">name=</span><span class="s">&quot;tf_lidar&quot;</span>
+<span class="w">        </span><span class="na">args=</span><span class="s">&quot;0.20 0 0.40  0 0 0  base_link livox_frame&quot;</span><span class="nt">/&gt;</span>
+<span class="w">  </span><span class="nt">&lt;node</span><span class="w"> </span><span class="na">pkg=</span><span class="s">&quot;tf2_ros&quot;</span><span class="w"> </span><span class="na">exec=</span><span class="s">&quot;static_transform_publisher&quot;</span><span class="w"> </span><span class="na">name=</span><span class="s">&quot;tf_camera&quot;</span>
+<span class="w">        </span><span class="na">args=</span><span class="s">&quot;0.30 0 0.35  0 0 0  base_link camera_link&quot;</span><span class="nt">/&gt;</span>
+<span class="nt">&lt;/launch&gt;</span>
+</code></pre></div>
+<p>Then leave <code>system.soma</code> commented out in the manifest until the URDF is ready, and run that side-launch in another shell.</p>
+<h2>Verifying the bring-up</h2>
+<p>After <code>rbnx boot</code>:</p>
+<div class="highlight"><pre><span></span><code>ros2<span class="w"> </span>topic<span class="w"> </span>hz<span class="w"> </span>/scanner/cloud<span class="w">   </span><span class="c1"># ~10 Hz lidar PointCloud2</span>
+ros2<span class="w"> </span>topic<span class="w"> </span>hz<span class="w"> </span>/livox/imu<span class="w">       </span><span class="c1"># ~200 Hz sensor_msgs/Imu</span>
+ros2<span class="w"> </span>topic<span class="w"> </span>hz<span class="w"> </span>/camera_435i/color/image_raw<span class="w">                    </span><span class="c1"># ~30 Hz</span>
+ros2<span class="w"> </span>topic<span class="w"> </span>hz<span class="w"> </span>/camera_435i/aligned_depth_to_color/image_raw<span class="w">   </span><span class="c1"># ~30 Hz</span>
+ros2<span class="w"> </span>topic<span class="w"> </span>hz<span class="w"> </span>/map<span class="w">             </span><span class="c1"># 1 Hz-ish OccupancyGrid (from rtabmap)</span>
+ros2<span class="w"> </span>topic<span class="w"> </span><span class="nb">echo</span><span class="w"> </span>/robonix/map/pose<span class="w"> </span>--once
+rbnx<span class="w"> </span>caps<span class="w">                      </span><span class="c1"># all the contracts above should be listed</span>
+</code></pre></div>
+<p>Open RViz and load the rtabmap visualization config to see the map build up.</p>
+<h2>Defer / boot sequencing</h2>
+<p>The deploy manifest is an unordered list. Boot ordering happens at runtime via the defer protocol: a package whose dep isn't ready returns <code>Driver_Response(state="deferred")</code> and <code>rbnx boot</code> retries it periodically until the system reaches steady state. There's no explicit dep graph in the manifest — each package only declares what it needs at the moment its Init runs.</p>
+<p>Concretely, the cascade for this stack:</p>
+<div class="highlight"><pre><span></span><code>mid360_lidar.Init    →  spawns livox driver, declares lidar3d
+                        (also makes /livox/imu live on the bus)
+mid360_imu.Init      →  defers if /livox/imu silent; succeeds on retry
+                        once mid360_lidar&#39;s launch is publishing
+realsense_camera.Init→  spawns realsense, declares rgb + depth
+mapping.Init         →  queries atlas for lidar3d, rgb, depth, imu;
+                        defers any not yet present; succeeds when all are
+</code></pre></div>
+<h2>License</h2>
+<p>Manifest + this README: MulanPSL-2.0. Each <code>url:</code> package retains its own license.</p>
         </article>
       </section>
       <aside class="panel detail-side">
@@ -323,6 +498,6 @@
       </aside>
     </div>
   </main>
-  <footer class="shell">Generated on 2026-07-13T13:31:01+00:00.</footer>
+  <footer class="shell">Generated on 2026-07-14T07:25:17+00:00.</footer>
 </body>
 </html>
