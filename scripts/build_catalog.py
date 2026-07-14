@@ -5,16 +5,19 @@ import datetime as dt
 import html
 import json
 import os
+import posixpath
 import re
 import shutil
 import sys
 import urllib.error
+import urllib.parse
 import urllib.request
 from pathlib import Path
 
 import bleach
 import markdown
 import yaml
+from pygments.formatters import HtmlFormatter
 
 
 GITHUB_RE = re.compile(r"^https://github\.com/([^/]+)/([^/#?]+?)(?:\.git)?/?$")
@@ -46,6 +49,28 @@ def github_json(url: str) -> dict:
         fail(f"GitHub request failed: {url}: {e}")
 
 
+def github_optional_json(url: str) -> dict | None:
+    """Fetch an optional GitHub API resource, returning None only for 404."""
+    headers = {
+        "Accept": "application/vnd.github+json",
+        "User-Agent": "robonix-package-catalog",
+    }
+    token = os.environ.get("GITHUB_TOKEN")
+    if token:
+        headers["Authorization"] = f"Bearer {token}"
+    req = urllib.request.Request(url, headers=headers)
+    try:
+        with urllib.request.urlopen(req, timeout=30) as resp:
+            return json.loads(resp.read().decode("utf-8"))
+    except urllib.error.HTTPError as e:
+        if e.code == 404:
+            return None
+        body = e.read().decode("utf-8", "replace")
+        fail(f"GitHub request failed {e.code}: {url}\n{body}")
+    except Exception as e:
+        fail(f"GitHub request failed: {url}: {e}")
+
+
 def parse_repo(url: str) -> tuple[str, str]:
     m = GITHUB_RE.match(url.strip())
     if not m:
@@ -54,14 +79,16 @@ def parse_repo(url: str) -> tuple[str, str]:
 
 
 def load_remote_text(owner: str, repo: str, path: str, branch: str, *, required: bool) -> str:
-    try:
+    if required:
         content = github_json(
             f"https://api.github.com/repos/{owner}/{repo}/contents/{path}?ref={branch}"
         )
-    except SystemExit:
-        if required:
-            raise
-        return ""
+    else:
+        content = github_optional_json(
+            f"https://api.github.com/repos/{owner}/{repo}/contents/{path}?ref={branch}"
+        )
+        if content is None:
+            return ""
     if content.get("encoding") != "base64" or "content" not in content:
         if required:
             fail(f"https://github.com/{owner}/{repo}: {path} is not base64 content")
@@ -210,6 +237,14 @@ def collect(catalog_path: Path) -> list[dict]:
             fail(f"{name}: manifest must be a non-empty string")
         branch, manifest, readme = load_remote_manifest(repo, manifest_path)
         catalog_type = entry.get("_catalog_type") or ("robot" if manifest_path == "robonix_manifest.yaml" or name.startswith("robonix.robot.") else "package")
+        preview_image_url = ""
+        if catalog_type == "robot":
+            owner, parsed_repo = parse_repo(repo)
+            preview = github_optional_json(
+                f"https://api.github.com/repos/{owner}/{parsed_repo}/contents/assets/robot.jpg?ref={urllib.parse.quote(branch, safe='')}"
+            )
+            if preview and preview.get("type") == "file":
+                preview_image_url = preview.get("download_url") or ""
         if catalog_type == "robot":
             meta = manifest.get("catalog")
             version, description, tags, maintainers = validate_catalog_metadata(name, meta, name)
@@ -239,6 +274,7 @@ def collect(catalog_path: Path) -> list[dict]:
                 "capabilities": cap_names,
                 "deploy_dependencies": deploy_dependencies,
                 "readme_url": f"{repo}/blob/{branch}/README.md",
+                "preview_image_url": preview_image_url,
                 "_readme_markdown": readme,
             }
         )
@@ -297,7 +333,7 @@ def render_tags(tags: list[str]) -> str:
 
 
 def render_css() -> str:
-    return """
+    base_css = """
     :root {
       color-scheme: light;
       --pico-font-family: Arial, Helvetica, sans-serif;
@@ -474,6 +510,21 @@ def render_css() -> str:
       font-size: 13px;
       margin: 0;
     }
+    .card-side {
+      display: grid;
+      gap: 10px;
+      justify-items: end;
+      align-content: start;
+    }
+    .card-preview {
+      display: block;
+      width: 190px;
+      aspect-ratio: 4 / 3;
+      object-fit: cover;
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      background: var(--soft);
+    }
     .tags { display: flex; gap: 5px; flex-wrap: wrap; margin-top: 8px; }
     .tag {
       border: 0;
@@ -559,6 +610,9 @@ def render_css() -> str:
       font-size: 0.92em;
     }
     .readme pre code { background: transparent; padding: 0; }
+    .readme .highlight { margin: 10px 0; }
+    .readme .highlight pre { margin: 0; }
+    .readme img { display: block; max-width: 100%; height: auto; border-radius: 7px; }
     .readme table { border-collapse: collapse; width: 100%; display: block; overflow-x: auto; }
     .readme th, .readme td { border: 1px solid var(--line); padding: 6px 8px; }
     code { font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
@@ -568,10 +622,13 @@ def render_css() -> str:
       .filters { position: static; }
       .toolbar { align-items: stretch; flex-direction: column; }
       .package-card { grid-template-columns: 1fr; }
+      .card-side { justify-items: start; }
       .card-actions { justify-content: flex-start; }
+      .card-preview { width: min(100%, 360px); }
       .api-reference { padding: 16px; }
     }
     """
+    return base_css + "\n" + HtmlFormatter(style="friendly").get_style_defs(".highlight")
 
 
 def detail_base(package: dict) -> str:
@@ -599,6 +656,12 @@ def render_listing_page(public_dir: Path, generated_at: str, packages: list[dict
             + p["capabilities"]
             + [d.get("name", "") for d in p.get("deploy_dependencies", [])]
         )
+        preview_html = ""
+        if p.get("preview_image_url"):
+            preview_html = (
+                f'<img class="card-preview" src="{html.escape(p["preview_image_url"])}" '
+                f'alt="{html.escape(p["name"])} preview" loading="lazy">'
+            )
         cards.append(
             f"""<article class="package-card" data-kind="{html.escape(p['kind'])}" data-tags="{html.escape(' '.join(p['tags']))}" data-search="{html.escape(search_text.lower())}">
         <div>
@@ -614,9 +677,12 @@ def render_listing_page(public_dir: Path, generated_at: str, packages: list[dict
           </div>
           <div class="tags">{render_tags(p['tags'])}</div>
         </div>
-        <div class="card-actions">
-          <a href="{detail_href}">Details</a>
-          <a href="{html.escape(p['repo'])}">GitHub</a>
+        <div class="card-side">
+          <div class="card-actions">
+            <a href="{detail_href}">Details</a>
+            <a href="{html.escape(p['repo'])}">GitHub</a>
+          </div>
+          {preview_html}
         </div>
       </article>"""
         )
@@ -835,15 +901,61 @@ def render_site(public_dir: Path, generated_at: str, packages: list[dict]) -> No
     )
 
 
-def render_markdown(md: str) -> str:
+def absolute_readme_url(value: str, repo_url: str, branch: str, *, raw: bool) -> str:
+    """Resolve a README-relative link against the indexed repository root."""
+    value = html.unescape(value)
+    parsed = urllib.parse.urlsplit(value)
+    if parsed.scheme or parsed.netloc or value.startswith(("#", "//")):
+        return value
+    owner, repo = parse_repo(repo_url)
+    path = posixpath.normpath(parsed.path.lstrip("/"))
+    if path in ("", "."):
+        path = "README.md"
+    escaped_branch = urllib.parse.quote(branch, safe="")
+    escaped_path = urllib.parse.quote(path, safe="/")
+    if raw:
+        base = f"https://raw.githubusercontent.com/{owner}/{repo}/{escaped_branch}/{escaped_path}"
+    else:
+        base = f"{repo_url}/blob/{escaped_branch}/{escaped_path}"
+    return urllib.parse.urlunsplit(("", "", base, parsed.query, parsed.fragment))
+
+
+def rewrite_readme_urls(rendered: str, repo_url: str, branch: str) -> str:
+    """Make repository-relative README images and links work on catalog pages."""
+    def replace(pattern: str, source: str, *, raw: bool) -> str:
+        def repl(match: re.Match) -> str:
+            resolved = absolute_readme_url(match.group(2), repo_url, branch, raw=raw)
+            return match.group(1) + html.escape(resolved, quote=True) + match.group(3)
+
+        return re.sub(pattern, repl, source, flags=re.IGNORECASE)
+
+    rendered = replace(r'(<img\b[^>]*\bsrc=")([^"]+)(")', rendered, raw=True)
+    return replace(r'(<a\b[^>]*\bhref=")([^"]+)(")', rendered, raw=False)
+
+
+def render_markdown(md: str, repo_url: str, branch: str) -> str:
     if not md.strip():
         return "<p>No README.md was found in this package repository.</p>"
-    rendered = markdown.markdown(md, extensions=["fenced_code", "tables"])
+    rendered = markdown.markdown(
+        md,
+        extensions=["tables", "pymdownx.highlight", "pymdownx.superfences"],
+        extension_configs={
+            "pymdownx.highlight": {
+                "css_class": "highlight",
+                "guess_lang": False,
+                "use_pygments": True,
+            }
+        },
+    )
+    rendered = rewrite_readme_urls(rendered, repo_url, branch)
     allowed_tags = set(bleach.sanitizer.ALLOWED_TAGS).union(
         {
+            "div",
+            "span",
             "p",
             "pre",
             "code",
+            "img",
             "h1",
             "h2",
             "h3",
@@ -867,6 +979,9 @@ def render_markdown(md: str) -> str:
     allowed_attrs = {
         "a": ["href", "title"],
         "code": ["class"],
+        "div": ["class"],
+        "span": ["class"],
+        "img": ["src", "alt", "title", "width", "height", "loading"],
         "th": ["align"],
         "td": ["align"],
     }
@@ -896,7 +1011,9 @@ def render_package_pages(public_dir: Path, generated_at: str, packages: list[dic
         else:
             cap_title = "Capabilities"
             cap_items = "\n".join(f"<li>{html.escape(cap)}</li>" for cap in p["capabilities"])
-        readme_html = render_markdown(p.get("_readme_markdown", ""))
+        readme_html = render_markdown(
+            p.get("_readme_markdown", ""), p["repo"], p["default_branch"]
+        )
         package_dir.joinpath("index.html").write_text(
             f"""<!doctype html>
 <html lang="en" data-theme="light">
@@ -1027,6 +1144,7 @@ def render_readme(path: Path, generated_at: str, packages: list[dict]) -> None:
         "| `capabilities` | string[] | declared Robonix contract IDs |",
         "| `deploy_dependencies` | object[] | robot deployment dependencies parsed from `robonix_manifest.yaml` |",
         "| `readme_url` | string | GitHub README URL for the indexed branch |",
+        "| `preview_image_url` | string | optional robot preview discovered at `assets/robot.jpg`; empty when absent |",
         "",
         "### JavaScript",
         "",
@@ -1122,6 +1240,11 @@ def render_readme(path: Path, generated_at: str, packages: list[dict]) -> None:
         "  maintainers:",
         "    - wheatfox <wheatfox17@icloud.com>",
         "```",
+        "",
+        "A robot deployment repository may add `assets/robot.jpg`. When present,",
+        "the catalog exposes its raw URL as `preview_image_url` and displays the",
+        "photo in the robot deployment list. Repositories without the file keep",
+        "the same metadata and layout without an image placeholder.",
         "",
         "The builder also parses `primitive:`, `service:`, and `skill:` entries from",
         "`robonix_manifest.yaml` into `deploy_dependencies[]`, linking dependencies",
