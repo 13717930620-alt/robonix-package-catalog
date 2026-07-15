@@ -27,12 +27,16 @@ packages:
     repo: https://github.com/syswonder/service-grasp-pose-rbnx
   - name: robonix.service.piper_moveit
     repo: https://github.com/syswonder/service-piper-moveit-rbnx
+  - name: robonix.service.roboarm.ik
+    repo: https://github.com/syswonder/service-roboarm-ik-rbnx
   - name: robonix.skill.pick.vertical_grasp
     repo: https://github.com/syswonder/skill-pick-vertical-grasp-rbnx
   - name: robonix.skill.vla.openvla
     repo: https://github.com/syswonder/skill-vla-openvla-rbnx
 
 robots:
+  - name: robonix.robot.agilex.piper_grasp
+    repo: https://github.com/syswonder/robot-agilex-piper
   - name: robonix.robot.agilex.ranger_mini_v3
     repo: https://github.com/syswonder/robot-agilex-ranger_mini_v3
   - name: robonix.robot.wheeltec.r550
