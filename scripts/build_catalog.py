@@ -23,6 +23,7 @@ from pygments.formatters import HtmlFormatter
 GITHUB_RE = re.compile(r"^https://github\.com/([^/]+)/([^/#?]+?)(?:\.git)?/?$")
 MAINTAINER_RE = re.compile(r"^[^<>\n]+ <[^<>\s@]+@[^<>\s@]+\.[^<>\s@]+>$")
 VENDOR_ASSETS = Path("assets/vendor/pico")
+LEGACY_MISSING_LICENSE = {"robonix.robot.wheeltec.r550"}
 
 
 def fail(msg: str) -> None:
@@ -158,10 +159,11 @@ def validate_catalog_metadata(package_name: str, meta: dict, expected_name: str)
         fail(f"{package_name}: version is required")
     if not isinstance(description, str) or not description.strip():
         fail(f"{package_name}: description is required")
-    # Older robot catalog blocks predate the license field. Preserve those
-    # repositories while exposing an explicit SPDX-compatible placeholder;
-    # all new templates and documentation require a real license value.
+    # Keep the one pre-existing exception explicit. Every newly submitted
+    # package or robot must provide a non-empty SPDX license value.
     if license_name is None:
+        if package_name not in LEGACY_MISSING_LICENSE:
+            fail(f"{package_name}: license is required")
         license_name = "NOASSERTION"
         print(
             f"warning: {package_name}: license is missing; using NOASSERTION for backward compatibility",
@@ -170,6 +172,8 @@ def validate_catalog_metadata(package_name: str, meta: dict, expected_name: str)
     elif not isinstance(license_name, str) or not license_name.strip():
         fail(f"{package_name}: license must be a non-empty SPDX license string")
     tags = norm_list(tags, "tags", package_name)
+    if not tags:
+        fail(f"{package_name}: tags is required")
     maintainers = norm_list(maintainers, "maintainers", package_name)
     if not maintainers:
         fail(f"{package_name}: maintainers is required")
@@ -347,58 +351,149 @@ def render_tags(tags: list[str]) -> str:
 
 def render_css() -> str:
     base_css = """
+    @import url("https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Noto+Sans+SC:wght@400;500;700&display=swap");
+
     :root {
       color-scheme: light;
-      --pico-font-family: Arial, Helvetica, sans-serif;
+      --font-sans: "Noto Sans CJK SC", "Noto Sans SC", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      --font-mono: "JetBrains Mono", "Noto Sans CJK SC", "Noto Sans SC", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      --pico-font-family: var(--font-sans);
       --pico-border-radius: 6px;
       --pico-spacing: 0.75rem;
-      --bg: #ffffff;
+      --bg: #f7f8fc;
       --paper: #ffffff;
-      --soft: #f7f7f8;
-      --ink: #111827;
-      --muted: #667085;
-      --line: #e5e7eb;
-      --line-strong: #d0d5dd;
-      --accent: #2563eb;
-      --shadow: 0 1px 2px rgba(16, 24, 40, 0.04);
+      --soft: #f1f3f9;
+      --ink: #11172a;
+      --muted: #5f677a;
+      --line: #dde1ec;
+      --line-strong: #bdc5d8;
+      --brand: #283689;
+      --brand-deep: #17205f;
+      --signal: #3674ff;
+      --signal-soft: #e9edff;
+      --shadow: 0 8px 28px rgba(28, 38, 88, 0.06);
     }
     * { box-sizing: border-box; }
+    .visually-hidden {
+      position: absolute !important;
+      width: 1px !important;
+      height: 1px !important;
+      padding: 0 !important;
+      margin: -1px !important;
+      overflow: hidden !important;
+      clip: rect(0, 0, 0, 0) !important;
+      white-space: nowrap !important;
+      border: 0 !important;
+    }
     body {
       margin: 0;
       color: var(--ink);
-      background: var(--bg);
-      font-family: Arial, Helvetica, sans-serif;
+      background:
+        radial-gradient(circle at 18% -8%, rgba(54, 116, 255, 0.09), transparent 30rem),
+        var(--bg);
+      font-family: var(--font-sans);
       font-size: 15px;
       letter-spacing: 0;
     }
-    a { color: var(--accent); text-decoration: none; }
+    a { color: var(--brand); text-decoration: none; }
     a:hover { text-decoration: underline; }
+    :focus-visible {
+      outline: 3px solid rgba(54, 116, 255, 0.42);
+      outline-offset: 3px;
+    }
     .shell {
       width: min(100% - 48px, 1180px);
       max-width: 1180px;
       margin: 0 auto;
     }
-    header {
+    .site-header {
+      position: sticky;
+      top: 0;
+      z-index: 20;
       color: var(--ink);
-      border-bottom: 1px solid var(--line);
-      margin-bottom: 0;
+      border-bottom: 1px solid rgba(221, 225, 236, 0.88);
+      background: rgba(255, 255, 255, 0.9);
+      backdrop-filter: blur(16px);
     }
-    header.shell { padding-block: 14px; }
+    .site-header .shell { padding-block: 12px; }
     .topline { display: flex; justify-content: space-between; gap: 16px; align-items: center; }
-    .brand { font-weight: 700; font-size: 18px; letter-spacing: 0; }
+    .brand {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      color: var(--ink);
+      font-weight: 700;
+      font-size: 17px;
+      letter-spacing: -0.01em;
+    }
+    .brand:hover { color: var(--brand); text-decoration: none; }
+    .brand small { color: var(--muted); font-size: 12px; font-weight: 500; }
+    .brand-bus {
+      position: relative;
+      display: grid;
+      grid-template-columns: repeat(4, 5px);
+      gap: 3px;
+      align-items: center;
+      width: 29px;
+      height: 16px;
+    }
+    .brand-bus::before {
+      content: "";
+      position: absolute;
+      left: 2px;
+      right: 2px;
+      top: 7px;
+      height: 2px;
+      border-radius: 99px;
+      background: var(--line-strong);
+    }
+    .brand-bus::after {
+      content: "";
+      position: absolute;
+      top: 5px;
+      left: 0;
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--signal);
+      box-shadow: 0 0 0 4px rgba(54, 116, 255, 0.13);
+      animation: bus-pulse 3.2s cubic-bezier(.45, 0, .2, 1) infinite;
+    }
+    .brand-bus span {
+      position: relative;
+      z-index: 1;
+      width: 5px;
+      height: 5px;
+      border: 1px solid var(--brand);
+      border-radius: 50%;
+      background: #fff;
+    }
+    @keyframes bus-pulse {
+      0%, 14% { transform: translateX(0); opacity: 0; }
+      22% { opacity: 1; }
+      72% { transform: translateX(23px); opacity: 1; }
+      82%, 100% { transform: translateX(23px); opacity: 0; }
+    }
     .api-links { display: flex; gap: 8px; flex-wrap: wrap; justify-content: flex-end; }
     .api-links a {
       color: #344054;
-      border: 1px solid var(--line);
-      background: var(--soft);
+      border: 1px solid transparent;
+      background: transparent;
       border-radius: 6px;
       padding: 7px 9px;
-      font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
-      font-size: 12px;
+      font-size: 13px;
+      font-weight: 600;
+      transition: color 160ms ease, background 160ms ease, border-color 160ms ease;
+    }
+    .api-links a:hover, .api-links a[aria-current="page"] {
+      color: var(--brand);
+      border-color: #d9def4;
+      background: var(--signal-soft);
+      text-decoration: none;
     }
     h1 {
       margin: 0;
-      font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      font-family: var(--font-sans);
       font-size: 22px;
       line-height: 1.35;
       letter-spacing: 0;
@@ -406,6 +501,15 @@ def render_css() -> str:
       word-break: break-word;
     }
     .lede { color: var(--muted); max-width: 720px; margin: 8px 0 0; line-height: 1.55; font-size: 15px; }
+    .page-intro { padding: 28px 0 16px; }
+    .page-intro .eyebrow, .catalog-hero .eyebrow {
+      color: var(--brand);
+      font-family: var(--font-mono);
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.09em;
+      text-transform: uppercase;
+    }
     main.shell { padding-block: 0 34px; }
     .search-strip { padding: 16px 0 14px; }
     .catalog-frame {
@@ -421,8 +525,11 @@ def render_css() -> str:
       border-radius: 8px;
       overflow: hidden;
       margin-bottom: 0;
+      transition: border-color 180ms ease, box-shadow 180ms ease, transform 180ms ease;
     }
     .filters { padding: 14px; position: sticky; top: 14px; }
+    .filters > summary { display: none; }
+    .filter-content { min-width: 0; }
     .filters h2, .content h2 { margin: 0 0 9px; font-size: 15px; }
     .stat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 7px; margin-bottom: 14px; }
     .stat { border: 1px solid var(--line); border-radius: 6px; padding: 8px; background: var(--soft); }
@@ -440,14 +547,24 @@ def render_css() -> str:
       font-size: 13px;
       margin: 0;
     }
-    .filter-button.active { background: #1f2933; color: #fff; border-color: #1f2933; }
+    .filter-button { transition: color 150ms ease, border-color 150ms ease, background 150ms ease; }
+    .filter-button:hover { border-color: var(--brand); }
+    .filter-button.active { background: var(--brand); color: #fff; border-color: var(--brand); }
     .content { padding: 14px; min-width: 0; }
     .api-reference {
       margin-top: 14px;
-      padding: 18px;
+      padding: 0;
       font-size: 14px;
       line-height: 1.45;
     }
+    .api-reference > summary {
+      cursor: pointer;
+      padding: 14px 18px;
+      color: var(--ink);
+      font-weight: 700;
+    }
+    .api-reference[open] > summary { border-bottom: 1px solid var(--line); }
+    .api-reference-body { padding: 16px 18px 18px; }
     .api-reference h2 { margin: 0 0 8px; font-size: 16px; line-height: 1.3; }
     .api-reference p { margin: 0 0 10px; font-size: 14px; line-height: 1.45; }
     .api-reference table {
@@ -472,7 +589,7 @@ def render_css() -> str:
     }
     .api-reference code { font-size: 0.92em; }
     .muted { color: var(--muted); }
-    .toolbar { display: flex; justify-content: flex-end; align-items: center; margin-bottom: 10px; }
+    .toolbar { display: flex; justify-content: space-between; gap: 12px; align-items: center; margin-bottom: 10px; }
     .search {
       width: min(620px, 100%);
       border: 1px solid var(--line-strong);
@@ -483,6 +600,17 @@ def render_css() -> str:
       margin: 0;
     }
     .count { color: var(--muted); white-space: nowrap; }
+    .clear-filters {
+      display: none;
+      width: auto;
+      margin: 0;
+      padding: 5px 8px;
+      border: 0;
+      background: transparent;
+      color: var(--brand);
+      font-size: 13px;
+    }
+    .clear-filters.visible { display: inline-block; }
     .package-list { display: grid; gap: 9px; }
     .package-card {
       border: 1px solid var(--line);
@@ -493,16 +621,36 @@ def render_css() -> str:
       grid-template-columns: 1fr auto;
       gap: 12px;
       margin: 0;
+      animation: rise-in 360ms cubic-bezier(.2, .7, .2, 1) both;
+    }
+    .package-card:nth-child(2) { animation-delay: 35ms; }
+    .package-card:nth-child(3) { animation-delay: 70ms; }
+    .package-card:nth-child(4) { animation-delay: 105ms; }
+    .package-card:hover { border-color: #bcc6ec; box-shadow: var(--shadow); transform: translateY(-2px); }
+    @keyframes rise-in {
+      from { opacity: 0; transform: translateY(7px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .kind-label {
+      display: inline-block;
+      margin-bottom: 5px;
+      color: var(--brand);
+      font-family: var(--font-mono);
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
     }
     .package-title { display: flex; gap: 8px; align-items: baseline; flex-wrap: wrap; margin-bottom: 5px; }
     .package-title a {
-      font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      font-family: var(--font-mono);
       font-size: 16px;
       font-weight: 700;
-      color: #152238;
+      color: var(--ink);
+      overflow-wrap: anywhere;
     }
     .version {
-      font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      font-family: var(--font-mono);
       color: var(--muted);
       font-size: 12px;
       border: 1px solid var(--line);
@@ -512,6 +660,7 @@ def render_css() -> str:
     }
     .description { color: #343941; margin: 0 0 8px; line-height: 1.38; }
     .meta-line { color: var(--muted); font-size: 13px; display: flex; gap: 14px; flex-wrap: wrap; }
+    .meta-line strong, .meta-line code { overflow-wrap: anywhere; }
     .meta-line code { font-size: 12px; }
     .card-actions { display: flex; gap: 8px; align-items: start; }
     .card-actions a {
@@ -522,7 +671,11 @@ def render_css() -> str:
       color: #29303a;
       font-size: 13px;
       margin: 0;
+      font-weight: 600;
+      transition: background 160ms ease, border-color 160ms ease, color 160ms ease;
     }
+    .card-actions a:first-child { color: #fff; border-color: var(--brand); background: var(--brand); }
+    .card-actions a:hover { border-color: var(--brand); text-decoration: none; }
     .card-side {
       display: grid;
       gap: 10px;
@@ -578,7 +731,7 @@ def render_css() -> str:
     .kv div:nth-child(even) { min-width: 0; overflow-wrap: anywhere; }
     .cap-list { margin: 0; padding-left: 0; list-style: none; display: grid; gap: 5px; }
     .cap-list li {
-      font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      font-family: var(--font-mono);
       font-size: 13px;
       border: 1px solid var(--line);
       background: var(--soft);
@@ -592,7 +745,9 @@ def render_css() -> str:
       display: inline-block;
       min-width: 64px;
     }
-    .back { display: inline-block; margin: 14px 0; color: var(--accent); }
+    .detail-hero { padding: 20px 0 4px; }
+    .detail-hero h1 { font-family: var(--font-mono); }
+    .back { display: inline-block; margin: 0 0 12px; color: var(--brand); }
     .generated { color: var(--muted); margin-top: 12px; font-size: 13px; }
     footer {
       color: var(--muted);
@@ -628,20 +783,199 @@ def render_css() -> str:
     .readme img { display: block; max-width: 100%; height: auto; border-radius: 7px; }
     .readme table { border-collapse: collapse; width: 100%; display: block; overflow-x: auto; }
     .readme th, .readme td { border: 1px solid var(--line); padding: 6px 8px; }
-    code { font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
+    code { font-family: var(--font-mono); }
+    .catalog-hero {
+      position: relative;
+      padding: clamp(38px, 8vw, 82px) 0 24px;
+      overflow: hidden;
+    }
+    .catalog-hero::after {
+      content: "";
+      position: absolute;
+      z-index: -1;
+      width: 330px;
+      height: 330px;
+      right: -90px;
+      top: -105px;
+      border: 1px solid rgba(40, 54, 137, 0.14);
+      border-radius: 50%;
+      box-shadow: 0 0 0 38px rgba(40, 54, 137, 0.025), 0 0 0 78px rgba(40, 54, 137, 0.018);
+    }
+    .catalog-hero h1 {
+      max-width: 760px;
+      margin-top: 10px;
+      font-size: clamp(32px, 6vw, 58px);
+      line-height: 1.05;
+      letter-spacing: -0.045em;
+    }
+    .catalog-hero .lede { max-width: 690px; font-size: 17px; }
+    .hero-search { position: relative; width: min(720px, 100%); margin-top: 24px; }
+    .hero-search::before {
+      content: ">";
+      position: absolute;
+      z-index: 1;
+      left: 17px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--signal);
+      font-family: var(--font-mono);
+      font-weight: 700;
+    }
+    .hero-search input {
+      width: 100%;
+      height: 52px;
+      margin: 0;
+      padding: 0 18px 0 38px;
+      border: 1px solid #b9c3df;
+      border-radius: 9px;
+      background: rgba(255, 255, 255, 0.96);
+      box-shadow: 0 14px 34px rgba(31, 43, 105, 0.1);
+      font-size: 16px;
+    }
+    .entry-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
+    .entry-card { position: relative; padding: 20px; }
+    .entry-card:hover { border-color: #bcc6ec; box-shadow: var(--shadow); transform: translateY(-2px); }
+    .entry-card h2 { margin: 0 0 7px; font-size: 19px; }
+    .entry-card strong { display: block; margin-top: 16px; color: var(--brand); font-size: 30px; line-height: 1; }
+    .entry-links { display: flex; flex-wrap: wrap; gap: 7px; margin-top: 14px; }
+    .entry-links a {
+      padding: 5px 8px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: var(--soft);
+      font-size: 12px;
+      font-weight: 600;
+    }
+    .home-results { padding: 14px; }
+    .home-results[hidden], .home-empty[hidden], .entry-grid[hidden] { display: none; }
+    .home-results-head { display: flex; justify-content: space-between; gap: 12px; margin-bottom: 10px; }
+    .home-result-list { display: grid; gap: 8px; }
+    .home-result {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 12px;
+      padding: 11px 12px;
+      border: 1px solid var(--line);
+      border-radius: 7px;
+      color: var(--ink);
+      background: #fff;
+    }
+    .home-result:hover { border-color: #bcc6ec; background: #fbfcff; text-decoration: none; }
+    .home-result code { color: var(--brand-deep); font-weight: 700; overflow-wrap: anywhere; }
+    .home-result span { color: var(--muted); font-size: 13px; text-align: right; }
+    .home-empty { margin: 10px 0 0; color: var(--muted); }
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        scroll-behavior: auto !important;
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+      }
+    }
     @media (max-width: 860px) {
       .shell { width: min(100% - 28px, 1180px); }
+      .topline { align-items: stretch; flex-direction: column; }
+      .api-links {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        justify-content: stretch;
+        width: 100%;
+      }
+      .api-links a { min-width: 0; text-align: center; overflow-wrap: anywhere; }
       .catalog-frame, .detail-layout { grid-template-columns: 1fr; }
-      .filters { position: static; }
+      .detail-side { order: -1; }
+      .entry-grid { grid-template-columns: 1fr; }
+      .filters { padding: 0; position: static; }
+      .filters > summary {
+        display: block;
+        padding: 12px 14px;
+        color: var(--ink);
+        cursor: pointer;
+        font-weight: 700;
+        list-style-position: inside;
+      }
+      .filters[open] > summary { border-bottom: 1px solid var(--line); }
+      .filter-content { padding: 14px; }
       .toolbar { align-items: stretch; flex-direction: column; }
       .package-card { grid-template-columns: 1fr; }
       .card-side { justify-items: start; }
       .card-actions { justify-content: flex-start; }
       .card-preview { width: min(100%, 360px); }
-      .api-reference { padding: 16px; }
+      .api-reference-body { padding: 14px; }
+    }
+    @media (max-width: 520px) {
+      body { font-size: 14px; }
+      .shell { width: min(100% - 20px, 1180px); }
+      .site-header .shell { padding-block: 10px; }
+      .brand { font-size: 17px; overflow-wrap: anywhere; }
+      .brand small { display: none; }
+      .api-links { gap: 6px; }
+      .api-links a { padding: 7px 5px; font-size: 11px; }
+      .search-strip { padding: 12px 0; }
+      .content, .detail-main, .detail-side { padding: 12px; min-width: 0; }
+      .package-card { gap: 10px; padding: 11px; }
+      .package-title a { font-size: 14px; }
+      .card-actions { width: 100%; }
+      .card-actions a { flex: 1; text-align: center; }
+      .page-intro { padding-top: 20px; }
+      .catalog-hero { padding-top: 32px; }
+      .catalog-hero h1 { font-size: 34px; }
+      .catalog-hero .lede { font-size: 15px; }
+      .home-result { grid-template-columns: 1fr; gap: 3px; }
+      .home-result span { text-align: left; }
+      .kv { grid-template-columns: 1fr; gap: 2px; }
+      .kv div:nth-child(odd) { margin-top: 7px; font-size: 12px; font-weight: 700; }
+      .api-reference table,
+      .api-reference tbody,
+      .api-reference tr,
+      .api-reference td { display: block; width: 100%; }
+      .api-reference thead { display: none; }
+      .api-reference tr {
+        border: 1px solid var(--line);
+        border-radius: 6px;
+        margin-bottom: 8px;
+        overflow: hidden;
+      }
+      .api-reference td {
+        display: grid;
+        grid-template-columns: 76px minmax(0, 1fr);
+        gap: 8px;
+        border: 0;
+        border-bottom: 1px solid var(--line);
+        overflow-wrap: anywhere;
+      }
+      .api-reference td:last-child { border-bottom: 0; }
+      .api-reference td::before {
+        content: attr(data-label);
+        color: var(--muted);
+        font-size: 11px;
+        font-weight: 700;
+        letter-spacing: 0.03em;
+        text-transform: uppercase;
+      }
     }
     """
     return base_css + "\n" + HtmlFormatter(style="friendly").get_style_defs(".highlight")
+
+
+def render_navigation(root: str, current: str = "") -> str:
+    def page_link(path: str, label: str, page: str) -> str:
+        active = ' aria-current="page"' if current == page else ""
+        return f'<a href="{root}{path}"{active}>{label}</a>'
+
+    return f"""<header class="site-header">
+    <div class="shell topline">
+      <a class="brand" href="{root}">
+        <span class="brand-bus" aria-hidden="true"><span></span><span></span><span></span><span></span></span>
+        <span>Robonix <small>Package Catalog</small></span>
+      </a>
+      <nav class="api-links" aria-label="Catalog navigation">
+        {page_link('packages/', 'Packages', 'packages')}
+        {page_link('robots/', 'Robots', 'robots')}
+        {page_link('api/v1/catalog', 'API', 'api')}
+      </nav>
+    </div>
+  </header>"""
 
 
 def detail_base(package: dict) -> str:
@@ -679,6 +1013,7 @@ def render_listing_page(public_dir: Path, generated_at: str, packages: list[dict
         cards.append(
             f"""<article class="package-card" data-kind="{html.escape(p['kind'])}" data-tags="{html.escape(' '.join(p['tags']))}" data-search="{html.escape(search_text.lower())}">
         <div>
+          <span class="kind-label">{html.escape(p['kind'])}</span>
           <div class="package-title">
             <a href="{detail_href}">{html.escape(p['name'])}</a>
             <span class="version">v{html.escape(p['version'])}</span>
@@ -725,76 +1060,86 @@ def render_listing_page(public_dir: Path, generated_at: str, packages: list[dict
   </style>
 </head>
 <body>
-  <header class="shell">
-    <div class="topline">
-      <div class="brand"><a href="../">Robonix Package Catalog</a> / {html.escape(title)}</div>
-      <nav class="api-links">
-        <a href="../packages/">Packages</a>
-        <a href="../robots/">Robot deployments</a>
-        <a href="../api/v1/packages">API</a>
-      </nav>
-    </div>
-  </header>
+  {render_navigation('../', page)}
   <main class="shell">
-    <section class="search-strip">
-      <input class="search" id="q" placeholder="Search {html.escape(empty_label)}, tags, maintainers">
+    <section class="page-intro">
+      <span class="eyebrow">Robonix ecosystem index</span>
+      <h1>{html.escape(title)}</h1>
+      <p class="lede">{'Complete robot deployments, including the packages and platform metadata they assemble.' if page == 'robots' else 'Reusable primitive, service, and skill packages, indexed by capability, source, and maintainer.'}</p>
+      <div class="search-strip">
+        <label for="q" class="visually-hidden">Search {html.escape(empty_label)}</label>
+        <input class="search" id="q" type="search" autocomplete="off" placeholder="Search {html.escape(empty_label)}, capabilities, tags, or maintainers">
+      </div>
     </section>
     <div class="catalog-frame">
-      <aside class="panel filters">
-        <div class="stat-grid">
-          <div class="stat"><strong>{len(packages)}</strong><span>{html.escape(empty_label)}</span></div>
-          <div class="stat"><strong>{sum(len(p.get("deploy_dependencies", [])) if p.get("catalog_type") == "robot" else len(p.get("capabilities", [])) for p in packages)}</strong><span>indexed items</span></div>
-        </div>
-        <div class="filter-group">
-          <h2>Kind</h2>
-          <div class="filter-buttons" id="kindFilters">
-            <button class="filter-button active" data-kind="">All</button>
-            {kind_buttons}
+      <details class="panel filters" open>
+        <summary>Filters and catalog summary</summary>
+        <div class="filter-content">
+          <div class="stat-grid">
+            <div class="stat"><strong>{len(packages)}</strong><span>{html.escape(empty_label)}</span></div>
+            <div class="stat"><strong>{sum(len(p.get("deploy_dependencies", [])) if p.get("catalog_type") == "robot" else len(p.get("capabilities", [])) for p in packages)}</strong><span>indexed items</span></div>
+          </div>
+          <div class="filter-group">
+            <h2>Kind</h2>
+            <div class="filter-buttons" id="kindFilters">
+              <button class="filter-button active" data-kind="">All</button>
+              {kind_buttons}
+            </div>
+          </div>
+          <div class="filter-group">
+            <h2>Tags</h2>
+            <div class="filter-buttons" id="tagFilters">
+              <button class="filter-button active" data-tag-filter="">All</button>
+              {tag_buttons}
+            </div>
           </div>
         </div>
-        <div class="filter-group">
-          <h2>Tags</h2>
-          <div class="filter-buttons" id="tagFilters">
-            <button class="filter-button active" data-tag-filter="">All</button>
-            {tag_buttons}
-          </div>
-        </div>
-      </aside>
+      </details>
       <section class="panel content">
         <div class="toolbar">
-          <div class="count" id="count"></div>
+          <div class="count" id="count" aria-live="polite"></div>
+          <button class="clear-filters" id="clearFilters" type="button">Clear filters</button>
         </div>
         <div class="package-list" id="packages">
           {''.join(cards)}
         </div>
       </section>
     </div>
-    <section class="panel api-reference">
+    <details class="panel api-reference">
+      <summary>Catalog API</summary>
+      <div class="api-reference-body">
       <h2>API Reference</h2>
       <p class="muted">Static JSON API hosted by GitHub Pages. Use <code>GET</code>; no API key is required.</p>
       <table>
         <thead><tr><th>Method</th><th>Path</th><th>Parameters</th><th>Response</th></tr></thead>
         <tbody>
-          <tr><td><code>GET</code></td><td><code>/api/v1/packages</code></td><td>none</td><td>catalog object with <code>api_version</code>, <code>generated_at</code>, and <code>packages[]</code></td></tr>
-          <tr><td><code>GET</code></td><td><code>/api/v1/search</code></td><td>none</td><td>plain package array for client-side filtering</td></tr>
-          <tr><td><code>GET</code></td><td><code>/api/v1/package/&lt;package-name&gt;</code></td><td><code>package-name</code>: exact <code>package.name</code>, URL-encoded</td><td>one package object; missing packages return GitHub Pages 404</td></tr>
+          <tr><td data-label="Method"><code>GET</code></td><td data-label="Path"><code>/api/v1/packages</code></td><td data-label="Parameters">none</td><td data-label="Response">catalog object with <code>api_version</code>, <code>generated_at</code>, and <code>packages[]</code></td></tr>
+          <tr><td data-label="Method"><code>GET</code></td><td data-label="Path"><code>/api/v1/search</code></td><td data-label="Parameters">none</td><td data-label="Response">plain package array for client-side filtering</td></tr>
+          <tr><td data-label="Method"><code>GET</code></td><td data-label="Path"><code>/api/v1/package/&lt;package-name&gt;</code></td><td data-label="Parameters"><code>package-name</code>: exact <code>package.name</code>, URL-encoded</td><td data-label="Response">one package object; missing packages return GitHub Pages 404</td></tr>
         </tbody>
       </table>
       <pre><code>const base = 'https://syswonder.github.io/robonix-package-catalog/api/v1';
 const catalog = await fetch(`${{base}}/packages`).then(r => r.json());
 const detail = await fetch(`${{base}}/package/${{encodeURIComponent('robonix.service.mapping')}}`).then(r => r.json());</code></pre>
-    </section>
+      </div>
+    </details>
   </main>
   <footer class="shell">Generated on {html.escape(generated_at)}.</footer>
   <script>
     const input = document.getElementById('q');
     const cards = Array.from(document.querySelectorAll('.package-card'));
     const count = document.getElementById('count');
-    let kind = '';
-    let tag = '';
+    const clearFilters = document.getElementById('clearFilters');
+    const filters = document.querySelector('.filters');
+    if (window.matchMedia('(max-width: 860px)').matches) filters.open = false;
+    const params = new URLSearchParams(window.location.search);
+    let kind = params.get('kind') || '';
+    let tag = params.get('tag') || '';
     function setActive(group, selector, value) {{
       for (const button of document.querySelectorAll(group + ' .filter-button')) {{
-        button.classList.toggle('active', button.getAttribute(selector) === value);
+        const active = button.getAttribute(selector) === value;
+        button.classList.toggle('active', active);
+        button.setAttribute('aria-pressed', String(active));
       }}
     }}
     function applyFilters() {{
@@ -810,6 +1155,13 @@ const detail = await fetch(`${{base}}/package/${{encodeURIComponent('robonix.ser
         if (visible) shown += 1;
       }}
       count.textContent = shown + ' / ' + cards.length + ' {empty_label}';
+      const hasFilters = Boolean(q || kind || tag);
+      clearFilters.classList.toggle('visible', hasFilters);
+      clearFilters.setAttribute('aria-hidden', hasFilters ? 'false' : 'true');
+      const next = new URL(window.location.href);
+      kind ? next.searchParams.set('kind', kind) : next.searchParams.delete('kind');
+      tag ? next.searchParams.set('tag', tag) : next.searchParams.delete('tag');
+      history.replaceState(null, '', next);
     }}
     input.addEventListener('input', applyFilters);
     document.getElementById('kindFilters').addEventListener('click', (event) => {{
@@ -834,6 +1186,17 @@ const detail = await fetch(`${{base}}/package/${{encodeURIComponent('robonix.ser
       setActive('#tagFilters', 'data-tag-filter', tag);
       applyFilters();
     }});
+    clearFilters.addEventListener('click', () => {{
+      input.value = '';
+      kind = '';
+      tag = '';
+      setActive('#kindFilters', 'data-kind', '');
+      setActive('#tagFilters', 'data-tag-filter', '');
+      applyFilters();
+      input.focus();
+    }});
+    setActive('#kindFilters', 'data-kind', kind);
+    setActive('#tagFilters', 'data-tag-filter', tag);
     applyFilters();
   </script>
 </body>
@@ -850,6 +1213,25 @@ def render_site(public_dir: Path, generated_at: str, packages: list[dict]) -> No
     copy_assets(public_dir)
     render_listing_page(public_dir, generated_at, package_entries, page="packages", title="Packages", empty_label="packages")
     render_listing_page(public_dir, generated_at, robot_entries, page="robots", title="Robot deployments", empty_label="robot deployments")
+    home_results = []
+    for package in packages:
+        base = detail_base(package)
+        search_text = " ".join(
+            [
+                package["name"],
+                package["kind"],
+                package["description"],
+                " ".join(package["maintainers"]),
+                " ".join(package["tags"]),
+                " ".join(package.get("capabilities", [])),
+            ]
+        ).lower()
+        home_results.append(
+            f"""<a class="home-result" href="{base}/{html.escape(package_slug(package['name']))}/" data-search="{html.escape(search_text)}" hidden>
+          <code>{html.escape(package['name'])}</code>
+          <span>{html.escape(package['kind'])} · {html.escape(package['description'])}</span>
+        </a>"""
+        )
     (public_dir / "index.html").write_text(
         f"""<!doctype html>
 <html lang="en" data-theme="light">
@@ -860,54 +1242,93 @@ def render_site(public_dir: Path, generated_at: str, packages: list[dict]) -> No
   <link rel="stylesheet" href="assets/vendor/pico/pico.classless.min.css">
   <style>
 {render_css()}
-  .entry-grid {{ display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; padding-top: 16px; }}
-  .entry-card {{ display: block; padding: 18px; color: var(--ink); }}
-  .entry-card:hover {{ text-decoration: none; border-color: var(--line-strong); }}
-  .entry-card h2 {{ margin: 0 0 8px; font-size: 18px; }}
-  .entry-card strong {{ font-size: 28px; line-height: 1; }}
-  @media (max-width: 760px) {{ .entry-grid {{ grid-template-columns: 1fr; }} }}
   </style>
 </head>
 <body>
-  <header class="shell">
-    <div class="topline">
-      <div class="brand">Robonix Package Catalog</div>
-      <nav class="api-links">
-        <a href="packages/">Packages</a>
-        <a href="robots/">Robot deployments</a>
-        <a href="api/v1/packages">API: packages</a>
-      </nav>
-    </div>
-  </header>
+  {render_navigation('')}
   <main class="shell">
-    <section class="entry-grid">
-      <a class="panel entry-card" href="packages/">
-        <h2>Packages</h2>
-        <p class="muted">Primitive, service, and skill repositories with capability contracts.</p>
-        <strong>{len(package_entries)}</strong>
-      </a>
-      <a class="panel entry-card" href="robots/">
-        <h2>Robot deployments</h2>
-        <p class="muted">Whole-robot deploy repositories built around robonix_manifest.yaml.</p>
-        <strong>{len(robot_entries)}</strong>
-      </a>
+    <section class="catalog-hero">
+      <span class="eyebrow">{len(package_entries)} packages · {len(robot_entries)} robot deployments</span>
+      <h1>Find what your robot can run.</h1>
+      <p class="lede">Search Robonix primitives, services, skills, and complete robot deployments. Inspect capability contracts, maintainers, platform support, and source before integrating.</p>
+      <div class="hero-search">
+        <label for="catalogSearch" class="visually-hidden">Search the Robonix package catalog</label>
+        <input id="catalogSearch" type="search" autocomplete="off" placeholder="Search packages, capabilities, hardware, or robots">
+      </div>
     </section>
-    <section class="panel api-reference">
+    <section class="entry-grid" id="entryGrid">
+      <article class="panel entry-card">
+        <span class="kind-label">Reusable software</span>
+        <h2>Packages</h2>
+        <p class="muted">Hardware primitives, system services, and robot skills with declared capability contracts.</p>
+        <strong>{len(package_entries)}</strong>
+        <div class="entry-links">
+          <a href="packages/">All packages</a>
+          <a href="packages/?kind=primitive">Primitives</a>
+          <a href="packages/?kind=service">Services</a>
+          <a href="packages/?kind=skill">Skills</a>
+        </div>
+      </article>
+      <article class="panel entry-card">
+        <span class="kind-label">Complete platforms</span>
+        <h2>Robots</h2>
+        <p class="muted">Deployment repositories that assemble body descriptions, drivers, services, skills, and runtime configuration.</p>
+        <strong>{len(robot_entries)}</strong>
+        <div class="entry-links"><a href="robots/">Browse robot deployments</a></div>
+      </article>
+    </section>
+    <section class="panel home-results" id="homeResults" hidden>
+      <div class="home-results-head">
+        <strong>Search results</strong>
+        <span class="count" id="homeCount" aria-live="polite"></span>
+      </div>
+      <div class="home-result-list">{''.join(home_results)}</div>
+      <p class="home-empty" id="homeEmpty" hidden>No catalog entries match that search.</p>
+    </section>
+    <details class="panel api-reference">
+      <summary>Catalog API</summary>
+      <div class="api-reference-body">
       <h2>API Reference</h2>
       <p class="muted">Static JSON API hosted by GitHub Pages. Use <code>GET</code>; no API key is required.</p>
       <table>
         <thead><tr><th>Method</th><th>Path</th><th>Response</th></tr></thead>
         <tbody>
-          <tr><td><code>GET</code></td><td><code>/api/v1/packages</code></td><td>ordinary primitive/service/skill package entries</td></tr>
-          <tr><td><code>GET</code></td><td><code>/api/v1/robots</code></td><td>robot deployment entries parsed from robonix_manifest.yaml</td></tr>
-          <tr><td><code>GET</code></td><td><code>/api/v1/catalog</code></td><td>combined catalog object</td></tr>
-          <tr><td><code>GET</code></td><td><code>/api/v1/search</code></td><td>plain combined catalog array for client-side filtering</td></tr>
-          <tr><td><code>GET</code></td><td><code>/api/v1/package/&lt;name&gt;</code></td><td>one package or robot deployment object</td></tr>
+          <tr><td data-label="Method"><code>GET</code></td><td data-label="Path"><code>/api/v1/packages</code></td><td data-label="Response">ordinary primitive/service/skill package entries</td></tr>
+          <tr><td data-label="Method"><code>GET</code></td><td data-label="Path"><code>/api/v1/robots</code></td><td data-label="Response">robot deployment entries parsed from robonix_manifest.yaml</td></tr>
+          <tr><td data-label="Method"><code>GET</code></td><td data-label="Path"><code>/api/v1/catalog</code></td><td data-label="Response">combined catalog object</td></tr>
+          <tr><td data-label="Method"><code>GET</code></td><td data-label="Path"><code>/api/v1/search</code></td><td data-label="Response">plain combined catalog array for client-side filtering</td></tr>
+          <tr><td data-label="Method"><code>GET</code></td><td data-label="Path"><code>/api/v1/package/&lt;name&gt;</code></td><td data-label="Response">one package or robot deployment object</td></tr>
         </tbody>
       </table>
-    </section>
+      </div>
+    </details>
   </main>
   <footer class="shell">Generated on {html.escape(generated_at)}.</footer>
+  <script>
+    const catalogSearch = document.getElementById('catalogSearch');
+    const entryGrid = document.getElementById('entryGrid');
+    const homeResults = document.getElementById('homeResults');
+    const homeCount = document.getElementById('homeCount');
+    const homeEmpty = document.getElementById('homeEmpty');
+    const homeItems = Array.from(document.querySelectorAll('.home-result'));
+    function searchCatalog() {{
+      const query = catalogSearch.value.trim().toLowerCase();
+      entryGrid.hidden = Boolean(query);
+      homeResults.hidden = !query;
+      let shown = 0;
+      for (const item of homeItems) {{
+        const visible = Boolean(query) && item.dataset.search.includes(query);
+        item.hidden = !visible;
+        if (visible) shown += 1;
+      }}
+      homeCount.textContent = shown + ' result' + (shown === 1 ? '' : 's');
+      homeEmpty.hidden = shown !== 0;
+    }}
+    catalogSearch.addEventListener('input', searchCatalog);
+    catalogSearch.addEventListener('keydown', (event) => {{
+      if (event.key === 'Escape') {{ catalogSearch.value = ''; searchCatalog(); }}
+    }});
+  </script>
 </body>
 </html>
 """,
@@ -1041,8 +1462,10 @@ def render_package_pages(public_dir: Path, generated_at: str, packages: list[dic
   </style>
 </head>
 <body>
-  <header class="shell">
+  {render_navigation('../../', base)}
+  <header class="shell detail-hero">
     <a class="back" href="../">Back to {html.escape(base)}</a>
+    <span class="kind-label">{html.escape(p['kind'])}</span>
     <h1>{html.escape(p['name'])}</h1>
     <p class="lede">{html.escape(p['description'])}</p>
   </header>

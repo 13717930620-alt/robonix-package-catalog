@@ -24,7 +24,8 @@
     "robonix/service/manipulation/driver",
     "robonix/service/manipulation/execute_grasp",
     "robonix/service/manipulation/reset",
-    "robonix/service/manipulation/teach_safe"
+    "robonix/service/manipulation/teach_safe",
+    "robonix/service/manipulation/put_down"
   ],
   "deploy_dependencies": [],
   "readme_url": "https://github.com/syswonder/service-roboarm-ik-rbnx/blob/main/README.md",

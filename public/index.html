@@ -7,58 +7,149 @@
   <link rel="stylesheet" href="assets/vendor/pico/pico.classless.min.css">
   <style>
 
+    @import url("https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Noto+Sans+SC:wght@400;500;700&display=swap");
+
     :root {
       color-scheme: light;
-      --pico-font-family: Arial, Helvetica, sans-serif;
+      --font-sans: "Noto Sans CJK SC", "Noto Sans SC", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      --font-mono: "JetBrains Mono", "Noto Sans CJK SC", "Noto Sans SC", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      --pico-font-family: var(--font-sans);
       --pico-border-radius: 6px;
       --pico-spacing: 0.75rem;
-      --bg: #ffffff;
+      --bg: #f7f8fc;
       --paper: #ffffff;
-      --soft: #f7f7f8;
-      --ink: #111827;
-      --muted: #667085;
-      --line: #e5e7eb;
-      --line-strong: #d0d5dd;
-      --accent: #2563eb;
-      --shadow: 0 1px 2px rgba(16, 24, 40, 0.04);
+      --soft: #f1f3f9;
+      --ink: #11172a;
+      --muted: #5f677a;
+      --line: #dde1ec;
+      --line-strong: #bdc5d8;
+      --brand: #283689;
+      --brand-deep: #17205f;
+      --signal: #3674ff;
+      --signal-soft: #e9edff;
+      --shadow: 0 8px 28px rgba(28, 38, 88, 0.06);
     }
     * { box-sizing: border-box; }
+    .visually-hidden {
+      position: absolute !important;
+      width: 1px !important;
+      height: 1px !important;
+      padding: 0 !important;
+      margin: -1px !important;
+      overflow: hidden !important;
+      clip: rect(0, 0, 0, 0) !important;
+      white-space: nowrap !important;
+      border: 0 !important;
+    }
     body {
       margin: 0;
       color: var(--ink);
-      background: var(--bg);
-      font-family: Arial, Helvetica, sans-serif;
+      background:
+        radial-gradient(circle at 18% -8%, rgba(54, 116, 255, 0.09), transparent 30rem),
+        var(--bg);
+      font-family: var(--font-sans);
       font-size: 15px;
       letter-spacing: 0;
     }
-    a { color: var(--accent); text-decoration: none; }
+    a { color: var(--brand); text-decoration: none; }
     a:hover { text-decoration: underline; }
+    :focus-visible {
+      outline: 3px solid rgba(54, 116, 255, 0.42);
+      outline-offset: 3px;
+    }
     .shell {
       width: min(100% - 48px, 1180px);
       max-width: 1180px;
       margin: 0 auto;
     }
-    header {
+    .site-header {
+      position: sticky;
+      top: 0;
+      z-index: 20;
       color: var(--ink);
-      border-bottom: 1px solid var(--line);
-      margin-bottom: 0;
+      border-bottom: 1px solid rgba(221, 225, 236, 0.88);
+      background: rgba(255, 255, 255, 0.9);
+      backdrop-filter: blur(16px);
     }
-    header.shell { padding-block: 14px; }
+    .site-header .shell { padding-block: 12px; }
     .topline { display: flex; justify-content: space-between; gap: 16px; align-items: center; }
-    .brand { font-weight: 700; font-size: 18px; letter-spacing: 0; }
+    .brand {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      color: var(--ink);
+      font-weight: 700;
+      font-size: 17px;
+      letter-spacing: -0.01em;
+    }
+    .brand:hover { color: var(--brand); text-decoration: none; }
+    .brand small { color: var(--muted); font-size: 12px; font-weight: 500; }
+    .brand-bus {
+      position: relative;
+      display: grid;
+      grid-template-columns: repeat(4, 5px);
+      gap: 3px;
+      align-items: center;
+      width: 29px;
+      height: 16px;
+    }
+    .brand-bus::before {
+      content: "";
+      position: absolute;
+      left: 2px;
+      right: 2px;
+      top: 7px;
+      height: 2px;
+      border-radius: 99px;
+      background: var(--line-strong);
+    }
+    .brand-bus::after {
+      content: "";
+      position: absolute;
+      top: 5px;
+      left: 0;
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--signal);
+      box-shadow: 0 0 0 4px rgba(54, 116, 255, 0.13);
+      animation: bus-pulse 3.2s cubic-bezier(.45, 0, .2, 1) infinite;
+    }
+    .brand-bus span {
+      position: relative;
+      z-index: 1;
+      width: 5px;
+      height: 5px;
+      border: 1px solid var(--brand);
+      border-radius: 50%;
+      background: #fff;
+    }
+    @keyframes bus-pulse {
+      0%, 14% { transform: translateX(0); opacity: 0; }
+      22% { opacity: 1; }
+      72% { transform: translateX(23px); opacity: 1; }
+      82%, 100% { transform: translateX(23px); opacity: 0; }
+    }
     .api-links { display: flex; gap: 8px; flex-wrap: wrap; justify-content: flex-end; }
     .api-links a {
       color: #344054;
-      border: 1px solid var(--line);
-      background: var(--soft);
+      border: 1px solid transparent;
+      background: transparent;
       border-radius: 6px;
       padding: 7px 9px;
-      font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
-      font-size: 12px;
+      font-size: 13px;
+      font-weight: 600;
+      transition: color 160ms ease, background 160ms ease, border-color 160ms ease;
+    }
+    .api-links a:hover, .api-links a[aria-current="page"] {
+      color: var(--brand);
+      border-color: #d9def4;
+      background: var(--signal-soft);
+      text-decoration: none;
     }
     h1 {
       margin: 0;
-      font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      font-family: var(--font-sans);
       font-size: 22px;
       line-height: 1.35;
       letter-spacing: 0;
@@ -66,6 +157,15 @@
       word-break: break-word;
     }
     .lede { color: var(--muted); max-width: 720px; margin: 8px 0 0; line-height: 1.55; font-size: 15px; }
+    .page-intro { padding: 28px 0 16px; }
+    .page-intro .eyebrow, .catalog-hero .eyebrow {
+      color: var(--brand);
+      font-family: var(--font-mono);
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.09em;
+      text-transform: uppercase;
+    }
     main.shell { padding-block: 0 34px; }
     .search-strip { padding: 16px 0 14px; }
     .catalog-frame {
@@ -81,8 +181,11 @@
       border-radius: 8px;
       overflow: hidden;
       margin-bottom: 0;
+      transition: border-color 180ms ease, box-shadow 180ms ease, transform 180ms ease;
     }
     .filters { padding: 14px; position: sticky; top: 14px; }
+    .filters > summary { display: none; }
+    .filter-content { min-width: 0; }
     .filters h2, .content h2 { margin: 0 0 9px; font-size: 15px; }
     .stat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 7px; margin-bottom: 14px; }
     .stat { border: 1px solid var(--line); border-radius: 6px; padding: 8px; background: var(--soft); }
@@ -100,14 +203,24 @@
       font-size: 13px;
       margin: 0;
     }
-    .filter-button.active { background: #1f2933; color: #fff; border-color: #1f2933; }
+    .filter-button { transition: color 150ms ease, border-color 150ms ease, background 150ms ease; }
+    .filter-button:hover { border-color: var(--brand); }
+    .filter-button.active { background: var(--brand); color: #fff; border-color: var(--brand); }
     .content { padding: 14px; min-width: 0; }
     .api-reference {
       margin-top: 14px;
-      padding: 18px;
+      padding: 0;
       font-size: 14px;
       line-height: 1.45;
     }
+    .api-reference > summary {
+      cursor: pointer;
+      padding: 14px 18px;
+      color: var(--ink);
+      font-weight: 700;
+    }
+    .api-reference[open] > summary { border-bottom: 1px solid var(--line); }
+    .api-reference-body { padding: 16px 18px 18px; }
     .api-reference h2 { margin: 0 0 8px; font-size: 16px; line-height: 1.3; }
     .api-reference p { margin: 0 0 10px; font-size: 14px; line-height: 1.45; }
     .api-reference table {
@@ -132,7 +245,7 @@
     }
     .api-reference code { font-size: 0.92em; }
     .muted { color: var(--muted); }
-    .toolbar { display: flex; justify-content: flex-end; align-items: center; margin-bottom: 10px; }
+    .toolbar { display: flex; justify-content: space-between; gap: 12px; align-items: center; margin-bottom: 10px; }
     .search {
       width: min(620px, 100%);
       border: 1px solid var(--line-strong);
@@ -143,6 +256,17 @@
       margin: 0;
     }
     .count { color: var(--muted); white-space: nowrap; }
+    .clear-filters {
+      display: none;
+      width: auto;
+      margin: 0;
+      padding: 5px 8px;
+      border: 0;
+      background: transparent;
+      color: var(--brand);
+      font-size: 13px;
+    }
+    .clear-filters.visible { display: inline-block; }
     .package-list { display: grid; gap: 9px; }
     .package-card {
       border: 1px solid var(--line);
@@ -153,16 +277,36 @@
       grid-template-columns: 1fr auto;
       gap: 12px;
       margin: 0;
+      animation: rise-in 360ms cubic-bezier(.2, .7, .2, 1) both;
+    }
+    .package-card:nth-child(2) { animation-delay: 35ms; }
+    .package-card:nth-child(3) { animation-delay: 70ms; }
+    .package-card:nth-child(4) { animation-delay: 105ms; }
+    .package-card:hover { border-color: #bcc6ec; box-shadow: var(--shadow); transform: translateY(-2px); }
+    @keyframes rise-in {
+      from { opacity: 0; transform: translateY(7px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .kind-label {
+      display: inline-block;
+      margin-bottom: 5px;
+      color: var(--brand);
+      font-family: var(--font-mono);
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
     }
     .package-title { display: flex; gap: 8px; align-items: baseline; flex-wrap: wrap; margin-bottom: 5px; }
     .package-title a {
-      font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      font-family: var(--font-mono);
       font-size: 16px;
       font-weight: 700;
-      color: #152238;
+      color: var(--ink);
+      overflow-wrap: anywhere;
     }
     .version {
-      font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      font-family: var(--font-mono);
       color: var(--muted);
       font-size: 12px;
       border: 1px solid var(--line);
@@ -172,6 +316,7 @@
     }
     .description { color: #343941; margin: 0 0 8px; line-height: 1.38; }
     .meta-line { color: var(--muted); font-size: 13px; display: flex; gap: 14px; flex-wrap: wrap; }
+    .meta-line strong, .meta-line code { overflow-wrap: anywhere; }
     .meta-line code { font-size: 12px; }
     .card-actions { display: flex; gap: 8px; align-items: start; }
     .card-actions a {
@@ -182,7 +327,11 @@
       color: #29303a;
       font-size: 13px;
       margin: 0;
+      font-weight: 600;
+      transition: background 160ms ease, border-color 160ms ease, color 160ms ease;
     }
+    .card-actions a:first-child { color: #fff; border-color: var(--brand); background: var(--brand); }
+    .card-actions a:hover { border-color: var(--brand); text-decoration: none; }
     .card-side {
       display: grid;
       gap: 10px;
@@ -238,7 +387,7 @@
     .kv div:nth-child(even) { min-width: 0; overflow-wrap: anywhere; }
     .cap-list { margin: 0; padding-left: 0; list-style: none; display: grid; gap: 5px; }
     .cap-list li {
-      font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      font-family: var(--font-mono);
       font-size: 13px;
       border: 1px solid var(--line);
       background: var(--soft);
@@ -252,7 +401,9 @@
       display: inline-block;
       min-width: 64px;
     }
-    .back { display: inline-block; margin: 14px 0; color: var(--accent); }
+    .detail-hero { padding: 20px 0 4px; }
+    .detail-hero h1 { font-family: var(--font-mono); }
+    .back { display: inline-block; margin: 0 0 12px; color: var(--brand); }
     .generated { color: var(--muted); margin-top: 12px; font-size: 13px; }
     footer {
       color: var(--muted);
@@ -288,17 +439,176 @@
     .readme img { display: block; max-width: 100%; height: auto; border-radius: 7px; }
     .readme table { border-collapse: collapse; width: 100%; display: block; overflow-x: auto; }
     .readme th, .readme td { border: 1px solid var(--line); padding: 6px 8px; }
-    code { font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
+    code { font-family: var(--font-mono); }
+    .catalog-hero {
+      position: relative;
+      padding: clamp(38px, 8vw, 82px) 0 24px;
+      overflow: hidden;
+    }
+    .catalog-hero::after {
+      content: "";
+      position: absolute;
+      z-index: -1;
+      width: 330px;
+      height: 330px;
+      right: -90px;
+      top: -105px;
+      border: 1px solid rgba(40, 54, 137, 0.14);
+      border-radius: 50%;
+      box-shadow: 0 0 0 38px rgba(40, 54, 137, 0.025), 0 0 0 78px rgba(40, 54, 137, 0.018);
+    }
+    .catalog-hero h1 {
+      max-width: 760px;
+      margin-top: 10px;
+      font-size: clamp(32px, 6vw, 58px);
+      line-height: 1.05;
+      letter-spacing: -0.045em;
+    }
+    .catalog-hero .lede { max-width: 690px; font-size: 17px; }
+    .hero-search { position: relative; width: min(720px, 100%); margin-top: 24px; }
+    .hero-search::before {
+      content: ">";
+      position: absolute;
+      z-index: 1;
+      left: 17px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--signal);
+      font-family: var(--font-mono);
+      font-weight: 700;
+    }
+    .hero-search input {
+      width: 100%;
+      height: 52px;
+      margin: 0;
+      padding: 0 18px 0 38px;
+      border: 1px solid #b9c3df;
+      border-radius: 9px;
+      background: rgba(255, 255, 255, 0.96);
+      box-shadow: 0 14px 34px rgba(31, 43, 105, 0.1);
+      font-size: 16px;
+    }
+    .entry-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
+    .entry-card { position: relative; padding: 20px; }
+    .entry-card:hover { border-color: #bcc6ec; box-shadow: var(--shadow); transform: translateY(-2px); }
+    .entry-card h2 { margin: 0 0 7px; font-size: 19px; }
+    .entry-card strong { display: block; margin-top: 16px; color: var(--brand); font-size: 30px; line-height: 1; }
+    .entry-links { display: flex; flex-wrap: wrap; gap: 7px; margin-top: 14px; }
+    .entry-links a {
+      padding: 5px 8px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: var(--soft);
+      font-size: 12px;
+      font-weight: 600;
+    }
+    .home-results { padding: 14px; }
+    .home-results[hidden], .home-empty[hidden], .entry-grid[hidden] { display: none; }
+    .home-results-head { display: flex; justify-content: space-between; gap: 12px; margin-bottom: 10px; }
+    .home-result-list { display: grid; gap: 8px; }
+    .home-result {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 12px;
+      padding: 11px 12px;
+      border: 1px solid var(--line);
+      border-radius: 7px;
+      color: var(--ink);
+      background: #fff;
+    }
+    .home-result:hover { border-color: #bcc6ec; background: #fbfcff; text-decoration: none; }
+    .home-result code { color: var(--brand-deep); font-weight: 700; overflow-wrap: anywhere; }
+    .home-result span { color: var(--muted); font-size: 13px; text-align: right; }
+    .home-empty { margin: 10px 0 0; color: var(--muted); }
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        scroll-behavior: auto !important;
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+      }
+    }
     @media (max-width: 860px) {
       .shell { width: min(100% - 28px, 1180px); }
+      .topline { align-items: stretch; flex-direction: column; }
+      .api-links {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        justify-content: stretch;
+        width: 100%;
+      }
+      .api-links a { min-width: 0; text-align: center; overflow-wrap: anywhere; }
       .catalog-frame, .detail-layout { grid-template-columns: 1fr; }
-      .filters { position: static; }
+      .detail-side { order: -1; }
+      .entry-grid { grid-template-columns: 1fr; }
+      .filters { padding: 0; position: static; }
+      .filters > summary {
+        display: block;
+        padding: 12px 14px;
+        color: var(--ink);
+        cursor: pointer;
+        font-weight: 700;
+        list-style-position: inside;
+      }
+      .filters[open] > summary { border-bottom: 1px solid var(--line); }
+      .filter-content { padding: 14px; }
       .toolbar { align-items: stretch; flex-direction: column; }
       .package-card { grid-template-columns: 1fr; }
       .card-side { justify-items: start; }
       .card-actions { justify-content: flex-start; }
       .card-preview { width: min(100%, 360px); }
-      .api-reference { padding: 16px; }
+      .api-reference-body { padding: 14px; }
+    }
+    @media (max-width: 520px) {
+      body { font-size: 14px; }
+      .shell { width: min(100% - 20px, 1180px); }
+      .site-header .shell { padding-block: 10px; }
+      .brand { font-size: 17px; overflow-wrap: anywhere; }
+      .brand small { display: none; }
+      .api-links { gap: 6px; }
+      .api-links a { padding: 7px 5px; font-size: 11px; }
+      .search-strip { padding: 12px 0; }
+      .content, .detail-main, .detail-side { padding: 12px; min-width: 0; }
+      .package-card { gap: 10px; padding: 11px; }
+      .package-title a { font-size: 14px; }
+      .card-actions { width: 100%; }
+      .card-actions a { flex: 1; text-align: center; }
+      .page-intro { padding-top: 20px; }
+      .catalog-hero { padding-top: 32px; }
+      .catalog-hero h1 { font-size: 34px; }
+      .catalog-hero .lede { font-size: 15px; }
+      .home-result { grid-template-columns: 1fr; gap: 3px; }
+      .home-result span { text-align: left; }
+      .kv { grid-template-columns: 1fr; gap: 2px; }
+      .kv div:nth-child(odd) { margin-top: 7px; font-size: 12px; font-weight: 700; }
+      .api-reference table,
+      .api-reference tbody,
+      .api-reference tr,
+      .api-reference td { display: block; width: 100%; }
+      .api-reference thead { display: none; }
+      .api-reference tr {
+        border: 1px solid var(--line);
+        border-radius: 6px;
+        margin-bottom: 8px;
+        overflow: hidden;
+      }
+      .api-reference td {
+        display: grid;
+        grid-template-columns: 76px minmax(0, 1fr);
+        gap: 8px;
+        border: 0;
+        border-bottom: 1px solid var(--line);
+        overflow-wrap: anywhere;
+      }
+      .api-reference td:last-child { border-bottom: 0; }
+      .api-reference td::before {
+        content: attr(data-label);
+        color: var(--muted);
+        font-size: 11px;
+        font-weight: 700;
+        letter-spacing: 0.03em;
+        text-transform: uppercase;
+      }
     }
     
 pre { line-height: 125%; }
@@ -376,53 +686,176 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 .highlight .vi { color: #BB60D5 } /* Name.Variable.Instance */
 .highlight .vm { color: #BB60D5 } /* Name.Variable.Magic */
 .highlight .il { color: #40A070 } /* Literal.Number.Integer.Long */
-  .entry-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; padding-top: 16px; }
-  .entry-card { display: block; padding: 18px; color: var(--ink); }
-  .entry-card:hover { text-decoration: none; border-color: var(--line-strong); }
-  .entry-card h2 { margin: 0 0 8px; font-size: 18px; }
-  .entry-card strong { font-size: 28px; line-height: 1; }
-  @media (max-width: 760px) { .entry-grid { grid-template-columns: 1fr; } }
   </style>
 </head>
 <body>
-  <header class="shell">
-    <div class="topline">
-      <div class="brand">Robonix Package Catalog</div>
-      <nav class="api-links">
+  <header class="site-header">
+    <div class="shell topline">
+      <a class="brand" href="">
+        <span class="brand-bus" aria-hidden="true"><span></span><span></span><span></span><span></span></span>
+        <span>Robonix <small>Package Catalog</small></span>
+      </a>
+      <nav class="api-links" aria-label="Catalog navigation">
         <a href="packages/">Packages</a>
-        <a href="robots/">Robot deployments</a>
-        <a href="api/v1/packages">API: packages</a>
+        <a href="robots/">Robots</a>
+        <a href="api/v1/catalog">API</a>
       </nav>
     </div>
   </header>
   <main class="shell">
-    <section class="entry-grid">
-      <a class="panel entry-card" href="packages/">
-        <h2>Packages</h2>
-        <p class="muted">Primitive, service, and skill repositories with capability contracts.</p>
-        <strong>21</strong>
-      </a>
-      <a class="panel entry-card" href="robots/">
-        <h2>Robot deployments</h2>
-        <p class="muted">Whole-robot deploy repositories built around robonix_manifest.yaml.</p>
-        <strong>4</strong>
-      </a>
+    <section class="catalog-hero">
+      <span class="eyebrow">21 packages · 3 robot deployments</span>
+      <h1>Find what your robot can run.</h1>
+      <p class="lede">Search Robonix primitives, services, skills, and complete robot deployments. Inspect capability contracts, maintainers, platform support, and source before integrating.</p>
+      <div class="hero-search">
+        <label for="catalogSearch" class="visually-hidden">Search the Robonix package catalog</label>
+        <input id="catalogSearch" type="search" autocomplete="off" placeholder="Search packages, capabilities, hardware, or robots">
+      </div>
     </section>
-    <section class="panel api-reference">
+    <section class="entry-grid" id="entryGrid">
+      <article class="panel entry-card">
+        <span class="kind-label">Reusable software</span>
+        <h2>Packages</h2>
+        <p class="muted">Hardware primitives, system services, and robot skills with declared capability contracts.</p>
+        <strong>21</strong>
+        <div class="entry-links">
+          <a href="packages/">All packages</a>
+          <a href="packages/?kind=primitive">Primitives</a>
+          <a href="packages/?kind=service">Services</a>
+          <a href="packages/?kind=skill">Skills</a>
+        </div>
+      </article>
+      <article class="panel entry-card">
+        <span class="kind-label">Complete platforms</span>
+        <h2>Robots</h2>
+        <p class="muted">Deployment repositories that assemble body descriptions, drivers, services, skills, and runtime configuration.</p>
+        <strong>3</strong>
+        <div class="entry-links"><a href="robots/">Browse robot deployments</a></div>
+      </article>
+    </section>
+    <section class="panel home-results" id="homeResults" hidden>
+      <div class="home-results-head">
+        <strong>Search results</strong>
+        <span class="count" id="homeCount" aria-live="polite"></span>
+      </div>
+      <div class="home-result-list"><a class="home-result" href="packages/robonix.primitive.agilex.piper.arm/" data-search="robonix.primitive.agilex.piper.arm primitive agilex piper 6-dof arm primitive — declares joint_states / arm_status / end_pose / pos_cmd. lhw2002426 &lt;lhw2002426@users.noreply.github.com&gt; primitive arm agilex piper ros2 robonix/primitive/arm/driver robonix/primitive/arm/joint_states robonix/primitive/arm/arm_status robonix/primitive/arm/end_pose robonix/primitive/arm/pos_cmd" hidden>
+          <code>robonix.primitive.agilex.piper.arm</code>
+          <span>primitive · AgileX Piper 6-DoF arm primitive — declares joint_states / arm_status / end_pose / pos_cmd.</span>
+        </a><a class="home-result" href="packages/robonix.primitive.agilex.piper.description/" data-search="robonix.primitive.agilex.piper.description primitive piper arm urdf + robot_state_publisher wrapper (tf stand-in until soma ships). lhw2002426 &lt;lhw2002426@users.noreply.github.com&gt; primitive description urdf agilex piper ros2 " hidden>
+          <code>robonix.primitive.agilex.piper.description</code>
+          <span>primitive · Piper arm URDF + robot_state_publisher wrapper (TF stand-in until soma ships).</span>
+        </a><a class="home-result" href="packages/robonix.primitive.agilex.piper.handeye/" data-search="robonix.primitive.agilex.piper.handeye primitive hand-eye calibration tf publisher (vendored easy_handeye2 0.5.0). lhw2002426 &lt;lhw2002426@users.noreply.github.com&gt; primitive calibration handeye easy_handeye2 agilex piper ros2 " hidden>
+          <code>robonix.primitive.agilex.piper.handeye</code>
+          <span>primitive · Hand-eye calibration TF publisher (vendored easy_handeye2 0.5.0).</span>
+        </a><a class="home-result" href="packages/robonix.primitive.agilex.ranger_mini_v3.chassis/" data-search="robonix.primitive.agilex.ranger_mini_v3.chassis primitive agilex ranger mini chassis driver wrapper. wheatfox &lt;wheatfox17@icloud.com&gt; primitive chassis agilex ranger_mini_v3 ros2 robonix/primitive/chassis/driver robonix/primitive/chassis/odom robonix/primitive/chassis/twist_in" hidden>
+          <code>robonix.primitive.agilex.ranger_mini_v3.chassis</code>
+          <span>primitive · AgileX Ranger Mini chassis driver wrapper.</span>
+        </a><a class="home-result" href="packages/robonix.primitive.deep_robotics.lite3.description/" data-search="robonix.primitive.deep_robotics.lite3.description primitive deep robotics lite3 urdf and fixed sensor transform publisher. bunnycxk &lt;2501213313@stu.pku.edu.cn&gt; primitive description urdf tf deep_robotics lite3 ros2 robonix/primitive/lite3/description" hidden>
+          <code>robonix.primitive.deep_robotics.lite3.description</code>
+          <span>primitive · Deep Robotics Lite3 URDF and fixed sensor transform publisher.</span>
+        </a><a class="home-result" href="packages/robonix.primitive.deep_robotics.lite3.quadruped/" data-search="robonix.primitive.deep_robotics.lite3.quadruped primitive lite3 quadruped ros primitive driver wrapper bunnycxk &lt;2501213313@stu.pku.edu.cn&gt; primitive chassis deep_robotics lite3 quadruped ros2 robonix/primitive/chassis/driver robonix/primitive/chassis/move robonix/primitive/chassis/twist_in robonix/primitive/chassis/odom robonix/primitive/chassis/posture" hidden>
+          <code>robonix.primitive.deep_robotics.lite3.quadruped</code>
+          <span>primitive · Lite3 quadruped ROS primitive driver wrapper</span>
+        </a><a class="home-result" href="packages/robonix.primitive.intel.realsense_d435i.camera/" data-search="robonix.primitive.intel.realsense_d435i.camera primitive intel realsense d435i driver wrapper — declares rgb + depth + extrinsics contracts. wheatfox &lt;wheatfox17@icloud.com&gt; primitive camera intel realsense_d435i rgbd robonix/primitive/camera/driver robonix/primitive/camera/rgb robonix/primitive/camera/depth robonix/primitive/camera/extrinsics robonix/primitive/camera/snapshot robonix/primitive/camera/depth_snapshot" hidden>
+          <code>robonix.primitive.intel.realsense_d435i.camera</code>
+          <span>primitive · Intel RealSense D435i driver wrapper — declares RGB + depth + extrinsics contracts.</span>
+        </a><a class="home-result" href="packages/robonix.primitive.livox.mid360.imu/" data-search="robonix.primitive.livox.mid360.imu primitive livox mid-360 imu atlas wrapper — depends on mid360_lidar_rbnx. wheatfox &lt;wheatfox17@icloud.com&gt; primitive imu livox mid360 robonix/primitive/imu/driver robonix/primitive/imu/imu" hidden>
+          <code>robonix.primitive.livox.mid360.imu</code>
+          <span>primitive · Livox MID-360 IMU atlas wrapper — depends on mid360_lidar_rbnx.</span>
+        </a><a class="home-result" href="packages/robonix.primitive.livox.mid360.lidar/" data-search="robonix.primitive.livox.mid360.lidar primitive livox mid-360 lidar driver wrapper. wheatfox &lt;wheatfox17@icloud.com&gt; primitive lidar livox mid360 pointcloud robonix/primitive/lidar/driver robonix/primitive/lidar/lidar3d robonix/primitive/lidar/lidar_snapshot" hidden>
+          <code>robonix.primitive.livox.mid360.lidar</code>
+          <span>primitive · Livox MID-360 lidar driver wrapper.</span>
+        </a><a class="home-result" href="packages/robonix.primitive.orbbec.dabai_dcw.camera/" data-search="robonix.primitive.orbbec.dabai_dcw.camera primitive orbbec dabai dcw rgbd primitive — declares rgb + depth + camera_info. lhw2002426 &lt;lhw2002426@users.noreply.github.com&gt; primitive camera orbbec dabai_dcw rgbd ros2 robonix/primitive/camera/driver robonix/primitive/camera/rgb robonix/primitive/camera/depth robonix/primitive/camera/camera_info" hidden>
+          <code>robonix.primitive.orbbec.dabai_dcw.camera</code>
+          <span>primitive · Orbbec Dabai DCW RGBD primitive — declares rgb + depth + camera_info.</span>
+        </a><a class="home-result" href="packages/robonix.primitive.orbbec.gemini330.camera/" data-search="robonix.primitive.orbbec.gemini330.camera primitive orbbec gemini 330-series rgbd camera driver wrapper — declares rgb + depth + extrinsics contracts. bunnycxk &lt;2501213313@stu.pku.edu.cn&gt; primitive camera orbbec gemini330 rgbd ros2 robonix/primitive/camera/driver robonix/primitive/camera/rgb robonix/primitive/camera/depth robonix/primitive/camera/extrinsics robonix/primitive/camera/snapshot robonix/primitive/camera/depth_snapshot" hidden>
+          <code>robonix.primitive.orbbec.gemini330.camera</code>
+          <span>primitive · Orbbec Gemini 330-series RGBD camera driver wrapper — declares RGB + depth + extrinsics contracts.</span>
+        </a><a class="home-result" href="robots/robonix.robot.agilex.ranger_mini_v3/" data-search="robonix.robot.agilex.ranger_mini_v3 robot robonix deployment for the agilex ranger mini v3 robot. wheatfox &lt;wheatfox17@icloud.com&gt; robot deploy agilex ranger_mini_v3 jetson lidar rgbd scene mapping navigation " hidden>
+          <code>robonix.robot.agilex.ranger_mini_v3</code>
+          <span>robot · Robonix deployment for the AgileX Ranger Mini v3 robot.</span>
+        </a><a class="home-result" href="robots/robonix.robot.deep_robotics.lite3/" data-search="robonix.robot.deep_robotics.lite3 robot minimal robonix deployment for the deep robotics lite3. bunnycxk &lt;2501213313@stu.pku.edu.cn&gt; robot deploy deep_robotics lite3 quadruped jetson lidar rgbd mapping navigation " hidden>
+          <code>robonix.robot.deep_robotics.lite3</code>
+          <span>robot · Minimal Robonix deployment for the Deep Robotics Lite3.</span>
+        </a><a class="home-result" href="robots/robonix.robot.wheeltec.r550/" data-search="robonix.robot.wheeltec.r550 robot robonix deploy manifest for the wheeltec r550 robot. xiangrui cheng &lt;sherry-part@users.noreply.github.com&gt; robot deploy wheeltec r550 lidar camera navigation mapping " hidden>
+          <code>robonix.robot.wheeltec.r550</code>
+          <span>robot · Robonix deploy manifest for the WHEELTEC R550 robot.</span>
+        </a><a class="home-result" href="packages/robonix.service.grasp_pose/" data-search="robonix.service.grasp_pose service geometric grasp-pose estimator (grpc). lhw2002426 &lt;lhw2002426@users.noreply.github.com&gt; service perception grasp_pose grasp ros2 robonix/service/perception/grasp_pose/driver robonix/service/perception/grasp_pose/grasp_request" hidden>
+          <code>robonix.service.grasp_pose</code>
+          <span>service · Geometric grasp-pose estimator (gRPC).</span>
+        </a><a class="home-result" href="packages/robonix.service.mapping/" data-search="robonix.service.mapping service slam mapping service. algo + sensor inputs config-driven. wheatfox &lt;wheatfox17@icloud.com&gt; service mapping slam rtabmap ros2 robonix/service/map/driver robonix/service/map/occupancy_grid robonix/service/map/pointcloud robonix/service/map/pose robonix/service/map/odom robonix/service/map/lifecycle robonix/service/map/save_map robonix/service/map/list_maps robonix/service/map/load_map robonix/service/map/pose_estimate robonix/service/map/switch_mode" hidden>
+          <code>robonix.service.mapping</code>
+          <span>service · SLAM mapping service. Algo + sensor inputs config-driven.</span>
+        </a><a class="home-result" href="packages/robonix.service.navigation/" data-search="robonix.service.navigation service nav2 service wrapper exposing service/navigation/* over grpc. wheatfox &lt;wheatfox17@icloud.com&gt; service navigation nav2 ros2 robonix/service/navigation/driver robonix/service/navigation/navigate robonix/service/navigation/navigate/status robonix/service/navigation/navigate/cancel" hidden>
+          <code>robonix.service.navigation</code>
+          <span>service · Nav2 service wrapper exposing service/navigation/* over gRPC.</span>
+        </a><a class="home-result" href="packages/robonix.service.object_detect/" data-search="robonix.service.object_detect service llm-based object detection — atlas mcp service, drop-in replacement for yolo_world_rbnx. lhw2002426 &lt;lhw2002426@users.noreply.github.com&gt; service perception object_detect llm vlm ros2 robonix/service/perception/object_detect/driver robonix/service/perception/object_detect/detect_object" hidden>
+          <code>robonix.service.object_detect</code>
+          <span>service · LLM-based object detection — atlas MCP service, drop-in replacement for yolo_world_rbnx.</span>
+        </a><a class="home-result" href="packages/robonix.service.pcld2lscan/" data-search="robonix.service.pcld2lscan service pointcloud2 to laserscan conversion service. bunnycxk &lt;2501213313@stu.pku.edu.cn&gt; service lidar pointcloud laserscan ros2 robonix/service/lidar/scan_converter/driver robonix/service/lidar/scan_converter/scan" hidden>
+          <code>robonix.service.pcld2lscan</code>
+          <span>service · PointCloud2 to LaserScan conversion service.</span>
+        </a><a class="home-result" href="packages/robonix.service.piper_moveit/" data-search="robonix.service.piper_moveit service moveit + grasp executor (atlas-routed manipulation service). lhw2002426 &lt;lhw2002426@users.noreply.github.com&gt; service manipulation moveit agilex piper ros2 robonix/service/manipulation/driver robonix/service/manipulation/execute_grasp robonix/service/manipulation/reset" hidden>
+          <code>robonix.service.piper_moveit</code>
+          <span>service · MoveIt + grasp executor (atlas-routed manipulation service).</span>
+        </a><a class="home-result" href="packages/robonix.service.roboarm.ik/" data-search="robonix.service.roboarm.ik service roboarm-style python ik executor service for piper manipulation. lhw2002426 &lt;lhw2002426@users.noreply.github.com&gt; service manipulation ik agilex piper ros2 robonix/service/manipulation/driver robonix/service/manipulation/execute_grasp robonix/service/manipulation/reset robonix/service/manipulation/teach_safe robonix/service/manipulation/put_down" hidden>
+          <code>robonix.service.roboarm.ik</code>
+          <span>service · Roboarm-style Python IK executor service for Piper manipulation.</span>
+        </a><a class="home-result" href="packages/robonix.skill.explore/" data-search="robonix.skill.explore skill frontier-based autonomous exploration skill. wheatfox &lt;wheatfox17@icloud.com&gt; skill explore frontier navigation mapping robonix/skill/explore/driver robonix/skill/explore/explore robonix/skill/explore/explore/status robonix/skill/explore/explore/cancel" hidden>
+          <code>robonix.skill.explore</code>
+          <span>skill · Frontier-based autonomous exploration skill.</span>
+        </a><a class="home-result" href="packages/robonix.skill.pick.vertical_grasp/" data-search="robonix.skill.pick.vertical_grasp skill pick-up-a-named-object skill — orchestrates perception + manipulation services. lhw2002426 &lt;lhw2002426@users.noreply.github.com&gt; skill pick manipulation grasp robonix/skill/pick/driver robonix/skill/pick/pick robonix/skill/pick/put_down" hidden>
+          <code>robonix.skill.pick.vertical_grasp</code>
+          <span>skill · Pick-up-a-named-object skill — orchestrates perception + manipulation services.</span>
+        </a><a class="home-result" href="packages/robonix.skill.vla.openvla/" data-search="robonix.skill.vla.openvla skill vla client skill — llm-callable entry point for vision-language-action inference and joint-space execution. lhw2002426 &lt;lhw2002426@users.noreply.github.com&gt; skill vla manipulation llm robonix/skill/vla/driver robonix/skill/vla/execute" hidden>
+          <code>robonix.skill.vla.openvla</code>
+          <span>skill · VLA client skill — LLM-callable entry point for vision-language-action inference and JOINT-SPACE execution.</span>
+        </a></div>
+      <p class="home-empty" id="homeEmpty" hidden>No catalog entries match that search.</p>
+    </section>
+    <details class="panel api-reference">
+      <summary>Catalog API</summary>
+      <div class="api-reference-body">
       <h2>API Reference</h2>
       <p class="muted">Static JSON API hosted by GitHub Pages. Use <code>GET</code>; no API key is required.</p>
       <table>
         <thead><tr><th>Method</th><th>Path</th><th>Response</th></tr></thead>
         <tbody>
-          <tr><td><code>GET</code></td><td><code>/api/v1/packages</code></td><td>ordinary primitive/service/skill package entries</td></tr>
-          <tr><td><code>GET</code></td><td><code>/api/v1/robots</code></td><td>robot deployment entries parsed from robonix_manifest.yaml</td></tr>
-          <tr><td><code>GET</code></td><td><code>/api/v1/catalog</code></td><td>combined catalog object</td></tr>
-          <tr><td><code>GET</code></td><td><code>/api/v1/search</code></td><td>plain combined catalog array for client-side filtering</td></tr>
-          <tr><td><code>GET</code></td><td><code>/api/v1/package/&lt;name&gt;</code></td><td>one package or robot deployment object</td></tr>
+          <tr><td data-label="Method"><code>GET</code></td><td data-label="Path"><code>/api/v1/packages</code></td><td data-label="Response">ordinary primitive/service/skill package entries</td></tr>
+          <tr><td data-label="Method"><code>GET</code></td><td data-label="Path"><code>/api/v1/robots</code></td><td data-label="Response">robot deployment entries parsed from robonix_manifest.yaml</td></tr>
+          <tr><td data-label="Method"><code>GET</code></td><td data-label="Path"><code>/api/v1/catalog</code></td><td data-label="Response">combined catalog object</td></tr>
+          <tr><td data-label="Method"><code>GET</code></td><td data-label="Path"><code>/api/v1/search</code></td><td data-label="Response">plain combined catalog array for client-side filtering</td></tr>
+          <tr><td data-label="Method"><code>GET</code></td><td data-label="Path"><code>/api/v1/package/&lt;name&gt;</code></td><td data-label="Response">one package or robot deployment object</td></tr>
         </tbody>
       </table>
-    </section>
+      </div>
+    </details>
   </main>
-  <footer class="shell">Generated on 2026-07-15T08:22:31+00:00.</footer>
+  <footer class="shell">Generated on 2026-07-15T12:44:58+00:00.</footer>
+  <script>
+    const catalogSearch = document.getElementById('catalogSearch');
+    const entryGrid = document.getElementById('entryGrid');
+    const homeResults = document.getElementById('homeResults');
+    const homeCount = document.getElementById('homeCount');
+    const homeEmpty = document.getElementById('homeEmpty');
+    const homeItems = Array.from(document.querySelectorAll('.home-result'));
+    function searchCatalog() {
+      const query = catalogSearch.value.trim().toLowerCase();
+      entryGrid.hidden = Boolean(query);
+      homeResults.hidden = !query;
+      let shown = 0;
+      for (const item of homeItems) {
+        const visible = Boolean(query) && item.dataset.search.includes(query);
+        item.hidden = !visible;
+        if (visible) shown += 1;
+      }
+      homeCount.textContent = shown + ' result' + (shown === 1 ? '' : 's');
+      homeEmpty.hidden = shown !== 0;
+    }
+    catalogSearch.addEventListener('input', searchCatalog);
+    catalogSearch.addEventListener('keydown', (event) => {
+      if (event.key === 'Escape') { catalogSearch.value = ''; searchCatalog(); }
+    });
+  </script>
 </body>
 </html>

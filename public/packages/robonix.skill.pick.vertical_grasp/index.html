@@ -7,58 +7,149 @@
   <link rel="stylesheet" href="../../assets/vendor/pico/pico.classless.min.css">
   <style>
 
+    @import url("https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Noto+Sans+SC:wght@400;500;700&display=swap");
+
     :root {
       color-scheme: light;
-      --pico-font-family: Arial, Helvetica, sans-serif;
+      --font-sans: "Noto Sans CJK SC", "Noto Sans SC", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      --font-mono: "JetBrains Mono", "Noto Sans CJK SC", "Noto Sans SC", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      --pico-font-family: var(--font-sans);
       --pico-border-radius: 6px;
       --pico-spacing: 0.75rem;
-      --bg: #ffffff;
+      --bg: #f7f8fc;
       --paper: #ffffff;
-      --soft: #f7f7f8;
-      --ink: #111827;
-      --muted: #667085;
-      --line: #e5e7eb;
-      --line-strong: #d0d5dd;
-      --accent: #2563eb;
-      --shadow: 0 1px 2px rgba(16, 24, 40, 0.04);
+      --soft: #f1f3f9;
+      --ink: #11172a;
+      --muted: #5f677a;
+      --line: #dde1ec;
+      --line-strong: #bdc5d8;
+      --brand: #283689;
+      --brand-deep: #17205f;
+      --signal: #3674ff;
+      --signal-soft: #e9edff;
+      --shadow: 0 8px 28px rgba(28, 38, 88, 0.06);
     }
     * { box-sizing: border-box; }
+    .visually-hidden {
+      position: absolute !important;
+      width: 1px !important;
+      height: 1px !important;
+      padding: 0 !important;
+      margin: -1px !important;
+      overflow: hidden !important;
+      clip: rect(0, 0, 0, 0) !important;
+      white-space: nowrap !important;
+      border: 0 !important;
+    }
     body {
       margin: 0;
       color: var(--ink);
-      background: var(--bg);
-      font-family: Arial, Helvetica, sans-serif;
+      background:
+        radial-gradient(circle at 18% -8%, rgba(54, 116, 255, 0.09), transparent 30rem),
+        var(--bg);
+      font-family: var(--font-sans);
       font-size: 15px;
       letter-spacing: 0;
     }
-    a { color: var(--accent); text-decoration: none; }
+    a { color: var(--brand); text-decoration: none; }
     a:hover { text-decoration: underline; }
+    :focus-visible {
+      outline: 3px solid rgba(54, 116, 255, 0.42);
+      outline-offset: 3px;
+    }
     .shell {
       width: min(100% - 48px, 1180px);
       max-width: 1180px;
       margin: 0 auto;
     }
-    header {
+    .site-header {
+      position: sticky;
+      top: 0;
+      z-index: 20;
       color: var(--ink);
-      border-bottom: 1px solid var(--line);
-      margin-bottom: 0;
+      border-bottom: 1px solid rgba(221, 225, 236, 0.88);
+      background: rgba(255, 255, 255, 0.9);
+      backdrop-filter: blur(16px);
     }
-    header.shell { padding-block: 14px; }
+    .site-header .shell { padding-block: 12px; }
     .topline { display: flex; justify-content: space-between; gap: 16px; align-items: center; }
-    .brand { font-weight: 700; font-size: 18px; letter-spacing: 0; }
+    .brand {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      color: var(--ink);
+      font-weight: 700;
+      font-size: 17px;
+      letter-spacing: -0.01em;
+    }
+    .brand:hover { color: var(--brand); text-decoration: none; }
+    .brand small { color: var(--muted); font-size: 12px; font-weight: 500; }
+    .brand-bus {
+      position: relative;
+      display: grid;
+      grid-template-columns: repeat(4, 5px);
+      gap: 3px;
+      align-items: center;
+      width: 29px;
+      height: 16px;
+    }
+    .brand-bus::before {
+      content: "";
+      position: absolute;
+      left: 2px;
+      right: 2px;
+      top: 7px;
+      height: 2px;
+      border-radius: 99px;
+      background: var(--line-strong);
+    }
+    .brand-bus::after {
+      content: "";
+      position: absolute;
+      top: 5px;
+      left: 0;
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--signal);
+      box-shadow: 0 0 0 4px rgba(54, 116, 255, 0.13);
+      animation: bus-pulse 3.2s cubic-bezier(.45, 0, .2, 1) infinite;
+    }
+    .brand-bus span {
+      position: relative;
+      z-index: 1;
+      width: 5px;
+      height: 5px;
+      border: 1px solid var(--brand);
+      border-radius: 50%;
+      background: #fff;
+    }
+    @keyframes bus-pulse {
+      0%, 14% { transform: translateX(0); opacity: 0; }
+      22% { opacity: 1; }
+      72% { transform: translateX(23px); opacity: 1; }
+      82%, 100% { transform: translateX(23px); opacity: 0; }
+    }
     .api-links { display: flex; gap: 8px; flex-wrap: wrap; justify-content: flex-end; }
     .api-links a {
       color: #344054;
-      border: 1px solid var(--line);
-      background: var(--soft);
+      border: 1px solid transparent;
+      background: transparent;
       border-radius: 6px;
       padding: 7px 9px;
-      font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
-      font-size: 12px;
+      font-size: 13px;
+      font-weight: 600;
+      transition: color 160ms ease, background 160ms ease, border-color 160ms ease;
+    }
+    .api-links a:hover, .api-links a[aria-current="page"] {
+      color: var(--brand);
+      border-color: #d9def4;
+      background: var(--signal-soft);
+      text-decoration: none;
     }
     h1 {
       margin: 0;
-      font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      font-family: var(--font-sans);
       font-size: 22px;
       line-height: 1.35;
       letter-spacing: 0;
@@ -66,6 +157,15 @@
       word-break: break-word;
     }
     .lede { color: var(--muted); max-width: 720px; margin: 8px 0 0; line-height: 1.55; font-size: 15px; }
+    .page-intro { padding: 28px 0 16px; }
+    .page-intro .eyebrow, .catalog-hero .eyebrow {
+      color: var(--brand);
+      font-family: var(--font-mono);
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.09em;
+      text-transform: uppercase;
+    }
     main.shell { padding-block: 0 34px; }
     .search-strip { padding: 16px 0 14px; }
     .catalog-frame {
@@ -81,8 +181,11 @@
       border-radius: 8px;
       overflow: hidden;
       margin-bottom: 0;
+      transition: border-color 180ms ease, box-shadow 180ms ease, transform 180ms ease;
     }
     .filters { padding: 14px; position: sticky; top: 14px; }
+    .filters > summary { display: none; }
+    .filter-content { min-width: 0; }
     .filters h2, .content h2 { margin: 0 0 9px; font-size: 15px; }
     .stat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 7px; margin-bottom: 14px; }
     .stat { border: 1px solid var(--line); border-radius: 6px; padding: 8px; background: var(--soft); }
@@ -100,14 +203,24 @@
       font-size: 13px;
       margin: 0;
     }
-    .filter-button.active { background: #1f2933; color: #fff; border-color: #1f2933; }
+    .filter-button { transition: color 150ms ease, border-color 150ms ease, background 150ms ease; }
+    .filter-button:hover { border-color: var(--brand); }
+    .filter-button.active { background: var(--brand); color: #fff; border-color: var(--brand); }
     .content { padding: 14px; min-width: 0; }
     .api-reference {
       margin-top: 14px;
-      padding: 18px;
+      padding: 0;
       font-size: 14px;
       line-height: 1.45;
     }
+    .api-reference > summary {
+      cursor: pointer;
+      padding: 14px 18px;
+      color: var(--ink);
+      font-weight: 700;
+    }
+    .api-reference[open] > summary { border-bottom: 1px solid var(--line); }
+    .api-reference-body { padding: 16px 18px 18px; }
     .api-reference h2 { margin: 0 0 8px; font-size: 16px; line-height: 1.3; }
     .api-reference p { margin: 0 0 10px; font-size: 14px; line-height: 1.45; }
     .api-reference table {
@@ -132,7 +245,7 @@
     }
     .api-reference code { font-size: 0.92em; }
     .muted { color: var(--muted); }
-    .toolbar { display: flex; justify-content: flex-end; align-items: center; margin-bottom: 10px; }
+    .toolbar { display: flex; justify-content: space-between; gap: 12px; align-items: center; margin-bottom: 10px; }
     .search {
       width: min(620px, 100%);
       border: 1px solid var(--line-strong);
@@ -143,6 +256,17 @@
       margin: 0;
     }
     .count { color: var(--muted); white-space: nowrap; }
+    .clear-filters {
+      display: none;
+      width: auto;
+      margin: 0;
+      padding: 5px 8px;
+      border: 0;
+      background: transparent;
+      color: var(--brand);
+      font-size: 13px;
+    }
+    .clear-filters.visible { display: inline-block; }
     .package-list { display: grid; gap: 9px; }
     .package-card {
       border: 1px solid var(--line);
@@ -153,16 +277,36 @@
       grid-template-columns: 1fr auto;
       gap: 12px;
       margin: 0;
+      animation: rise-in 360ms cubic-bezier(.2, .7, .2, 1) both;
+    }
+    .package-card:nth-child(2) { animation-delay: 35ms; }
+    .package-card:nth-child(3) { animation-delay: 70ms; }
+    .package-card:nth-child(4) { animation-delay: 105ms; }
+    .package-card:hover { border-color: #bcc6ec; box-shadow: var(--shadow); transform: translateY(-2px); }
+    @keyframes rise-in {
+      from { opacity: 0; transform: translateY(7px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .kind-label {
+      display: inline-block;
+      margin-bottom: 5px;
+      color: var(--brand);
+      font-family: var(--font-mono);
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
     }
     .package-title { display: flex; gap: 8px; align-items: baseline; flex-wrap: wrap; margin-bottom: 5px; }
     .package-title a {
-      font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      font-family: var(--font-mono);
       font-size: 16px;
       font-weight: 700;
-      color: #152238;
+      color: var(--ink);
+      overflow-wrap: anywhere;
     }
     .version {
-      font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      font-family: var(--font-mono);
       color: var(--muted);
       font-size: 12px;
       border: 1px solid var(--line);
@@ -172,6 +316,7 @@
     }
     .description { color: #343941; margin: 0 0 8px; line-height: 1.38; }
     .meta-line { color: var(--muted); font-size: 13px; display: flex; gap: 14px; flex-wrap: wrap; }
+    .meta-line strong, .meta-line code { overflow-wrap: anywhere; }
     .meta-line code { font-size: 12px; }
     .card-actions { display: flex; gap: 8px; align-items: start; }
     .card-actions a {
@@ -182,7 +327,11 @@
       color: #29303a;
       font-size: 13px;
       margin: 0;
+      font-weight: 600;
+      transition: background 160ms ease, border-color 160ms ease, color 160ms ease;
     }
+    .card-actions a:first-child { color: #fff; border-color: var(--brand); background: var(--brand); }
+    .card-actions a:hover { border-color: var(--brand); text-decoration: none; }
     .card-side {
       display: grid;
       gap: 10px;
@@ -238,7 +387,7 @@
     .kv div:nth-child(even) { min-width: 0; overflow-wrap: anywhere; }
     .cap-list { margin: 0; padding-left: 0; list-style: none; display: grid; gap: 5px; }
     .cap-list li {
-      font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      font-family: var(--font-mono);
       font-size: 13px;
       border: 1px solid var(--line);
       background: var(--soft);
@@ -252,7 +401,9 @@
       display: inline-block;
       min-width: 64px;
     }
-    .back { display: inline-block; margin: 14px 0; color: var(--accent); }
+    .detail-hero { padding: 20px 0 4px; }
+    .detail-hero h1 { font-family: var(--font-mono); }
+    .back { display: inline-block; margin: 0 0 12px; color: var(--brand); }
     .generated { color: var(--muted); margin-top: 12px; font-size: 13px; }
     footer {
       color: var(--muted);
@@ -288,17 +439,176 @@
     .readme img { display: block; max-width: 100%; height: auto; border-radius: 7px; }
     .readme table { border-collapse: collapse; width: 100%; display: block; overflow-x: auto; }
     .readme th, .readme td { border: 1px solid var(--line); padding: 6px 8px; }
-    code { font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
+    code { font-family: var(--font-mono); }
+    .catalog-hero {
+      position: relative;
+      padding: clamp(38px, 8vw, 82px) 0 24px;
+      overflow: hidden;
+    }
+    .catalog-hero::after {
+      content: "";
+      position: absolute;
+      z-index: -1;
+      width: 330px;
+      height: 330px;
+      right: -90px;
+      top: -105px;
+      border: 1px solid rgba(40, 54, 137, 0.14);
+      border-radius: 50%;
+      box-shadow: 0 0 0 38px rgba(40, 54, 137, 0.025), 0 0 0 78px rgba(40, 54, 137, 0.018);
+    }
+    .catalog-hero h1 {
+      max-width: 760px;
+      margin-top: 10px;
+      font-size: clamp(32px, 6vw, 58px);
+      line-height: 1.05;
+      letter-spacing: -0.045em;
+    }
+    .catalog-hero .lede { max-width: 690px; font-size: 17px; }
+    .hero-search { position: relative; width: min(720px, 100%); margin-top: 24px; }
+    .hero-search::before {
+      content: ">";
+      position: absolute;
+      z-index: 1;
+      left: 17px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--signal);
+      font-family: var(--font-mono);
+      font-weight: 700;
+    }
+    .hero-search input {
+      width: 100%;
+      height: 52px;
+      margin: 0;
+      padding: 0 18px 0 38px;
+      border: 1px solid #b9c3df;
+      border-radius: 9px;
+      background: rgba(255, 255, 255, 0.96);
+      box-shadow: 0 14px 34px rgba(31, 43, 105, 0.1);
+      font-size: 16px;
+    }
+    .entry-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
+    .entry-card { position: relative; padding: 20px; }
+    .entry-card:hover { border-color: #bcc6ec; box-shadow: var(--shadow); transform: translateY(-2px); }
+    .entry-card h2 { margin: 0 0 7px; font-size: 19px; }
+    .entry-card strong { display: block; margin-top: 16px; color: var(--brand); font-size: 30px; line-height: 1; }
+    .entry-links { display: flex; flex-wrap: wrap; gap: 7px; margin-top: 14px; }
+    .entry-links a {
+      padding: 5px 8px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: var(--soft);
+      font-size: 12px;
+      font-weight: 600;
+    }
+    .home-results { padding: 14px; }
+    .home-results[hidden], .home-empty[hidden], .entry-grid[hidden] { display: none; }
+    .home-results-head { display: flex; justify-content: space-between; gap: 12px; margin-bottom: 10px; }
+    .home-result-list { display: grid; gap: 8px; }
+    .home-result {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 12px;
+      padding: 11px 12px;
+      border: 1px solid var(--line);
+      border-radius: 7px;
+      color: var(--ink);
+      background: #fff;
+    }
+    .home-result:hover { border-color: #bcc6ec; background: #fbfcff; text-decoration: none; }
+    .home-result code { color: var(--brand-deep); font-weight: 700; overflow-wrap: anywhere; }
+    .home-result span { color: var(--muted); font-size: 13px; text-align: right; }
+    .home-empty { margin: 10px 0 0; color: var(--muted); }
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        scroll-behavior: auto !important;
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+      }
+    }
     @media (max-width: 860px) {
       .shell { width: min(100% - 28px, 1180px); }
+      .topline { align-items: stretch; flex-direction: column; }
+      .api-links {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        justify-content: stretch;
+        width: 100%;
+      }
+      .api-links a { min-width: 0; text-align: center; overflow-wrap: anywhere; }
       .catalog-frame, .detail-layout { grid-template-columns: 1fr; }
-      .filters { position: static; }
+      .detail-side { order: -1; }
+      .entry-grid { grid-template-columns: 1fr; }
+      .filters { padding: 0; position: static; }
+      .filters > summary {
+        display: block;
+        padding: 12px 14px;
+        color: var(--ink);
+        cursor: pointer;
+        font-weight: 700;
+        list-style-position: inside;
+      }
+      .filters[open] > summary { border-bottom: 1px solid var(--line); }
+      .filter-content { padding: 14px; }
       .toolbar { align-items: stretch; flex-direction: column; }
       .package-card { grid-template-columns: 1fr; }
       .card-side { justify-items: start; }
       .card-actions { justify-content: flex-start; }
       .card-preview { width: min(100%, 360px); }
-      .api-reference { padding: 16px; }
+      .api-reference-body { padding: 14px; }
+    }
+    @media (max-width: 520px) {
+      body { font-size: 14px; }
+      .shell { width: min(100% - 20px, 1180px); }
+      .site-header .shell { padding-block: 10px; }
+      .brand { font-size: 17px; overflow-wrap: anywhere; }
+      .brand small { display: none; }
+      .api-links { gap: 6px; }
+      .api-links a { padding: 7px 5px; font-size: 11px; }
+      .search-strip { padding: 12px 0; }
+      .content, .detail-main, .detail-side { padding: 12px; min-width: 0; }
+      .package-card { gap: 10px; padding: 11px; }
+      .package-title a { font-size: 14px; }
+      .card-actions { width: 100%; }
+      .card-actions a { flex: 1; text-align: center; }
+      .page-intro { padding-top: 20px; }
+      .catalog-hero { padding-top: 32px; }
+      .catalog-hero h1 { font-size: 34px; }
+      .catalog-hero .lede { font-size: 15px; }
+      .home-result { grid-template-columns: 1fr; gap: 3px; }
+      .home-result span { text-align: left; }
+      .kv { grid-template-columns: 1fr; gap: 2px; }
+      .kv div:nth-child(odd) { margin-top: 7px; font-size: 12px; font-weight: 700; }
+      .api-reference table,
+      .api-reference tbody,
+      .api-reference tr,
+      .api-reference td { display: block; width: 100%; }
+      .api-reference thead { display: none; }
+      .api-reference tr {
+        border: 1px solid var(--line);
+        border-radius: 6px;
+        margin-bottom: 8px;
+        overflow: hidden;
+      }
+      .api-reference td {
+        display: grid;
+        grid-template-columns: 76px minmax(0, 1fr);
+        gap: 8px;
+        border: 0;
+        border-bottom: 1px solid var(--line);
+        overflow-wrap: anywhere;
+      }
+      .api-reference td:last-child { border-bottom: 0; }
+      .api-reference td::before {
+        content: attr(data-label);
+        color: var(--muted);
+        font-size: 11px;
+        font-weight: 700;
+        letter-spacing: 0.03em;
+        text-transform: uppercase;
+      }
     }
     
 pre { line-height: 125%; }
@@ -379,8 +689,22 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
   </style>
 </head>
 <body>
-  <header class="shell">
+  <header class="site-header">
+    <div class="shell topline">
+      <a class="brand" href="../../">
+        <span class="brand-bus" aria-hidden="true"><span></span><span></span><span></span><span></span></span>
+        <span>Robonix <small>Package Catalog</small></span>
+      </a>
+      <nav class="api-links" aria-label="Catalog navigation">
+        <a href="../../packages/" aria-current="page">Packages</a>
+        <a href="../../robots/">Robots</a>
+        <a href="../../api/v1/catalog">API</a>
+      </nav>
+    </div>
+  </header>
+  <header class="shell detail-hero">
     <a class="back" href="../">Back to packages</a>
+    <span class="kind-label">skill</span>
     <h1>robonix.skill.pick.vertical_grasp</h1>
     <p class="lede">Pick-up-a-named-object skill — orchestrates perception + manipulation services.</p>
   </header>
@@ -389,207 +713,125 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
       <section class="panel detail-main">
         <h2>README</h2>
         <article class="readme">
-          <h1>skill-pick-rbnx</h1>
-<p>Robonix package for the <strong>user-facing "pick up X" skill</strong> on the Piper + Orbbec Dabai DCW grasp pipeline. The LLM-facing entry point of the whole pipeline. Owns the <code>skill/pick/*</code> namespace.</p>
+          <h1>skill-pick-vertical-grasp-rbnx</h1>
+<p>Robonix user-facing pick skill for the Piper + Orbbec Dabai DCW vertical-grasp
+pipeline. It owns <code>robonix/skill/pick/*</code>.</p>
 <p>Catalog name: <code>robonix.skill.pick.vertical_grasp</code>.</p>
-<h2>What It Does</h2>
-<p>Exposes a single MCP tool — <code>robonix/skill/pick/pick(object_name)</code> — that orchestrates three upstream services into one synchronous "pick the X" call:</p>
-<div class="highlight"><pre><span></span><code>                 Pilot LLM
-                     │
-             pick(&quot;the comb&quot;)           (MCP)
-                     │
-                     ▼
-            ┌────────────────────────┐
-            │   skill-pick-rbnx      │
-            └────────┬───────────────┘
-                     │
-        ┌────────────┼─────────────┐
-        │            │             │
-        ▼            ▼             ▼
-   detect_object  grasp_request  execute_grasp
-  (object_detect) (grasp_pose)   (piper_moveit)
-        │            │             │
-        ▼            ▼             ▼
-       2D bbox    grasp pose     arm motion
-       + 3D ctr   + width        + gripper close
-</code></pre></div>
-<p>All three upstream calls are <strong>MCP HTTP</strong> (FastMCP Client). Atlas resolves the URLs at <code>on_activate</code> time. There is <strong>no fallback</strong> to legacy ROS service paths — this skill speaks robonix contracts only.</p>
 <h2>Capability surface</h2>
 <table>
 <thead>
 <tr>
 <th>Contract</th>
-<th>Mode</th>
 <th>Transport</th>
-<th>Source / handler</th>
+<th>Purpose</th>
 </tr>
 </thead>
 <tbody>
 <tr>
 <td><code>robonix/skill/pick/driver</code></td>
-<td>rpc</td>
 <td>gRPC</td>
-<td><code>Driver(CMD_INIT, config_json)</code> — lifecycle gate</td>
+<td>Lifecycle (<code>CMD_INIT</code> / lazy <code>CMD_ACTIVATE</code>)</td>
 </tr>
 <tr>
 <td><code>robonix/skill/pick/pick</code></td>
-<td>rpc</td>
 <td>MCP</td>
-<td><code>Pick(object_name, timeout_s, max_retries) → result</code></td>
+<td>Pick one named object and leave it held</td>
+</tr>
+<tr>
+<td><code>robonix/skill/pick/put_down</code></td>
+<td>MCP</td>
+<td>Put down the held object at the configured fixed pose</td>
 </tr>
 </tbody>
 </table>
-<h2>Lifecycle (lazy activate)</h2>
-<p>Skills differ from primitives / services here — they do not auto-bring-up on <code>rbnx boot</code>:</p>
-<div class="highlight"><pre><span></span><code>boot:
-  CMD_INIT     ── light: parse cfg, log defaults. State = INITIALIZED.
-                  (No atlas resolution — upstream services may still be
-                   warming up, and we don&#39;t want to deadlock boot order.)
-
-first MCP call:
-  CMD_ACTIVATE ── heavy: block up to 60 s waiting for atlas to
-                  resolve the three upstream MCP endpoints. State = ACTIVE.
-
-idle:
-  CMD_DEACTIVATE ── drop endpoint cache + FastMCP client cache.
-                    Re-ACTIVATE rebuilds. (Eviction policy is
-                    executor&#39;s, not ours.)
+<p><code>pick</code> accepts only an open-vocabulary <code>object_name</code>:</p>
+<div class="highlight"><pre><span></span><code><span class="p">{</span><span class="nt">&quot;object_name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;comb&quot;</span><span class="p">}</span>
 </code></pre></div>
-<h2>Boot ordering</h2>
-<p>Skills are launched by soma stage 2 after all primitives and services. <code>skill-pick-rbnx</code> has no boot-time dependency on its upstreams (lazy activate covers that) — but <code>service-object-detect-rbnx</code>, <code>service-grasp-pose-rbnx</code>, and <code>service-piper-moveit-rbnx</code> <strong>MUST be <code>ACTIVE</code></strong> before the first <code>pick()</code> call. If any is missing at that moment, <code>pick()</code> fails fast with a clear "missing dependencies" message rather than silently timing out mid-motion.</p>
-<h2>Pipeline implementation</h2>
-<p><code>pick_skill/atlas_bridge.py::pick(req)</code> runs:</p>
-<ol>
-<li><strong>Stage 1</strong> — <code>detect_object(req.object_name)</code> over MCP. If <code>success=False</code> (object not in view, low confidence, etc.): short-circuit return <code>detection_failed: &lt;message&gt;</code>.</li>
-<li><strong>Retry loop</strong>, up to <code>req.max_retries</code> times (default 5):
-   a. <strong>Stage 2</strong> — <code>grasp_request(name, bbox_2d, object_center_3d, retry)</code>. Each retry value lets <code>service-grasp-pose-rbnx</code> pick a different grasp candidate. If <code>success=False</code>: log + continue.
-   b. <strong>Stage 3</strong> — <code>execute_grasp(grasp_pose, gripper_width, exec_timeout)</code>. <code>execute_grasp</code> itself does the busy/idle wait on <code>/arm/arm_status</code>, so we do not need to. Returns once the arm hit busy → idle (success) or budget exhausted (timeout).
-   c. If success → return immediately.
-   d. If failure → log + next retry.</li>
-<li>After the budget or retry limit: return <code>all_N_retries_failed; last: &lt;message&gt;</code>.</li>
-</ol>
-<h2>Vertical-grasp three-stage motion</h2>
-<p>On the <code>feature/vertical-grasp</code> branch, <code>pick()</code> orchestrates a three-stage motion sequence via <code>execute_grasp</code>:</p>
-<ol>
-<li><strong>pre-grasp</strong>: lift the target grasp pose by <code>approach_dist</code> in +z, plan + execute;</li>
-<li><strong>grasp</strong>: descend to the target pose, close gripper;</li>
-<li><strong>post-grasp</strong>: lift by <code>approach_dist</code> in +z, plan + execute.</li>
-</ol>
-<p><code>approach_dist</code> is configured on <code>service-grasp-pose-rbnx</code>.</p>
-<h2>Time budgeting</h2>
-<p><code>req.timeout_s</code> is the <strong>total</strong> budget for the whole pick. Internally distributed:</p>
+<p>The call is synchronous, uses a fixed 60 s budget, and makes one grasp
+attempt. <code>put_down</code> has an empty request.</p>
+<h2>Runtime paths</h2>
+<div class="highlight"><pre><span></span><code>pilot / executor
+  -&gt; pick_skill.pick(object_name)                    MCP
+  -&gt; llm_detect.detect_object                        MCP
+  -&gt; grasp_pose.grasp_request                        gRPC
+  -&gt; roboarm_ik.execute_grasp (approach/grasp/lift) gRPC
+  -&gt; return while holding the object
+
+pilot / executor
+  -&gt; pick_skill.put_down()                           MCP
+  -&gt; roboarm_ik.put_down                             gRPC
+</code></pre></div>
+<p>Atlas resolves all endpoints. There is no legacy ROS-service or
+<code>/graspnet</code> fallback in this skill.</p>
+<h2>Lifecycle and dependencies</h2>
+<p>At boot, <code>CMD_INIT</code> only parses configuration and the skill remains
+<code>INITIALIZED</code>. On the first tool call, <code>CMD_ACTIVATE</code> resolves upstream
+endpoints.</p>
+<p>Pipeline mode requires:</p>
 <ul>
-<li>Detection: bounded by FastMCP client timeout (~5–10 s typical).</li>
-<li>Per-<code>grasp_request</code>: also FastMCP-bounded.</li>
-<li>Per-<code>execute_grasp</code>: <code>min(remaining_budget, max(8s, remaining/(retries_left+1)))</code> — reserve some headroom for retries unless this is the last attempt.</li>
+<li><code>service/perception/object_detect/detect_object</code> over MCP;</li>
+<li><code>service/perception/grasp_pose/grasp_request</code> over gRPC;</li>
+<li><code>service/manipulation/execute_grasp</code> over gRPC.</li>
 </ul>
-<p>If the caller passes <code>timeout_s=0</code>, we use <code>default_timeout_s</code> (60 s by default; tunable via deploy manifest config).</p>
+<p>The following manipulation endpoints are optional during activation:</p>
+<ul>
+<li><code>reset</code>: observation-pose setup and failure recovery;</li>
+<li><code>teach_safe</code>: optional post-pick parking while keeping the gripper closed;</li>
+<li><code>put_down</code>: fixed-pose release used by the <code>put_down</code> tool.</li>
+</ul>
+<p>If <code>put_down</code> is unavailable, picking can still succeed and leave the object
+held, but the <code>put_down</code> tool returns an error. In <code>vla</code> mode,
+<code>robonix/skill/vla/execute</code> over MCP replaces the three pipeline dependencies.</p>
+<h2>Pipeline mode</h2>
+<ol>
+<li>If <code>reset</code> is available, move to the calibrated observation pose.</li>
+<li>Detect <code>object_name</code> with <code>llm_detect</code>.</li>
+<li>Compute one vertical grasp pose with <code>grasp_pose</code> (<code>retry=0</code>).</li>
+<li>Execute approach, descend/close, and lift through <code>roboarm_ik</code>.</li>
+<li>Verify fresh gripper feedback on <code>/arm/joint_states_single</code>.</li>
+<li>On success, leave the object held. If configured, move to the teach-safe
+   pose while keeping the gripper closed.</li>
+<li>On failure, run a best-effort reset for recovery.</li>
+</ol>
+<p>The grasp z and approach distance come from <code>grasp_pose</code>; the skill does not
+perform camera calibration or IK itself.</p>
+<h2>Configuration</h2>
+<div class="highlight"><pre><span></span><code><span class="nt">mode</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">pipeline</span><span class="w">                         </span><span class="c1"># pipeline or vla</span>
+<span class="nt">vla_max_steps</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">50</span><span class="w">                     </span><span class="c1"># used only in vla mode</span>
+<span class="nt">gripper_open_width</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.08</span><span class="w">              </span><span class="c1"># metres</span>
+<span class="nt">gripper_close_width</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.0</span><span class="w">              </span><span class="c1"># metres</span>
+<span class="nt">gripper_grasp_threshold_width</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.005</span><span class="w">  </span><span class="c1"># measured width above this means held</span>
+<span class="nt">gripper_feedback_timeout_s</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">2.0</span>
+<span class="nt">gripper_joint_states_topic</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/arm/joint_states_single</span>
+<span class="nt">park_at_teach_safe_after_pick</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">false</span>
+</code></pre></div>
+<p>The deploy may override <code>park_at_teach_safe_after_pick</code>; other values shown
+above are the implementation defaults.</p>
 <h2>Layout</h2>
-<div class="highlight"><pre><span></span><code>skill-pick-rbnx/
+<div class="highlight"><pre><span></span><code>skill-pick-vertical-grasp-rbnx/
 ├── package_manifest.yaml
 ├── capabilities/
-│   ├── driver.v1.toml             # rpc, lifecycle/srv/Driver.srv
-│   ├── pick.v1.toml               # rpc/MCP, pick/srv/Pick.srv
-│   └── lib/pick/srv/
-│       └── Pick.srv               # codegen → Pick_Request/_Response
-├── pick_skill/
-│   ├── __init__.py
-│   └── atlas_bridge.py            # Skill + on_activate + MCP orchestration
-├── scripts/
-│   ├── build.sh                   # rbnx codegen --mcp ONLY (no colcon!)
-│   └── start.sh                   # source ROS, exec atlas_bridge
-└── (no src/ — pure Python, no vendored ROS packages)
+│   ├── driver.v1.toml
+│   ├── pick.v1.toml
+│   ├── put_down.v1.toml
+│   ├── lib/{pick,manipulation}/srv/
+│   └── service/{perception,manipulation}/
+├── pick_skill/atlas_bridge.py
+└── scripts/{build,start}.sh
 </code></pre></div>
-<p><code>src/</code> is intentionally absent. Unlike primitives / services we do not vendor any ROS source: the skill talks to upstream services exclusively over MCP HTTP, and our own surfaces (<code>Pick.srv</code> codegen) only need Python dataclasses. Build is significantly faster (~2 s vs ~30–60 s for the moveit package).</p>
-<h2>Config (passed via <code>Driver(CMD_INIT, config_json)</code>)</h2>
-<div class="highlight"><pre><span></span><code><span class="nt">default_timeout_s</span><span class="p">:</span><span class="w">    </span><span class="l l-Scalar l-Scalar-Plain">60.0</span><span class="w">      </span><span class="c1"># used when caller passes 0</span>
-<span class="nt">default_max_retries</span><span class="p">:</span><span class="w">  </span><span class="l l-Scalar l-Scalar-Plain">5</span><span class="w">         </span><span class="c1"># used when caller passes 0</span>
-</code></pre></div>
-<p>Both optional. <code>pick(timeout_s, max_retries)</code> arguments override these per-call.</p>
-<h2>Build / run standalone</h2>
-<div class="highlight"><pre><span></span><code>bash<span class="w"> </span>scripts/build.sh<span class="w">                                 </span><span class="c1"># rbnx codegen --mcp (fast, ~2 s)</span>
-<span class="nv">ROBONIX_ATLAS</span><span class="o">=</span><span class="m">127</span>.0.0.1:50051<span class="w"> </span><span class="se">\</span>
-<span class="w">    </span>bash<span class="w"> </span>scripts/start.sh
-</code></pre></div>
-<h2>Verification</h2>
-<div class="highlight"><pre><span></span><code><span class="c1"># 1. atlas-side: provider visible, INITIALIZED at boot</span>
+<p>This is a pure-Python orchestration package. Its build is codegen-only; it
+does not vendor a ROS package.</p>
+<h2>Build and verification</h2>
+<div class="highlight"><pre><span></span><code>bash<span class="w"> </span>scripts/build.sh
+
+<span class="c1"># With the deploy running:</span>
 rbnx<span class="w"> </span>caps<span class="w"> </span><span class="p">|</span><span class="w"> </span>grep<span class="w"> </span>pick
-<span class="c1"># expect: pick  robonix.skill.pick.vertical_grasp  INITIALIZED</span>
-<span class="c1">#   robonix/skill/pick/driver  (rpc/grpc)</span>
-<span class="c1">#   robonix/skill/pick/pick    (rpc/mcp)</span>
-
-<span class="c1"># 2. End-to-end via Pilot LLM (design intent):</span>
 rbnx<span class="w"> </span>ask<span class="w"> </span><span class="s2">&quot;please pick up the comb&quot;</span>
-<span class="c1"># pilot should:</span>
-<span class="c1">#   * pick the `pick` MCP tool</span>
-<span class="c1">#   * call it with object_name=&quot;comb&quot;</span>
-<span class="c1">#   * return the grasp result to the user</span>
-
-<span class="c1"># 3. Direct MCP test (skip pilot):</span>
-curl<span class="w"> </span>-s<span class="w"> </span>http://127.0.0.1:&lt;pick_skill_port&gt;/mcp/<span class="w"> </span><span class="se">\</span>
-<span class="w">    </span>-H<span class="w"> </span><span class="s2">&quot;Content-Type: application/json&quot;</span><span class="w"> </span><span class="se">\</span>
-<span class="w">    </span>-H<span class="w"> </span><span class="s2">&quot;Accept: application/json, text/event-stream&quot;</span><span class="w"> </span><span class="se">\</span>
-<span class="w">    </span>-d<span class="w"> </span><span class="s1">&#39;{</span>
-<span class="s1">      &quot;jsonrpc&quot;:&quot;2.0&quot;, &quot;id&quot;:1,</span>
-<span class="s1">      &quot;method&quot;:&quot;tools/call&quot;,</span>
-<span class="s1">      &quot;params&quot;:{</span>
-<span class="s1">        &quot;name&quot;:&quot;pick&quot;,</span>
-<span class="s1">        &quot;arguments&quot;:{&quot;object_name&quot;:&quot;comb&quot;,&quot;timeout_s&quot;:60.0,&quot;max_retries&quot;:5}</span>
-<span class="s1">      }</span>
-<span class="s1">    }&#39;</span>
-<span class="c1"># Find the port via `rbnx caps -v` or the package&#39;s start log.</span>
 </code></pre></div>
-<h2>Failure modes</h2>
-<table>
-<thead>
-<tr>
-<th>symptom</th>
-<th>cause</th>
-<th>fix</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><code>pick skill cannot find dependencies on atlas: missing [...]</code></td>
-<td>one of object_detect / grasp_pose / piper_moveit not ACTIVE</td>
-<td><code>rbnx caps</code> to see which one's missing; check that package's log</td>
-</tr>
-<tr>
-<td><code>detection_failed: object 'X' not found at confidence ≥ 0.2</code></td>
-<td>object_detect genuinely does not see the object</td>
-<td>move closer; try a different <code>object_name</code>; test <code>detect_object</code> independently</td>
-</tr>
-<tr>
-<td><code>grasp_pose retry N</code> repeating without success</td>
-<td>grasp_pose returning failure (e.g. <code>z_table</code> wrong, bbox outside depth range)</td>
-<td>see <code>service-grasp-pose-rbnx</code> README</td>
-</tr>
-<tr>
-<td><code>execute retry 0: timeout: arm_status never went busy</code></td>
-<td>piper_moveit / cpp did not pick up the GraspPose, OR /arm/arm_status not flowing</td>
-<td>check piper_ctl_rbnx ACTIVE + <code>ros2 topic info /graspnet/grasps</code></td>
-</tr>
-<tr>
-<td><code>pick skill not active</code> on first call</td>
-<td>CMD_ACTIVATE failed — atlas_bridge logs the actual reason</td>
-<td>check pick_skill log; usually means upstream service down</td>
-</tr>
-<tr>
-<td>Hangs for full timeout</td>
-<td>one of the upstream MCP servers is reachable but not responding</td>
-<td>check the slow service's log; the test harness's <code>timeout_s</code> is the only ceiling</td>
-</tr>
-</tbody>
-</table>
-<h2>Coupling with neighbours</h2>
-<ul>
-<li><strong>Upstream</strong> <code>service-object-detect-rbnx</code> — provides <code>service/perception/object_detect/detect_object</code> MCP.</li>
-<li><strong>Upstream</strong> <code>service-grasp-pose-rbnx</code> — provides <code>service/perception/grasp_pose/grasp_request</code> MCP.</li>
-<li><strong>Upstream</strong> <code>service-piper-moveit-rbnx</code> — provides <code>service/manipulation/execute_grasp</code> MCP.</li>
-<li><strong>Indirectly upstream</strong> <code>primitive-agilex-piper-arm-rbnx</code> + <code>primitive-agilex-piper-description-rbnx</code> + <code>primitive-agilex-piper-handeye-rbnx</code> — pick does not talk to them, but <code>execute_grasp</code> does (transitively); if they are not ACTIVE, <code>execute_grasp</code> fails fast and pick reports it.</li>
-</ul>
+<p>After a successful pick, call <code>put_down</code> before requesting another object if
+the object should be released.</p>
 <h2>License</h2>
-<p>This package: MulanPSL-2.0.</p>
+<p>MulanPSL-2.0.</p>
         </article>
       </section>
       <aside class="panel detail-side">
@@ -615,6 +857,6 @@ curl<span class="w"> </span>-s<span class="w"> </span>http://127.0.0.1:&lt;pick_
       </aside>
     </div>
   </main>
-  <footer class="shell">Generated on 2026-07-15T08:22:31+00:00.</footer>
+  <footer class="shell">Generated on 2026-07-15T12:44:58+00:00.</footer>
 </body>
 </html>
