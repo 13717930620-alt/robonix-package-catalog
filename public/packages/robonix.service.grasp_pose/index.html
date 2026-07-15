@@ -7,58 +7,149 @@
   <link rel="stylesheet" href="../../assets/vendor/pico/pico.classless.min.css">
   <style>
 
+    @import url("https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Noto+Sans+SC:wght@400;500;700&display=swap");
+
     :root {
       color-scheme: light;
-      --pico-font-family: Arial, Helvetica, sans-serif;
+      --font-sans: "Noto Sans CJK SC", "Noto Sans SC", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      --font-mono: "JetBrains Mono", "Noto Sans CJK SC", "Noto Sans SC", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      --pico-font-family: var(--font-sans);
       --pico-border-radius: 6px;
       --pico-spacing: 0.75rem;
-      --bg: #ffffff;
+      --bg: #f7f8fc;
       --paper: #ffffff;
-      --soft: #f7f7f8;
-      --ink: #111827;
-      --muted: #667085;
-      --line: #e5e7eb;
-      --line-strong: #d0d5dd;
-      --accent: #2563eb;
-      --shadow: 0 1px 2px rgba(16, 24, 40, 0.04);
+      --soft: #f1f3f9;
+      --ink: #11172a;
+      --muted: #5f677a;
+      --line: #dde1ec;
+      --line-strong: #bdc5d8;
+      --brand: #283689;
+      --brand-deep: #17205f;
+      --signal: #3674ff;
+      --signal-soft: #e9edff;
+      --shadow: 0 8px 28px rgba(28, 38, 88, 0.06);
     }
     * { box-sizing: border-box; }
+    .visually-hidden {
+      position: absolute !important;
+      width: 1px !important;
+      height: 1px !important;
+      padding: 0 !important;
+      margin: -1px !important;
+      overflow: hidden !important;
+      clip: rect(0, 0, 0, 0) !important;
+      white-space: nowrap !important;
+      border: 0 !important;
+    }
     body {
       margin: 0;
       color: var(--ink);
-      background: var(--bg);
-      font-family: Arial, Helvetica, sans-serif;
+      background:
+        radial-gradient(circle at 18% -8%, rgba(54, 116, 255, 0.09), transparent 30rem),
+        var(--bg);
+      font-family: var(--font-sans);
       font-size: 15px;
       letter-spacing: 0;
     }
-    a { color: var(--accent); text-decoration: none; }
+    a { color: var(--brand); text-decoration: none; }
     a:hover { text-decoration: underline; }
+    :focus-visible {
+      outline: 3px solid rgba(54, 116, 255, 0.42);
+      outline-offset: 3px;
+    }
     .shell {
       width: min(100% - 48px, 1180px);
       max-width: 1180px;
       margin: 0 auto;
     }
-    header {
+    .site-header {
+      position: sticky;
+      top: 0;
+      z-index: 20;
       color: var(--ink);
-      border-bottom: 1px solid var(--line);
-      margin-bottom: 0;
+      border-bottom: 1px solid rgba(221, 225, 236, 0.88);
+      background: rgba(255, 255, 255, 0.9);
+      backdrop-filter: blur(16px);
     }
-    header.shell { padding-block: 14px; }
+    .site-header .shell { padding-block: 12px; }
     .topline { display: flex; justify-content: space-between; gap: 16px; align-items: center; }
-    .brand { font-weight: 700; font-size: 18px; letter-spacing: 0; }
+    .brand {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      color: var(--ink);
+      font-weight: 700;
+      font-size: 17px;
+      letter-spacing: -0.01em;
+    }
+    .brand:hover { color: var(--brand); text-decoration: none; }
+    .brand small { color: var(--muted); font-size: 12px; font-weight: 500; }
+    .brand-bus {
+      position: relative;
+      display: grid;
+      grid-template-columns: repeat(4, 5px);
+      gap: 3px;
+      align-items: center;
+      width: 29px;
+      height: 16px;
+    }
+    .brand-bus::before {
+      content: "";
+      position: absolute;
+      left: 2px;
+      right: 2px;
+      top: 7px;
+      height: 2px;
+      border-radius: 99px;
+      background: var(--line-strong);
+    }
+    .brand-bus::after {
+      content: "";
+      position: absolute;
+      top: 5px;
+      left: 0;
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--signal);
+      box-shadow: 0 0 0 4px rgba(54, 116, 255, 0.13);
+      animation: bus-pulse 3.2s cubic-bezier(.45, 0, .2, 1) infinite;
+    }
+    .brand-bus span {
+      position: relative;
+      z-index: 1;
+      width: 5px;
+      height: 5px;
+      border: 1px solid var(--brand);
+      border-radius: 50%;
+      background: #fff;
+    }
+    @keyframes bus-pulse {
+      0%, 14% { transform: translateX(0); opacity: 0; }
+      22% { opacity: 1; }
+      72% { transform: translateX(23px); opacity: 1; }
+      82%, 100% { transform: translateX(23px); opacity: 0; }
+    }
     .api-links { display: flex; gap: 8px; flex-wrap: wrap; justify-content: flex-end; }
     .api-links a {
       color: #344054;
-      border: 1px solid var(--line);
-      background: var(--soft);
+      border: 1px solid transparent;
+      background: transparent;
       border-radius: 6px;
       padding: 7px 9px;
-      font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
-      font-size: 12px;
+      font-size: 13px;
+      font-weight: 600;
+      transition: color 160ms ease, background 160ms ease, border-color 160ms ease;
+    }
+    .api-links a:hover, .api-links a[aria-current="page"] {
+      color: var(--brand);
+      border-color: #d9def4;
+      background: var(--signal-soft);
+      text-decoration: none;
     }
     h1 {
       margin: 0;
-      font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      font-family: var(--font-sans);
       font-size: 22px;
       line-height: 1.35;
       letter-spacing: 0;
@@ -66,6 +157,15 @@
       word-break: break-word;
     }
     .lede { color: var(--muted); max-width: 720px; margin: 8px 0 0; line-height: 1.55; font-size: 15px; }
+    .page-intro { padding: 28px 0 16px; }
+    .page-intro .eyebrow, .catalog-hero .eyebrow {
+      color: var(--brand);
+      font-family: var(--font-mono);
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.09em;
+      text-transform: uppercase;
+    }
     main.shell { padding-block: 0 34px; }
     .search-strip { padding: 16px 0 14px; }
     .catalog-frame {
@@ -81,8 +181,11 @@
       border-radius: 8px;
       overflow: hidden;
       margin-bottom: 0;
+      transition: border-color 180ms ease, box-shadow 180ms ease, transform 180ms ease;
     }
     .filters { padding: 14px; position: sticky; top: 14px; }
+    .filters > summary { display: none; }
+    .filter-content { min-width: 0; }
     .filters h2, .content h2 { margin: 0 0 9px; font-size: 15px; }
     .stat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 7px; margin-bottom: 14px; }
     .stat { border: 1px solid var(--line); border-radius: 6px; padding: 8px; background: var(--soft); }
@@ -100,14 +203,24 @@
       font-size: 13px;
       margin: 0;
     }
-    .filter-button.active { background: #1f2933; color: #fff; border-color: #1f2933; }
+    .filter-button { transition: color 150ms ease, border-color 150ms ease, background 150ms ease; }
+    .filter-button:hover { border-color: var(--brand); }
+    .filter-button.active { background: var(--brand); color: #fff; border-color: var(--brand); }
     .content { padding: 14px; min-width: 0; }
     .api-reference {
       margin-top: 14px;
-      padding: 18px;
+      padding: 0;
       font-size: 14px;
       line-height: 1.45;
     }
+    .api-reference > summary {
+      cursor: pointer;
+      padding: 14px 18px;
+      color: var(--ink);
+      font-weight: 700;
+    }
+    .api-reference[open] > summary { border-bottom: 1px solid var(--line); }
+    .api-reference-body { padding: 16px 18px 18px; }
     .api-reference h2 { margin: 0 0 8px; font-size: 16px; line-height: 1.3; }
     .api-reference p { margin: 0 0 10px; font-size: 14px; line-height: 1.45; }
     .api-reference table {
@@ -132,7 +245,7 @@
     }
     .api-reference code { font-size: 0.92em; }
     .muted { color: var(--muted); }
-    .toolbar { display: flex; justify-content: flex-end; align-items: center; margin-bottom: 10px; }
+    .toolbar { display: flex; justify-content: space-between; gap: 12px; align-items: center; margin-bottom: 10px; }
     .search {
       width: min(620px, 100%);
       border: 1px solid var(--line-strong);
@@ -143,6 +256,17 @@
       margin: 0;
     }
     .count { color: var(--muted); white-space: nowrap; }
+    .clear-filters {
+      display: none;
+      width: auto;
+      margin: 0;
+      padding: 5px 8px;
+      border: 0;
+      background: transparent;
+      color: var(--brand);
+      font-size: 13px;
+    }
+    .clear-filters.visible { display: inline-block; }
     .package-list { display: grid; gap: 9px; }
     .package-card {
       border: 1px solid var(--line);
@@ -153,16 +277,36 @@
       grid-template-columns: 1fr auto;
       gap: 12px;
       margin: 0;
+      animation: rise-in 360ms cubic-bezier(.2, .7, .2, 1) both;
+    }
+    .package-card:nth-child(2) { animation-delay: 35ms; }
+    .package-card:nth-child(3) { animation-delay: 70ms; }
+    .package-card:nth-child(4) { animation-delay: 105ms; }
+    .package-card:hover { border-color: #bcc6ec; box-shadow: var(--shadow); transform: translateY(-2px); }
+    @keyframes rise-in {
+      from { opacity: 0; transform: translateY(7px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .kind-label {
+      display: inline-block;
+      margin-bottom: 5px;
+      color: var(--brand);
+      font-family: var(--font-mono);
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
     }
     .package-title { display: flex; gap: 8px; align-items: baseline; flex-wrap: wrap; margin-bottom: 5px; }
     .package-title a {
-      font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      font-family: var(--font-mono);
       font-size: 16px;
       font-weight: 700;
-      color: #152238;
+      color: var(--ink);
+      overflow-wrap: anywhere;
     }
     .version {
-      font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      font-family: var(--font-mono);
       color: var(--muted);
       font-size: 12px;
       border: 1px solid var(--line);
@@ -172,6 +316,7 @@
     }
     .description { color: #343941; margin: 0 0 8px; line-height: 1.38; }
     .meta-line { color: var(--muted); font-size: 13px; display: flex; gap: 14px; flex-wrap: wrap; }
+    .meta-line strong, .meta-line code { overflow-wrap: anywhere; }
     .meta-line code { font-size: 12px; }
     .card-actions { display: flex; gap: 8px; align-items: start; }
     .card-actions a {
@@ -182,7 +327,11 @@
       color: #29303a;
       font-size: 13px;
       margin: 0;
+      font-weight: 600;
+      transition: background 160ms ease, border-color 160ms ease, color 160ms ease;
     }
+    .card-actions a:first-child { color: #fff; border-color: var(--brand); background: var(--brand); }
+    .card-actions a:hover { border-color: var(--brand); text-decoration: none; }
     .card-side {
       display: grid;
       gap: 10px;
@@ -238,7 +387,7 @@
     .kv div:nth-child(even) { min-width: 0; overflow-wrap: anywhere; }
     .cap-list { margin: 0; padding-left: 0; list-style: none; display: grid; gap: 5px; }
     .cap-list li {
-      font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      font-family: var(--font-mono);
       font-size: 13px;
       border: 1px solid var(--line);
       background: var(--soft);
@@ -252,7 +401,9 @@
       display: inline-block;
       min-width: 64px;
     }
-    .back { display: inline-block; margin: 14px 0; color: var(--accent); }
+    .detail-hero { padding: 20px 0 4px; }
+    .detail-hero h1 { font-family: var(--font-mono); }
+    .back { display: inline-block; margin: 0 0 12px; color: var(--brand); }
     .generated { color: var(--muted); margin-top: 12px; font-size: 13px; }
     footer {
       color: var(--muted);
@@ -288,17 +439,176 @@
     .readme img { display: block; max-width: 100%; height: auto; border-radius: 7px; }
     .readme table { border-collapse: collapse; width: 100%; display: block; overflow-x: auto; }
     .readme th, .readme td { border: 1px solid var(--line); padding: 6px 8px; }
-    code { font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
+    code { font-family: var(--font-mono); }
+    .catalog-hero {
+      position: relative;
+      padding: clamp(38px, 8vw, 82px) 0 24px;
+      overflow: hidden;
+    }
+    .catalog-hero::after {
+      content: "";
+      position: absolute;
+      z-index: -1;
+      width: 330px;
+      height: 330px;
+      right: -90px;
+      top: -105px;
+      border: 1px solid rgba(40, 54, 137, 0.14);
+      border-radius: 50%;
+      box-shadow: 0 0 0 38px rgba(40, 54, 137, 0.025), 0 0 0 78px rgba(40, 54, 137, 0.018);
+    }
+    .catalog-hero h1 {
+      max-width: 760px;
+      margin-top: 10px;
+      font-size: clamp(32px, 6vw, 58px);
+      line-height: 1.05;
+      letter-spacing: -0.045em;
+    }
+    .catalog-hero .lede { max-width: 690px; font-size: 17px; }
+    .hero-search { position: relative; width: min(720px, 100%); margin-top: 24px; }
+    .hero-search::before {
+      content: ">";
+      position: absolute;
+      z-index: 1;
+      left: 17px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--signal);
+      font-family: var(--font-mono);
+      font-weight: 700;
+    }
+    .hero-search input {
+      width: 100%;
+      height: 52px;
+      margin: 0;
+      padding: 0 18px 0 38px;
+      border: 1px solid #b9c3df;
+      border-radius: 9px;
+      background: rgba(255, 255, 255, 0.96);
+      box-shadow: 0 14px 34px rgba(31, 43, 105, 0.1);
+      font-size: 16px;
+    }
+    .entry-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
+    .entry-card { position: relative; padding: 20px; }
+    .entry-card:hover { border-color: #bcc6ec; box-shadow: var(--shadow); transform: translateY(-2px); }
+    .entry-card h2 { margin: 0 0 7px; font-size: 19px; }
+    .entry-card strong { display: block; margin-top: 16px; color: var(--brand); font-size: 30px; line-height: 1; }
+    .entry-links { display: flex; flex-wrap: wrap; gap: 7px; margin-top: 14px; }
+    .entry-links a {
+      padding: 5px 8px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: var(--soft);
+      font-size: 12px;
+      font-weight: 600;
+    }
+    .home-results { padding: 14px; }
+    .home-results[hidden], .home-empty[hidden], .entry-grid[hidden] { display: none; }
+    .home-results-head { display: flex; justify-content: space-between; gap: 12px; margin-bottom: 10px; }
+    .home-result-list { display: grid; gap: 8px; }
+    .home-result {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 12px;
+      padding: 11px 12px;
+      border: 1px solid var(--line);
+      border-radius: 7px;
+      color: var(--ink);
+      background: #fff;
+    }
+    .home-result:hover { border-color: #bcc6ec; background: #fbfcff; text-decoration: none; }
+    .home-result code { color: var(--brand-deep); font-weight: 700; overflow-wrap: anywhere; }
+    .home-result span { color: var(--muted); font-size: 13px; text-align: right; }
+    .home-empty { margin: 10px 0 0; color: var(--muted); }
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        scroll-behavior: auto !important;
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+      }
+    }
     @media (max-width: 860px) {
       .shell { width: min(100% - 28px, 1180px); }
+      .topline { align-items: stretch; flex-direction: column; }
+      .api-links {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        justify-content: stretch;
+        width: 100%;
+      }
+      .api-links a { min-width: 0; text-align: center; overflow-wrap: anywhere; }
       .catalog-frame, .detail-layout { grid-template-columns: 1fr; }
-      .filters { position: static; }
+      .detail-side { order: -1; }
+      .entry-grid { grid-template-columns: 1fr; }
+      .filters { padding: 0; position: static; }
+      .filters > summary {
+        display: block;
+        padding: 12px 14px;
+        color: var(--ink);
+        cursor: pointer;
+        font-weight: 700;
+        list-style-position: inside;
+      }
+      .filters[open] > summary { border-bottom: 1px solid var(--line); }
+      .filter-content { padding: 14px; }
       .toolbar { align-items: stretch; flex-direction: column; }
       .package-card { grid-template-columns: 1fr; }
       .card-side { justify-items: start; }
       .card-actions { justify-content: flex-start; }
       .card-preview { width: min(100%, 360px); }
-      .api-reference { padding: 16px; }
+      .api-reference-body { padding: 14px; }
+    }
+    @media (max-width: 520px) {
+      body { font-size: 14px; }
+      .shell { width: min(100% - 20px, 1180px); }
+      .site-header .shell { padding-block: 10px; }
+      .brand { font-size: 17px; overflow-wrap: anywhere; }
+      .brand small { display: none; }
+      .api-links { gap: 6px; }
+      .api-links a { padding: 7px 5px; font-size: 11px; }
+      .search-strip { padding: 12px 0; }
+      .content, .detail-main, .detail-side { padding: 12px; min-width: 0; }
+      .package-card { gap: 10px; padding: 11px; }
+      .package-title a { font-size: 14px; }
+      .card-actions { width: 100%; }
+      .card-actions a { flex: 1; text-align: center; }
+      .page-intro { padding-top: 20px; }
+      .catalog-hero { padding-top: 32px; }
+      .catalog-hero h1 { font-size: 34px; }
+      .catalog-hero .lede { font-size: 15px; }
+      .home-result { grid-template-columns: 1fr; gap: 3px; }
+      .home-result span { text-align: left; }
+      .kv { grid-template-columns: 1fr; gap: 2px; }
+      .kv div:nth-child(odd) { margin-top: 7px; font-size: 12px; font-weight: 700; }
+      .api-reference table,
+      .api-reference tbody,
+      .api-reference tr,
+      .api-reference td { display: block; width: 100%; }
+      .api-reference thead { display: none; }
+      .api-reference tr {
+        border: 1px solid var(--line);
+        border-radius: 6px;
+        margin-bottom: 8px;
+        overflow: hidden;
+      }
+      .api-reference td {
+        display: grid;
+        grid-template-columns: 76px minmax(0, 1fr);
+        gap: 8px;
+        border: 0;
+        border-bottom: 1px solid var(--line);
+        overflow-wrap: anywhere;
+      }
+      .api-reference td:last-child { border-bottom: 0; }
+      .api-reference td::before {
+        content: attr(data-label);
+        color: var(--muted);
+        font-size: 11px;
+        font-weight: 700;
+        letter-spacing: 0.03em;
+        text-transform: uppercase;
+      }
     }
     
 pre { line-height: 125%; }
@@ -379,276 +689,118 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
   </style>
 </head>
 <body>
-  <header class="shell">
+  <header class="site-header">
+    <div class="shell topline">
+      <a class="brand" href="../../">
+        <span class="brand-bus" aria-hidden="true"><span></span><span></span><span></span><span></span></span>
+        <span>Robonix <small>Package Catalog</small></span>
+      </a>
+      <nav class="api-links" aria-label="Catalog navigation">
+        <a href="../../packages/" aria-current="page">Packages</a>
+        <a href="../../robots/">Robots</a>
+        <a href="../../api/v1/catalog">API</a>
+      </nav>
+    </div>
+  </header>
+  <header class="shell detail-hero">
     <a class="back" href="../">Back to packages</a>
+    <span class="kind-label">service</span>
     <h1>robonix.service.grasp_pose</h1>
-    <p class="lede">Geometric grasp-pose estimator (pure MCP).</p>
+    <p class="lede">Geometric grasp-pose estimator (gRPC).</p>
   </header>
   <main class="shell">
     <div class="detail-layout">
       <section class="panel detail-main">
         <h2>README</h2>
         <article class="readme">
-          <h1>service-grasp-pose-rbnx</h1>
-<p>Robonix package for <strong>grasp-pose estimation</strong> on the Piper + Orbbec Dabai DCW grasp pipeline. Atlas + ROS dual surface. Owns the <code>service/perception/grasp_pose/*</code> namespace.</p>
-<p>Catalog name: <code>robonix.service.grasp_pose</code>.</p>
-<h2>Capability surface</h2>
-<table>
-<thead>
-<tr>
-<th>Contract</th>
-<th>Mode</th>
-<th>Transport</th>
-<th>Source / handler</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><code>robonix/service/perception/grasp_pose/driver</code></td>
-<td>rpc</td>
-<td>gRPC</td>
-<td><code>Driver(CMD_INIT, config_json)</code> — lifecycle gate</td>
-</tr>
-<tr>
-<td><code>robonix/service/perception/grasp_pose/grasp_request</code></td>
-<td>rpc</td>
-<td>gRPC/MCP</td>
-<td><code>GraspRequest(object_name, bbox_2d?, object_center_3d?, retry?) → GraspPose</code></td>
-</tr>
-<tr>
-<td><code>robonix/service/perception/grasp_pose/grasps</code></td>
-<td>topic_out</td>
-<td>ROS 2</td>
-<td><code>/graspnet/grasps</code> (graspnet_msgs/msg/GraspPose)</td>
-</tr>
-</tbody>
-</table>
-<p>The legacy ROS service <code>/graspnet/grasp_request</code> (<code>graspnet_msgs/srv/GraspRequest</code>) is kept alive as a secondary surface. <code>_serve_grasp_request()</code> internally calls <code>service-object-detect-rbnx</code>'s <code>detect_object</code> when the caller does not provide a bbox.</p>
-<p>The C++ <code>piper_moveit_control</code> subscriber on <code>/graspnet/grasps</code> always gets a fire-and-forget message on success even when the caller used the MCP path — that way <code>service-piper-moveit-rbnx</code> does not have to track which surface produced the pose.</p>
-<h2>Two surfaces, one estimator</h2>
-<div class="highlight"><pre><span></span><code>       Pilot LLM               skill-pick-rbnx
-           │                        │
-           ▼                        ▼
-    atlas-routed MCP           ROS service
-    grasp_request           /graspnet/grasp_request
-           │                        │
-           └──► _serve_grasp_request() ◄──┘
-                          │
-                          ▼
-                   _estimate_grasp_pose()
-                          │
-                          ▼              ┌─► topic /graspnet/grasps
-                   GraspPose response ───┤   (C++ moveit_control subscriber)
-                                         └─► (also returned synchronously)
+          <h1>grasp_pose_rbnx</h1>
+<p>gRPC geometric grasp-pose estimator for the Piper + Orbbec vertical grasp
+pipeline.</p>
+<h2>What It Does</h2>
+<p><code>grasp_pose_rbnx</code> owns:</p>
+<div class="highlight"><pre><span></span><code>robonix/service/perception/grasp_pose/driver
+robonix/service/perception/grasp_pose/grasp_request
 </code></pre></div>
-<h2>Boot ordering</h2>
-<p>Must come <strong>after</strong> <code>service-object-detect-rbnx</code> (consumes its detection output). Also requires the TF tree published by <code>primitive-agilex-piper-description-rbnx</code> + <code>primitive-agilex-piper-handeye-rbnx</code>.</p>
-<h2>Two algorithms shipped side-by-side</h2>
-<p>The package ships two grasp-pose strategies in the same estimator surface. Which one is active depends on the deploy branch / config.</p>
-<h3>Vertical-grasp (feature/vertical-grasp branch — the current default)</h3>
-<ul>
-<li><strong>xy</strong>: bbox center pixel from <code>service-object-detect-rbnx</code> → back-project a ray using camera intrinsics → intersect with the tabletop plane <code>z = z_table</code> → <code>(x, y)</code> in <code>base_link</code> frame.</li>
-<li><strong>z</strong>: fixed constant <code>z_table + z_offset</code>.</li>
-<li><strong>orientation</strong>: fixed <code>roll = π</code>, <code>pitch = 0</code>, <code>yaw = default_yaw_rad</code> (or radial-yaw mode).</li>
-<li><strong>gripper opening</strong>: <code>default_gripper_width</code>.</li>
-<li>The three-stage motion sequence (pre-grasp / grasp / post-grasp) is orchestrated by <code>skill-pick-rbnx</code>; <code>approach_dist</code> here is the z lift used for the pre/post motion.</li>
-</ul>
-<h3>Depth-median geometric estimator (main branch — legacy)</h3>
-<p>Direct port of upstream <code>detect_grasp/yolo_grasp.py</code>, preserved at <code>yolo_grasp/_upstream/yolo_grasp.py</code> for reference. Per grasp:</p>
+<p>It accepts a detector-provided RGB bbox and returns a vertical grasp pose in
+<code>arm/base_link</code>. It does not publish <code>/graspnet/grasps</code>, does not host
+<code>/graspnet/grasp_request</code>, and does not build or import <code>graspnet_msgs</code>.</p>
+<p>Runtime path:</p>
+<div class="highlight"><pre><span></span><code>pick_skill
+  -&gt; llm_detect.detect_object
+  -&gt; grasp_pose.grasp_request
+  -&gt; roboarm_ik.execute_grasp
+</code></pre></div>
+<h2>Algorithm</h2>
+<p>For each <code>grasp_request</code>:</p>
 <ol>
-<li>Take the bbox center pixel <code>(u, v) = ((x_min+x_max)/2, (y_min+y_max)/2)</code>.</li>
-<li>Sample a <code>median_grid × median_grid</code> lattice (default 7×7) of depth pixels inside the bbox. Keep only depths in <code>[min_depth_m, max_depth_m]</code> (default <code>[0.05, 3.0]</code> m). Take the median.</li>
-<li>Back-project <code>(u, v, z)</code> through the pinhole intrinsics from <code>camera_info</code> (<code>fx, fy, cx, cy</code> from <code>K</code>): <code>x = (u - cx) * z / fx; y = (v - cy) * z / fy</code>.</li>
-<li>Subtract <code>safe_height_m</code> (default 0.10 m) from z so the gripper ends ABOVE the object. The MoveIt cartesian descent finishes the last 10 cm.</li>
-<li>Orientation = a pre-calibrated approach quaternion <code>[-0.1329, 0.1508, -0.6840, -0.7013]</code> (override via <code>cfg.orientation_xyzw</code>).</li>
-<li>Gripper width = <code>clamp(0.12, gripper_width_min, gripper_width_max)</code>.</li>
+<li>Require <code>bbox_2d = [x_min, y_min, x_max, y_max]</code>.</li>
+<li>Compute bbox center pixel <code>(u, v)</code>.</li>
+<li>Project <code>[u, v, 1]</code> through the required 3x3 homography to get
+   arm-plane <code>(x, y)</code>.</li>
+<li>Apply optional global <code>bias_x</code> / <code>bias_y</code>.</li>
+<li>Estimate gripper yaw from the bbox long edge.</li>
+<li>Apply <code>catch_offset</code> along the yaw direction.</li>
+<li>Use <code>default_desktop_height</code> as the final grasp z.</li>
+<li>Return a vertical-down <code>PoseStamped</code> in <code>output_frame</code>, default
+   <code>arm/base_link</code>.</li>
 </ol>
-<p>Output frame is <code>camera_color_optical_frame</code>; <code>primitive-agilex-piper-handeye-rbnx</code> supplies the <code>link6 → camera_color_optical_frame</code> static TF so <code>service-piper-moveit-rbnx</code> can transform to <code>base_link</code> without extra plumbing.</p>
-<h2>Driver-init lifecycle</h2>
-<div class="highlight"><pre><span></span><code>on_init ── parse cfg
-        ── atlas resolve object_detect endpoint (informational)
-        ── spawn rclpy thread
-             (ROS service host
-              + /graspnet/grasps publisher
-              + /yolo/detect_object client)
-
-on_deactivate ── stop rclpy thread.
+<p>Depth, camera intrinsics, and TF are intentionally not used.</p>
+<h2>Required Config</h2>
+<p>Runtime config comes from <code>robonix_manifest.yaml</code>:</p>
+<div class="highlight"><pre><span></span><code><span class="nt">hand_eye_calibration_file</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/absolute/path/to/2d_homography.npy</span>
+<span class="nt">default_desktop_height</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">-0.205</span>
 </code></pre></div>
-<p><code>on_init</code> does not depend on <code>detect_object</code> being up — we wait up to 30 s in the rclpy thread, log a warning if it never appears, and let <code>grasp_request</code> calls without a bbox fail cleanly afterwards. This keeps boot from deadlocking when the detection service is still warming up.</p>
-<h2>Auto-publish stream mode (default OFF — safety)</h2>
-<p>Independent of the <code>grasp_request</code> RPC surfaces, the package can run in "stream mode" — exactly what upstream <code>yolo_grasp.py</code> did:</p>
-<div class="highlight"><pre><span></span><code>object_detect publishes /yolo/detect_objects (DetectedObjects)
-                  │
-                  ▼
-grasp_pose subscribes; for each detection whose object_name is in
-`cfg.candidates`, compute a grasp and publish to /graspnet/grasps
-                  │
-                  ▼
-piper_moveit_control C++ subscriber receives → executes
+<p>You may provide an inline <code>homography_matrix</code> instead of
+<code>hand_eye_calibration_file</code>.</p>
+<p>Useful optional knobs:</p>
+<div class="highlight"><pre><span></span><code><span class="nt">bias_x</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.0</span>
+<span class="nt">bias_y</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.0</span>
+<span class="nt">catch_offset</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.0</span>
+<span class="nt">box_rotation_deg</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.0</span>
+<span class="nt">gripper_width_default</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.04</span>
+<span class="nt">output_frame</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">arm/base_link</span>
+<span class="nt">approach_dist</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.10</span>
 </code></pre></div>
-<p><strong>OFF by default.</strong> The C++ <code>moveit_control_node_yolo</code> triggers a real arm motion on the FIRST <code>/graspnet/grasps</code> message it sees while idle. With auto-publish ON, the moment the cpp node returns to idle (e.g. right after <code>/moveit_control/reset</code>), the next 1 Hz tick from the auto-publish stream will start an unsolicited grasp — exactly the kind of surprise we don't want for a hardware deploy. Enable explicitly only for the legacy demo:</p>
-<div class="highlight"><pre><span></span><code><span class="nt">config</span><span class="p">:</span>
-<span class="w">  </span><span class="nt">auto_publish_topic</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
+<h2>Build / Run</h2>
+<div class="highlight"><pre><span></span><code>bash<span class="w"> </span>scripts/build.sh
+rbnx<span class="w"> </span>boot
 </code></pre></div>
-<p>The candidates allowlist defaults to the upstream list (15 prompt-free YOLOE class names); override via <code>cfg.candidates</code> to scope to your scene.</p>
-<h2>Layout</h2>
-<div class="highlight"><pre><span></span><code>service-grasp-pose-rbnx/
-├── package_manifest.yaml
-├── capabilities/
-│   ├── service/perception/grasp_pose/{driver,grasp_request,grasps}.v1.toml
-│   └── lib/grasp/
-│       ├── srv/GraspRequest.srv    # codegen → GraspRequest_Request/_Response
-│       └── msg/GraspPose.msg       # codegen → GraspPose dataclass
-├── yolo_grasp/
-│   ├── __init__.py
-│   ├── main.py                     # robonix Service + rclpy thread (live)
-│   └── _upstream/
-│       └── yolo_grasp.py           # upstream source kept for reference
-├── scripts/
-│   ├── build.sh                    # colcon graspnet_msgs + rbnx codegen --mcp
-│   └── start.sh                    # source overlays, exec yolo_grasp.main
-└── src/
-    └── graspnet_msgs/              # vendored (32 KB)
+<p><code>scripts/build.sh</code> runs <code>rbnx codegen</code> for protobuf/gRPC stubs.</p>
+<h2>Debugging</h2>
+<p>Check:</p>
+<div class="highlight"><pre><span></span><code>rbnx-boot/logs/grasp_pose.log
 </code></pre></div>
-<h2>Config (passed via <code>Driver(CMD_INIT, config_json)</code>)</h2>
-<p>All keys are optional. Defaults below.</p>
-<div class="highlight"><pre><span></span><code><span class="c1"># ── Vertical-grasp parameters (feature/vertical-grasp branch) ──</span>
-<span class="nt">z_table</span><span class="p">:</span><span class="w">                </span><span class="l l-Scalar l-Scalar-Plain">-0.186</span><span class="w">           </span><span class="c1"># measure on-site! see below</span>
-<span class="nt">z_offset</span><span class="p">:</span><span class="w">               </span><span class="l l-Scalar l-Scalar-Plain">0.0</span>
-<span class="nt">bias_x</span><span class="p">:</span><span class="w">                 </span><span class="l l-Scalar l-Scalar-Plain">0.0</span>
-<span class="nt">bias_y</span><span class="p">:</span><span class="w">                 </span><span class="l l-Scalar l-Scalar-Plain">0.025</span>
-<span class="nt">approach_dist</span><span class="p">:</span><span class="w">          </span><span class="l l-Scalar l-Scalar-Plain">0.10</span>
-<span class="nt">default_yaw_rad</span><span class="p">:</span><span class="w">        </span><span class="l l-Scalar l-Scalar-Plain">0.0</span>
-<span class="nt">radial_yaw</span><span class="p">:</span><span class="w">             </span><span class="l l-Scalar l-Scalar-Plain">true</span><span class="w">             </span><span class="c1"># ignore default_yaw_rad if true</span>
-<span class="nt">radial_yaw_offset_rad</span><span class="p">:</span><span class="w">  </span><span class="l l-Scalar l-Scalar-Plain">0.0</span>
-<span class="nt">default_gripper_width</span><span class="p">:</span><span class="w">  </span><span class="l l-Scalar l-Scalar-Plain">0.04</span>
-<span class="nt">base_frame</span><span class="p">:</span><span class="w">             </span><span class="l l-Scalar l-Scalar-Plain">arm/base_link</span>
-<span class="nt">camera_frame</span><span class="p">:</span><span class="w">           </span><span class="l l-Scalar l-Scalar-Plain">camera_color_optical_frame</span>
-<span class="nt">camera_info_topic</span><span class="p">:</span><span class="w">      </span><span class="l l-Scalar l-Scalar-Plain">/camera/color/camera_info</span>
-<span class="nt">output_frame</span><span class="p">:</span><span class="w">           </span><span class="l l-Scalar l-Scalar-Plain">arm/base_link</span>
-
-<span class="c1"># ── Depth-median estimator (main branch) ──</span>
-<span class="nt">median_grid</span><span class="p">:</span><span class="w">            </span><span class="l l-Scalar l-Scalar-Plain">7</span>
-<span class="nt">min_depth_m</span><span class="p">:</span><span class="w">            </span><span class="l l-Scalar l-Scalar-Plain">0.05</span>
-<span class="nt">max_depth_m</span><span class="p">:</span><span class="w">            </span><span class="l l-Scalar l-Scalar-Plain">3.0</span>
-<span class="nt">safe_height_m</span><span class="p">:</span><span class="w">          </span><span class="l l-Scalar l-Scalar-Plain">0.10</span>
-<span class="nt">gripper_width_default</span><span class="p">:</span><span class="w">  </span><span class="l l-Scalar l-Scalar-Plain">0.12</span>
-<span class="nt">gripper_width_min</span><span class="p">:</span><span class="w">      </span><span class="l l-Scalar l-Scalar-Plain">0.0</span>
-<span class="nt">gripper_width_max</span><span class="p">:</span><span class="w">      </span><span class="l l-Scalar l-Scalar-Plain">0.12</span>
-<span class="nt">orientation_xyzw</span><span class="p">:</span><span class="w">       </span><span class="p p-Indicator">[</span><span class="nv">-0.1329</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">0.1508</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">-0.6840</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">-0.7013</span><span class="p p-Indicator">]</span>
-
-<span class="c1"># ── Auto-publish stream (legacy upstream behaviour) ──</span>
-<span class="nt">auto_publish_topic</span><span class="p">:</span><span class="w">          </span><span class="l l-Scalar l-Scalar-Plain">false</span><span class="w">        </span><span class="c1"># default false — SAFETY</span>
-<span class="nt">auto_publish_min_interval_s</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.0</span><span class="w">          </span><span class="c1"># 0 = no rate limit</span>
-<span class="nt">candidates</span><span class="p">:</span><span class="w">                               </span><span class="c1"># detection allowlist</span>
-<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">bookmark</span>
-<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">lamp</span>
-<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">paper</span>
-<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">document</span>
-<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">monitor</span>
-<span class="w">  </span><span class="c1"># …see _DEFAULT_CANDIDATES in main.py for full list</span>
-
-<span class="c1"># ── ROS topic name overrides (rarely needed) ──</span>
-<span class="nt">depth_topic</span><span class="p">:</span><span class="w">          </span><span class="l l-Scalar l-Scalar-Plain">/camera/depth/image_raw</span>
-<span class="nt">detect_objects_topic</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/yolo/detect_objects</span>
-<span class="nt">grasps_topic</span><span class="p">:</span><span class="w">         </span><span class="l l-Scalar l-Scalar-Plain">/graspnet/grasps</span>
-</code></pre></div>
-<ul>
-<li><code>z_table</code> <strong>MUST</strong> be measured on-site with <code>ros2 run tf2_ros tf2_echo arm/base_link &lt;table_marker_link&gt;</code> or by direct physical measurement. Getting it wrong grabs air or crashes into the table.</li>
-<li><code>radial_yaw</code>: when true, ignore <code>default_yaw_rad</code> and use <code>atan2(y_base, x_base)</code> — the gripper opening aligns radially from base to target, avoiding wrist flips at j6 ± π. <code>radial_yaw_offset_rad</code> rotates the opening direction.</li>
-</ul>
-<h2>Build / run standalone</h2>
-<div class="highlight"><pre><span></span><code>bash<span class="w"> </span>scripts/build.sh<span class="w">                           </span><span class="c1"># colcon graspnet_msgs + rbnx codegen --mcp</span>
-<span class="nv">ROBONIX_ATLAS</span><span class="o">=</span><span class="m">127</span>.0.0.1:50051<span class="w"> </span><span class="se">\</span>
-<span class="w">    </span>bash<span class="w"> </span>scripts/start.sh<span class="w">                       </span><span class="c1"># registers, awaits Init</span>
-</code></pre></div>
-<h3>Manual single-package debugging</h3>
-<p><code>scripts/dev_source.sh</code> is a helper for running this package by hand outside <code>rbnx boot</code> — useful for pdb / fast iter. It sources the same overlays / PYTHONPATH that <code>scripts/start.sh</code> would, and verifies that the vendored <code>graspnet_msgs</code> is the one importable in this shell.</p>
-<div class="highlight"><pre><span></span><code><span class="nb">source</span><span class="w"> </span>scripts/dev_source.sh
-python3<span class="w"> </span>-u<span class="w"> </span>-m<span class="w"> </span>yolo_grasp.main
-</code></pre></div>
-<p><strong>Do NOT add <code>source dev_source.sh</code> to <code>~/.bashrc</code>.</strong> The script spawns a child bash; if <code>.bashrc</code> re-sources the script, every child bash recurses, which manifests as N copies of "package root: …" in the rbnx-boot log followed by a 60 s registration timeout.</p>
-<h2>Verification</h2>
-<div class="highlight"><pre><span></span><code><span class="c1"># 1. atlas-side: provider + capabilities visible</span>
-rbnx<span class="w"> </span>caps<span class="w"> </span><span class="p">|</span><span class="w"> </span>grep<span class="w"> </span>grasp_pose
-<span class="c1"># expect: robonix.service.grasp_pose  ACTIVE  with</span>
-<span class="c1">#   robonix/service/perception/grasp_pose/{driver, grasp_request, grasps}</span>
-
-<span class="c1"># 2. End-to-end via Pilot LLM (MCP path):</span>
-rbnx<span class="w"> </span>ask<span class="w"> </span><span class="s2">&quot;grasp the paper on the desk&quot;</span>
-
-<span class="c1"># 3. Legacy ROS service shape (with bbox supplied):</span>
-ros2<span class="w"> </span>service<span class="w"> </span>call<span class="w"> </span>/graspnet/grasp_request<span class="w"> </span><span class="se">\</span>
-<span class="w">    </span>graspnet_msgs/srv/GraspRequest<span class="w"> </span><span class="se">\</span>
-<span class="w">    </span><span class="s2">&quot;{object_name: &#39;paper&#39;, bbox_2d: [200.0, 100.0, 400.0, 300.0], retry: 0}&quot;</span>
-
-<span class="c1"># 4. Auto-publish stream mode (no manual call needed):</span>
-ros2<span class="w"> </span>topic<span class="w"> </span><span class="nb">echo</span><span class="w"> </span>/graspnet/grasps<span class="w"> </span>--once
-<span class="c1"># expect: a GraspPose with non-trivial target_pose + gripper_width &gt; 0</span>
-<span class="c1"># whenever object_detect publishes a detection in `cfg.candidates`.</span>
-</code></pre></div>
-<h2>Failure modes</h2>
+<p>Common failure causes:</p>
 <table>
 <thead>
 <tr>
 <th>symptom</th>
-<th>cause</th>
-<th>fix</th>
+<th>likely cause</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td><code>grasp_request</code> returns <code>success=false, message="no depth frame received yet"</code></td>
-<td>Camera primitive not active, or <code>depth_topic</code> mismatch</td>
-<td>Check camera ACTIVE; verify topic with <code>ros2 topic hz $depth_topic</code></td>
+<td><code>bbox_2d is required</code></td>
+<td>caller did not pass the detection bbox</td>
 </tr>
 <tr>
-<td><code>grasp_request</code> returns <code>success=false, message="no valid depth in bbox …"</code></td>
-<td>Object outside <code>[min_depth_m, max_depth_m]</code>, or all-zero depth</td>
-<td>Widen <code>max_depth_m</code>, or increase <code>median_grid</code></td>
+<td><code>hand_eye_calibration_file does not exist</code></td>
+<td>missing/stale 2D calibration file</td>
 </tr>
 <tr>
-<td><code>detect_object pre-call failed: service not advertised</code></td>
-<td><code>service-object-detect-rbnx</code> not active (only matters for RPC path w/o bbox)</td>
-<td>Check <code>rbnx caps object_detect</code>; ensure it is up first</td>
+<td><code>missing required roboarm config: default_desktop_height</code></td>
+<td>grasp height not configured</td>
 </tr>
 <tr>
-<td><code>/graspnet/grasps</code> silent even on detections</td>
-<td>Mismatched topic name, or rclpy thread crashed</td>
-<td>Look for "rclpy thread exited" in logs; verify <code>grasps_topic</code> matches C++ subscriber</td>
+<td>grasp XY wrong</td>
+<td>stale homography or wrong camera/image orientation</td>
+</tr>
+<tr>
+<td>z too high/low</td>
+<td>incorrect <code>default_desktop_height</code></td>
 </tr>
 </tbody>
 </table>
-<h2>What was removed from upstream</h2>
-<p>The packaged <code>yolo_grasp/main.py</code> drops these debugging hooks from upstream <code>_upstream/yolo_grasp.py</code>:</p>
-<table>
-<thead>
-<tr>
-<th>upstream</th>
-<th>rbnx version</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><code>input("Continue? [y/n]")</code> block every 10 detections</td>
-<td><strong>removed</strong> — rbnx-spawned providers run with stdin closed. Use <code>auto_publish_min_interval_s</code>.</td>
-</tr>
-<tr>
-<td><code>published</code> flag = "publish exactly one grasp ever"</td>
-<td><strong>removed</strong> — every detection / RPC call gets a fresh grasp.</td>
-</tr>
-<tr>
-<td>Hardcoded <code>det_topic = /yolo/detect_objects</code> etc.</td>
-<td><strong>kept as defaults</strong>, but configurable.</td>
-</tr>
-<tr>
-<td>Shutdown publishes a zero-pose to <code>/graspnet/grasps</code></td>
-<td><strong>kept</strong> — useful sentinel for downstream subscribers.</td>
-</tr>
-</tbody>
-</table>
-<h2>License</h2>
-<p>This package: MulanPSL-2.0.</p>
         </article>
       </section>
       <aside class="panel detail-side">
@@ -673,6 +825,6 @@ ros2<span class="w"> </span>topic<span class="w"> </span><span class="nb">echo</
       </aside>
     </div>
   </main>
-  <footer class="shell">Generated on 2026-07-15T08:22:31+00:00.</footer>
+  <footer class="shell">Generated on 2026-07-15T12:44:58+00:00.</footer>
 </body>
 </html>

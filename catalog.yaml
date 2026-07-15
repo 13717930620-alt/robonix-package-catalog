@@ -43,8 +43,6 @@ packages:
     repo: https://github.com/syswonder/skill-vla-openvla-rbnx
 
 robots:
-  - name: robonix.robot.agilex.piper_grasp
-    repo: https://github.com/syswonder/robot-agilex-piper
   - name: robonix.robot.agilex.ranger_mini_v3
     repo: https://github.com/syswonder/robot-agilex-ranger_mini_v3
   - name: robonix.robot.deep_robotics.lite3

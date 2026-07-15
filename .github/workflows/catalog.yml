@@ -6,11 +6,13 @@ on:
     paths:
       - catalog.yaml
       - scripts/build_catalog.py
+      - tests/**
       - .github/workflows/catalog.yml
   pull_request:
     paths:
       - catalog.yaml
       - scripts/build_catalog.py
+      - tests/**
       - .github/workflows/catalog.yml
   workflow_dispatch:
 

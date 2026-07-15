@@ -1,7 +1,7 @@
 {
   "name": "robonix.service.grasp_pose",
   "version": "0.1.0",
-  "description": "Geometric grasp-pose estimator (pure MCP).",
+  "description": "Geometric grasp-pose estimator (gRPC).",
   "license": "MulanPSL-2.0",
   "tags": [
     "service",
