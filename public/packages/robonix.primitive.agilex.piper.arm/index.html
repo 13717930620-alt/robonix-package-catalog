@@ -463,6 +463,14 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 <p><code>CMD_DEACTIVATE</code> / <code>CMD_SHUTDOWN</code> kill the piper subprocess. Idempotent.</p>
 <h2>CAN bring-up — TWO paths</h2>
 <p>The Piper arm uses USB-CAN (MCP251xFD or similar). The CAN interface must be <strong>up</strong> and named <code>can_piper</code> (or whatever you set <code>can_port:</code> to) before <code>piper_ctrl_single_node</code> can talk to it. The CAN interface name is config-driven — the package never hardcodes a device name.</p>
+<p>If the configured USB address or interface name looks wrong, inspect
+the current host mapping first:</p>
+<div class="highlight"><pre><span></span><code>bash<span class="w"> </span>scripts/find_all_can_port.sh
+</code></pre></div>
+<p>Use the reported USB bus path, for example <code>1-4.2:1.0</code>, as
+<code>can_usb_address</code>. Do not guess when multiple CAN interfaces are
+present; Jetson onboard <code>*.mttcan</code> interfaces and USB-CAN adapters can
+coexist.</p>
 <h3>Path A — recommended for production (default)</h3>
 <p>Bring <code>can_piper</code> up <strong>outside <code>rbnx boot</code></strong>, ahead of time. On a Jetson with udev rules, this is once-per-boot:</p>
 <div class="highlight"><pre><span></span><code><span class="c1"># Run once per host boot, BEFORE `rbnx boot`:</span>
@@ -503,6 +511,7 @@ bash<span class="w"> </span>scripts/can_activate.sh<span class="w"> </span>can_p
 ├── scripts/
 │   ├── build.sh                             # colcon + rbnx codegen
 │   ├── start.sh                             # source ROS, exec main
+│   ├── find_all_can_port.sh                 # print CAN interface ↔ USB bus mapping
 │   └── can_activate.sh                      # vendored from upstream piper_ros
 └── src/                                     # vendored (no .git, no build/install)
     ├── piper/                               # main ROS 2 driver (rclpy)
@@ -581,6 +590,6 @@ ros2<span class="w"> </span>topic<span class="w"> </span>pub<span class="w"> </s
       </aside>
     </div>
   </main>
-  <footer class="shell">Generated on 2026-07-14T07:25:17+00:00.</footer>
+  <footer class="shell">Generated on 2026-07-15T07:28:17+00:00.</footer>
 </body>
 </html>

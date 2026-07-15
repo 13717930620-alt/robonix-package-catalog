@@ -401,6 +401,7 @@ up by <code>rbnx boot</code>. Consumers (<code>scene</code>, <code>nav</code>) b
 SLAM engine.</p>
 <ul>
 <li>Capability surface, config schema, and persistence layout: <strong><a href="https://github.com/syswonder/service-map-rbnx/blob/main/CAPABILITY.md">CAPABILITY.md</a></strong>.</li>
+<li>Provider instance configuration reference: <strong><a href="https://github.com/syswonder/service-map-rbnx/blob/main/config.spec">config.spec</a></strong>.</li>
 </ul>
 <h2>SLAM engines (<code>algo</code>)</h2>
 <table>
@@ -429,9 +430,9 @@ SLAM engine.</p>
 </tr>
 </tbody>
 </table>
-<p>The launch branches on whichever sensors the deploy enabled, so the <em>same</em>
-<code>rtabmap</code> config maps a webots Tiago (2D lidar + RGBD) and a MID-360 robot
-(3D lidar + RGBD) without code changes.</p>
+<p>The launch branches on the provider roles bound by the deployment, so the same
+service supports 2D lidar, 3D lidar, RGB-D, and external odometry without
+robot-specific branches.</p>
 <h2>How to integrate it on your robot</h2>
 <ol>
 <li><strong>Register your sensors</strong> as Robonix primitives under the standard
@@ -445,29 +446,27 @@ SLAM engine.</p>
 <span class="w">    </span><span class="nt">url</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">https://github.com/syswonder/service-map-rbnx</span>
 <span class="w">    </span><span class="c1"># manifest: package_manifest.jetson-native.yaml   # x86+docker is default</span>
 <span class="w">    </span><span class="nt">config</span><span class="p">:</span>
-<span class="w">      </span><span class="nt">algo</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">rtabmap</span>
-<span class="w">      </span><span class="nt">sensors</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">{</span><span class="nt"> lidar3d</span><span class="p">:</span><span class="w"> </span><span class="nv">true</span><span class="p p-Indicator">,</span><span class="nt"> rgb</span><span class="p">:</span><span class="w"> </span><span class="nv">true</span><span class="p p-Indicator">,</span><span class="nt"> depth</span><span class="p">:</span><span class="w"> </span><span class="nv">true</span><span class="p p-Indicator">,</span><span class="nt"> odom</span><span class="p">:</span><span class="w"> </span><span class="nv">true</span><span class="p p-Indicator">,</span><span class="nt"> imu</span><span class="p">:</span><span class="w"> </span><span class="nv">true</span><span class="w"> </span><span class="p p-Indicator">}</span>
-<span class="w">      </span><span class="nt">rtabmap_inputs</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">lidar</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">odom</span><span class="p p-Indicator">]</span>
+<span class="w">      </span><span class="nt">sensor_providers</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">lidar3d</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">roof_lidar</span>
+<span class="w">        </span><span class="nt">rgb</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">front_camera</span>
+<span class="w">        </span><span class="nt">depth</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">front_camera</span>
+<span class="w">        </span><span class="nt">odom</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">base_chassis</span>
 <span class="w">      </span><span class="nt">occupancy_sources</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">lidar</span><span class="p p-Indicator">]</span>
-<span class="w">      </span><span class="nt">deskew_lidar</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span><span class="w">    </span><span class="c1"># requires per-point timestamps (MID-360 format 0)</span>
-<span class="w">      </span><span class="nt">base_frame</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">base_link</span>
-<span class="w">      </span><span class="nt">use_sim_time</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">false</span>
-<span class="w">      </span><span class="nt">rtabmap_profile</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">ranger_mini_v3</span>
-<span class="w">      </span><span class="nt">map_mode</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">mapping</span><span class="w">       </span><span class="c1"># fresh runtime session; or localization</span>
+<span class="w">      </span><span class="nt">deskew_lidar</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
+<span class="w">      </span><span class="nt">params_file</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">config/rtabmap_params.yaml</span>
+<span class="w">      </span><span class="nt">rtabmap_params</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">Grid/FootprintLength</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.84</span>
+<span class="w">        </span><span class="nt">Grid/FootprintWidth</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.60</span>
 </code></pre></div>
 3. <code>rbnx build -f robonix_manifest.yaml</code> then <code>rbnx boot -f robonix_manifest.yaml</code>.
 4. Consume the map: subscribe to <code>robonix/service/map/occupancy_grid</code> /
    <code>.../pointcloud</code> / <code>.../pose</code> (resolve them via atlas).<p></p>
-<p>For Ranger Mini v3, select <code>occupancy_sources: [lidar]</code> and use the named
-profile instead of copying slash-named parameters into every deploy. Together
-they match the two known-good v0.1 map databases: lidar-only occupancy
-(<code>Grid/Sensor=0</code>), 5 Hz detection, 0.05 m/rad node thresholds, and retained
-unlinked nodes. <code>rtabmap_params</code> remains an explicit per-parameter override.</p>
+<p><a href="https://github.com/syswonder/service-map-rbnx/blob/main/config/rtabmap_params.template.yaml"><code>config/rtabmap_params.template.yaml</code></a> is
+only a starting template. Copy it into the robot deployment repository and set
+<code>params_file</code>; Mapping never loads the upstream template at runtime. Inline
+<code>rtabmap_params</code> applies after the deploy-owned file.</p>
 <p>With external odometry, <code>deskew_lidar</code> compensates each PointCloud2 point in
-the odom frame before SLAM. Without external odometry, it enables ICP's
-constant-velocity deskewing; include <code>imu</code> in <code>rtabmap_inputs</code> to initialize
-the ICP orientation from the selected IMU provider. Raw Livox gyro/accel is
-first converted to an orientation estimate by <code>imu_filter_madgwick</code>.</p>
+the odom frame before SLAM. Bind only the sensor roles Mapping should consume.</p>
 <h2>Deployment targets</h2>
 <p>One package, three targets (selected by the deploy <code>manifest:</code> field — see
 <a href="https://github.com/syswonder/service-map-rbnx/blob/main/CAPABILITY.md#deployment-targets">CAPABILITY.md</a>):</p>
@@ -573,8 +572,8 @@ untrusted network.</p>
 </code></pre></div>
 <h2>Troubleshooting</h2>
 <ul>
-<li><strong><code>/map</code> never populates</strong> — no sensor enabled, or the wrong <code>sensors:</code>
-  flags. Check the <code>[start_engine] rtabmap scan2d=… scan3d=…</code> log line.</li>
+<li><strong><code>/map</code> never populates</strong> — a provider binding is missing or points to the
+  wrong provider. Check the <code>[start_engine] rtabmap scan2d=… scan3d=…</code> line.</li>
 <li><strong><code>map_mode=localization</code> errors "no saved map"</strong> — run a <code>mapping</code> session
   with that <code>map_id</code> first, and confirm <code>MAPPING_MAPS_DIR</code> is the same path
   (mounted) across runs.</li>
@@ -587,7 +586,7 @@ untrusted network.</p>
       <aside class="panel detail-side">
         <h2>Package</h2>
         <div class="kv">
-          <div>Version</div><div><code>0.4.0</code></div>
+          <div>Version</div><div><code>0.5.0</code></div>
           <div>Kind</div><div>service</div>
           <div>Type</div><div>package</div>
           <div>Maintainers</div><div>wheatfox &lt;wheatfox17@icloud.com&gt;</div>
@@ -604,6 +603,7 @@ untrusted network.</p>
 <li>robonix/service/map/pointcloud</li>
 <li>robonix/service/map/pose</li>
 <li>robonix/service/map/odom</li>
+<li>robonix/service/map/lifecycle</li>
 <li>robonix/service/map/save_map</li>
 <li>robonix/service/map/list_maps</li>
 <li>robonix/service/map/load_map</li>
@@ -613,6 +613,6 @@ untrusted network.</p>
       </aside>
     </div>
   </main>
-  <footer class="shell">Generated on 2026-07-14T07:25:17+00:00.</footer>
+  <footer class="shell">Generated on 2026-07-15T07:28:17+00:00.</footer>
 </body>
 </html>

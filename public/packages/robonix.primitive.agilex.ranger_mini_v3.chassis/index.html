@@ -425,7 +425,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 <p><code>primitive/chassis/move</code> (rpc-mode) needs its own gRPC handler implementing <code>chassis/srv/ExecuteMoveCommand</code> — TODO. We do NOT implement <code>primitive/chassis/state</code>: that legacy contract bundled map-frame pose into a chassis-owned RPC, which is a layering inversion (chassis primitives are device leaves; localization belongs to the localization service). For "where is the robot in the map?" subscribe to <code>service/map/pose</code> instead.</p>
 <h2>Driver-init lifecycle</h2>
 <p><code>start.sh</code> brings up the atlas bridge — no ROS spawn. The bridge opens a gRPC server (default port 50234), registers the capability and declares only <code>primitive/chassis/driver</code>, then blocks awaiting <code>Driver(CMD_INIT, config_json)</code>.</p>
-<p>When <code>rbnx boot</code> calls Init, the handler parses config (CAN port, robot model, frames, update rate), spawns <code>ros2 launch ranger_bringup ranger_mini_v2.launch.xml</code>, waits for the first <code>nav_msgs/Odometry</code> on <code>/&lt;odom_topic_name&gt;</code>, and declares <code>chassis/odom</code> + <code>chassis/twist_in</code> on atlas.</p>
+<p>When <code>rbnx boot</code> calls Init, the handler parses config, spawns <code>ros2 launch ranger_bringup ranger_mini_v3.launch.xml</code>, waits for the first <code>nav_msgs/Odometry</code> on <code>/&lt;odom_topic_name&gt;</code>, and declares <code>chassis/odom</code> + <code>chassis/twist_in</code> on atlas.</p>
 <p>If the chassis isn't powered or CAN isn't up, the sentinel times out and Init returns <code>state="error"</code> (NOT deferred — the chassis owns its process; we know it's stuck if we just spawned it and got nothing).</p>
 <h2>Layout</h2>
 <div class="highlight"><pre><span></span><code>ranger_chassis_rbnx/
@@ -439,12 +439,12 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
     └── ugv_sdk/        VENDORED agilexrobotics/ugv_sdk (CAN bus client)
 </code></pre></div>
 <h2>CAN bus naming</h2>
-<p>The CAN interface name is config-driven — set <code>port_name:</code> in your deploy manifest's <code>config:</code> block to whatever the host calls its CAN device (<code>can0</code>, <code>can_ranger</code>, <code>can_chassis</code>, …). The package never hardcodes a device name, so it works on any host regardless of how its CAN interfaces are named.</p>
+<p>The CAN interface defaults to <code>can_ranger</code> and is config-driven. Set <code>port_name:</code> in the deploy manifest only when the host uses another stable name (<code>can0</code>, <code>can_chassis</code>, …).</p>
 <p>When multiple CAN devices share a host you may want to rename the Ranger's interface to something stable via <code>udev</code> / <code>systemd-networkd</code> so the name doesn't shift across boots, then point <code>port_name:</code> at the rename. That's a host-side operation — the package only sees the name you give it via config.</p>
 <h2>Config (passed via <code>Driver(CMD_INIT, config_json)</code>)</h2>
 <div class="highlight"><pre><span></span><code><span class="p">{</span>
-<span class="w">  </span><span class="nt">&quot;port_name&quot;</span><span class="p">:</span><span class="w">         </span><span class="s2">&quot;can0&quot;</span><span class="p">,</span>
-<span class="w">  </span><span class="nt">&quot;robot_model&quot;</span><span class="p">:</span><span class="w">       </span><span class="s2">&quot;ranger_mini_v2&quot;</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">&quot;port_name&quot;</span><span class="p">:</span><span class="w">         </span><span class="s2">&quot;can_ranger&quot;</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">&quot;robot_model&quot;</span><span class="p">:</span><span class="w">       </span><span class="s2">&quot;ranger_mini_v3&quot;</span><span class="p">,</span>
 <span class="w">  </span><span class="nt">&quot;odom_frame&quot;</span><span class="p">:</span><span class="w">        </span><span class="s2">&quot;odom&quot;</span><span class="p">,</span>
 <span class="w">  </span><span class="nt">&quot;base_frame&quot;</span><span class="p">:</span><span class="w">        </span><span class="s2">&quot;base_link&quot;</span><span class="p">,</span>
 <span class="w">  </span><span class="nt">&quot;update_rate&quot;</span><span class="p">:</span><span class="w">       </span><span class="mi">50</span><span class="p">,</span>
@@ -454,7 +454,8 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 <span class="w">  </span><span class="nt">&quot;sentinel_timeout_s&quot;</span><span class="p">:</span><span class="w"> </span><span class="mf">30.0</span>
 <span class="p">}</span>
 </code></pre></div>
-<p><code>publish_odom_tf</code> defaults to false; the canonical <code>base_link → odom</code> TF should come from soma's robot_state_publisher chain (URDF). Setting this to true here means competing publishers on <code>/tf</code> — only useful if soma isn't deployed.</p>
+<p><code>publish_odom_tf</code> defaults to false. A URDF publisher cannot publish the dynamic <code>odom -&gt; base_link</code> transform. Set this to true when the Ranger odometry is the selected localization source and no other localization component publishes that transform. Keep it false when another odometry or localization provider owns the same TF edge.</p>
+<p>See <code>config.spec</code> for the complete config surface and defaults. Deployments should omit values that match these defaults.</p>
 <h2>License</h2>
 <p>This package: Apache-2.0. Vendored ranger_ros2 / ugv_sdk: see their respective LICENSE files.</p>
         </article>
@@ -481,6 +482,6 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
       </aside>
     </div>
   </main>
-  <footer class="shell">Generated on 2026-07-14T07:25:17+00:00.</footer>
+  <footer class="shell">Generated on 2026-07-15T07:28:17+00:00.</footer>
 </body>
 </html>

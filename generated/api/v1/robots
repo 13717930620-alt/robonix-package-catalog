@@ -1,7 +1,116 @@
 {
   "api_version": "1",
-  "generated_at": "2026-07-14T07:25:17+00:00",
+  "generated_at": "2026-07-15T07:28:17+00:00",
   "robots": [
+    {
+      "name": "robonix.robot.agilex.piper_grasp",
+      "version": "0.1.0",
+      "description": "Robonix deploy manifest for AgileX Piper with Orbbec Dabai DCW and vertical grasp pipeline.",
+      "tags": [
+        "robot",
+        "deploy",
+        "agilex",
+        "piper_grasp",
+        "camera",
+        "manipulation",
+        "perception",
+        "grasp"
+      ],
+      "repo": "https://github.com/syswonder/robot-agilex-piper",
+      "maintainers": [
+        "lhw2002426 <lhw2002426@users.noreply.github.com>"
+      ],
+      "repo_name": "robot-agilex-piper",
+      "default_branch": "main",
+      "kind": "robot",
+      "catalog_type": "robot",
+      "manifest": "robonix_manifest.yaml",
+      "capabilities": [],
+      "deploy_dependencies": [
+        {
+          "section": "primitive",
+          "name": "orbbec_camera",
+          "repo": "https://github.com/syswonder/primitive-orbbec-dabai_dcw-camera-rbnx",
+          "path": "",
+          "branch": "main",
+          "manifest": "",
+          "package_name": "robonix.primitive.orbbec.dabai_dcw.camera",
+          "package_url": "../robonix.primitive.orbbec.dabai_dcw.camera/"
+        },
+        {
+          "section": "primitive",
+          "name": "piper_ctl",
+          "repo": "https://github.com/syswonder/primitive-agilex-piper-arm-rbnx",
+          "path": "",
+          "branch": "main",
+          "manifest": "",
+          "package_name": "robonix.primitive.agilex.piper.arm",
+          "package_url": "../robonix.primitive.agilex.piper.arm/"
+        },
+        {
+          "section": "primitive",
+          "name": "piper_description",
+          "repo": "https://github.com/syswonder/primitive-agilex-piper-description-rbnx",
+          "path": "",
+          "branch": "main",
+          "manifest": "",
+          "package_name": "robonix.primitive.agilex.piper.description",
+          "package_url": "../robonix.primitive.agilex.piper.description/"
+        },
+        {
+          "section": "primitive",
+          "name": "easy_handeye2",
+          "repo": "https://github.com/syswonder/primitive-agilex-piper-handeye-rbnx",
+          "path": "",
+          "branch": "main",
+          "manifest": "",
+          "package_name": "robonix.primitive.agilex.piper.handeye",
+          "package_url": "../robonix.primitive.agilex.piper.handeye/"
+        },
+        {
+          "section": "service",
+          "name": "llm_detect",
+          "repo": "https://github.com/syswonder/service-object-detect-rbnx",
+          "path": "",
+          "branch": "main",
+          "manifest": "",
+          "package_name": "robonix.service.object_detect",
+          "package_url": "../robonix.service.object_detect/"
+        },
+        {
+          "section": "service",
+          "name": "yolo_grasp",
+          "repo": "https://github.com/syswonder/service-grasp-pose-rbnx",
+          "path": "",
+          "branch": "main",
+          "manifest": "",
+          "package_name": "robonix.service.grasp_pose",
+          "package_url": "../robonix.service.grasp_pose/"
+        },
+        {
+          "section": "service",
+          "name": "piper_moveit",
+          "repo": "https://github.com/syswonder/service-piper-moveit-rbnx",
+          "path": "",
+          "branch": "main",
+          "manifest": "",
+          "package_name": "robonix.service.piper_moveit",
+          "package_url": "../robonix.service.piper_moveit/"
+        },
+        {
+          "section": "skill",
+          "name": "pick",
+          "repo": "https://github.com/syswonder/skill-pick-vertical-grasp-rbnx",
+          "path": "",
+          "branch": "main",
+          "manifest": "",
+          "package_name": "robonix.skill.pick.vertical_grasp",
+          "package_url": "../robonix.skill.pick.vertical_grasp/"
+        }
+      ],
+      "readme_url": "https://github.com/syswonder/robot-agilex-piper/blob/main/README.md",
+      "preview_image_url": ""
+    },
     {
       "name": "robonix.robot.agilex.ranger_mini_v3",
       "version": "0.2.0",

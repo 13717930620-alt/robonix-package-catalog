@@ -1,7 +1,7 @@
 {
   "name": "robonix.service.grasp_pose",
   "version": "0.1.0",
-  "description": "Geometric grasp-pose estimator (atlas + ROS dual surface).",
+  "description": "Geometric grasp-pose estimator (pure MCP).",
   "tags": [
     "service",
     "perception",
@@ -20,8 +20,7 @@
   "manifest": "package_manifest.yaml",
   "capabilities": [
     "robonix/service/perception/grasp_pose/driver",
-    "robonix/service/perception/grasp_pose/grasp_request",
-    "robonix/service/perception/grasp_pose/grasps"
+    "robonix/service/perception/grasp_pose/grasp_request"
   ],
   "deploy_dependencies": [],
   "readme_url": "https://github.com/syswonder/service-grasp-pose-rbnx/blob/main/README.md",

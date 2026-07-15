@@ -392,7 +392,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
           <h1>skill-pick-rbnx</h1>
 <p>Robonix package for the <strong>user-facing "pick up X" skill</strong> on the Piper + Orbbec Dabai DCW grasp pipeline. The LLM-facing entry point of the whole pipeline. Owns the <code>skill/pick/*</code> namespace.</p>
 <p>Catalog name: <code>robonix.skill.pick.vertical_grasp</code>.</p>
-<h2>What it does</h2>
+<h2>What It Does</h2>
 <p>Exposes a single MCP tool — <code>robonix/skill/pick/pick(object_name)</code> — that orchestrates three upstream services into one synchronous "pick the X" call:</p>
 <div class="highlight"><pre><span></span><code>                 Pilot LLM
                      │
@@ -519,7 +519,7 @@ rbnx<span class="w"> </span>caps<span class="w"> </span><span class="p">|</span>
 <span class="c1">#   robonix/skill/pick/pick    (rpc/mcp)</span>
 
 <span class="c1"># 2. End-to-end via Pilot LLM (design intent):</span>
-rbnx<span class="w"> </span>ask<span class="w"> </span><span class="s2">&quot;请帮我把那个 comb 抓起来&quot;</span>
+rbnx<span class="w"> </span>ask<span class="w"> </span><span class="s2">&quot;please pick up the comb&quot;</span>
 <span class="c1"># pilot should:</span>
 <span class="c1">#   * pick the `pick` MCP tool</span>
 <span class="c1">#   * call it with object_name=&quot;comb&quot;</span>
@@ -609,10 +609,11 @@ curl<span class="w"> </span>-s<span class="w"> </span>http://127.0.0.1:&lt;pick_
         <ul class="cap-list">
           <li>robonix/skill/pick/driver</li>
 <li>robonix/skill/pick/pick</li>
+<li>robonix/skill/pick/put_down</li>
         </ul>
       </aside>
     </div>
   </main>
-  <footer class="shell">Generated on 2026-07-14T07:25:17+00:00.</footer>
+  <footer class="shell">Generated on 2026-07-15T07:28:17+00:00.</footer>
 </body>
 </html>

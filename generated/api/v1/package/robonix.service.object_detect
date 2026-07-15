@@ -1,7 +1,7 @@
 {
   "name": "robonix.service.object_detect",
   "version": "0.1.0",
-  "description": "LLM-based object detection — atlas + ROS dual surface, drop-in replacement for yolo_world_rbnx.",
+  "description": "LLM-based object detection — atlas MCP service, drop-in replacement for yolo_world_rbnx.",
   "tags": [
     "service",
     "perception",

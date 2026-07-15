@@ -1,6 +1,6 @@
 {
   "name": "robonix.service.mapping",
-  "version": "0.4.0",
+  "version": "0.5.0",
   "description": "SLAM mapping service. Algo + sensor inputs config-driven.",
   "tags": [
     "service",
@@ -24,6 +24,7 @@
     "robonix/service/map/pointcloud",
     "robonix/service/map/pose",
     "robonix/service/map/odom",
+    "robonix/service/map/lifecycle",
     "robonix/service/map/save_map",
     "robonix/service/map/list_maps",
     "robonix/service/map/load_map",

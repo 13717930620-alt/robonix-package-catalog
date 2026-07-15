@@ -389,317 +389,68 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
       <section class="panel detail-main">
         <h2>README</h2>
         <article class="readme">
-          <h1>nav2_wrapper_rbnx</h1>
-<p>Robonix service package that wraps a standard <a href="https://navigation.ros.org/">Nav2</a>
-stack and owns the <code>robonix/service/navigation/*</code> capability. It routes the
-Robonix gRPC/MCP contracts (<code>navigate</code>, <code>navigate/status</code>, <code>navigate/cancel</code>) onto Nav2's
-<code>navigate_to_pose</code> action, and discovers every topic it consumes (<code>/map</code>,
-<code>/odom</code>, <code>/scan</code>) through atlas — so the same package drops onto any body that
-publishes those contracts, in simulation or on real hardware.</p>
-<p>It is body- and scene-agnostic: nothing in the package names a specific robot,
-topic, or provider. The deploy manifest picks a params profile and a build
-target; everything else is resolved at runtime.</p>
-<hr>
-<h2>Capability surface</h2>
-<table>
-<thead>
-<tr>
-<th>Contract</th>
-<th>Transport</th>
-<th>Handler</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><code>robonix/service/navigation/driver</code></td>
-<td>gRPC</td>
-<td><code>Driver(CMD_INIT/SHUTDOWN, …)</code> — lifecycle (Service)</td>
-</tr>
-<tr>
-<td><code>robonix/service/navigation/navigate</code></td>
-<td>gRPC + MCP</td>
-<td><code>Navigate(PoseStamped)</code> → dispatches a Nav2 action goal</td>
-</tr>
-<tr>
-<td><code>robonix/service/navigation/navigate/status</code></td>
-<td>gRPC + MCP</td>
-<td><code>GetNavigationStatus(run_id)</code> → status from cache</td>
-</tr>
-<tr>
-<td><code>robonix/service/navigation/navigate/cancel</code></td>
-<td>gRPC + MCP</td>
-<td><code>CancelNavigation(run_id)</code> → Nav2 <code>cancel_goal_async</code></td>
-</tr>
-</tbody>
-</table>
-<p>The driver + the three data contracts are hosted and declared on atlas by
-<code>robonix_api.Service.run()</code>. <code>navigate</code> / <code>status</code>
-/ <code>cancel</code> are live from process start; each guards on the rclpy node, so a call
-that lands before <code>CMD_INIT</code> finishes returns a clean "not initialized" instead
-of crashing.</p>
-<h2>Lifecycle (how a deploy brings nav2 up)</h2>
-<p>The package is a <code>robonix_api.Service</code>. <code>scripts/start.sh</code> launches the bridge
-(in a container or natively — see <em>Deployment targets</em>); the bridge registers
-<code>nav2</code> with atlas, serves the Driver gRPC, and blocks awaiting
-<code>Driver(CMD_INIT, config_json)</code> from <code>rbnx boot</code>. There is no config on disk or
-in the environment — the config dict arrives only over this gRPC channel.</p>
-<p>On <code>CMD_INIT</code> the <code>on_init</code> handler:</p>
+          <h1>service-navigation-rbnx</h1>
+<p>Robonix wrapper around a system-installed ROS 2 Nav2 stack. The service
+discovers map, odometry, and lidar inputs through Atlas and exposes
+<code>robonix/service/navigation/*</code> over gRPC and MCP.</p>
+<h2>Deployment config</h2>
+<p>Navigation behavior belongs to the robot deployment, not this provider. Each
+robot must carry a complete Nav2 YAML and reference it with <code>params_file</code>:</p>
+<div class="highlight"><pre><span></span><code><span class="nt">service</span><span class="p">:</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">nav2</span>
+<span class="w">    </span><span class="nt">url</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">https://github.com/syswonder/service-navigation-rbnx</span>
+<span class="w">    </span><span class="nt">branch</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">main</span>
+<span class="w">    </span><span class="nt">config</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">params_file</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">config/nav2_params.yaml</span>
+<span class="w">      </span><span class="nt">provider_ids</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">map</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">mapping</span>
+<span class="w">        </span><span class="nt">odom</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">chassis</span>
+<span class="w">        </span><span class="nt">scan</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">lidar</span>
+</code></pre></div>
+<p>Relative paths are resolved from the directory containing
+<code>robonix_manifest.yaml</code>. <code>config/nav2_params.example.yml</code> is a neutral example,
+not a robot profile. Copy it into the deploy repository and set the robot's
+frames, footprint, velocity and acceleration limits, costmap layers, goal
+tolerances, topics, and planner/controller plugins there.</p>
+<p>For a 3D lidar, bind <code>scan_cloud</code> and declare the adapter explicitly:</p>
+<div class="highlight"><pre><span></span><code><span class="w">      </span><span class="nt">params_file</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">config/nav2_params.yaml</span>
+<span class="w">      </span><span class="nt">provider_ids</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">map</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">mapping</span>
+<span class="w">        </span><span class="nt">odom</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">chassis</span>
+<span class="w">        </span><span class="nt">scan_cloud</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">lidar3d</span>
+<span class="w">      </span><span class="nt">scan_projection</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">enabled</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
+<span class="w">        </span><span class="nt">target_frame</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">base_link</span>
+<span class="w">        </span><span class="nt">min_height_m</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.1</span>
+<span class="w">        </span><span class="nt">max_height_m</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1.5</span>
+<span class="w">        </span><span class="nt">range_max_m</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">12.0</span>
+</code></pre></div>
+<p>Optional <code>bt_xml_file</code> points to a deploy-owned BehaviorTree XML. Existing
+<code>params_profile</code> deployments remain supported and emit a migration warning;
+new deployments should not use that field. See <code>config.spec</code> for every
+accepted instance field and default.</p>
+<h2>Runtime</h2>
+<p>At <code>Driver(CMD_INIT)</code>, the wrapper:</p>
 <ol>
-<li>Resolves upstream deps from atlas <strong>by contract</strong> (<code>ATLAS.find_capability</code>),
-   never by hardcoded topic name. If a <strong>required</strong> dep is missing it returns
-   <code>Deferred(...)</code> — rbnx retries once the upstream provider registers, so nav2
-   is never spawned half-wired.</li>
-<li>Spawns <code>ros2 launch nav2_bringup navigation_launch.py</code> with the selected
-   params profile, <code>use_sim_time</code>, and the resolved topics passed as launch
-   remaps.</li>
-<li>Brings up an rclpy node + <code>navigate_to_pose</code> ActionClient and waits
-   (<code>action_wait_s</code>) for the Nav2 lifecycle to advertise the action server.</li>
+<li>resolves the selected Atlas providers;</li>
+<li>resolves and materializes the deployment-owned Nav2 YAML;</li>
+<li>starts an optional PointCloud2-to-LaserScan adapter;</li>
+<li>starts Nav2 and waits for the <code>navigate_to_pose</code> action server;</li>
+<li>exposes navigate, status, and cancel capabilities.</li>
 </ol>
-<p><code>CMD_SHUTDOWN</code> (or a process signal) tears the Nav2 subprocess down via
-<code>on_shutdown</code> so it never outlives the wrapper.</p>
-<h2>Quick start (Webots simulation)</h2>
-<p>A minimal deploy that proves nav2 navigates the Webots Tiago lives in the
-robonix repo at <code>examples/webots/nav2_test.yaml</code> (atlas + executor + chassis +
-lidar + mapping + nav2). With the Webots sim already running:</p>
-<div class="highlight"><pre><span></span><code><span class="c1"># 1. one-time: build the nav2 docker image (x86 + docker is the default target)</span>
-rbnx<span class="w"> </span>build<span class="w"> </span>-p<span class="w"> </span>/path/to/nav2_wrapper_rbnx<span class="w">        </span><span class="c1"># builds image `robonix-nav2`</span>
-
-<span class="c1"># 2. boot the stack</span>
-<span class="nb">cd</span><span class="w"> </span>&lt;robonix&gt;/examples/webots
-rbnx<span class="w"> </span>boot<span class="w"> </span>-f<span class="w"> </span>nav2_test.yaml<span class="w">                      </span><span class="c1"># nav2 reaches ACTIVE</span>
-
-<span class="c1"># 3. send a goal over the navigate gRPC and watch /cmd_vel move the robot</span>
-<span class="c1">#    (goal in the map frame for the sim profile; see Params profiles)</span>
+<p>Missing required providers return <code>deferred</code>. Invalid config or a Nav2 startup
+failure returns <code>error</code> and tears down every child process.</p>
+<h2>Build and tests</h2>
+<div class="highlight"><pre><span></span><code>bash<span class="w"> </span>scripts/build.sh
+python3<span class="w"> </span>-m<span class="w"> </span>unittest<span class="w"> </span>-v<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>test_configuration.py<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>test_runtime_integration.py<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>test_rotation_guard.py<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>test_scan_filter.py
 </code></pre></div>
-<p>The <code>sim</code> params profile navigates in the <strong>map frame with online SLAM</strong>: an
-rtabmap mapping provider publishes both a live <code>/map</code> and a <code>map→odom</code> TF. Both
-costmaps anchor in <code>map</code> and a <code>StaticLayer</code> tracks <code>/map</code> as it grows
-(<code>map_subscribe_transient_local</code>), so the robot maps and navigates at the same
-time — obstacles populate the costmaps straight from the SLAM grid, and the
-<code>ObstacleLayer</code> adds anything not yet mapped. It needs a SLAM provider that
-owns <code>map→odom</code> (rtabmap in the Webots example); no AMCL or pre-built map.</p>
-<h2>Deployment targets</h2>
-<p>Nav2 itself is large and the upstream <code>apt</code> packages build cleanly on Humble, so
-this package vendors YAML plus one small Ranger terminal plugin. Three targets cover the
-common deployments; the target is selected by <code>RBNX_BUILD_TARGET</code> (build) and the
-matching per-target package manifest (<code>rbnx boot -f … --manifest</code>):</p>
-<table>
-<thead>
-<tr>
-<th><code>RBNX_BUILD_TARGET</code></th>
-<th>package manifest</th>
-<th>Where Nav2 runs</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><code>x86-docker</code> (default)</td>
-<td><code>package_manifest.yaml</code></td>
-<td>x86_64 host, Nav2 in the <code>robonix-nav2</code> image</td>
-</tr>
-<tr>
-<td><code>jetson-docker</code></td>
-<td><code>package_manifest.jetson-docker.yaml</code></td>
-<td>arm64 Jetson, same Dockerfile (ros:humble is multi-arch)</td>
-</tr>
-<tr>
-<td><code>jetson-native</code></td>
-<td><code>package_manifest.jetson-native.yaml</code></td>
-<td>arm64 Jetson with host ROS2 — no docker</td>
-</tr>
-</tbody>
-</table>
-<ul>
-<li><strong>Docker targets</strong> (<code>x86-docker</code>, <code>jetson-docker</code>) build the <code>robonix-nav2</code>
-  image from <code>docker/Dockerfile</code> (ROS2 Humble + <code>navigation2</code> + <code>nav2-bringup</code> +
-  <code>pointcloud-to-laserscan</code>). <code>scripts/start.sh</code> runs it with <code>--network host
-  --ipc=host</code>, bind-mounting the package and <code>robonix-api</code>. Use this where the
-  host has no ROS2.</li>
-<li><strong>Native target</strong> (<code>jetson-native</code>) requires <code>ros-humble-nav2-bringup</code> +
-  <code>ros-humble-navigation2</code> on the host:</li>
-</ul>
-<div class="highlight"><pre><span></span><code>sudo<span class="w"> </span>apt<span class="w"> </span>install<span class="w"> </span>ros-humble-nav2-bringup<span class="w"> </span>ros-humble-navigation2<span class="w"> </span><span class="se">\</span>
-<span class="w">                 </span>ros-humble-pointcloud-to-laserscan<span class="w"> </span>ros-humble-rtabmap-util
-</code></pre></div>
-<p><code>scripts/build.sh</code> verifies the host packages; <code>scripts/start_native.sh</code>
-  sources the host ROS2 and runs the bridge directly. The dispatch honours
-  <code>ROBONIX_NAV2_FORCE</code> / <code>ROBONIX_NAV2_PLATFORM</code> overrides.</p>
-<p>To add a target, drop a new <code>package_manifest.&lt;target&gt;.yaml</code> whose <code>build:</code> /
-<code>start:</code> lines set <code>RBNX_BUILD_TARGET</code> and run the right scripts; the dispatch in
-<code>build.sh</code> / <code>start.sh</code> already keys off that variable.</p>
-<h2>Config (passed via <code>Driver(CMD_INIT, config_json)</code>)</h2>
-<div class="highlight"><pre><span></span><code><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">nav2</span>
-<span class="w">  </span><span class="nt">url</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">https://github.com/syswonder/service-navigation-rbnx</span>
-<span class="w">  </span><span class="nt">branch</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">main</span>
-<span class="w">  </span><span class="nt">config</span><span class="p">:</span>
-<span class="w">    </span><span class="nt">params_profile</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">sim</span><span class="w">       </span><span class="c1"># sim | slam | default  → config/nav2_params_&lt;profile&gt;.yml</span>
-<span class="w">    </span><span class="nt">params_file</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;&quot;</span><span class="w">           </span><span class="c1"># absolute / package-relative path to override entirely</span>
-<span class="w">    </span><span class="nt">use_sim_time</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span><span class="w">        </span><span class="c1"># true under a simulator that publishes /clock</span>
-<span class="w">    </span><span class="nt">action_wait_s</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">90.0</span><span class="w">       </span><span class="c1"># how long to wait for navigate_to_pose to advertise</span>
-<span class="w">    </span><span class="nt">topic_remap</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">{}</span><span class="w">           </span><span class="c1"># per-key override of atlas-resolved bindings</span>
-</code></pre></div>
-<p><code>params_profile</code> selects <code>config/nav2_params_&lt;profile&gt;.yml</code>. <code>params_file</code>
-(absolute, or relative to the package root) overrides it entirely — useful when
-an operator's tuning lives outside the package.</p>
-<h3>Params profiles</h3>
-<table>
-<thead>
-<tr>
-<th>Profile</th>
-<th>Global costmap frame</th>
-<th>Localization</th>
-<th>Use when</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><code>sim</code></td>
-<td><code>map</code> (static layer)</td>
-<td>online SLAM (rtabmap)</td>
-<td>Webots / any body with a SLAM provider publishing <code>/map</code> + <code>map→odom</code>, mapping while navigating</td>
-</tr>
-<tr>
-<td><code>slam</code></td>
-<td><code>map</code></td>
-<td>AMCL + map</td>
-<td>Real deploy with a SLAM <code>map→odom</code> TF + static map</td>
-</tr>
-<tr>
-<td><code>default</code></td>
-<td><code>map</code></td>
-<td>AMCL + map</td>
-<td>Generic map-based navigation</td>
-</tr>
-<tr>
-<td><code>ranger_mini_v3</code></td>
-<td><code>map</code></td>
-<td>external SLAM</td>
-<td>Ranger Mini v3 with bounded, replan-persistent terminal rotation</td>
-</tr>
-</tbody>
-</table>
-<p>The Ranger profile keeps DWB for path tracking but replaces Humble's stock
-terminal state. <code>ControllerServer</code> resets the goal checker and DWB critics each
-time a replanned path arrives; at 5 Hz this clears the normal <code>RotateToGoal</code>
-XY latch and can re-enable translation after skid-steer rotation drifts XY.
-<code>PersistentGoalChecker</code> and <code>PersistentRotateToGoalCritic</code> reset only when the
-actual goal changes. Once the robot enters 0.30 m, translation stays disabled;
-0.45 m XY drift, 15 seconds, three seconds without yaw progress, or excessive
-cumulative rotation stops the controller with an actionable failure. Terminal
-angular velocity is capped at 0.30 rad/s. The Ranger recovery tree has no spin
-or backup motion.</p>
-<p>The Ranger global planner also treats map coverage as a safety boundary. For a
-goal in known space it first requests a path with unknown cells forbidden. Only
-when no such path exists does it evaluate an unknown-enabled fallback, which is
-accepted only when unknown exposure is at most 5% and 0.75 m in total, with no
-continuous unknown segment longer than 0.40 m. A goal that is itself unknown is
-logged and handled by the explicit unknown-goal planner mode.</p>
-<p>Daytime acceptance uses <code>scripts/ranger_acceptance.py PLAN.yaml</code>. It is a dry
-run by default; sending goals requires both <code>--execute</code> and
-<code>--i-understand-robot-will-move</code>. Each goal is sent once with no automatic
-retry. The JSON report records terminal XY drift, accumulated rotation,
-commands, stopped velocity, duration, and the Nav2 action result.</p>
-<h2>Atlas contract dependencies</h2>
-<p>The wrapper resolves every topic it consumes through atlas
-(<code>ATLAS.find_capability</code> + <code>connect_capability</code>) — it does NOT know which package
-provides them on a given deploy. Each resolved topic is passed to <code>nav2_bringup</code>
-as a launch remap.</p>
-<p><strong>Required</strong> (<code>on_init</code> returns <code>Deferred</code> until both are on atlas):</p>
-<table>
-<thead>
-<tr>
-<th>Contract</th>
-<th>Resolved into nav2 as</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><code>robonix/service/map/occupancy_grid</code></td>
-<td><code>/map</code></td>
-</tr>
-<tr>
-<td><code>robonix/primitive/chassis/odom</code></td>
-<td><code>/odom</code></td>
-</tr>
-</tbody>
-</table>
-<p><strong>Optional</strong> (init proceeds if absent; that observation source is just off):</p>
-<table>
-<thead>
-<tr>
-<th>Contract</th>
-<th>Resolved into nav2 as</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><code>robonix/primitive/lidar/lidar</code></td>
-<td><code>/scan</code></td>
-</tr>
-<tr>
-<td><code>robonix/primitive/lidar/lidar3d</code></td>
-<td><code>/scanner/cloud</code></td>
-</tr>
-</tbody>
-</table>
-<p>Override any binding via the manifest's <code>topic_remap</code> block (e.g. to pin one of
-several providers, or tap a downstream filter):</p>
-<div class="highlight"><pre><span></span><code><span class="nt">config</span><span class="p">:</span>
-<span class="w">  </span><span class="nt">topic_remap</span><span class="p">:</span>
-<span class="w">    </span><span class="nt">map</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/robonix/map/occupancy_grid</span>
-<span class="w">    </span><span class="nt">scan</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/scanner_normalized</span>
-</code></pre></div>
-<h2>TF prerequisites</h2>
-<p>Nav2 needs a healthy <code>odom → base_link → sensor</code> TF chain plus <code>map → odom</code> for
-all three profiles (<code>sim</code> included — it navigates in the map frame). TF is still
-a global ROS side-channel, not an atlas contract. The convention: the SLAM
-provider owns <code>map → odom</code>, the chassis provider owns <code>odom → base_link</code>, and a
-body-description provider owns <code>base_link → sensor_*</code> via <code>robot_state_publisher</code>.
-Under <code>sim</code>, an online-SLAM provider (rtabmap in the Webots example) supplies
-both <code>map → odom</code> and the <code>/map</code> the costmaps' static layer consumes.</p>
-<p>If your costmap references <code>/scan</code> but only <code>primitive/lidar/lidar3d</code>
-(PointCloud2) is on atlas, the Ranger profile owns the adapter. Set
-<code>scan_deskewing: true</code> only when the cloud has per-point timestamps; it runs
-RTAB-Map's lidar deskewing against the chassis odom TF before projection.</p>
-<h2>DDS / sysctl tuning (multi-container deploys)</h2>
-<p>The docker targets run Nav2 with <code>--network host</code> and a UDP-only FastDDS profile
-(<code>docker/no_shm_profile.xml</code>) — SHM is disabled because cross-container SHM
-locks are unreliable, and the transport stays on all interfaces so the sim's
-topics remain discoverable.</p>
-<p>On a host with many DDS participants (a simulator brings up dozens), the default
-<code>net.core.rmem_max</code> (208 KB) can overflow under the endpoint-discovery burst and
-drop Nav2's lifecycle <code>change_state</code> replies, stalling bring-up
-("failed to send response … timeout"). If you see Nav2 nodes stuck
-<code>unconfigured</code> / <code>inactive</code>, raise the host UDP buffers — the same fix used for
-high-rate lidar:</p>
-<div class="highlight"><pre><span></span><code>sudo<span class="w"> </span>sysctl<span class="w"> </span>-w<span class="w"> </span>net.core.rmem_max<span class="o">=</span><span class="m">2147483647</span>
-sudo<span class="w"> </span>sysctl<span class="w"> </span>-w<span class="w"> </span>net.core.wmem_max<span class="o">=</span><span class="m">2147483647</span>
-<span class="c1"># persist: echo &#39;net.core.rmem_max=2147483647&#39; | sudo tee /etc/sysctl.d/10-dds.conf</span>
-</code></pre></div>
-<p>On a robot with a quiet network and tuned buffers this is unnecessary.</p>
-<h2>Layout</h2>
-<div class="highlight"><pre><span></span><code>nav2_wrapper_rbnx/
-├── package_manifest.yaml                 x86-docker (default)
-├── package_manifest.jetson-docker.yaml
-├── package_manifest.jetson-native.yaml
-├── nav2_wrapper/
-│   └── atlas_bridge.py                    Service: lifecycle + navigate/status/cancel gRPC
-├── scripts/
-│   ├── build.sh                           codegen + per-target build (RBNX_BUILD_TARGET)
-│   ├── start.sh                           docker ↔ native dispatch
-│   └── start_native.sh                    host ROS2 path
-├── terminal_controller/                   persistent goal checker + DWB critic
-├── docker/
-│   ├── Dockerfile                         ROS2 Humble + Nav2 + pointcloud_to_laserscan
-│   ├── entrypoint.sh
-│   └── no_shm_profile.xml                 UDP-only FastDDS profile
-└── config/                                vendored Nav2 params
-    ├── nav2_params.yml
-    ├── nav2_params_slam.yml
-    └── nav2_params_sim.yml
-</code></pre></div>
-<h2>License</h2>
-<p>This package: Apache-2.0 (matches Nav2 upstream).</p>
+<p>Jetson native builds require ROS 2 Humble and Nav2 packages compatible with the
+host JetPack image. Docker manifests remain available for simulator and CI
+deployments.</p>
         </article>
       </section>
       <aside class="panel detail-side">
@@ -725,6 +476,6 @@ sudo<span class="w"> </span>sysctl<span class="w"> </span>-w<span class="w"> </s
       </aside>
     </div>
   </main>
-  <footer class="shell">Generated on 2026-07-14T07:25:17+00:00.</footer>
+  <footer class="shell">Generated on 2026-07-15T07:28:17+00:00.</footer>
 </body>
 </html>

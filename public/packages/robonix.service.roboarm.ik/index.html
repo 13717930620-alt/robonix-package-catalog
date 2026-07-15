@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>robonix.primitive.agilex.piper.description - Robonix Package Catalog</title>
+  <title>robonix.service.roboarm.ik - Robonix Package Catalog</title>
   <link rel="stylesheet" href="../../assets/vendor/pico/pico.classless.min.css">
   <style>
 
@@ -381,167 +381,56 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 <body>
   <header class="shell">
     <a class="back" href="../">Back to packages</a>
-    <h1>robonix.primitive.agilex.piper.description</h1>
-    <p class="lede">Piper arm URDF + robot_state_publisher wrapper (TF stand-in until soma ships).</p>
+    <h1>robonix.service.roboarm.ik</h1>
+    <p class="lede">Roboarm-style Python IK executor service for Piper manipulation.</p>
   </header>
   <main class="shell">
     <div class="detail-layout">
       <section class="panel detail-main">
         <h2>README</h2>
         <article class="readme">
-          <h1>primitive-agilex-piper-description-rbnx</h1>
-<p>Robonix package wrapping the <strong>AgileX Piper</strong> arm URDF + <code>robot_state_publisher</code>. Stand-in for <code>system.soma</code> (URDF + RSP), which is on robonix's v0.2 roadmap. Until soma ships that responsibility natively, this package owns the joint-driven TF tree for the Piper arm.</p>
-<p>Catalog name: <code>robonix.primitive.agilex.piper.description</code>.</p>
-<h2>What this package publishes</h2>
-<div class="highlight"><pre><span></span><code>base_link → link1 → link2 → link3 → link4 → link5 → link6 (→ gripper links)
+          <h1>roboarm_ik_rbnx</h1>
+<p>Robonix-managed manipulation executor ported from
+<code>/home/syswonder/lhw/roboarm</code>.</p>
+<p>It is an alternative to <code>piper_moveit_rbnx</code>: start exactly one of them in
+<code>robonix_manifest.yaml</code>. Both expose <code>robonix/service/manipulation/*</code>; running
+both at the same time can make atlas resolution ambiguous and can double-command
+the arm.</p>
+<p>Execution path:</p>
+<div class="highlight"><pre><span></span><code>pick_skill/yolo_grasp -&gt; manipulation/execute_grasp
+  -&gt; roboarm IK on Piper URDF link6
+  -&gt; /arm/joint_states
+  -&gt; piper_ctl_rbnx
+  -&gt; CAN
 </code></pre></div>
-<p>driven from <code>/arm/joint_states_single</code> via <code>robot_state_publisher</code>.</p>
-<p>This package does not publish camera hand-eye calibration. In the
-current vertical-grasp deploy, yolo_grasp consumes
-<code>rbnx-boot/hand-eye-data/2d_homography.npy</code> to map RGB bbox pixels
-directly into <code>arm/base_link</code> XY, then combines that with the configured
-desktop height.</p>
-<h2>Boot ordering</h2>
-<p>This package needs to boot <strong>after <code>piper_ctl</code></strong> (which publishes
-<code>/arm/joint_states_single</code>). Without joint feedback, RSP stays quiet
-on /tf and the arm appears "frozen at zero" in RViz. The deploy
-manifest enforces this by listing <code>piper_ctl</code> before
-<code>piper_description</code> under <code>primitive:</code>.</p>
-<p>Independent of <code>orbbec_camera</code>; the camera stream is consumed later by
-llm_detect/yolo_grasp, while this package only publishes the arm TF
-subtree.</p>
-<h2>Capability surface</h2>
-<p><strong>Empty on purpose</strong>:</p>
-<div class="highlight"><pre><span></span><code><span class="nt">capabilities</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[]</span>
-</code></pre></div>
-<p>The package registers a provider on atlas (so <code>rbnx boot</code> proceeds through the primitive block) but declares no routed contracts.</p>
-<p>TF is a global ROS 2 side-channel — every tf2-aware node joins <code>/tf</code> + <code>/tf_static</code> automatically — so atlas-routing it would only add indirection. With <code>capabilities: []</code>, <code>rbnx boot</code>'s <code>spawn_and_init</code> walks <code>wait_for_registration</code> → finds <code>driver_contract=None</code> → marks the package ACTIVE without trying to drive INIT / ACTIVATE.</p>
-<h2>Driver-init lifecycle</h2>
-<p>There is <strong>no <code>Driver(CMD_INIT)</code> handler</strong> — the package skips CMD_INIT entirely and is considered "up" the moment it registers on atlas. <code>start.sh</code> launches <code>robot_state_publisher</code> directly with the vendored Piper URDF, remapping <code>joint_states → /arm/joint_states_single</code>.</p>
-<h2>Boot ordering</h2>
-<p>Must come <strong>after</strong> <code>primitive-agilex-piper-arm-rbnx</code> in the deploy manifest — RSP needs a <code>JointState</code> producer or <code>/tf</code> will stay silent.</p>
-<p>Independent of <code>primitive-agilex-piper-handeye-rbnx</code> and <code>primitive-orbbec-dabai_dcw-camera-rbnx</code> — those publish disjoint TF subtrees. Either order works for boot.</p>
-<h2>Frame names — NOT prefixed with <code>arm/</code></h2>
-<p>The vendored upstream URDF uses bare names (<code>base_link</code>, <code>link1</code>... <code>link6</code>). We keep the upstream names verbatim — that matches what <code>primitive-agilex-piper-arm-rbnx</code> actually publishes in <code>JointState.name = ['joint1', 'joint2', ..., 'joint6', 'gripper']</code>.</p>
-<blockquote>
-<p>⚠️ <strong>Future moving-platform conflict</strong>: if the Piper ever sits on a Ranger Mini / mobile chassis whose own URDF also defines <code>base_link</code>, the two TF roots collide. Resolution then will be to fork the URDF and add a <code>tf_prefix</code> (e.g. <code>arm/</code>) to all link/joint names, AND update <code>primitive-agilex-piper-arm-rbnx</code>'s <code>JointState.name</code> accordingly. For the current fixed-arm grasp deploy no chassis is involved, so collision is impossible.</p>
-</blockquote>
-<h2>Layout</h2>
-<div class="highlight"><pre><span></span><code>primitive-agilex-piper-description-rbnx/
-├── package_manifest.yaml        # capabilities: []
-├── launch/
-│   └── piper_urdf.launch.py     # robot_state_publisher + remap
-├── scripts/
-│   ├── build.sh                 # rbnx codegen + colcon build
-│   ├── start.sh                 # source ROS, exec atlas_register_and_launch.py
-│   └── atlas_register_and_launch.py
-└── src/
-    └── piper_description/       # vendored upstream (URDF + meshes only;
-                                 # launch/, rviz/, mujoco_model/ stripped)
-        ├── package.xml
-        ├── CMakeLists.txt
-        ├── meshes/              # *.STL (~9 MB)
-        └── urdf/                # piper_description.urdf (with-gripper, default)
-                                 # piper_no_gripper_description.urdf (override via env)
-</code></pre></div>
-<h2>Build</h2>
-<p><code>scripts/build.sh</code> does two things, both fast:</p>
-<ol>
-<li><code>rbnx codegen</code> — generates <code>atlas_pb2 / atlas_pb2_grpc</code> Python stubs for <code>scripts/atlas_register_and_launch.py</code>.</li>
-<li><code>colcon build --packages-select piper_description</code> — installs URDF + meshes under <code>rbnx-build/ws/install/piper_description/share/</code> so the URDF's <code>package://piper_description/meshes/...</code> references resolve at RViz / MoveIt time. RSP itself does not need this for TF computation, but downstream visualisers do.</li>
-</ol>
-<h2>Config</h2>
-<p>This package has no <code>Driver(CMD_INIT)</code> handler, so the per-package <code>config:</code> block in the deploy manifest is <strong>ignored</strong>. Configuration comes from the top-level <code>env:</code> block instead:</p>
-<table>
-<thead>
-<tr>
-<th>Env</th>
-<th>Meaning</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><code>PIPER_URDF_PATH</code></td>
-<td>Absolute path to the URDF variant to use. Defaults to the vendored with-gripper URDF.</td>
-</tr>
-<tr>
-<td><code>ROBONIX_ATLAS</code></td>
-<td>Atlas gRPC endpoint. Defaults to <code>127.0.0.1:50051</code>.</td>
-</tr>
-</tbody>
-</table>
-<p>Example override to switch to the no-gripper variant:</p>
-<div class="highlight"><pre><span></span><code><span class="nt">env</span><span class="p">:</span>
-<span class="w">  </span><span class="nt">PIPER_URDF_PATH</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">${RBNX_INVOCATION_CWD}/../packages/piper_description/src/piper_description/urdf/piper_no_gripper_description.urdf</span>
-</code></pre></div>
-<h2>Choosing the URDF variant</h2>
-<table>
-<thead>
-<tr>
-<th>Variant</th>
-<th>Joints</th>
-<th>When to use</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><code>piper_description.urdf</code> (default)</td>
-<td>joint1..joint8</td>
-<td><code>gripper_exist: true</code> in piper_ctl config (<code>skill-pick-rbnx</code> uses gripper)</td>
-</tr>
-<tr>
-<td><code>piper_no_gripper_description.urdf</code></td>
-<td>joint1..joint6</td>
-<td><code>gripper_exist: false</code> (rare; manual EE swap)</td>
-</tr>
-</tbody>
-</table>
-<p>Override via <code>PIPER_URDF_PATH</code>, or by editing <code>atlas_register_and_launch.py::_resolve_urdf_path</code>.</p>
-<h2>Run standalone</h2>
-<div class="highlight"><pre><span></span><code>bash<span class="w"> </span>scripts/build.sh
-<span class="nv">ROBONIX_ATLAS</span><span class="o">=</span><span class="m">127</span>.0.0.1:50051<span class="w"> </span><span class="se">\</span>
-<span class="w">    </span>bash<span class="w"> </span>scripts/start.sh
-</code></pre></div>
-<p>The script exits if atlas is unreachable (5s RPC timeout). Once the launch is running, <code>/tf</code> should carry <code>base_link → link6</code> <strong>iff</strong> <code>primitive-agilex-piper-arm-rbnx</code> is also up and publishing JointState.</p>
-<h2>Verification</h2>
-<div class="highlight"><pre><span></span><code>rbnx<span class="w"> </span>caps<span class="w"> </span><span class="p">|</span><span class="w"> </span>grep<span class="w"> </span>piper_description
-<span class="c1"># Expected: piper_description provider, no caps</span>
-
-ros2<span class="w"> </span>run<span class="w"> </span>tf2_ros<span class="w"> </span>tf2_echo<span class="w"> </span>base_link<span class="w"> </span>link6
-<span class="c1"># Should report a transform that moves when you ros2 topic pub to</span>
-<span class="c1"># /arm/pos_cmd or wiggle the arm by hand.</span>
-
-<span class="c1"># Optional: if primitive-agilex-piper-handeye-rbnx is up too, the chain</span>
-<span class="c1"># base_link → link6 → camera_color_optical_frame should resolve:</span>
-ros2<span class="w"> </span>run<span class="w"> </span>tf2_ros<span class="w"> </span>tf2_echo<span class="w"> </span>base_link<span class="w"> </span>camera_color_optical_frame
-</code></pre></div>
-<h2>Vendor / upstream</h2>
-<p><code>src/piper_description/</code> is a verbatim subset of <a href="https://github.com/agilexrobotics/piper_ros">agilexrobotics/piper_ros</a> <code>src/piper_description/</code>, with the following stripped (none needed for TF publishing in a robonix deploy):</p>
+<p>ROS compatibility:</p>
 <ul>
-<li><code>launch/</code> — upstream launches add <code>joint_state_publisher_gui</code> + RViz, both inappropriate for a headless deploy.</li>
-<li><code>rviz/</code> — display config; users who want RViz should write their own outside this package.</li>
-<li><code>mujoco_model/</code> — sim-only; not in pipeline.</li>
+<li>subscribes <code>/arm/joint_states_single</code></li>
+<li>publishes <code>/arm/joint_states</code></li>
+<li>exposes <code>/moveit_control/reset</code> as <code>std_srvs/srv/Trigger</code></li>
 </ul>
-<h2>License</h2>
-<p>This package: MulanPSL-2.0. Vendored URDF + meshes inherit upstream <code>piper_ros</code>'s licensing (upstream <code>package.xml</code> declares "TODO"; the practical assumption is the non-commercial Solidworks export defaults — consult AgileX before redistribution).</p>
+<p>It does not start MoveIt, <code>move_group</code>, or the C++ moveit control node.</p>
         </article>
       </section>
       <aside class="panel detail-side">
         <h2>Package</h2>
         <div class="kv">
           <div>Version</div><div><code>0.1.0</code></div>
-          <div>Kind</div><div>primitive</div>
+          <div>Kind</div><div>service</div>
           <div>Type</div><div>package</div>
           <div>Maintainers</div><div>lhw2002426 &lt;lhw2002426@users.noreply.github.com&gt;</div>
-          <div>Repository</div><div><a href="https://github.com/syswonder/primitive-agilex-piper-description-rbnx">primitive-agilex-piper-description-rbnx</a></div>
+          <div>Repository</div><div><a href="https://github.com/syswonder/service-roboarm-ik-rbnx">service-roboarm-ik-rbnx</a></div>
           <div>Branch</div><div><code>main</code></div>
           <div>Manifest</div><div><code>package_manifest.yaml</code></div>
-          <div>API</div><div><a href="../../api/v1/package/robonix.primitive.agilex.piper.description">package metadata</a></div>
+          <div>API</div><div><a href="../../api/v1/package/robonix.service.roboarm.ik">package metadata</a></div>
         </div>
-        <div class="tags"><button class="tag tag-blue" data-tag="primitive">primitive</button> <button class="tag tag-gray" data-tag="description">description</button> <button class="tag tag-gray" data-tag="urdf">urdf</button> <button class="tag tag-gray" data-tag="agilex">agilex</button> <button class="tag tag-gray" data-tag="piper">piper</button> <button class="tag tag-gray" data-tag="ros2">ros2</button></div>
+        <div class="tags"><button class="tag tag-green" data-tag="service">service</button> <button class="tag tag-gray" data-tag="manipulation">manipulation</button> <button class="tag tag-gray" data-tag="ik">ik</button> <button class="tag tag-gray" data-tag="agilex">agilex</button> <button class="tag tag-gray" data-tag="piper">piper</button> <button class="tag tag-gray" data-tag="ros2">ros2</button></div>
         <h2>Capabilities</h2>
         <ul class="cap-list">
-          
+          <li>robonix/service/manipulation/driver</li>
+<li>robonix/service/manipulation/execute_grasp</li>
+<li>robonix/service/manipulation/reset</li>
+<li>robonix/service/manipulation/teach_safe</li>
         </ul>
       </aside>
     </div>

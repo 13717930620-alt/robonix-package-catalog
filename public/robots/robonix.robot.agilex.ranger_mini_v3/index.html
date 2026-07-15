@@ -394,7 +394,12 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 MID-360, Intel RealSense D435i, RTAB-Map, Scene, Nav2, and Explore.</p>
 <p>The deployment uses native ROS 2 packages on Jetson. Zenoh RMW is the default;
 <code>start.sh</code> starts a local <code>rmw_zenohd</code> for the lifetime of the boot.
-Scene, Mapping, and Nav2 are explicitly selected for their Jetson-native paths.</p>
+Scene, Mapping, and Nav2 are explicitly selected for their Jetson-native paths.
+Each package entry selects its own <code>package_manifest*.yaml</code>, so architecture and
+native/container choices are package properties rather than global environment
+variables. The same robot repository may therefore keep separate full/no-arm
+deployment manifests while selecting the appropriate package target for each
+component.</p>
 <p><img alt="SysWonder AgileX Ranger Mini v3 robot" src="https://raw.githubusercontent.com/syswonder/robot-agilex-ranger_mini_v3/main/assets/robot.jpg"></p>
 <h2>Hardware</h2>
 <table>
@@ -446,13 +451,39 @@ Scene, Mapping, and Nav2 are explicitly selected for their Jetson-native paths.<
 <p>The exact provider IDs, device addresses, sensor profiles, and runtime options
 are defined in <a href="https://github.com/syswonder/robot-agilex-ranger_mini_v3/blob/main/robonix_manifest.yaml"><code>robonix_manifest.yaml</code></a>. The robot body,
 component hierarchy, footprint, and provider-to-component mapping are defined
-in <a href="https://github.com/syswonder/robot-agilex-ranger_mini_v3/blob/main/soma.yaml"><code>soma.yaml</code></a>.</p>
+in <a href="https://github.com/syswonder/robot-agilex-ranger_mini_v3/blob/main/soma.yaml"><code>soma.yaml</code></a>. Vitals consumes Soma's body-health stream and
+aggregates Robonix module health on port <code>50093</code> for trusted operator clients.</p>
+<p>Robot-specific algorithm configuration is also deployment-owned:</p>
+<ul>
+<li><a href="https://github.com/syswonder/robot-agilex-ranger_mini_v3/blob/main/config/rtabmap_params.yaml"><code>config/rtabmap_params.yaml</code></a> contains the full
+  Ranger RTAB-Map parameter set.</li>
+<li><a href="https://github.com/syswonder/robot-agilex-ranger_mini_v3/blob/main/config/nav2_params.yaml"><code>config/nav2_params.yaml</code></a> contains the complete
+  Ranger Nav2 configuration.</li>
+<li><a href="https://github.com/syswonder/robot-agilex-ranger_mini_v3/blob/main/config/navigate.xml"><code>config/navigate.xml</code></a> contains the Ranger navigation
+  BehaviorTree.</li>
+</ul>
+<p>The manifest references these files with paths relative to this repository.
+The Mapping and Navigation provider repositories contain templates only; do
+not move Ranger dimensions, sensor limits, or controller policy upstream.</p>
+<p>Package target selection and algorithm configuration are separate. A package's
+<code>manifest:</code> chooses a build/start implementation such as Jetson native or a
+container. If a provider exposes a named <code>params_profile</code>, that name must be one
+the provider implements upstream; a robot manifest cannot invent a new profile.
+Robot-specific runtime values remain in this repository's parameter files (or
+documented config overrides) and do not create a new upstream profile.</p>
+<p>Scene is pinned to <code>realsense_camera</code>. That provider supplies both aligned RGB
+and depth (plus camera calibration); the wrist Orbbec cannot be selected by
+Atlas ordering. Scene obtains the robot's globally corrected pose from the
+Mapping <code>robonix/service/map/pose</code> contract and combines it with the complete
+URDF camera transform published by <code>robot_description</code>.</p>
 <h2>Prepare</h2>
-<p>Install the Robonix <code>dev</code> toolchain from its source clone, then install the
-ROS dependencies once:</p>
+<p>Robonix <code>dev</code> is the recommended branch for ordinary deployments. This
+repository currently reproduces the Ranger integration stack on <code>dev-next</code>
+(including provider-pinned Scene RGB-D ingest); use <code>dev-next</code> until those
+changes are merged into <code>dev</code>. Then install the ROS dependencies once:</p>
 <div class="highlight"><pre><span></span><code><span class="nb">cd</span><span class="w"> </span>~/wheatfox/robonix
-git<span class="w"> </span>switch<span class="w"> </span>dev
-git<span class="w"> </span>pull<span class="w"> </span>--ff-only<span class="w"> </span>origin<span class="w"> </span>dev
+git<span class="w"> </span>switch<span class="w"> </span>dev-next
+git<span class="w"> </span>pull<span class="w"> </span>--ff-only<span class="w"> </span>origin<span class="w"> </span>dev-next
 make<span class="w"> </span>install
 
 sudo<span class="w"> </span>apt<span class="w"> </span>install<span class="w"> </span>ros-humble-rmw-zenoh-cpp<span class="w"> </span><span class="se">\</span>
@@ -470,8 +501,9 @@ non-secret backend, AppID, engine, voice, and region settings in
 <div class="highlight"><pre><span></span><code>bash<span class="w"> </span>build.sh
 bash<span class="w"> </span>start.sh
 </code></pre></div>
-<p>The wrappers set <code>ROBONIX_DEPLOY_DIR</code>, source ROS Humble, select the native
-Jetson build, and keep the Zenoh router lifecycle tied to <code>rbnx boot</code>.</p>
+<p>The wrappers set <code>ROBONIX_DEPLOY_DIR</code>, source ROS Humble, and keep the Zenoh
+router lifecycle tied to <code>rbnx boot</code>. Each package's selected manifest chooses
+its Jetson-native build and start commands.</p>
 <p>Operator pages:</p>
 <ul>
 <li>Scene: <code>http://&lt;robot-host&gt;:50107/</code></li>
@@ -479,6 +511,10 @@ Jetson build, and keep the Zenoh router lifecycle tied to <code>rbnx boot</code>
 <li>Atlas for Robonix Client: <code>&lt;robot-host&gt;:50051</code></li>
 <li>Liaison for Robonix Client: <code>&lt;robot-host&gt;:50081</code></li>
 </ul>
+<p>Static deployment checks do not start hardware:</p>
+<div class="highlight"><pre><span></span><code>python3<span class="w"> </span>-m<span class="w"> </span>unittest<span class="w"> </span>-v<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>test_manifest_config.py<span class="w"> </span>test_nav2_config.py<span class="w"> </span>test_nav2_acceptance.py
+</code></pre></div>
 <h2>RViz</h2>
 <p>The deploy keeps the complete v0.1 RViz configuration and an updated mapping
 variant. The updated file preserves the original map, costmap, scan, path,
@@ -490,10 +526,9 @@ rviz2<span class="w"> </span>-d<span class="w"> </span>rviz/ranger_mapping.rviz
 </code></pre></div>
 <p>The unchanged historical configuration is <code>rviz/ranger_v0.1.rviz</code>.</p>
 <h2>Safety and bring-up order</h2>
-<p>Keep the chassis powered off while validating the passive stack. The chassis,
-Nav2, and Explore entries remain commented in <code>robonix_manifest.yaml</code>; LiDAR,
-IMU, camera, Robot Description, Scene, and Mapping can be inspected without exposing
-motion capabilities.</p>
+<p>The checked-in full manifest includes the chassis, Piper arm, Nav2, and skills;
+starting it exposes physical motion capabilities. Keep the hardware emergency
+stop available and clear the workspace before full bring-up.</p>
 <p>After the chassis is powered on:</p>
 <ol>
 <li>Verify <code>can_ranger</code> is UP and odometry is publishing.</li>
@@ -548,6 +583,6 @@ measurement rather than compensating in Scene or Mapping.</p>
       </aside>
     </div>
   </main>
-  <footer class="shell">Generated on 2026-07-14T07:25:17+00:00.</footer>
+  <footer class="shell">Generated on 2026-07-15T07:28:17+00:00.</footer>
 </body>
 </html>
