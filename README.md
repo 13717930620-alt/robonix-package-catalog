@@ -205,7 +205,7 @@ integrations should use the `/api/v1/...` paths above.
 The generated commit uses `[skip ci]`; normal CI only triggers from
 `catalog.yaml`, the builder script, the workflow, or manual dispatch.
 
-Generated on `2026-07-15T08:14:50+00:00`.
+Generated on `2026-07-15T08:22:31+00:00`.
 
 ## Packages
 
@@ -225,7 +225,7 @@ Generated on `2026-07-15T08:14:50+00:00`.
 | [`robonix.robot.agilex.piper_grasp`](https://syswonder.github.io/robonix-package-catalog/robots/robonix.robot.agilex.piper_grasp/) | `0.1.0` | `robot` | lhw2002426 <lhw2002426@users.noreply.github.com> | robot, deploy, agilex, piper_grasp, camera, manipulation, perception, grasp | [repo](https://github.com/syswonder/robot-agilex-piper) |
 | [`robonix.robot.agilex.ranger_mini_v3`](https://syswonder.github.io/robonix-package-catalog/robots/robonix.robot.agilex.ranger_mini_v3/) | `0.2.0` | `robot` | wheatfox <wheatfox17@icloud.com> | robot, deploy, agilex, ranger_mini_v3, jetson, lidar, rgbd, scene, mapping, navigation | [repo](https://github.com/syswonder/robot-agilex-ranger_mini_v3) |
 | [`robonix.robot.deep_robotics.lite3`](https://syswonder.github.io/robonix-package-catalog/robots/robonix.robot.deep_robotics.lite3/) | `0.2.0` | `robot` | Bunnycxk <2501213313@stu.pku.edu.cn> | robot, deploy, deep_robotics, lite3, quadruped, jetson, lidar, rgbd, mapping, navigation | [repo](https://github.com/syswonder/robot-deep_robotics-lite3) |
-| [`robonix.robot.wheeltec.r550`](https://syswonder.github.io/robonix-package-catalog/robots/robonix.robot.wheeltec.r550/) | `0.1.0` | `robot` | wheatfox <wheatfox17@icloud.com> | robot, deploy, wheeltec, r550, lidar, camera, navigation, mapping | [repo](https://github.com/syswonder/robot-wheeltec-r550) |
+| [`robonix.robot.wheeltec.r550`](https://syswonder.github.io/robonix-package-catalog/robots/robonix.robot.wheeltec.r550/) | `0.1.0` | `robot` | Xiangrui Cheng <sherry-part@users.noreply.github.com> | robot, deploy, wheeltec, r550, lidar, camera, navigation, mapping | [repo](https://github.com/syswonder/robot-wheeltec-r550) |
 | [`robonix.service.grasp_pose`](https://syswonder.github.io/robonix-package-catalog/packages/robonix.service.grasp_pose/) | `0.1.0` | `service` | lhw2002426 <lhw2002426@users.noreply.github.com> | service, perception, grasp_pose, grasp, ros2 | [repo](https://github.com/syswonder/service-grasp-pose-rbnx) |
 | [`robonix.service.mapping`](https://syswonder.github.io/robonix-package-catalog/packages/robonix.service.mapping/) | `0.5.0` | `service` | wheatfox <wheatfox17@icloud.com> | service, mapping, slam, rtabmap, ros2 | [repo](https://github.com/syswonder/service-map-rbnx) |
 | [`robonix.service.navigation`](https://syswonder.github.io/robonix-package-catalog/packages/robonix.service.navigation/) | `0.1.0` | `service` | wheatfox <wheatfox17@icloud.com> | service, navigation, nav2, ros2 | [repo](https://github.com/syswonder/service-navigation-rbnx) |

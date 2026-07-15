@@ -1,6 +1,6 @@
 {
   "api_version": "1",
-  "generated_at": "2026-07-15T08:14:50+00:00",
+  "generated_at": "2026-07-15T08:22:31+00:00",
   "packages": [
     {
       "name": "robonix.primitive.agilex.piper.arm",
@@ -830,7 +830,7 @@
       ],
       "repo": "https://github.com/syswonder/robot-wheeltec-r550",
       "maintainers": [
-        "wheatfox <wheatfox17@icloud.com>"
+        "Xiangrui Cheng <sherry-part@users.noreply.github.com>"
       ],
       "repo_name": "robot-wheeltec-r550",
       "default_branch": "main",
