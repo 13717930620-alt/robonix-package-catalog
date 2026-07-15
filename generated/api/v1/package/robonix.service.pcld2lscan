@@ -1,0 +1,29 @@
+{
+  "name": "robonix.service.pcld2lscan",
+  "version": "0.1.0",
+  "description": "PointCloud2 to LaserScan conversion service.",
+  "license": "Apache-2.0",
+  "tags": [
+    "service",
+    "lidar",
+    "pointcloud",
+    "laserscan",
+    "ros2"
+  ],
+  "repo": "https://github.com/syswonder/service-pcld2lscan-rbnx",
+  "maintainers": [
+    "Bunnycxk <2501213313@stu.pku.edu.cn>"
+  ],
+  "repo_name": "service-pcld2lscan-rbnx",
+  "default_branch": "main",
+  "kind": "service",
+  "catalog_type": "package",
+  "manifest": "package_manifest.yaml",
+  "capabilities": [
+    "robonix/service/lidar/scan_converter/driver",
+    "robonix/service/lidar/scan_converter/scan"
+  ],
+  "deploy_dependencies": [],
+  "readme_url": "https://github.com/syswonder/service-pcld2lscan-rbnx/blob/main/README.md",
+  "preview_image_url": ""
+}

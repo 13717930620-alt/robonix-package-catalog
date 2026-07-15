@@ -1,0 +1,132 @@
+{
+  "name": "robonix.robot.deep_robotics.lite3",
+  "version": "0.2.0",
+  "description": "Minimal Robonix deployment for the Deep Robotics Lite3.",
+  "license": "Apache-2.0",
+  "tags": [
+    "robot",
+    "deploy",
+    "deep_robotics",
+    "lite3",
+    "quadruped",
+    "jetson",
+    "lidar",
+    "rgbd",
+    "mapping",
+    "navigation"
+  ],
+  "repo": "https://github.com/syswonder/robot-deep_robotics-lite3",
+  "maintainers": [
+    "Bunnycxk <2501213313@stu.pku.edu.cn>"
+  ],
+  "repo_name": "robot-deep_robotics-lite3",
+  "default_branch": "main",
+  "kind": "robot",
+  "catalog_type": "robot",
+  "manifest": "robonix_manifest.yaml",
+  "capabilities": [],
+  "deploy_dependencies": [
+    {
+      "section": "primitive",
+      "name": "lite3_quadruped",
+      "repo": "https://github.com/syswonder/primitive-deep_robotics-lite3_quadruped.git",
+      "path": "",
+      "branch": "main",
+      "manifest": "",
+      "package_name": "",
+      "package_url": ""
+    },
+    {
+      "section": "primitive",
+      "name": "mid360_lidar",
+      "repo": "https://github.com/syswonder/primitive-livox-mid360-lidar-rbnx",
+      "path": "",
+      "branch": "main",
+      "manifest": "",
+      "package_name": "robonix.primitive.livox.mid360.lidar",
+      "package_url": "../robonix.primitive.livox.mid360.lidar/"
+    },
+    {
+      "section": "primitive",
+      "name": "mid360_imu",
+      "repo": "https://github.com/syswonder/primitive-livox-mid360-imu-rbnx",
+      "path": "",
+      "branch": "main",
+      "manifest": "",
+      "package_name": "robonix.primitive.livox.mid360.imu",
+      "package_url": "../robonix.primitive.livox.mid360.imu/"
+    },
+    {
+      "section": "primitive",
+      "name": "lite3_description",
+      "repo": "https://github.com/syswonder/primitive-deep_robotics-lite3_description.git",
+      "path": "",
+      "branch": "main",
+      "manifest": "",
+      "package_name": "",
+      "package_url": ""
+    },
+    {
+      "section": "primitive",
+      "name": "orbbec_camera",
+      "repo": "https://github.com/syswonder/primitive-orbbec-camera.git",
+      "path": "",
+      "branch": "main",
+      "manifest": "",
+      "package_name": "",
+      "package_url": ""
+    },
+    {
+      "section": "primitive",
+      "name": "audio_client_bridge",
+      "repo": "",
+      "path": "${ROBONIX_SOURCE_PATH}/examples/webots/primitives/audio_client_bridge",
+      "branch": "",
+      "manifest": "",
+      "package_name": "",
+      "package_url": ""
+    },
+    {
+      "section": "service",
+      "name": "pcld2lscan",
+      "repo": "https://github.com/syswonder/service-pcld2lscan-rbnx.git",
+      "path": "",
+      "branch": "main",
+      "manifest": "",
+      "package_name": "",
+      "package_url": ""
+    },
+    {
+      "section": "service",
+      "name": "mapping",
+      "repo": "https://github.com/syswonder/service-map-rbnx",
+      "path": "",
+      "branch": "main",
+      "manifest": "package_manifest.jetson-native.yaml",
+      "package_name": "robonix.service.mapping",
+      "package_url": "../robonix.service.mapping/"
+    },
+    {
+      "section": "service",
+      "name": "speech",
+      "repo": "",
+      "path": "${ROBONIX_SOURCE_PATH}/services/speech",
+      "branch": "",
+      "manifest": "",
+      "package_name": "",
+      "package_url": ""
+    },
+    {
+      "section": "service",
+      "name": "nav2",
+      "repo": "https://github.com/syswonder/service-navigation-rbnx.git",
+      "path": "",
+      "branch": "main",
+      "manifest": "package_manifest.jetson-native.yaml",
+      "package_name": "",
+      "package_url": ""
+    }
+  ],
+  "readme_url": "https://github.com/syswonder/robot-deep_robotics-lite3/blob/main/README.md",
+  "preview_image_url": ""
+}

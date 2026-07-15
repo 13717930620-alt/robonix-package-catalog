@@ -1,0 +1,30 @@
+{
+  "name": "robonix.primitive.deep_robotics.lite3.description",
+  "version": "0.1.0",
+  "description": "Deep Robotics Lite3 URDF and fixed sensor transform publisher.",
+  "license": "Apache-2.0",
+  "tags": [
+    "primitive",
+    "description",
+    "urdf",
+    "tf",
+    "deep_robotics",
+    "lite3",
+    "ros2"
+  ],
+  "repo": "https://github.com/syswonder/primitive-deep_robotics-lite3_description",
+  "maintainers": [
+    "Bunnycxk <2501213313@stu.pku.edu.cn>"
+  ],
+  "repo_name": "primitive-deep_robotics-lite3_description",
+  "default_branch": "main",
+  "kind": "primitive",
+  "catalog_type": "package",
+  "manifest": "package_manifest.yaml",
+  "capabilities": [
+    "robonix/primitive/lite3/description"
+  ],
+  "deploy_dependencies": [],
+  "readme_url": "https://github.com/syswonder/primitive-deep_robotics-lite3_description/blob/main/README.md",
+  "preview_image_url": ""
+}
