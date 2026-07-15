@@ -27,11 +27,11 @@ entry to the correct section in `catalog.yaml`. Do not edit generated files by h
 - Homepage: https://syswonder.github.io/robonix-package-catalog/
 - Package page: https://syswonder.github.io/robonix-package-catalog/packages/
 - Robot deployment page: https://syswonder.github.io/robonix-package-catalog/robots/
-- Full catalog API: `GET https://syswonder.github.io/robonix-package-catalog/api/v1/catalog`
-- Package list API: `GET https://syswonder.github.io/robonix-package-catalog/api/v1/packages`
-- Robot deployment API: `GET https://syswonder.github.io/robonix-package-catalog/api/v1/robots`
-- Search index API: `GET https://syswonder.github.io/robonix-package-catalog/api/v1/search`
-- Package detail API: `GET https://syswonder.github.io/robonix-package-catalog/api/v1/package/<package-name>`
+- Full catalog API: `GET https://syswonder.github.io/robonix-package-catalog/api/v1/catalog.json`
+- Package list API: `GET https://syswonder.github.io/robonix-package-catalog/api/v1/packages.json`
+- Robot deployment API: `GET https://syswonder.github.io/robonix-package-catalog/api/v1/robots.json`
+- Search index API: `GET https://syswonder.github.io/robonix-package-catalog/api/v1/search.json`
+- Package detail API: `GET https://syswonder.github.io/robonix-package-catalog/api/v1/package/<package-name>.json`
 - Package detail page: `https://syswonder.github.io/robonix-package-catalog/packages/<package-name>/`
 - Robot detail page: `https://syswonder.github.io/robonix-package-catalog/robots/<robot-name>/`
 
@@ -48,11 +48,11 @@ capability on the client using the returned JSON.
 
 | Method | Path | Parameters | Response |
 | --- | --- | --- | --- |
-| `GET` | `/api/v1/catalog` | none | combined catalog object with both ordinary packages and robot deployments |
-| `GET` | `/api/v1/packages` | none | ordinary primitive/service/skill packages only |
-| `GET` | `/api/v1/robots` | none | robot deployment entries only |
-| `GET` | `/api/v1/search` | none | plain combined catalog array, intended for client-side search/filter indexes |
-| `GET` | `/api/v1/package/<package-name>` | `package-name`: exact catalog `name`, URL-encoded | one ordinary package or robot deployment object; missing entries return GitHub Pages `404` |
+| `GET` | `/api/v1/catalog.json` | none | combined catalog object with both ordinary packages and robot deployments |
+| `GET` | `/api/v1/packages.json` | none | ordinary primitive/service/skill packages only |
+| `GET` | `/api/v1/robots.json` | none | robot deployment entries only |
+| `GET` | `/api/v1/search.json` | none | plain combined catalog array, intended for client-side search/filter indexes |
+| `GET` | `/api/v1/package/<package-name>.json` | `package-name`: exact catalog `name`, URL-encoded | one ordinary package or robot deployment object; missing entries return GitHub Pages `404` |
 
 Package object fields:
 
@@ -79,19 +79,19 @@ Package object fields:
 
 ```js
 const base = 'https://syswonder.github.io/robonix-package-catalog/api/v1';
-const res = await fetch(`${base}/packages`);
+const res = await fetch(`${base}/packages.json`);
 const catalog = await res.json();
 const mapping = catalog.packages.find(p => p.name === 'robonix.service.mapping');
 
-const detail = await fetch(`${base}/package/${encodeURIComponent(mapping.name)}`)
+const detail = await fetch(`${base}/package/${encodeURIComponent(mapping.name)}.json`)
   .then(r => r.json());
 ```
 
 ### curl
 
 ```bash
-curl -s https://syswonder.github.io/robonix-package-catalog/api/v1/packages
-curl -s https://syswonder.github.io/robonix-package-catalog/api/v1/package/robonix.service.mapping
+curl -s https://syswonder.github.io/robonix-package-catalog/api/v1/packages.json
+curl -s https://syswonder.github.io/robonix-package-catalog/api/v1/package/robonix.service.mapping.json
 ```
 
 ### Python
@@ -100,14 +100,14 @@ curl -s https://syswonder.github.io/robonix-package-catalog/api/v1/package/robon
 import urllib.request, json
 
 base = 'https://syswonder.github.io/robonix-package-catalog/api/v1'
-catalog = json.load(urllib.request.urlopen(f'{base}/packages'))
+catalog = json.load(urllib.request.urlopen(f'{base}/packages.json'))
 mapping = next(p for p in catalog['packages'] if p['name'] == 'robonix.service.mapping')
-detail = json.load(urllib.request.urlopen(f"{base}/package/{mapping['name']}"))
+detail = json.load(urllib.request.urlopen(f"{base}/package/{mapping['name']}.json"))
 ```
 
 ### API schema
 
-`GET /api/v1/packages` returns:
+`GET /api/v1/packages.json` returns:
 
 ```json
 {
@@ -132,11 +132,11 @@ detail = json.load(urllib.request.urlopen(f"{base}/package/{mapping['name']}"))
 }
 ```
 
-`GET /api/v1/robots` returns robot deployments under a top-level `robots[]` field.
+`GET /api/v1/robots.json` returns robot deployments under a top-level `robots[]` field.
 
-`GET /api/v1/search` returns the combined catalog entries as a plain array.
+`GET /api/v1/search.json` returns the combined catalog entries as a plain array.
 
-`GET /api/v1/package/<package-name>` returns one package object.
+`GET /api/v1/package/<package-name>.json` returns one package object.
 
 ## Package Manifest
 
@@ -187,11 +187,11 @@ back to cataloged ordinary packages when their repository is known.
 CI validates `catalog.yaml`, fetches every package manifest through the GitHub
 API, and generates:
 
-- `generated/api/v1/packages`
-- `generated/api/v1/robots`
-- `generated/api/v1/catalog`
-- `generated/api/v1/search`
-- `generated/api/v1/package/<package-name>`
+- `generated/api/v1/packages.json`
+- `generated/api/v1/robots.json`
+- `generated/api/v1/catalog.json`
+- `generated/api/v1/search.json`
+- `generated/api/v1/package/<package-name>.json`
 - `public/index.html`
 - `public/packages/index.html`
 - `public/packages/<package-name>/index.html`
@@ -199,13 +199,13 @@ API, and generates:
 - `public/robots/<robot-name>/index.html`
 - `public/api/...`
 
-For compatibility, CI also writes `.json` aliases under `api/`, but new
-integrations should use the `/api/v1/...` paths above.
+For compatibility, CI also keeps extensionless `/api/v1/...` resources,
+but browser-facing links and new integrations should use the `.json` paths above.
 
 The generated commit uses `[skip ci]`; normal CI only triggers from
 `catalog.yaml`, the builder script, the workflow, or manual dispatch.
 
-Generated on `2026-07-15T12:53:12+00:00`.
+Generated on `2026-07-15T13:15:08+00:00`.
 
 ## Packages
 

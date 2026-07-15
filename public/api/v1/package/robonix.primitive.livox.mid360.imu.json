@@ -1,0 +1,28 @@
+{
+  "name": "robonix.primitive.livox.mid360.imu",
+  "version": "0.1.0",
+  "description": "Livox MID-360 IMU atlas wrapper — depends on mid360_lidar_rbnx.",
+  "license": "MulanPSL-2.0",
+  "tags": [
+    "primitive",
+    "imu",
+    "livox",
+    "mid360"
+  ],
+  "repo": "https://github.com/syswonder/primitive-livox-mid360-imu-rbnx",
+  "maintainers": [
+    "wheatfox <wheatfox17@icloud.com>"
+  ],
+  "repo_name": "primitive-livox-mid360-imu-rbnx",
+  "default_branch": "main",
+  "kind": "primitive",
+  "catalog_type": "package",
+  "manifest": "package_manifest.yaml",
+  "capabilities": [
+    "robonix/primitive/imu/driver",
+    "robonix/primitive/imu/imu"
+  ],
+  "deploy_dependencies": [],
+  "readme_url": "https://github.com/syswonder/primitive-livox-mid360-imu-rbnx/blob/main/README.md",
+  "preview_image_url": ""
+}

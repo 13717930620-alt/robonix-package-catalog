@@ -120,13 +120,15 @@ class RobotListingTests(unittest.TestCase):
         self.assertIn("@media (max-width: 520px)", rendered)
         self.assertIn(".topline { align-items: stretch; flex-direction: column; }", rendered)
         self.assertIn("@media (prefers-reduced-motion: reduce)", rendered)
-        self.assertIn('class="brand-bus"', rendered)
+        self.assertNotIn('class="brand-bus"', rendered)
         self.assertIn('class="clear-filters"', rendered)
         self.assertIn('family=Noto+Sans+SC', rendered)
         self.assertIn('--font-sans: "Noto Sans CJK SC", "Noto Sans SC"', rendered)
         self.assertIn('--font-mono: "JetBrains Mono", "Noto Sans CJK SC"', rendered)
         self.assertIn('data-label="Method"', rendered)
         self.assertIn('data-label="Response"', rendered)
+        self.assertIn('href="../api/view/?resource=packages"', rendered)
+        self.assertNotIn('<span><code>example-robot</code></span>', rendered)
 
     def test_homepage_is_search_first_and_links_package_layers(self):
         package = {
@@ -150,6 +152,7 @@ class RobotListingTests(unittest.TestCase):
             public = Path(tmp)
             BUILD_CATALOG.render_site(public, "2026-07-14T00:00:00+00:00", [package])
             rendered = (public / "index.html").read_text()
+            api_viewer = (public / "api" / "view" / "index.html").read_text()
 
         self.assertIn("Find what your robot can run.", rendered)
         self.assertIn('id="catalogSearch"', rendered)
@@ -157,6 +160,19 @@ class RobotListingTests(unittest.TestCase):
         self.assertIn('href="packages/?kind=primitive"', rendered)
         self.assertIn("searchCatalog()", rendered)
         self.assertIn("<summary>Catalog API</summary>", rendered)
+        self.assertIn('href="api/view/"', rendered)
+        self.assertIn('class="home-result-name"', rendered)
+        self.assertNotIn('class="brand-bus"', rendered)
+        self.assertIn("fetch(file)", api_viewer)
+        self.assertIn("../v1/${resource}.json", api_viewer)
+
+    def test_api_writer_keeps_extensionless_resource_and_json_preview(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            target = Path(tmp) / "api" / "v1" / "catalog"
+            BUILD_CATALOG.write_api(target, {"api_version": "1"})
+
+            self.assertTrue(target.is_file())
+            self.assertTrue(target.with_name("catalog.json").is_file())
 
 
 class CatalogMetadataTests(unittest.TestCase):

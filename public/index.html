@@ -42,6 +42,9 @@
       border: 0 !important;
     }
     body {
+      width: 100%;
+      max-width: none;
+      padding: 0;
       margin: 0;
       color: var(--ink);
       background:
@@ -63,6 +66,10 @@
       margin: 0 auto;
     }
     .site-header {
+      width: 100%;
+      max-width: none;
+      margin: 0;
+      padding: 0;
       position: sticky;
       top: 0;
       z-index: 20;
@@ -76,7 +83,6 @@
     .brand {
       display: inline-flex;
       align-items: center;
-      gap: 10px;
       color: var(--ink);
       font-weight: 700;
       font-size: 17px;
@@ -84,52 +90,6 @@
     }
     .brand:hover { color: var(--brand); text-decoration: none; }
     .brand small { color: var(--muted); font-size: 12px; font-weight: 500; }
-    .brand-bus {
-      position: relative;
-      display: grid;
-      grid-template-columns: repeat(4, 5px);
-      gap: 3px;
-      align-items: center;
-      width: 29px;
-      height: 16px;
-    }
-    .brand-bus::before {
-      content: "";
-      position: absolute;
-      left: 2px;
-      right: 2px;
-      top: 7px;
-      height: 2px;
-      border-radius: 99px;
-      background: var(--line-strong);
-    }
-    .brand-bus::after {
-      content: "";
-      position: absolute;
-      top: 5px;
-      left: 0;
-      width: 6px;
-      height: 6px;
-      border-radius: 50%;
-      background: var(--signal);
-      box-shadow: 0 0 0 4px rgba(54, 116, 255, 0.13);
-      animation: bus-pulse 3.2s cubic-bezier(.45, 0, .2, 1) infinite;
-    }
-    .brand-bus span {
-      position: relative;
-      z-index: 1;
-      width: 5px;
-      height: 5px;
-      border: 1px solid var(--brand);
-      border-radius: 50%;
-      background: #fff;
-    }
-    @keyframes bus-pulse {
-      0%, 14% { transform: translateX(0); opacity: 0; }
-      22% { opacity: 1; }
-      72% { transform: translateX(23px); opacity: 1; }
-      82%, 100% { transform: translateX(23px); opacity: 0; }
-    }
     .api-links { display: flex; gap: 8px; flex-wrap: wrap; justify-content: flex-end; }
     .api-links a {
       color: #344054;
@@ -158,7 +118,7 @@
     }
     .lede { color: var(--muted); max-width: 720px; margin: 8px 0 0; line-height: 1.55; font-size: 15px; }
     .page-intro { padding: 28px 0 16px; }
-    .page-intro .eyebrow, .catalog-hero .eyebrow {
+    .page-intro .eyebrow, .catalog-hero .eyebrow, .api-viewer .eyebrow {
       color: var(--brand);
       font-family: var(--font-mono);
       font-size: 11px;
@@ -244,6 +204,26 @@
       line-height: 1.45;
     }
     .api-reference code { font-size: 0.92em; }
+    .api-viewer { padding-block: 30px 40px; }
+    .api-viewer-head { margin-bottom: 16px; }
+    .api-viewer-head h1 { margin-top: 7px; }
+    .api-viewer-endpoint { margin: 10px 0 0; color: var(--muted); }
+    .api-json-panel { padding: 14px; }
+    .api-json {
+      width: 100%;
+      min-height: 420px;
+      max-height: calc(100vh - 260px);
+      margin: 0;
+      overflow: auto;
+      border: 0;
+      background: #f8fafc;
+      color: #1d2939;
+      font-family: var(--font-mono);
+      font-size: 12px;
+      line-height: 1.5;
+      white-space: pre;
+    }
+    .api-json code { padding: 0; background: transparent; }
     .muted { color: var(--muted); }
     .toolbar { display: flex; justify-content: space-between; gap: 12px; align-items: center; margin-bottom: 10px; }
     .search {
@@ -441,47 +421,22 @@
     .readme th, .readme td { border: 1px solid var(--line); padding: 6px 8px; }
     code { font-family: var(--font-mono); }
     .catalog-hero {
-      position: relative;
       padding: clamp(38px, 8vw, 82px) 0 24px;
-      overflow: hidden;
-    }
-    .catalog-hero::after {
-      content: "";
-      position: absolute;
-      z-index: -1;
-      width: 330px;
-      height: 330px;
-      right: -90px;
-      top: -105px;
-      border: 1px solid rgba(40, 54, 137, 0.14);
-      border-radius: 50%;
-      box-shadow: 0 0 0 38px rgba(40, 54, 137, 0.025), 0 0 0 78px rgba(40, 54, 137, 0.018);
     }
     .catalog-hero h1 {
-      max-width: 760px;
+      max-width: none;
       margin-top: 10px;
-      font-size: clamp(32px, 6vw, 58px);
+      font-size: clamp(32px, 4.2vw, 50px);
       line-height: 1.05;
       letter-spacing: -0.045em;
     }
     .catalog-hero .lede { max-width: 690px; font-size: 17px; }
-    .hero-search { position: relative; width: min(720px, 100%); margin-top: 24px; }
-    .hero-search::before {
-      content: ">";
-      position: absolute;
-      z-index: 1;
-      left: 17px;
-      top: 50%;
-      transform: translateY(-50%);
-      color: var(--signal);
-      font-family: var(--font-mono);
-      font-weight: 700;
-    }
+    .hero-search { width: min(720px, 100%); margin-top: 24px; }
     .hero-search input {
       width: 100%;
       height: 52px;
       margin: 0;
-      padding: 0 18px 0 38px;
+      padding: 0 18px;
       border: 1px solid #b9c3df;
       border-radius: 9px;
       background: rgba(255, 255, 255, 0.96);
@@ -517,7 +472,7 @@
       background: #fff;
     }
     .home-result:hover { border-color: #bcc6ec; background: #fbfcff; text-decoration: none; }
-    .home-result code { color: var(--brand-deep); font-weight: 700; overflow-wrap: anywhere; }
+    .home-result-name { color: var(--brand-deep); font-family: var(--font-mono); font-weight: 700; overflow-wrap: anywhere; }
     .home-result span { color: var(--muted); font-size: 13px; text-align: right; }
     .home-empty { margin: 10px 0 0; color: var(--muted); }
     @media (prefers-reduced-motion: reduce) {
@@ -558,6 +513,9 @@
       .card-actions { justify-content: flex-start; }
       .card-preview { width: min(100%, 360px); }
       .api-reference-body { padding: 14px; }
+    }
+    @media (min-width: 861px) {
+      .catalog-hero h1 { white-space: nowrap; }
     }
     @media (max-width: 520px) {
       body { font-size: 14px; }
@@ -692,13 +650,12 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
   <header class="site-header">
     <div class="shell topline">
       <a class="brand" href="">
-        <span class="brand-bus" aria-hidden="true"><span></span><span></span><span></span><span></span></span>
         <span>Robonix <small>Package Catalog</small></span>
       </a>
       <nav class="api-links" aria-label="Catalog navigation">
         <a href="packages/">Packages</a>
         <a href="robots/">Robots</a>
-        <a href="api/v1/catalog">API</a>
+        <a href="api/view/">API</a>
       </nav>
     </div>
   </header>
@@ -739,76 +696,76 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
         <span class="count" id="homeCount" aria-live="polite"></span>
       </div>
       <div class="home-result-list"><a class="home-result" href="packages/robonix.primitive.agilex.piper.arm/" data-search="robonix.primitive.agilex.piper.arm primitive agilex piper 6-dof arm primitive — declares joint_states / arm_status / end_pose / pos_cmd. lhw2002426 &lt;lhw2002426@users.noreply.github.com&gt; primitive arm agilex piper ros2 robonix/primitive/arm/driver robonix/primitive/arm/joint_states robonix/primitive/arm/arm_status robonix/primitive/arm/end_pose robonix/primitive/arm/pos_cmd" hidden>
-          <code>robonix.primitive.agilex.piper.arm</code>
+          <strong class="home-result-name">robonix.primitive.agilex.piper.arm</strong>
           <span>primitive · AgileX Piper 6-DoF arm primitive — declares joint_states / arm_status / end_pose / pos_cmd.</span>
         </a><a class="home-result" href="packages/robonix.primitive.agilex.piper.description/" data-search="robonix.primitive.agilex.piper.description primitive piper arm urdf + robot_state_publisher wrapper (tf stand-in until soma ships). lhw2002426 &lt;lhw2002426@users.noreply.github.com&gt; primitive description urdf agilex piper ros2 " hidden>
-          <code>robonix.primitive.agilex.piper.description</code>
+          <strong class="home-result-name">robonix.primitive.agilex.piper.description</strong>
           <span>primitive · Piper arm URDF + robot_state_publisher wrapper (TF stand-in until soma ships).</span>
         </a><a class="home-result" href="packages/robonix.primitive.agilex.piper.handeye/" data-search="robonix.primitive.agilex.piper.handeye primitive hand-eye calibration tf publisher (vendored easy_handeye2 0.5.0). lhw2002426 &lt;lhw2002426@users.noreply.github.com&gt; primitive calibration handeye easy_handeye2 agilex piper ros2 " hidden>
-          <code>robonix.primitive.agilex.piper.handeye</code>
+          <strong class="home-result-name">robonix.primitive.agilex.piper.handeye</strong>
           <span>primitive · Hand-eye calibration TF publisher (vendored easy_handeye2 0.5.0).</span>
         </a><a class="home-result" href="packages/robonix.primitive.agilex.ranger_mini_v3.chassis/" data-search="robonix.primitive.agilex.ranger_mini_v3.chassis primitive agilex ranger mini chassis driver wrapper. wheatfox &lt;wheatfox17@icloud.com&gt; primitive chassis agilex ranger_mini_v3 ros2 robonix/primitive/chassis/driver robonix/primitive/chassis/odom robonix/primitive/chassis/twist_in" hidden>
-          <code>robonix.primitive.agilex.ranger_mini_v3.chassis</code>
+          <strong class="home-result-name">robonix.primitive.agilex.ranger_mini_v3.chassis</strong>
           <span>primitive · AgileX Ranger Mini chassis driver wrapper.</span>
         </a><a class="home-result" href="packages/robonix.primitive.deep_robotics.lite3.description/" data-search="robonix.primitive.deep_robotics.lite3.description primitive deep robotics lite3 urdf and fixed sensor transform publisher. bunnycxk &lt;2501213313@stu.pku.edu.cn&gt; primitive description urdf tf deep_robotics lite3 ros2 robonix/primitive/lite3/description" hidden>
-          <code>robonix.primitive.deep_robotics.lite3.description</code>
+          <strong class="home-result-name">robonix.primitive.deep_robotics.lite3.description</strong>
           <span>primitive · Deep Robotics Lite3 URDF and fixed sensor transform publisher.</span>
         </a><a class="home-result" href="packages/robonix.primitive.deep_robotics.lite3.quadruped/" data-search="robonix.primitive.deep_robotics.lite3.quadruped primitive lite3 quadruped ros primitive driver wrapper bunnycxk &lt;2501213313@stu.pku.edu.cn&gt; primitive chassis deep_robotics lite3 quadruped ros2 robonix/primitive/chassis/driver robonix/primitive/chassis/move robonix/primitive/chassis/twist_in robonix/primitive/chassis/odom robonix/primitive/chassis/posture" hidden>
-          <code>robonix.primitive.deep_robotics.lite3.quadruped</code>
+          <strong class="home-result-name">robonix.primitive.deep_robotics.lite3.quadruped</strong>
           <span>primitive · Lite3 quadruped ROS primitive driver wrapper</span>
         </a><a class="home-result" href="packages/robonix.primitive.intel.realsense_d435i.camera/" data-search="robonix.primitive.intel.realsense_d435i.camera primitive intel realsense d435i driver wrapper — declares rgb + depth + extrinsics contracts. wheatfox &lt;wheatfox17@icloud.com&gt; primitive camera intel realsense_d435i rgbd robonix/primitive/camera/driver robonix/primitive/camera/rgb robonix/primitive/camera/depth robonix/primitive/camera/extrinsics robonix/primitive/camera/snapshot robonix/primitive/camera/depth_snapshot" hidden>
-          <code>robonix.primitive.intel.realsense_d435i.camera</code>
+          <strong class="home-result-name">robonix.primitive.intel.realsense_d435i.camera</strong>
           <span>primitive · Intel RealSense D435i driver wrapper — declares RGB + depth + extrinsics contracts.</span>
         </a><a class="home-result" href="packages/robonix.primitive.livox.mid360.imu/" data-search="robonix.primitive.livox.mid360.imu primitive livox mid-360 imu atlas wrapper — depends on mid360_lidar_rbnx. wheatfox &lt;wheatfox17@icloud.com&gt; primitive imu livox mid360 robonix/primitive/imu/driver robonix/primitive/imu/imu" hidden>
-          <code>robonix.primitive.livox.mid360.imu</code>
+          <strong class="home-result-name">robonix.primitive.livox.mid360.imu</strong>
           <span>primitive · Livox MID-360 IMU atlas wrapper — depends on mid360_lidar_rbnx.</span>
         </a><a class="home-result" href="packages/robonix.primitive.livox.mid360.lidar/" data-search="robonix.primitive.livox.mid360.lidar primitive livox mid-360 lidar driver wrapper. wheatfox &lt;wheatfox17@icloud.com&gt; primitive lidar livox mid360 pointcloud robonix/primitive/lidar/driver robonix/primitive/lidar/lidar3d robonix/primitive/lidar/lidar_snapshot" hidden>
-          <code>robonix.primitive.livox.mid360.lidar</code>
+          <strong class="home-result-name">robonix.primitive.livox.mid360.lidar</strong>
           <span>primitive · Livox MID-360 lidar driver wrapper.</span>
         </a><a class="home-result" href="packages/robonix.primitive.orbbec.dabai_dcw.camera/" data-search="robonix.primitive.orbbec.dabai_dcw.camera primitive orbbec dabai dcw rgbd primitive — declares rgb + depth + camera_info. lhw2002426 &lt;lhw2002426@users.noreply.github.com&gt; primitive camera orbbec dabai_dcw rgbd ros2 robonix/primitive/camera/driver robonix/primitive/camera/rgb robonix/primitive/camera/depth robonix/primitive/camera/camera_info" hidden>
-          <code>robonix.primitive.orbbec.dabai_dcw.camera</code>
+          <strong class="home-result-name">robonix.primitive.orbbec.dabai_dcw.camera</strong>
           <span>primitive · Orbbec Dabai DCW RGBD primitive — declares rgb + depth + camera_info.</span>
         </a><a class="home-result" href="packages/robonix.primitive.orbbec.gemini330.camera/" data-search="robonix.primitive.orbbec.gemini330.camera primitive orbbec gemini 330-series rgbd camera driver wrapper — declares rgb + depth + extrinsics contracts. bunnycxk &lt;2501213313@stu.pku.edu.cn&gt; primitive camera orbbec gemini330 rgbd ros2 robonix/primitive/camera/driver robonix/primitive/camera/rgb robonix/primitive/camera/depth robonix/primitive/camera/extrinsics robonix/primitive/camera/snapshot robonix/primitive/camera/depth_snapshot" hidden>
-          <code>robonix.primitive.orbbec.gemini330.camera</code>
+          <strong class="home-result-name">robonix.primitive.orbbec.gemini330.camera</strong>
           <span>primitive · Orbbec Gemini 330-series RGBD camera driver wrapper — declares RGB + depth + extrinsics contracts.</span>
         </a><a class="home-result" href="robots/robonix.robot.agilex.ranger_mini_v3/" data-search="robonix.robot.agilex.ranger_mini_v3 robot robonix deployment for the agilex ranger mini v3 robot. wheatfox &lt;wheatfox17@icloud.com&gt; robot deploy agilex ranger_mini_v3 jetson lidar rgbd scene mapping navigation " hidden>
-          <code>robonix.robot.agilex.ranger_mini_v3</code>
+          <strong class="home-result-name">robonix.robot.agilex.ranger_mini_v3</strong>
           <span>robot · Robonix deployment for the AgileX Ranger Mini v3 robot.</span>
         </a><a class="home-result" href="robots/robonix.robot.deep_robotics.lite3/" data-search="robonix.robot.deep_robotics.lite3 robot minimal robonix deployment for the deep robotics lite3. bunnycxk &lt;2501213313@stu.pku.edu.cn&gt; robot deploy deep_robotics lite3 quadruped jetson lidar rgbd mapping navigation " hidden>
-          <code>robonix.robot.deep_robotics.lite3</code>
+          <strong class="home-result-name">robonix.robot.deep_robotics.lite3</strong>
           <span>robot · Minimal Robonix deployment for the Deep Robotics Lite3.</span>
         </a><a class="home-result" href="robots/robonix.robot.wheeltec.r550/" data-search="robonix.robot.wheeltec.r550 robot robonix deploy manifest for the wheeltec r550 robot. xiangrui cheng &lt;sherry-part@users.noreply.github.com&gt; robot deploy wheeltec r550 lidar camera navigation mapping " hidden>
-          <code>robonix.robot.wheeltec.r550</code>
+          <strong class="home-result-name">robonix.robot.wheeltec.r550</strong>
           <span>robot · Robonix deploy manifest for the WHEELTEC R550 robot.</span>
         </a><a class="home-result" href="packages/robonix.service.grasp_pose/" data-search="robonix.service.grasp_pose service geometric grasp-pose estimator (grpc). lhw2002426 &lt;lhw2002426@users.noreply.github.com&gt; service perception grasp_pose grasp ros2 robonix/service/perception/grasp_pose/driver robonix/service/perception/grasp_pose/grasp_request" hidden>
-          <code>robonix.service.grasp_pose</code>
+          <strong class="home-result-name">robonix.service.grasp_pose</strong>
           <span>service · Geometric grasp-pose estimator (gRPC).</span>
         </a><a class="home-result" href="packages/robonix.service.mapping/" data-search="robonix.service.mapping service slam mapping service. algo + sensor inputs config-driven. wheatfox &lt;wheatfox17@icloud.com&gt; service mapping slam rtabmap ros2 robonix/service/map/driver robonix/service/map/occupancy_grid robonix/service/map/pointcloud robonix/service/map/pose robonix/service/map/odom robonix/service/map/lifecycle robonix/service/map/save_map robonix/service/map/list_maps robonix/service/map/load_map robonix/service/map/pose_estimate robonix/service/map/switch_mode" hidden>
-          <code>robonix.service.mapping</code>
+          <strong class="home-result-name">robonix.service.mapping</strong>
           <span>service · SLAM mapping service. Algo + sensor inputs config-driven.</span>
         </a><a class="home-result" href="packages/robonix.service.navigation/" data-search="robonix.service.navigation service nav2 service wrapper exposing service/navigation/* over grpc. wheatfox &lt;wheatfox17@icloud.com&gt; service navigation nav2 ros2 robonix/service/navigation/driver robonix/service/navigation/navigate robonix/service/navigation/navigate/status robonix/service/navigation/navigate/cancel" hidden>
-          <code>robonix.service.navigation</code>
+          <strong class="home-result-name">robonix.service.navigation</strong>
           <span>service · Nav2 service wrapper exposing service/navigation/* over gRPC.</span>
         </a><a class="home-result" href="packages/robonix.service.object_detect/" data-search="robonix.service.object_detect service llm-based object detection — atlas mcp service, drop-in replacement for yolo_world_rbnx. lhw2002426 &lt;lhw2002426@users.noreply.github.com&gt; service perception object_detect llm vlm ros2 robonix/service/perception/object_detect/driver robonix/service/perception/object_detect/detect_object" hidden>
-          <code>robonix.service.object_detect</code>
+          <strong class="home-result-name">robonix.service.object_detect</strong>
           <span>service · LLM-based object detection — atlas MCP service, drop-in replacement for yolo_world_rbnx.</span>
         </a><a class="home-result" href="packages/robonix.service.pcld2lscan/" data-search="robonix.service.pcld2lscan service pointcloud2 to laserscan conversion service. bunnycxk &lt;2501213313@stu.pku.edu.cn&gt; service lidar pointcloud laserscan ros2 robonix/service/lidar/scan_converter/driver robonix/service/lidar/scan_converter/scan" hidden>
-          <code>robonix.service.pcld2lscan</code>
+          <strong class="home-result-name">robonix.service.pcld2lscan</strong>
           <span>service · PointCloud2 to LaserScan conversion service.</span>
         </a><a class="home-result" href="packages/robonix.service.piper_moveit/" data-search="robonix.service.piper_moveit service moveit + grasp executor (atlas-routed manipulation service). lhw2002426 &lt;lhw2002426@users.noreply.github.com&gt; service manipulation moveit agilex piper ros2 robonix/service/manipulation/driver robonix/service/manipulation/execute_grasp robonix/service/manipulation/reset" hidden>
-          <code>robonix.service.piper_moveit</code>
+          <strong class="home-result-name">robonix.service.piper_moveit</strong>
           <span>service · MoveIt + grasp executor (atlas-routed manipulation service).</span>
         </a><a class="home-result" href="packages/robonix.service.roboarm.ik/" data-search="robonix.service.roboarm.ik service roboarm-style python ik executor service for piper manipulation. lhw2002426 &lt;lhw2002426@users.noreply.github.com&gt; service manipulation ik agilex piper ros2 robonix/service/manipulation/driver robonix/service/manipulation/execute_grasp robonix/service/manipulation/reset robonix/service/manipulation/teach_safe robonix/service/manipulation/put_down" hidden>
-          <code>robonix.service.roboarm.ik</code>
+          <strong class="home-result-name">robonix.service.roboarm.ik</strong>
           <span>service · Roboarm-style Python IK executor service for Piper manipulation.</span>
         </a><a class="home-result" href="packages/robonix.skill.explore/" data-search="robonix.skill.explore skill frontier-based autonomous exploration skill. wheatfox &lt;wheatfox17@icloud.com&gt; skill explore frontier navigation mapping robonix/skill/explore/driver robonix/skill/explore/explore robonix/skill/explore/explore/status robonix/skill/explore/explore/cancel" hidden>
-          <code>robonix.skill.explore</code>
+          <strong class="home-result-name">robonix.skill.explore</strong>
           <span>skill · Frontier-based autonomous exploration skill.</span>
         </a><a class="home-result" href="packages/robonix.skill.pick.vertical_grasp/" data-search="robonix.skill.pick.vertical_grasp skill pick-up-a-named-object skill — orchestrates perception + manipulation services. lhw2002426 &lt;lhw2002426@users.noreply.github.com&gt; skill pick manipulation grasp robonix/skill/pick/driver robonix/skill/pick/pick robonix/skill/pick/put_down" hidden>
-          <code>robonix.skill.pick.vertical_grasp</code>
+          <strong class="home-result-name">robonix.skill.pick.vertical_grasp</strong>
           <span>skill · Pick-up-a-named-object skill — orchestrates perception + manipulation services.</span>
         </a><a class="home-result" href="packages/robonix.skill.vla.openvla/" data-search="robonix.skill.vla.openvla skill vla client skill — llm-callable entry point for vision-language-action inference and joint-space execution. lhw2002426 &lt;lhw2002426@users.noreply.github.com&gt; skill vla manipulation llm robonix/skill/vla/driver robonix/skill/vla/execute" hidden>
-          <code>robonix.skill.vla.openvla</code>
+          <strong class="home-result-name">robonix.skill.vla.openvla</strong>
           <span>skill · VLA client skill — LLM-callable entry point for vision-language-action inference and JOINT-SPACE execution.</span>
         </a></div>
       <p class="home-empty" id="homeEmpty" hidden>No catalog entries match that search.</p>
@@ -821,17 +778,17 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
       <table>
         <thead><tr><th>Method</th><th>Path</th><th>Response</th></tr></thead>
         <tbody>
-          <tr><td data-label="Method"><code>GET</code></td><td data-label="Path"><code>/api/v1/packages</code></td><td data-label="Response">ordinary primitive/service/skill package entries</td></tr>
-          <tr><td data-label="Method"><code>GET</code></td><td data-label="Path"><code>/api/v1/robots</code></td><td data-label="Response">robot deployment entries parsed from robonix_manifest.yaml</td></tr>
-          <tr><td data-label="Method"><code>GET</code></td><td data-label="Path"><code>/api/v1/catalog</code></td><td data-label="Response">combined catalog object</td></tr>
-          <tr><td data-label="Method"><code>GET</code></td><td data-label="Path"><code>/api/v1/search</code></td><td data-label="Response">plain combined catalog array for client-side filtering</td></tr>
-          <tr><td data-label="Method"><code>GET</code></td><td data-label="Path"><code>/api/v1/package/&lt;name&gt;</code></td><td data-label="Response">one package or robot deployment object</td></tr>
+          <tr><td data-label="Method"><code>GET</code></td><td data-label="Path"><a href="api/view/?resource=packages"><code>/api/v1/packages.json</code></a></td><td data-label="Response">ordinary primitive/service/skill package entries</td></tr>
+          <tr><td data-label="Method"><code>GET</code></td><td data-label="Path"><a href="api/view/?resource=robots"><code>/api/v1/robots.json</code></a></td><td data-label="Response">robot deployment entries parsed from robonix_manifest.yaml</td></tr>
+          <tr><td data-label="Method"><code>GET</code></td><td data-label="Path"><a href="api/view/?resource=catalog"><code>/api/v1/catalog.json</code></a></td><td data-label="Response">combined catalog object</td></tr>
+          <tr><td data-label="Method"><code>GET</code></td><td data-label="Path"><a href="api/view/?resource=search"><code>/api/v1/search.json</code></a></td><td data-label="Response">plain combined catalog array for client-side filtering</td></tr>
+          <tr><td data-label="Method"><code>GET</code></td><td data-label="Path"><code>/api/v1/package/&lt;name&gt;.json</code></td><td data-label="Response">one package or robot deployment object</td></tr>
         </tbody>
       </table>
       </div>
     </details>
   </main>
-  <footer class="shell">Generated on 2026-07-15T12:53:12+00:00.</footer>
+  <footer class="shell">Generated on 2026-07-15T13:15:08+00:00.</footer>
   <script>
     const catalogSearch = document.getElementById('catalogSearch');
     const entryGrid = document.getElementById('entryGrid');

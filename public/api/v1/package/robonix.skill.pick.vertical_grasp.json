@@ -1,0 +1,29 @@
+{
+  "name": "robonix.skill.pick.vertical_grasp",
+  "version": "0.1.0",
+  "description": "Pick-up-a-named-object skill — orchestrates perception + manipulation services.",
+  "license": "MulanPSL-2.0",
+  "tags": [
+    "skill",
+    "pick",
+    "manipulation",
+    "grasp"
+  ],
+  "repo": "https://github.com/syswonder/skill-pick-vertical-grasp-rbnx",
+  "maintainers": [
+    "lhw2002426 <lhw2002426@users.noreply.github.com>"
+  ],
+  "repo_name": "skill-pick-vertical-grasp-rbnx",
+  "default_branch": "main",
+  "kind": "skill",
+  "catalog_type": "package",
+  "manifest": "package_manifest.yaml",
+  "capabilities": [
+    "robonix/skill/pick/driver",
+    "robonix/skill/pick/pick",
+    "robonix/skill/pick/put_down"
+  ],
+  "deploy_dependencies": [],
+  "readme_url": "https://github.com/syswonder/skill-pick-vertical-grasp-rbnx/blob/main/README.md",
+  "preview_image_url": ""
+}

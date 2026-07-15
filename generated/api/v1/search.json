@@ -1,0 +1,1111 @@
+[
+  {
+    "name": "robonix.primitive.agilex.piper.arm",
+    "version": "0.1.0",
+    "description": "AgileX Piper 6-DoF arm primitive — declares joint_states / arm_status / end_pose / pos_cmd.",
+    "license": "Apache-2.0",
+    "tags": [
+      "primitive",
+      "arm",
+      "agilex",
+      "piper",
+      "ros2"
+    ],
+    "repo": "https://github.com/syswonder/primitive-agilex-piper-arm-rbnx",
+    "maintainers": [
+      "lhw2002426 <lhw2002426@users.noreply.github.com>"
+    ],
+    "repo_name": "primitive-agilex-piper-arm-rbnx",
+    "default_branch": "main",
+    "kind": "primitive",
+    "catalog_type": "package",
+    "manifest": "package_manifest.yaml",
+    "capabilities": [
+      "robonix/primitive/arm/driver",
+      "robonix/primitive/arm/joint_states",
+      "robonix/primitive/arm/arm_status",
+      "robonix/primitive/arm/end_pose",
+      "robonix/primitive/arm/pos_cmd"
+    ],
+    "deploy_dependencies": [],
+    "readme_url": "https://github.com/syswonder/primitive-agilex-piper-arm-rbnx/blob/main/README.md",
+    "preview_image_url": ""
+  },
+  {
+    "name": "robonix.primitive.agilex.piper.description",
+    "version": "0.1.0",
+    "description": "Piper arm URDF + robot_state_publisher wrapper (TF stand-in until soma ships).",
+    "license": "MulanPSL-2.0",
+    "tags": [
+      "primitive",
+      "description",
+      "urdf",
+      "agilex",
+      "piper",
+      "ros2"
+    ],
+    "repo": "https://github.com/syswonder/primitive-agilex-piper-description-rbnx",
+    "maintainers": [
+      "lhw2002426 <lhw2002426@users.noreply.github.com>"
+    ],
+    "repo_name": "primitive-agilex-piper-description-rbnx",
+    "default_branch": "main",
+    "kind": "primitive",
+    "catalog_type": "package",
+    "manifest": "package_manifest.yaml",
+    "capabilities": [],
+    "deploy_dependencies": [],
+    "readme_url": "https://github.com/syswonder/primitive-agilex-piper-description-rbnx/blob/main/README.md",
+    "preview_image_url": ""
+  },
+  {
+    "name": "robonix.primitive.agilex.piper.handeye",
+    "version": "0.1.0",
+    "description": "Hand-eye calibration TF publisher (vendored easy_handeye2 0.5.0).",
+    "license": "MulanPSL-2.0",
+    "tags": [
+      "primitive",
+      "calibration",
+      "handeye",
+      "easy_handeye2",
+      "agilex",
+      "piper",
+      "ros2"
+    ],
+    "repo": "https://github.com/syswonder/primitive-agilex-piper-handeye-rbnx",
+    "maintainers": [
+      "lhw2002426 <lhw2002426@users.noreply.github.com>"
+    ],
+    "repo_name": "primitive-agilex-piper-handeye-rbnx",
+    "default_branch": "main",
+    "kind": "primitive",
+    "catalog_type": "package",
+    "manifest": "package_manifest.yaml",
+    "capabilities": [],
+    "deploy_dependencies": [],
+    "readme_url": "https://github.com/syswonder/primitive-agilex-piper-handeye-rbnx/blob/main/README.md",
+    "preview_image_url": ""
+  },
+  {
+    "name": "robonix.primitive.agilex.ranger_mini_v3.chassis",
+    "version": "0.1.0",
+    "description": "AgileX Ranger Mini chassis driver wrapper.",
+    "license": "Apache-2.0",
+    "tags": [
+      "primitive",
+      "chassis",
+      "agilex",
+      "ranger_mini_v3",
+      "ros2"
+    ],
+    "repo": "https://github.com/syswonder/primitive-agilex-ranger_mini_v3-chassis-rbnx",
+    "maintainers": [
+      "wheatfox <wheatfox17@icloud.com>"
+    ],
+    "repo_name": "primitive-agilex-ranger_mini_v3-chassis-rbnx",
+    "default_branch": "main",
+    "kind": "primitive",
+    "catalog_type": "package",
+    "manifest": "package_manifest.yaml",
+    "capabilities": [
+      "robonix/primitive/chassis/driver",
+      "robonix/primitive/chassis/odom",
+      "robonix/primitive/chassis/twist_in"
+    ],
+    "deploy_dependencies": [],
+    "readme_url": "https://github.com/syswonder/primitive-agilex-ranger_mini_v3-chassis-rbnx/blob/main/README.md",
+    "preview_image_url": ""
+  },
+  {
+    "name": "robonix.primitive.deep_robotics.lite3.description",
+    "version": "0.1.0",
+    "description": "Deep Robotics Lite3 URDF and fixed sensor transform publisher.",
+    "license": "Apache-2.0",
+    "tags": [
+      "primitive",
+      "description",
+      "urdf",
+      "tf",
+      "deep_robotics",
+      "lite3",
+      "ros2"
+    ],
+    "repo": "https://github.com/syswonder/primitive-deep_robotics-lite3_description",
+    "maintainers": [
+      "Bunnycxk <2501213313@stu.pku.edu.cn>"
+    ],
+    "repo_name": "primitive-deep_robotics-lite3_description",
+    "default_branch": "main",
+    "kind": "primitive",
+    "catalog_type": "package",
+    "manifest": "package_manifest.yaml",
+    "capabilities": [
+      "robonix/primitive/lite3/description"
+    ],
+    "deploy_dependencies": [],
+    "readme_url": "https://github.com/syswonder/primitive-deep_robotics-lite3_description/blob/main/README.md",
+    "preview_image_url": ""
+  },
+  {
+    "name": "robonix.primitive.deep_robotics.lite3.quadruped",
+    "version": "0.1.0",
+    "description": "Lite3 quadruped ROS primitive driver wrapper",
+    "license": "Apache-2.0",
+    "tags": [
+      "primitive",
+      "chassis",
+      "deep_robotics",
+      "lite3",
+      "quadruped",
+      "ros2"
+    ],
+    "repo": "https://github.com/syswonder/primitive-deep_robotics-lite3_quadruped",
+    "maintainers": [
+      "Bunnycxk <2501213313@stu.pku.edu.cn>"
+    ],
+    "repo_name": "primitive-deep_robotics-lite3_quadruped",
+    "default_branch": "main",
+    "kind": "primitive",
+    "catalog_type": "package",
+    "manifest": "package_manifest.yaml",
+    "capabilities": [
+      "robonix/primitive/chassis/driver",
+      "robonix/primitive/chassis/move",
+      "robonix/primitive/chassis/twist_in",
+      "robonix/primitive/chassis/odom",
+      "robonix/primitive/chassis/posture"
+    ],
+    "deploy_dependencies": [],
+    "readme_url": "https://github.com/syswonder/primitive-deep_robotics-lite3_quadruped/blob/main/README.md",
+    "preview_image_url": ""
+  },
+  {
+    "name": "robonix.primitive.intel.realsense_d435i.camera",
+    "version": "0.1.0",
+    "description": "Intel RealSense D435i driver wrapper — declares RGB + depth + extrinsics contracts.",
+    "license": "Apache-2.0",
+    "tags": [
+      "primitive",
+      "camera",
+      "intel",
+      "realsense_d435i",
+      "rgbd"
+    ],
+    "repo": "https://github.com/syswonder/primitive-intel-realsense_d435i-camera-rbnx",
+    "maintainers": [
+      "wheatfox <wheatfox17@icloud.com>"
+    ],
+    "repo_name": "primitive-intel-realsense_d435i-camera-rbnx",
+    "default_branch": "main",
+    "kind": "primitive",
+    "catalog_type": "package",
+    "manifest": "package_manifest.yaml",
+    "capabilities": [
+      "robonix/primitive/camera/driver",
+      "robonix/primitive/camera/rgb",
+      "robonix/primitive/camera/depth",
+      "robonix/primitive/camera/extrinsics",
+      "robonix/primitive/camera/snapshot",
+      "robonix/primitive/camera/depth_snapshot"
+    ],
+    "deploy_dependencies": [],
+    "readme_url": "https://github.com/syswonder/primitive-intel-realsense_d435i-camera-rbnx/blob/main/README.md",
+    "preview_image_url": ""
+  },
+  {
+    "name": "robonix.primitive.livox.mid360.imu",
+    "version": "0.1.0",
+    "description": "Livox MID-360 IMU atlas wrapper — depends on mid360_lidar_rbnx.",
+    "license": "MulanPSL-2.0",
+    "tags": [
+      "primitive",
+      "imu",
+      "livox",
+      "mid360"
+    ],
+    "repo": "https://github.com/syswonder/primitive-livox-mid360-imu-rbnx",
+    "maintainers": [
+      "wheatfox <wheatfox17@icloud.com>"
+    ],
+    "repo_name": "primitive-livox-mid360-imu-rbnx",
+    "default_branch": "main",
+    "kind": "primitive",
+    "catalog_type": "package",
+    "manifest": "package_manifest.yaml",
+    "capabilities": [
+      "robonix/primitive/imu/driver",
+      "robonix/primitive/imu/imu"
+    ],
+    "deploy_dependencies": [],
+    "readme_url": "https://github.com/syswonder/primitive-livox-mid360-imu-rbnx/blob/main/README.md",
+    "preview_image_url": ""
+  },
+  {
+    "name": "robonix.primitive.livox.mid360.lidar",
+    "version": "0.1.0",
+    "description": "Livox MID-360 lidar driver wrapper.",
+    "license": "MulanPSL-2.0",
+    "tags": [
+      "primitive",
+      "lidar",
+      "livox",
+      "mid360",
+      "pointcloud"
+    ],
+    "repo": "https://github.com/syswonder/primitive-livox-mid360-lidar-rbnx",
+    "maintainers": [
+      "wheatfox <wheatfox17@icloud.com>"
+    ],
+    "repo_name": "primitive-livox-mid360-lidar-rbnx",
+    "default_branch": "main",
+    "kind": "primitive",
+    "catalog_type": "package",
+    "manifest": "package_manifest.yaml",
+    "capabilities": [
+      "robonix/primitive/lidar/driver",
+      "robonix/primitive/lidar/lidar3d",
+      "robonix/primitive/lidar/lidar_snapshot"
+    ],
+    "deploy_dependencies": [],
+    "readme_url": "https://github.com/syswonder/primitive-livox-mid360-lidar-rbnx/blob/main/README.md",
+    "preview_image_url": ""
+  },
+  {
+    "name": "robonix.primitive.orbbec.dabai_dcw.camera",
+    "version": "0.1.0",
+    "description": "Orbbec Dabai DCW RGBD primitive — declares rgb + depth + camera_info.",
+    "license": "Apache-2.0",
+    "tags": [
+      "primitive",
+      "camera",
+      "orbbec",
+      "dabai_dcw",
+      "rgbd",
+      "ros2"
+    ],
+    "repo": "https://github.com/syswonder/primitive-orbbec-dabai_dcw-camera-rbnx",
+    "maintainers": [
+      "lhw2002426 <lhw2002426@users.noreply.github.com>"
+    ],
+    "repo_name": "primitive-orbbec-dabai_dcw-camera-rbnx",
+    "default_branch": "main",
+    "kind": "primitive",
+    "catalog_type": "package",
+    "manifest": "package_manifest.yaml",
+    "capabilities": [
+      "robonix/primitive/camera/driver",
+      "robonix/primitive/camera/rgb",
+      "robonix/primitive/camera/depth",
+      "robonix/primitive/camera/camera_info"
+    ],
+    "deploy_dependencies": [],
+    "readme_url": "https://github.com/syswonder/primitive-orbbec-dabai_dcw-camera-rbnx/blob/main/README.md",
+    "preview_image_url": ""
+  },
+  {
+    "name": "robonix.primitive.orbbec.gemini330.camera",
+    "version": "0.1.0",
+    "description": "Orbbec Gemini 330-series RGBD camera driver wrapper — declares RGB + depth + extrinsics contracts.",
+    "license": "Apache-2.0",
+    "tags": [
+      "primitive",
+      "camera",
+      "orbbec",
+      "gemini330",
+      "rgbd",
+      "ros2"
+    ],
+    "repo": "https://github.com/syswonder/primitive-orbbec-camera",
+    "maintainers": [
+      "Bunnycxk <2501213313@stu.pku.edu.cn>"
+    ],
+    "repo_name": "primitive-orbbec-camera",
+    "default_branch": "main",
+    "kind": "primitive",
+    "catalog_type": "package",
+    "manifest": "package_manifest.yaml",
+    "capabilities": [
+      "robonix/primitive/camera/driver",
+      "robonix/primitive/camera/rgb",
+      "robonix/primitive/camera/depth",
+      "robonix/primitive/camera/extrinsics",
+      "robonix/primitive/camera/snapshot",
+      "robonix/primitive/camera/depth_snapshot"
+    ],
+    "deploy_dependencies": [],
+    "readme_url": "https://github.com/syswonder/primitive-orbbec-camera/blob/main/README.md",
+    "preview_image_url": ""
+  },
+  {
+    "name": "robonix.robot.agilex.ranger_mini_v3",
+    "version": "0.2.0",
+    "description": "Robonix deployment for the AgileX Ranger Mini v3 robot.",
+    "license": "Apache-2.0",
+    "tags": [
+      "robot",
+      "deploy",
+      "agilex",
+      "ranger_mini_v3",
+      "jetson",
+      "lidar",
+      "rgbd",
+      "scene",
+      "mapping",
+      "navigation"
+    ],
+    "repo": "https://github.com/syswonder/robot-agilex-ranger_mini_v3",
+    "maintainers": [
+      "wheatfox <wheatfox17@icloud.com>"
+    ],
+    "repo_name": "robot-agilex-ranger_mini_v3",
+    "default_branch": "main",
+    "kind": "robot",
+    "catalog_type": "robot",
+    "manifest": "robonix_manifest.yaml",
+    "capabilities": [],
+    "deploy_dependencies": [
+      {
+        "section": "primitive",
+        "name": "robot_description",
+        "repo": "https://github.com/syswonder/primitive-robot-description-rbnx",
+        "path": "",
+        "branch": "main",
+        "manifest": "package_manifest.native.yaml",
+        "package_name": "",
+        "package_url": ""
+      },
+      {
+        "section": "primitive",
+        "name": "mid360_lidar",
+        "repo": "https://github.com/syswonder/primitive-livox-mid360-lidar-rbnx",
+        "path": "",
+        "branch": "main",
+        "manifest": "",
+        "package_name": "robonix.primitive.livox.mid360.lidar",
+        "package_url": "../robonix.primitive.livox.mid360.lidar/"
+      },
+      {
+        "section": "primitive",
+        "name": "mid360_imu",
+        "repo": "https://github.com/syswonder/primitive-livox-mid360-imu-rbnx",
+        "path": "",
+        "branch": "main",
+        "manifest": "",
+        "package_name": "robonix.primitive.livox.mid360.imu",
+        "package_url": "../robonix.primitive.livox.mid360.imu/"
+      },
+      {
+        "section": "primitive",
+        "name": "realsense_camera",
+        "repo": "https://github.com/syswonder/primitive-intel-realsense_d435i-camera-rbnx",
+        "path": "",
+        "branch": "main",
+        "manifest": "",
+        "package_name": "robonix.primitive.intel.realsense_d435i.camera",
+        "package_url": "../robonix.primitive.intel.realsense_d435i.camera/"
+      },
+      {
+        "section": "primitive",
+        "name": "orbbec_camera",
+        "repo": "",
+        "path": "/home/syswonder/lhw/rbnx_piper_packages/rbnx-boot/cache/OrbbecSDK_rbnx",
+        "branch": "",
+        "manifest": "",
+        "package_name": "",
+        "package_url": ""
+      },
+      {
+        "section": "primitive",
+        "name": "ranger_chassis",
+        "repo": "https://github.com/syswonder/primitive-agilex-ranger_mini_v3-chassis-rbnx",
+        "path": "",
+        "branch": "main",
+        "manifest": "",
+        "package_name": "robonix.primitive.agilex.ranger_mini_v3.chassis",
+        "package_url": "../robonix.primitive.agilex.ranger_mini_v3.chassis/"
+      },
+      {
+        "section": "primitive",
+        "name": "piper_ctl",
+        "repo": "",
+        "path": "/home/syswonder/lhw/rbnx_piper_packages/rbnx-boot/cache/piper_ctl_rbnx",
+        "branch": "",
+        "manifest": "",
+        "package_name": "",
+        "package_url": ""
+      },
+      {
+        "section": "primitive",
+        "name": "audio_driver",
+        "repo": "",
+        "path": "${ROBONIX_SOURCE_PATH}/examples/webots/primitives/audio_driver",
+        "branch": "",
+        "manifest": "",
+        "package_name": "",
+        "package_url": ""
+      },
+      {
+        "section": "primitive",
+        "name": "audio_client_bridge",
+        "repo": "",
+        "path": "${ROBONIX_SOURCE_PATH}/examples/webots/primitives/audio_client_bridge",
+        "branch": "",
+        "manifest": "",
+        "package_name": "",
+        "package_url": ""
+      },
+      {
+        "section": "service",
+        "name": "memory",
+        "repo": "",
+        "path": "${ROBONIX_SOURCE_PATH}/services/memsearch",
+        "branch": "",
+        "manifest": "",
+        "package_name": "",
+        "package_url": ""
+      },
+      {
+        "section": "service",
+        "name": "speech",
+        "repo": "",
+        "path": "${ROBONIX_SOURCE_PATH}/services/speech",
+        "branch": "",
+        "manifest": "",
+        "package_name": "",
+        "package_url": ""
+      },
+      {
+        "section": "service",
+        "name": "voiceprint",
+        "repo": "",
+        "path": "${ROBONIX_SOURCE_PATH}/services/voiceprint",
+        "branch": "",
+        "manifest": "",
+        "package_name": "",
+        "package_url": ""
+      },
+      {
+        "section": "service",
+        "name": "llm_detect",
+        "repo": "",
+        "path": "/home/syswonder/lhw/rbnx_piper_packages/rbnx-boot/cache/llm_detect_rbnx",
+        "branch": "",
+        "manifest": "",
+        "package_name": "",
+        "package_url": ""
+      },
+      {
+        "section": "service",
+        "name": "grasp_pose",
+        "repo": "",
+        "path": "/home/syswonder/lhw/rbnx_piper_packages/rbnx-boot/cache/grasp_pose_rbnx",
+        "branch": "",
+        "manifest": "",
+        "package_name": "",
+        "package_url": ""
+      },
+      {
+        "section": "service",
+        "name": "roboarm_ik",
+        "repo": "",
+        "path": "/home/syswonder/lhw/rbnx_piper_packages/rbnx-boot/cache/roboarm_ik_rbnx",
+        "branch": "",
+        "manifest": "",
+        "package_name": "",
+        "package_url": ""
+      },
+      {
+        "section": "service",
+        "name": "mapping",
+        "repo": "https://github.com/syswonder/service-map-rbnx",
+        "path": "",
+        "branch": "main",
+        "manifest": "package_manifest.jetson-native.yaml",
+        "package_name": "robonix.service.mapping",
+        "package_url": "../robonix.service.mapping/"
+      },
+      {
+        "section": "service",
+        "name": "nav2",
+        "repo": "https://github.com/syswonder/service-navigation-rbnx",
+        "path": "",
+        "branch": "main",
+        "manifest": "package_manifest.jetson-native.yaml",
+        "package_name": "robonix.service.navigation",
+        "package_url": "../robonix.service.navigation/"
+      },
+      {
+        "section": "skill",
+        "name": "explore",
+        "repo": "https://github.com/syswonder/skill-explore-rbnx",
+        "path": "",
+        "branch": "main",
+        "manifest": "",
+        "package_name": "robonix.skill.explore",
+        "package_url": "../robonix.skill.explore/"
+      },
+      {
+        "section": "skill",
+        "name": "greet",
+        "repo": "",
+        "path": "./skills/greet",
+        "branch": "",
+        "manifest": "",
+        "package_name": "",
+        "package_url": ""
+      },
+      {
+        "section": "skill",
+        "name": "pick",
+        "repo": "",
+        "path": "/home/syswonder/lhw/rbnx_piper_packages/rbnx-boot/cache/pick_skill_rbnx",
+        "branch": "",
+        "manifest": "",
+        "package_name": "",
+        "package_url": ""
+      }
+    ],
+    "readme_url": "https://github.com/syswonder/robot-agilex-ranger_mini_v3/blob/main/README.md",
+    "preview_image_url": "https://raw.githubusercontent.com/syswonder/robot-agilex-ranger_mini_v3/main/assets/robot.jpg"
+  },
+  {
+    "name": "robonix.robot.deep_robotics.lite3",
+    "version": "0.2.0",
+    "description": "Minimal Robonix deployment for the Deep Robotics Lite3.",
+    "license": "Apache-2.0",
+    "tags": [
+      "robot",
+      "deploy",
+      "deep_robotics",
+      "lite3",
+      "quadruped",
+      "jetson",
+      "lidar",
+      "rgbd",
+      "mapping",
+      "navigation"
+    ],
+    "repo": "https://github.com/syswonder/robot-deep_robotics-lite3",
+    "maintainers": [
+      "Bunnycxk <2501213313@stu.pku.edu.cn>"
+    ],
+    "repo_name": "robot-deep_robotics-lite3",
+    "default_branch": "main",
+    "kind": "robot",
+    "catalog_type": "robot",
+    "manifest": "robonix_manifest.yaml",
+    "capabilities": [],
+    "deploy_dependencies": [
+      {
+        "section": "primitive",
+        "name": "lite3_quadruped",
+        "repo": "https://github.com/syswonder/primitive-deep_robotics-lite3_quadruped.git",
+        "path": "",
+        "branch": "main",
+        "manifest": "",
+        "package_name": "",
+        "package_url": ""
+      },
+      {
+        "section": "primitive",
+        "name": "mid360_lidar",
+        "repo": "https://github.com/syswonder/primitive-livox-mid360-lidar-rbnx",
+        "path": "",
+        "branch": "main",
+        "manifest": "",
+        "package_name": "robonix.primitive.livox.mid360.lidar",
+        "package_url": "../robonix.primitive.livox.mid360.lidar/"
+      },
+      {
+        "section": "primitive",
+        "name": "mid360_imu",
+        "repo": "https://github.com/syswonder/primitive-livox-mid360-imu-rbnx",
+        "path": "",
+        "branch": "main",
+        "manifest": "",
+        "package_name": "robonix.primitive.livox.mid360.imu",
+        "package_url": "../robonix.primitive.livox.mid360.imu/"
+      },
+      {
+        "section": "primitive",
+        "name": "lite3_description",
+        "repo": "https://github.com/syswonder/primitive-deep_robotics-lite3_description.git",
+        "path": "",
+        "branch": "main",
+        "manifest": "",
+        "package_name": "",
+        "package_url": ""
+      },
+      {
+        "section": "primitive",
+        "name": "orbbec_camera",
+        "repo": "https://github.com/syswonder/primitive-orbbec-camera.git",
+        "path": "",
+        "branch": "main",
+        "manifest": "",
+        "package_name": "",
+        "package_url": ""
+      },
+      {
+        "section": "primitive",
+        "name": "audio_client_bridge",
+        "repo": "",
+        "path": "${ROBONIX_SOURCE_PATH}/examples/webots/primitives/audio_client_bridge",
+        "branch": "",
+        "manifest": "",
+        "package_name": "",
+        "package_url": ""
+      },
+      {
+        "section": "service",
+        "name": "pcld2lscan",
+        "repo": "https://github.com/syswonder/service-pcld2lscan-rbnx.git",
+        "path": "",
+        "branch": "main",
+        "manifest": "",
+        "package_name": "",
+        "package_url": ""
+      },
+      {
+        "section": "service",
+        "name": "mapping",
+        "repo": "https://github.com/syswonder/service-map-rbnx",
+        "path": "",
+        "branch": "main",
+        "manifest": "package_manifest.jetson-native.yaml",
+        "package_name": "robonix.service.mapping",
+        "package_url": "../robonix.service.mapping/"
+      },
+      {
+        "section": "service",
+        "name": "speech",
+        "repo": "",
+        "path": "${ROBONIX_SOURCE_PATH}/services/speech",
+        "branch": "",
+        "manifest": "",
+        "package_name": "",
+        "package_url": ""
+      },
+      {
+        "section": "service",
+        "name": "nav2",
+        "repo": "https://github.com/syswonder/service-navigation-rbnx.git",
+        "path": "",
+        "branch": "main",
+        "manifest": "package_manifest.jetson-native.yaml",
+        "package_name": "",
+        "package_url": ""
+      }
+    ],
+    "readme_url": "https://github.com/syswonder/robot-deep_robotics-lite3/blob/main/README.md",
+    "preview_image_url": ""
+  },
+  {
+    "name": "robonix.robot.wheeltec.r550",
+    "version": "0.1.0",
+    "description": "Robonix deploy manifest for the WHEELTEC R550 robot.",
+    "license": "NOASSERTION",
+    "tags": [
+      "robot",
+      "deploy",
+      "wheeltec",
+      "r550",
+      "lidar",
+      "camera",
+      "navigation",
+      "mapping"
+    ],
+    "repo": "https://github.com/syswonder/robot-wheeltec-r550",
+    "maintainers": [
+      "Xiangrui Cheng <sherry-part@users.noreply.github.com>"
+    ],
+    "repo_name": "robot-wheeltec-r550",
+    "default_branch": "main",
+    "kind": "robot",
+    "catalog_type": "robot",
+    "manifest": "robonix_manifest.yaml",
+    "capabilities": [],
+    "deploy_dependencies": [
+      {
+        "section": "primitive",
+        "name": "mid360_lidar",
+        "repo": "https://github.com/syswonder/primitive-livox-mid360-lidar-rbnx",
+        "path": "",
+        "branch": "main",
+        "manifest": "",
+        "package_name": "robonix.primitive.livox.mid360.lidar",
+        "package_url": "../robonix.primitive.livox.mid360.lidar/"
+      },
+      {
+        "section": "primitive",
+        "name": "mid360_imu",
+        "repo": "https://github.com/syswonder/primitive-livox-mid360-imu-rbnx",
+        "path": "",
+        "branch": "main",
+        "manifest": "",
+        "package_name": "robonix.primitive.livox.mid360.imu",
+        "package_url": "../robonix.primitive.livox.mid360.imu/"
+      },
+      {
+        "section": "primitive",
+        "name": "realsense_camera",
+        "repo": "https://github.com/syswonder/primitive-intel-realsense_d435i-camera-rbnx",
+        "path": "",
+        "branch": "main",
+        "manifest": "",
+        "package_name": "robonix.primitive.intel.realsense_d435i.camera",
+        "package_url": "../robonix.primitive.intel.realsense_d435i.camera/"
+      },
+      {
+        "section": "primitive",
+        "name": "wheeltec_chassis",
+        "repo": "https://github.com/syswonder/primitive-wheeltec-r550-chassis-rbnx",
+        "path": "",
+        "branch": "main",
+        "manifest": "",
+        "package_name": "",
+        "package_url": ""
+      },
+      {
+        "section": "service",
+        "name": "mapping",
+        "repo": "https://github.com/syswonder/service-map-rbnx",
+        "path": "",
+        "branch": "main",
+        "manifest": "",
+        "package_name": "robonix.service.mapping",
+        "package_url": "../robonix.service.mapping/"
+      },
+      {
+        "section": "service",
+        "name": "nav2",
+        "repo": "https://github.com/syswonder/service-navigation-rbnx",
+        "path": "",
+        "branch": "main",
+        "manifest": "",
+        "package_name": "robonix.service.navigation",
+        "package_url": "../robonix.service.navigation/"
+      },
+      {
+        "section": "skill",
+        "name": "explore",
+        "repo": "https://github.com/syswonder/skill-explore-rbnx",
+        "path": "",
+        "branch": "main",
+        "manifest": "",
+        "package_name": "robonix.skill.explore",
+        "package_url": "../robonix.skill.explore/"
+      }
+    ],
+    "readme_url": "https://github.com/syswonder/robot-wheeltec-r550/blob/main/README.md",
+    "preview_image_url": ""
+  },
+  {
+    "name": "robonix.service.grasp_pose",
+    "version": "0.1.0",
+    "description": "Geometric grasp-pose estimator (gRPC).",
+    "license": "MulanPSL-2.0",
+    "tags": [
+      "service",
+      "perception",
+      "grasp_pose",
+      "grasp",
+      "ros2"
+    ],
+    "repo": "https://github.com/syswonder/service-grasp-pose-rbnx",
+    "maintainers": [
+      "lhw2002426 <lhw2002426@users.noreply.github.com>"
+    ],
+    "repo_name": "service-grasp-pose-rbnx",
+    "default_branch": "main",
+    "kind": "service",
+    "catalog_type": "package",
+    "manifest": "package_manifest.yaml",
+    "capabilities": [
+      "robonix/service/perception/grasp_pose/driver",
+      "robonix/service/perception/grasp_pose/grasp_request"
+    ],
+    "deploy_dependencies": [],
+    "readme_url": "https://github.com/syswonder/service-grasp-pose-rbnx/blob/main/README.md",
+    "preview_image_url": ""
+  },
+  {
+    "name": "robonix.service.mapping",
+    "version": "0.5.0",
+    "description": "SLAM mapping service. Algo + sensor inputs config-driven.",
+    "license": "MulanPSL-2.0",
+    "tags": [
+      "service",
+      "mapping",
+      "slam",
+      "rtabmap",
+      "ros2"
+    ],
+    "repo": "https://github.com/syswonder/service-map-rbnx",
+    "maintainers": [
+      "wheatfox <wheatfox17@icloud.com>"
+    ],
+    "repo_name": "service-map-rbnx",
+    "default_branch": "main",
+    "kind": "service",
+    "catalog_type": "package",
+    "manifest": "package_manifest.yaml",
+    "capabilities": [
+      "robonix/service/map/driver",
+      "robonix/service/map/occupancy_grid",
+      "robonix/service/map/pointcloud",
+      "robonix/service/map/pose",
+      "robonix/service/map/odom",
+      "robonix/service/map/lifecycle",
+      "robonix/service/map/save_map",
+      "robonix/service/map/list_maps",
+      "robonix/service/map/load_map",
+      "robonix/service/map/pose_estimate",
+      "robonix/service/map/switch_mode"
+    ],
+    "deploy_dependencies": [],
+    "readme_url": "https://github.com/syswonder/service-map-rbnx/blob/main/README.md",
+    "preview_image_url": ""
+  },
+  {
+    "name": "robonix.service.navigation",
+    "version": "0.1.0",
+    "description": "Nav2 service wrapper exposing service/navigation/* over gRPC.",
+    "license": "Apache-2.0",
+    "tags": [
+      "service",
+      "navigation",
+      "nav2",
+      "ros2"
+    ],
+    "repo": "https://github.com/syswonder/service-navigation-rbnx",
+    "maintainers": [
+      "wheatfox <wheatfox17@icloud.com>"
+    ],
+    "repo_name": "service-navigation-rbnx",
+    "default_branch": "main",
+    "kind": "service",
+    "catalog_type": "package",
+    "manifest": "package_manifest.yaml",
+    "capabilities": [
+      "robonix/service/navigation/driver",
+      "robonix/service/navigation/navigate",
+      "robonix/service/navigation/navigate/status",
+      "robonix/service/navigation/navigate/cancel"
+    ],
+    "deploy_dependencies": [],
+    "readme_url": "https://github.com/syswonder/service-navigation-rbnx/blob/main/README.md",
+    "preview_image_url": ""
+  },
+  {
+    "name": "robonix.service.object_detect",
+    "version": "0.1.0",
+    "description": "LLM-based object detection — atlas MCP service, drop-in replacement for yolo_world_rbnx.",
+    "license": "MulanPSL-2.0",
+    "tags": [
+      "service",
+      "perception",
+      "object_detect",
+      "llm",
+      "vlm",
+      "ros2"
+    ],
+    "repo": "https://github.com/syswonder/service-object-detect-rbnx",
+    "maintainers": [
+      "lhw2002426 <lhw2002426@users.noreply.github.com>"
+    ],
+    "repo_name": "service-object-detect-rbnx",
+    "default_branch": "main",
+    "kind": "service",
+    "catalog_type": "package",
+    "manifest": "package_manifest.yaml",
+    "capabilities": [
+      "robonix/service/perception/object_detect/driver",
+      "robonix/service/perception/object_detect/detect_object"
+    ],
+    "deploy_dependencies": [],
+    "readme_url": "https://github.com/syswonder/service-object-detect-rbnx/blob/main/README.md",
+    "preview_image_url": ""
+  },
+  {
+    "name": "robonix.service.pcld2lscan",
+    "version": "0.1.0",
+    "description": "PointCloud2 to LaserScan conversion service.",
+    "license": "Apache-2.0",
+    "tags": [
+      "service",
+      "lidar",
+      "pointcloud",
+      "laserscan",
+      "ros2"
+    ],
+    "repo": "https://github.com/syswonder/service-pcld2lscan-rbnx",
+    "maintainers": [
+      "Bunnycxk <2501213313@stu.pku.edu.cn>"
+    ],
+    "repo_name": "service-pcld2lscan-rbnx",
+    "default_branch": "main",
+    "kind": "service",
+    "catalog_type": "package",
+    "manifest": "package_manifest.yaml",
+    "capabilities": [
+      "robonix/service/lidar/scan_converter/driver",
+      "robonix/service/lidar/scan_converter/scan"
+    ],
+    "deploy_dependencies": [],
+    "readme_url": "https://github.com/syswonder/service-pcld2lscan-rbnx/blob/main/README.md",
+    "preview_image_url": ""
+  },
+  {
+    "name": "robonix.service.piper_moveit",
+    "version": "0.1.0",
+    "description": "MoveIt + grasp executor (atlas-routed manipulation service).",
+    "license": "MulanPSL-2.0",
+    "tags": [
+      "service",
+      "manipulation",
+      "moveit",
+      "agilex",
+      "piper",
+      "ros2"
+    ],
+    "repo": "https://github.com/syswonder/service-piper-moveit-rbnx",
+    "maintainers": [
+      "lhw2002426 <lhw2002426@users.noreply.github.com>"
+    ],
+    "repo_name": "service-piper-moveit-rbnx",
+    "default_branch": "main",
+    "kind": "service",
+    "catalog_type": "package",
+    "manifest": "package_manifest.yaml",
+    "capabilities": [
+      "robonix/service/manipulation/driver",
+      "robonix/service/manipulation/execute_grasp",
+      "robonix/service/manipulation/reset"
+    ],
+    "deploy_dependencies": [],
+    "readme_url": "https://github.com/syswonder/service-piper-moveit-rbnx/blob/main/README.md",
+    "preview_image_url": ""
+  },
+  {
+    "name": "robonix.service.roboarm.ik",
+    "version": "0.1.0",
+    "description": "Roboarm-style Python IK executor service for Piper manipulation.",
+    "license": "MulanPSL-2.0",
+    "tags": [
+      "service",
+      "manipulation",
+      "ik",
+      "agilex",
+      "piper",
+      "ros2"
+    ],
+    "repo": "https://github.com/syswonder/service-roboarm-ik-rbnx",
+    "maintainers": [
+      "lhw2002426 <lhw2002426@users.noreply.github.com>"
+    ],
+    "repo_name": "service-roboarm-ik-rbnx",
+    "default_branch": "main",
+    "kind": "service",
+    "catalog_type": "package",
+    "manifest": "package_manifest.yaml",
+    "capabilities": [
+      "robonix/service/manipulation/driver",
+      "robonix/service/manipulation/execute_grasp",
+      "robonix/service/manipulation/reset",
+      "robonix/service/manipulation/teach_safe",
+      "robonix/service/manipulation/put_down"
+    ],
+    "deploy_dependencies": [],
+    "readme_url": "https://github.com/syswonder/service-roboarm-ik-rbnx/blob/main/README.md",
+    "preview_image_url": ""
+  },
+  {
+    "name": "robonix.skill.explore",
+    "version": "0.1.0",
+    "description": "Frontier-based autonomous exploration skill.",
+    "license": "MulanPSL-2.0",
+    "tags": [
+      "skill",
+      "explore",
+      "frontier",
+      "navigation",
+      "mapping"
+    ],
+    "repo": "https://github.com/syswonder/skill-explore-rbnx",
+    "maintainers": [
+      "wheatfox <wheatfox17@icloud.com>"
+    ],
+    "repo_name": "skill-explore-rbnx",
+    "default_branch": "main",
+    "kind": "skill",
+    "catalog_type": "package",
+    "manifest": "package_manifest.yaml",
+    "capabilities": [
+      "robonix/skill/explore/driver",
+      "robonix/skill/explore/explore",
+      "robonix/skill/explore/explore/status",
+      "robonix/skill/explore/explore/cancel"
+    ],
+    "deploy_dependencies": [],
+    "readme_url": "https://github.com/syswonder/skill-explore-rbnx/blob/main/README.md",
+    "preview_image_url": ""
+  },
+  {
+    "name": "robonix.skill.pick.vertical_grasp",
+    "version": "0.1.0",
+    "description": "Pick-up-a-named-object skill — orchestrates perception + manipulation services.",
+    "license": "MulanPSL-2.0",
+    "tags": [
+      "skill",
+      "pick",
+      "manipulation",
+      "grasp"
+    ],
+    "repo": "https://github.com/syswonder/skill-pick-vertical-grasp-rbnx",
+    "maintainers": [
+      "lhw2002426 <lhw2002426@users.noreply.github.com>"
+    ],
+    "repo_name": "skill-pick-vertical-grasp-rbnx",
+    "default_branch": "main",
+    "kind": "skill",
+    "catalog_type": "package",
+    "manifest": "package_manifest.yaml",
+    "capabilities": [
+      "robonix/skill/pick/driver",
+      "robonix/skill/pick/pick",
+      "robonix/skill/pick/put_down"
+    ],
+    "deploy_dependencies": [],
+    "readme_url": "https://github.com/syswonder/skill-pick-vertical-grasp-rbnx/blob/main/README.md",
+    "preview_image_url": ""
+  },
+  {
+    "name": "robonix.skill.vla.openvla",
+    "version": "0.2.0",
+    "description": "VLA client skill — LLM-callable entry point for vision-language-action inference and JOINT-SPACE execution.",
+    "license": "MulanPSL-2.0",
+    "tags": [
+      "skill",
+      "vla",
+      "manipulation",
+      "llm"
+    ],
+    "repo": "https://github.com/syswonder/skill-vla-openvla-rbnx",
+    "maintainers": [
+      "lhw2002426 <lhw2002426@users.noreply.github.com>"
+    ],
+    "repo_name": "skill-vla-openvla-rbnx",
+    "default_branch": "main",
+    "kind": "skill",
+    "catalog_type": "package",
+    "manifest": "package_manifest.yaml",
+    "capabilities": [
+      "robonix/skill/vla/driver",
+      "robonix/skill/vla/execute"
+    ],
+    "deploy_dependencies": [],
+    "readme_url": "https://github.com/syswonder/skill-vla-openvla-rbnx/blob/main/README.md",
+    "preview_image_url": ""
+  }
+]

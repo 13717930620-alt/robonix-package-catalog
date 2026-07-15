@@ -1,0 +1,28 @@
+{
+  "name": "robonix.primitive.agilex.piper.handeye",
+  "version": "0.1.0",
+  "description": "Hand-eye calibration TF publisher (vendored easy_handeye2 0.5.0).",
+  "license": "MulanPSL-2.0",
+  "tags": [
+    "primitive",
+    "calibration",
+    "handeye",
+    "easy_handeye2",
+    "agilex",
+    "piper",
+    "ros2"
+  ],
+  "repo": "https://github.com/syswonder/primitive-agilex-piper-handeye-rbnx",
+  "maintainers": [
+    "lhw2002426 <lhw2002426@users.noreply.github.com>"
+  ],
+  "repo_name": "primitive-agilex-piper-handeye-rbnx",
+  "default_branch": "main",
+  "kind": "primitive",
+  "catalog_type": "package",
+  "manifest": "package_manifest.yaml",
+  "capabilities": [],
+  "deploy_dependencies": [],
+  "readme_url": "https://github.com/syswonder/primitive-agilex-piper-handeye-rbnx/blob/main/README.md",
+  "preview_image_url": ""
+}

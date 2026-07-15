@@ -42,6 +42,9 @@
       border: 0 !important;
     }
     body {
+      width: 100%;
+      max-width: none;
+      padding: 0;
       margin: 0;
       color: var(--ink);
       background:
@@ -63,6 +66,10 @@
       margin: 0 auto;
     }
     .site-header {
+      width: 100%;
+      max-width: none;
+      margin: 0;
+      padding: 0;
       position: sticky;
       top: 0;
       z-index: 20;
@@ -76,7 +83,6 @@
     .brand {
       display: inline-flex;
       align-items: center;
-      gap: 10px;
       color: var(--ink);
       font-weight: 700;
       font-size: 17px;
@@ -84,52 +90,6 @@
     }
     .brand:hover { color: var(--brand); text-decoration: none; }
     .brand small { color: var(--muted); font-size: 12px; font-weight: 500; }
-    .brand-bus {
-      position: relative;
-      display: grid;
-      grid-template-columns: repeat(4, 5px);
-      gap: 3px;
-      align-items: center;
-      width: 29px;
-      height: 16px;
-    }
-    .brand-bus::before {
-      content: "";
-      position: absolute;
-      left: 2px;
-      right: 2px;
-      top: 7px;
-      height: 2px;
-      border-radius: 99px;
-      background: var(--line-strong);
-    }
-    .brand-bus::after {
-      content: "";
-      position: absolute;
-      top: 5px;
-      left: 0;
-      width: 6px;
-      height: 6px;
-      border-radius: 50%;
-      background: var(--signal);
-      box-shadow: 0 0 0 4px rgba(54, 116, 255, 0.13);
-      animation: bus-pulse 3.2s cubic-bezier(.45, 0, .2, 1) infinite;
-    }
-    .brand-bus span {
-      position: relative;
-      z-index: 1;
-      width: 5px;
-      height: 5px;
-      border: 1px solid var(--brand);
-      border-radius: 50%;
-      background: #fff;
-    }
-    @keyframes bus-pulse {
-      0%, 14% { transform: translateX(0); opacity: 0; }
-      22% { opacity: 1; }
-      72% { transform: translateX(23px); opacity: 1; }
-      82%, 100% { transform: translateX(23px); opacity: 0; }
-    }
     .api-links { display: flex; gap: 8px; flex-wrap: wrap; justify-content: flex-end; }
     .api-links a {
       color: #344054;
@@ -158,7 +118,7 @@
     }
     .lede { color: var(--muted); max-width: 720px; margin: 8px 0 0; line-height: 1.55; font-size: 15px; }
     .page-intro { padding: 28px 0 16px; }
-    .page-intro .eyebrow, .catalog-hero .eyebrow {
+    .page-intro .eyebrow, .catalog-hero .eyebrow, .api-viewer .eyebrow {
       color: var(--brand);
       font-family: var(--font-mono);
       font-size: 11px;
@@ -244,6 +204,26 @@
       line-height: 1.45;
     }
     .api-reference code { font-size: 0.92em; }
+    .api-viewer { padding-block: 30px 40px; }
+    .api-viewer-head { margin-bottom: 16px; }
+    .api-viewer-head h1 { margin-top: 7px; }
+    .api-viewer-endpoint { margin: 10px 0 0; color: var(--muted); }
+    .api-json-panel { padding: 14px; }
+    .api-json {
+      width: 100%;
+      min-height: 420px;
+      max-height: calc(100vh - 260px);
+      margin: 0;
+      overflow: auto;
+      border: 0;
+      background: #f8fafc;
+      color: #1d2939;
+      font-family: var(--font-mono);
+      font-size: 12px;
+      line-height: 1.5;
+      white-space: pre;
+    }
+    .api-json code { padding: 0; background: transparent; }
     .muted { color: var(--muted); }
     .toolbar { display: flex; justify-content: space-between; gap: 12px; align-items: center; margin-bottom: 10px; }
     .search {
@@ -441,47 +421,22 @@
     .readme th, .readme td { border: 1px solid var(--line); padding: 6px 8px; }
     code { font-family: var(--font-mono); }
     .catalog-hero {
-      position: relative;
       padding: clamp(38px, 8vw, 82px) 0 24px;
-      overflow: hidden;
-    }
-    .catalog-hero::after {
-      content: "";
-      position: absolute;
-      z-index: -1;
-      width: 330px;
-      height: 330px;
-      right: -90px;
-      top: -105px;
-      border: 1px solid rgba(40, 54, 137, 0.14);
-      border-radius: 50%;
-      box-shadow: 0 0 0 38px rgba(40, 54, 137, 0.025), 0 0 0 78px rgba(40, 54, 137, 0.018);
     }
     .catalog-hero h1 {
-      max-width: 760px;
+      max-width: none;
       margin-top: 10px;
-      font-size: clamp(32px, 6vw, 58px);
+      font-size: clamp(32px, 4.2vw, 50px);
       line-height: 1.05;
       letter-spacing: -0.045em;
     }
     .catalog-hero .lede { max-width: 690px; font-size: 17px; }
-    .hero-search { position: relative; width: min(720px, 100%); margin-top: 24px; }
-    .hero-search::before {
-      content: ">";
-      position: absolute;
-      z-index: 1;
-      left: 17px;
-      top: 50%;
-      transform: translateY(-50%);
-      color: var(--signal);
-      font-family: var(--font-mono);
-      font-weight: 700;
-    }
+    .hero-search { width: min(720px, 100%); margin-top: 24px; }
     .hero-search input {
       width: 100%;
       height: 52px;
       margin: 0;
-      padding: 0 18px 0 38px;
+      padding: 0 18px;
       border: 1px solid #b9c3df;
       border-radius: 9px;
       background: rgba(255, 255, 255, 0.96);
@@ -517,7 +472,7 @@
       background: #fff;
     }
     .home-result:hover { border-color: #bcc6ec; background: #fbfcff; text-decoration: none; }
-    .home-result code { color: var(--brand-deep); font-weight: 700; overflow-wrap: anywhere; }
+    .home-result-name { color: var(--brand-deep); font-family: var(--font-mono); font-weight: 700; overflow-wrap: anywhere; }
     .home-result span { color: var(--muted); font-size: 13px; text-align: right; }
     .home-empty { margin: 10px 0 0; color: var(--muted); }
     @media (prefers-reduced-motion: reduce) {
@@ -558,6 +513,9 @@
       .card-actions { justify-content: flex-start; }
       .card-preview { width: min(100%, 360px); }
       .api-reference-body { padding: 14px; }
+    }
+    @media (min-width: 861px) {
+      .catalog-hero h1 { white-space: nowrap; }
     }
     @media (max-width: 520px) {
       body { font-size: 14px; }
@@ -692,19 +650,17 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
   <header class="site-header">
     <div class="shell topline">
       <a class="brand" href="../../">
-        <span class="brand-bus" aria-hidden="true"><span></span><span></span><span></span><span></span></span>
         <span>Robonix <small>Package Catalog</small></span>
       </a>
       <nav class="api-links" aria-label="Catalog navigation">
         <a href="../../packages/" aria-current="page">Packages</a>
         <a href="../../robots/">Robots</a>
-        <a href="../../api/v1/catalog">API</a>
+        <a href="../../api/view/">API</a>
       </nav>
     </div>
   </header>
   <header class="shell detail-hero">
     <a class="back" href="../">Back to packages</a>
-    <span class="kind-label">primitive</span>
     <h1>robonix.primitive.agilex.piper.description</h1>
     <p class="lede">Piper arm URDF + robot_state_publisher wrapper (TF stand-in until soma ships).</p>
   </header>
@@ -859,7 +815,7 @@ ros2<span class="w"> </span>run<span class="w"> </span>tf2_ros<span class="w"> <
           <div>Repository</div><div><a href="https://github.com/syswonder/primitive-agilex-piper-description-rbnx">primitive-agilex-piper-description-rbnx</a></div>
           <div>Branch</div><div><code>main</code></div>
           <div>Manifest</div><div><code>package_manifest.yaml</code></div>
-          <div>API</div><div><a href="../../api/v1/package/robonix.primitive.agilex.piper.description">package metadata</a></div>
+          <div>API</div><div><a href="../../api/view/?package=robonix.primitive.agilex.piper.description">package metadata</a></div>
         </div>
         <div class="tags"><button class="tag tag-blue" data-tag="primitive">primitive</button> <button class="tag tag-gray" data-tag="description">description</button> <button class="tag tag-gray" data-tag="urdf">urdf</button> <button class="tag tag-gray" data-tag="agilex">agilex</button> <button class="tag tag-gray" data-tag="piper">piper</button> <button class="tag tag-gray" data-tag="ros2">ros2</button></div>
         <h2>Capabilities</h2>
@@ -869,6 +825,6 @@ ros2<span class="w"> </span>run<span class="w"> </span>tf2_ros<span class="w"> <
       </aside>
     </div>
   </main>
-  <footer class="shell">Generated on 2026-07-15T12:53:12+00:00.</footer>
+  <footer class="shell">Generated on 2026-07-15T13:15:08+00:00.</footer>
 </body>
 </html>

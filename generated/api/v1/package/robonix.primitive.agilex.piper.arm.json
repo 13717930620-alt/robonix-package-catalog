@@ -1,0 +1,32 @@
+{
+  "name": "robonix.primitive.agilex.piper.arm",
+  "version": "0.1.0",
+  "description": "AgileX Piper 6-DoF arm primitive — declares joint_states / arm_status / end_pose / pos_cmd.",
+  "license": "Apache-2.0",
+  "tags": [
+    "primitive",
+    "arm",
+    "agilex",
+    "piper",
+    "ros2"
+  ],
+  "repo": "https://github.com/syswonder/primitive-agilex-piper-arm-rbnx",
+  "maintainers": [
+    "lhw2002426 <lhw2002426@users.noreply.github.com>"
+  ],
+  "repo_name": "primitive-agilex-piper-arm-rbnx",
+  "default_branch": "main",
+  "kind": "primitive",
+  "catalog_type": "package",
+  "manifest": "package_manifest.yaml",
+  "capabilities": [
+    "robonix/primitive/arm/driver",
+    "robonix/primitive/arm/joint_states",
+    "robonix/primitive/arm/arm_status",
+    "robonix/primitive/arm/end_pose",
+    "robonix/primitive/arm/pos_cmd"
+  ],
+  "deploy_dependencies": [],
+  "readme_url": "https://github.com/syswonder/primitive-agilex-piper-arm-rbnx/blob/main/README.md",
+  "preview_image_url": ""
+}

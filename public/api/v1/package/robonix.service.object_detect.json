@@ -1,0 +1,30 @@
+{
+  "name": "robonix.service.object_detect",
+  "version": "0.1.0",
+  "description": "LLM-based object detection — atlas MCP service, drop-in replacement for yolo_world_rbnx.",
+  "license": "MulanPSL-2.0",
+  "tags": [
+    "service",
+    "perception",
+    "object_detect",
+    "llm",
+    "vlm",
+    "ros2"
+  ],
+  "repo": "https://github.com/syswonder/service-object-detect-rbnx",
+  "maintainers": [
+    "lhw2002426 <lhw2002426@users.noreply.github.com>"
+  ],
+  "repo_name": "service-object-detect-rbnx",
+  "default_branch": "main",
+  "kind": "service",
+  "catalog_type": "package",
+  "manifest": "package_manifest.yaml",
+  "capabilities": [
+    "robonix/service/perception/object_detect/driver",
+    "robonix/service/perception/object_detect/detect_object"
+  ],
+  "deploy_dependencies": [],
+  "readme_url": "https://github.com/syswonder/service-object-detect-rbnx/blob/main/README.md",
+  "preview_image_url": ""
+}

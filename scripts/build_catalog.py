@@ -312,8 +312,9 @@ def write_json(path: Path, data) -> None:
 
 
 def write_api(path: Path, data) -> None:
-    """Write an extensionless static JSON API resource for GitHub Pages."""
+    """Write backward-compatible and browser-renderable JSON API resources."""
     write_json(path, data)
+    write_json(path.with_name(f"{path.name}.json"), data)
 
 
 def copy_assets(public_dir: Path) -> None:
@@ -386,6 +387,9 @@ def render_css() -> str:
       border: 0 !important;
     }
     body {
+      width: 100%;
+      max-width: none;
+      padding: 0;
       margin: 0;
       color: var(--ink);
       background:
@@ -407,6 +411,10 @@ def render_css() -> str:
       margin: 0 auto;
     }
     .site-header {
+      width: 100%;
+      max-width: none;
+      margin: 0;
+      padding: 0;
       position: sticky;
       top: 0;
       z-index: 20;
@@ -420,7 +428,6 @@ def render_css() -> str:
     .brand {
       display: inline-flex;
       align-items: center;
-      gap: 10px;
       color: var(--ink);
       font-weight: 700;
       font-size: 17px;
@@ -428,52 +435,6 @@ def render_css() -> str:
     }
     .brand:hover { color: var(--brand); text-decoration: none; }
     .brand small { color: var(--muted); font-size: 12px; font-weight: 500; }
-    .brand-bus {
-      position: relative;
-      display: grid;
-      grid-template-columns: repeat(4, 5px);
-      gap: 3px;
-      align-items: center;
-      width: 29px;
-      height: 16px;
-    }
-    .brand-bus::before {
-      content: "";
-      position: absolute;
-      left: 2px;
-      right: 2px;
-      top: 7px;
-      height: 2px;
-      border-radius: 99px;
-      background: var(--line-strong);
-    }
-    .brand-bus::after {
-      content: "";
-      position: absolute;
-      top: 5px;
-      left: 0;
-      width: 6px;
-      height: 6px;
-      border-radius: 50%;
-      background: var(--signal);
-      box-shadow: 0 0 0 4px rgba(54, 116, 255, 0.13);
-      animation: bus-pulse 3.2s cubic-bezier(.45, 0, .2, 1) infinite;
-    }
-    .brand-bus span {
-      position: relative;
-      z-index: 1;
-      width: 5px;
-      height: 5px;
-      border: 1px solid var(--brand);
-      border-radius: 50%;
-      background: #fff;
-    }
-    @keyframes bus-pulse {
-      0%, 14% { transform: translateX(0); opacity: 0; }
-      22% { opacity: 1; }
-      72% { transform: translateX(23px); opacity: 1; }
-      82%, 100% { transform: translateX(23px); opacity: 0; }
-    }
     .api-links { display: flex; gap: 8px; flex-wrap: wrap; justify-content: flex-end; }
     .api-links a {
       color: #344054;
@@ -502,7 +463,7 @@ def render_css() -> str:
     }
     .lede { color: var(--muted); max-width: 720px; margin: 8px 0 0; line-height: 1.55; font-size: 15px; }
     .page-intro { padding: 28px 0 16px; }
-    .page-intro .eyebrow, .catalog-hero .eyebrow {
+    .page-intro .eyebrow, .catalog-hero .eyebrow, .api-viewer .eyebrow {
       color: var(--brand);
       font-family: var(--font-mono);
       font-size: 11px;
@@ -588,6 +549,26 @@ def render_css() -> str:
       line-height: 1.45;
     }
     .api-reference code { font-size: 0.92em; }
+    .api-viewer { padding-block: 30px 40px; }
+    .api-viewer-head { margin-bottom: 16px; }
+    .api-viewer-head h1 { margin-top: 7px; }
+    .api-viewer-endpoint { margin: 10px 0 0; color: var(--muted); }
+    .api-json-panel { padding: 14px; }
+    .api-json {
+      width: 100%;
+      min-height: 420px;
+      max-height: calc(100vh - 260px);
+      margin: 0;
+      overflow: auto;
+      border: 0;
+      background: #f8fafc;
+      color: #1d2939;
+      font-family: var(--font-mono);
+      font-size: 12px;
+      line-height: 1.5;
+      white-space: pre;
+    }
+    .api-json code { padding: 0; background: transparent; }
     .muted { color: var(--muted); }
     .toolbar { display: flex; justify-content: space-between; gap: 12px; align-items: center; margin-bottom: 10px; }
     .search {
@@ -785,47 +766,22 @@ def render_css() -> str:
     .readme th, .readme td { border: 1px solid var(--line); padding: 6px 8px; }
     code { font-family: var(--font-mono); }
     .catalog-hero {
-      position: relative;
       padding: clamp(38px, 8vw, 82px) 0 24px;
-      overflow: hidden;
-    }
-    .catalog-hero::after {
-      content: "";
-      position: absolute;
-      z-index: -1;
-      width: 330px;
-      height: 330px;
-      right: -90px;
-      top: -105px;
-      border: 1px solid rgba(40, 54, 137, 0.14);
-      border-radius: 50%;
-      box-shadow: 0 0 0 38px rgba(40, 54, 137, 0.025), 0 0 0 78px rgba(40, 54, 137, 0.018);
     }
     .catalog-hero h1 {
-      max-width: 760px;
+      max-width: none;
       margin-top: 10px;
-      font-size: clamp(32px, 6vw, 58px);
+      font-size: clamp(32px, 4.2vw, 50px);
       line-height: 1.05;
       letter-spacing: -0.045em;
     }
     .catalog-hero .lede { max-width: 690px; font-size: 17px; }
-    .hero-search { position: relative; width: min(720px, 100%); margin-top: 24px; }
-    .hero-search::before {
-      content: ">";
-      position: absolute;
-      z-index: 1;
-      left: 17px;
-      top: 50%;
-      transform: translateY(-50%);
-      color: var(--signal);
-      font-family: var(--font-mono);
-      font-weight: 700;
-    }
+    .hero-search { width: min(720px, 100%); margin-top: 24px; }
     .hero-search input {
       width: 100%;
       height: 52px;
       margin: 0;
-      padding: 0 18px 0 38px;
+      padding: 0 18px;
       border: 1px solid #b9c3df;
       border-radius: 9px;
       background: rgba(255, 255, 255, 0.96);
@@ -861,7 +817,7 @@ def render_css() -> str:
       background: #fff;
     }
     .home-result:hover { border-color: #bcc6ec; background: #fbfcff; text-decoration: none; }
-    .home-result code { color: var(--brand-deep); font-weight: 700; overflow-wrap: anywhere; }
+    .home-result-name { color: var(--brand-deep); font-family: var(--font-mono); font-weight: 700; overflow-wrap: anywhere; }
     .home-result span { color: var(--muted); font-size: 13px; text-align: right; }
     .home-empty { margin: 10px 0 0; color: var(--muted); }
     @media (prefers-reduced-motion: reduce) {
@@ -902,6 +858,9 @@ def render_css() -> str:
       .card-actions { justify-content: flex-start; }
       .card-preview { width: min(100%, 360px); }
       .api-reference-body { padding: 14px; }
+    }
+    @media (min-width: 861px) {
+      .catalog-hero h1 { white-space: nowrap; }
     }
     @media (max-width: 520px) {
       body { font-size: 14px; }
@@ -966,13 +925,12 @@ def render_navigation(root: str, current: str = "") -> str:
     return f"""<header class="site-header">
     <div class="shell topline">
       <a class="brand" href="{root}">
-        <span class="brand-bus" aria-hidden="true"><span></span><span></span><span></span><span></span></span>
         <span>Robonix <small>Package Catalog</small></span>
       </a>
       <nav class="api-links" aria-label="Catalog navigation">
         {page_link('packages/', 'Packages', 'packages')}
         {page_link('robots/', 'Robots', 'robots')}
-        {page_link('api/v1/catalog', 'API', 'api')}
+        {page_link('api/view/', 'API', 'api')}
       </nav>
     </div>
   </header>"""
@@ -1022,7 +980,6 @@ def render_listing_page(public_dir: Path, generated_at: str, packages: list[dict
           <div class="meta-line">
             <span>maintainers <strong>{html.escape(', '.join(p['maintainers']))}</strong></span>
             <span>{html.escape(str(unit_count))} {html.escape(unit_label)}</span>
-            <span><code>{html.escape(p['repo_name'])}</code></span>
           </div>
           <div class="tags">{render_tags(p['tags'])}</div>
         </div>
@@ -1113,9 +1070,9 @@ def render_listing_page(public_dir: Path, generated_at: str, packages: list[dict
       <table>
         <thead><tr><th>Method</th><th>Path</th><th>Parameters</th><th>Response</th></tr></thead>
         <tbody>
-          <tr><td data-label="Method"><code>GET</code></td><td data-label="Path"><code>/api/v1/packages</code></td><td data-label="Parameters">none</td><td data-label="Response">catalog object with <code>api_version</code>, <code>generated_at</code>, and <code>packages[]</code></td></tr>
-          <tr><td data-label="Method"><code>GET</code></td><td data-label="Path"><code>/api/v1/search</code></td><td data-label="Parameters">none</td><td data-label="Response">plain package array for client-side filtering</td></tr>
-          <tr><td data-label="Method"><code>GET</code></td><td data-label="Path"><code>/api/v1/package/&lt;package-name&gt;</code></td><td data-label="Parameters"><code>package-name</code>: exact <code>package.name</code>, URL-encoded</td><td data-label="Response">one package object; missing packages return GitHub Pages 404</td></tr>
+          <tr><td data-label="Method"><code>GET</code></td><td data-label="Path"><a href="../api/view/?resource=packages"><code>/api/v1/packages.json</code></a></td><td data-label="Parameters">none</td><td data-label="Response">catalog object with <code>api_version</code>, <code>generated_at</code>, and <code>packages[]</code></td></tr>
+          <tr><td data-label="Method"><code>GET</code></td><td data-label="Path"><a href="../api/view/?resource=search"><code>/api/v1/search.json</code></a></td><td data-label="Parameters">none</td><td data-label="Response">plain package array for client-side filtering</td></tr>
+          <tr><td data-label="Method"><code>GET</code></td><td data-label="Path"><code>/api/v1/package/&lt;package-name&gt;.json</code></td><td data-label="Parameters"><code>package-name</code>: exact <code>package.name</code>, URL-encoded</td><td data-label="Response">one package object; missing packages return GitHub Pages 404</td></tr>
         </tbody>
       </table>
       <pre><code>const base = 'https://syswonder.github.io/robonix-package-catalog/api/v1';
@@ -1228,7 +1185,7 @@ def render_site(public_dir: Path, generated_at: str, packages: list[dict]) -> No
         ).lower()
         home_results.append(
             f"""<a class="home-result" href="{base}/{html.escape(package_slug(package['name']))}/" data-search="{html.escape(search_text)}" hidden>
-          <code>{html.escape(package['name'])}</code>
+          <strong class="home-result-name">{html.escape(package['name'])}</strong>
           <span>{html.escape(package['kind'])} · {html.escape(package['description'])}</span>
         </a>"""
         )
@@ -1293,11 +1250,11 @@ def render_site(public_dir: Path, generated_at: str, packages: list[dict]) -> No
       <table>
         <thead><tr><th>Method</th><th>Path</th><th>Response</th></tr></thead>
         <tbody>
-          <tr><td data-label="Method"><code>GET</code></td><td data-label="Path"><code>/api/v1/packages</code></td><td data-label="Response">ordinary primitive/service/skill package entries</td></tr>
-          <tr><td data-label="Method"><code>GET</code></td><td data-label="Path"><code>/api/v1/robots</code></td><td data-label="Response">robot deployment entries parsed from robonix_manifest.yaml</td></tr>
-          <tr><td data-label="Method"><code>GET</code></td><td data-label="Path"><code>/api/v1/catalog</code></td><td data-label="Response">combined catalog object</td></tr>
-          <tr><td data-label="Method"><code>GET</code></td><td data-label="Path"><code>/api/v1/search</code></td><td data-label="Response">plain combined catalog array for client-side filtering</td></tr>
-          <tr><td data-label="Method"><code>GET</code></td><td data-label="Path"><code>/api/v1/package/&lt;name&gt;</code></td><td data-label="Response">one package or robot deployment object</td></tr>
+          <tr><td data-label="Method"><code>GET</code></td><td data-label="Path"><a href="api/view/?resource=packages"><code>/api/v1/packages.json</code></a></td><td data-label="Response">ordinary primitive/service/skill package entries</td></tr>
+          <tr><td data-label="Method"><code>GET</code></td><td data-label="Path"><a href="api/view/?resource=robots"><code>/api/v1/robots.json</code></a></td><td data-label="Response">robot deployment entries parsed from robonix_manifest.yaml</td></tr>
+          <tr><td data-label="Method"><code>GET</code></td><td data-label="Path"><a href="api/view/?resource=catalog"><code>/api/v1/catalog.json</code></a></td><td data-label="Response">combined catalog object</td></tr>
+          <tr><td data-label="Method"><code>GET</code></td><td data-label="Path"><a href="api/view/?resource=search"><code>/api/v1/search.json</code></a></td><td data-label="Response">plain combined catalog array for client-side filtering</td></tr>
+          <tr><td data-label="Method"><code>GET</code></td><td data-label="Path"><code>/api/v1/package/&lt;name&gt;.json</code></td><td data-label="Response">one package or robot deployment object</td></tr>
         </tbody>
       </table>
       </div>
@@ -1328,6 +1285,68 @@ def render_site(public_dir: Path, generated_at: str, packages: list[dict]) -> No
     catalogSearch.addEventListener('keydown', (event) => {{
       if (event.key === 'Escape') {{ catalogSearch.value = ''; searchCatalog(); }}
     }});
+  </script>
+</body>
+</html>
+""",
+        encoding="utf-8",
+    )
+    render_api_viewer(public_dir, generated_at)
+
+
+def render_api_viewer(public_dir: Path, generated_at: str) -> None:
+    viewer_dir = public_dir / "api" / "view"
+    viewer_dir.mkdir(parents=True, exist_ok=True)
+    viewer_dir.joinpath("index.html").write_text(
+        f"""<!doctype html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Catalog API - Robonix Package Catalog</title>
+  <link rel="stylesheet" href="../../assets/vendor/pico/pico.classless.min.css">
+  <style>
+{render_css()}
+  </style>
+</head>
+<body>
+  {render_navigation('../../', 'api')}
+  <main class="shell api-viewer">
+    <header class="api-viewer-head">
+      <span class="eyebrow">Static JSON API</span>
+      <h1 id="apiTitle">Catalog API</h1>
+      <p class="api-viewer-endpoint"><code id="apiEndpoint">GET /api/v1/catalog.json</code></p>
+    </header>
+    <section class="panel api-json-panel">
+      <pre class="api-json"><code id="apiJson">Loading JSON…</code></pre>
+    </section>
+  </main>
+  <footer class="shell">Generated on {html.escape(generated_at)}.</footer>
+  <script>
+    const params = new URLSearchParams(window.location.search);
+    const packageName = params.get('package');
+    const allowed = new Set(['catalog', 'packages', 'robots', 'search']);
+    const requested = params.get('resource') || 'catalog';
+    const resource = allowed.has(requested) ? requested : 'catalog';
+    const file = packageName
+      ? `../v1/package/${{encodeURIComponent(packageName)}}.json`
+      : `../v1/${{resource}}.json`;
+    const endpoint = packageName
+      ? `/api/v1/package/${{packageName}}.json`
+      : `/api/v1/${{resource}}.json`;
+    document.getElementById('apiTitle').textContent = packageName || `${{resource[0].toUpperCase() + resource.slice(1)}} API`;
+    document.getElementById('apiEndpoint').textContent = `GET ${{endpoint}}`;
+    fetch(file)
+      .then((response) => {{
+        if (!response.ok) throw new Error(`HTTP ${{response.status}}`);
+        return response.json();
+      }})
+      .then((data) => {{
+        document.getElementById('apiJson').textContent = JSON.stringify(data, null, 2);
+      }})
+      .catch((error) => {{
+        document.getElementById('apiJson').textContent = `Unable to load ${{endpoint}}: ${{error.message}}`;
+      }});
   </script>
 </body>
 </html>
@@ -1465,7 +1484,6 @@ def render_package_pages(public_dir: Path, generated_at: str, packages: list[dic
   {render_navigation('../../', base)}
   <header class="shell detail-hero">
     <a class="back" href="../">Back to {html.escape(base)}</a>
-    <span class="kind-label">{html.escape(p['kind'])}</span>
     <h1>{html.escape(p['name'])}</h1>
     <p class="lede">{html.escape(p['description'])}</p>
   </header>
@@ -1488,7 +1506,7 @@ def render_package_pages(public_dir: Path, generated_at: str, packages: list[dic
           <div>Repository</div><div><a href="{html.escape(p['repo'])}">{html.escape(p['repo_name'])}</a></div>
           <div>Branch</div><div><code>{html.escape(p['default_branch'])}</code></div>
           <div>Manifest</div><div><code>{html.escape(p['manifest'])}</code></div>
-          <div>API</div><div><a href="../../api/v1/package/{html.escape(p['name'])}">package metadata</a></div>
+          <div>API</div><div><a href="../../api/view/?package={urllib.parse.quote(p['name'], safe='')}">package metadata</a></div>
         </div>
         <div class="tags">{render_tags(p['tags'])}</div>
         <h2>{html.escape(cap_title)}</h2>
@@ -1537,11 +1555,11 @@ def render_readme(path: Path, generated_at: str, packages: list[dict]) -> None:
         "- Homepage: https://syswonder.github.io/robonix-package-catalog/",
         "- Package page: https://syswonder.github.io/robonix-package-catalog/packages/",
         "- Robot deployment page: https://syswonder.github.io/robonix-package-catalog/robots/",
-        "- Full catalog API: `GET https://syswonder.github.io/robonix-package-catalog/api/v1/catalog`",
-        "- Package list API: `GET https://syswonder.github.io/robonix-package-catalog/api/v1/packages`",
-        "- Robot deployment API: `GET https://syswonder.github.io/robonix-package-catalog/api/v1/robots`",
-        "- Search index API: `GET https://syswonder.github.io/robonix-package-catalog/api/v1/search`",
-        "- Package detail API: `GET https://syswonder.github.io/robonix-package-catalog/api/v1/package/<package-name>`",
+        "- Full catalog API: `GET https://syswonder.github.io/robonix-package-catalog/api/v1/catalog.json`",
+        "- Package list API: `GET https://syswonder.github.io/robonix-package-catalog/api/v1/packages.json`",
+        "- Robot deployment API: `GET https://syswonder.github.io/robonix-package-catalog/api/v1/robots.json`",
+        "- Search index API: `GET https://syswonder.github.io/robonix-package-catalog/api/v1/search.json`",
+        "- Package detail API: `GET https://syswonder.github.io/robonix-package-catalog/api/v1/package/<package-name>.json`",
         "- Package detail page: `https://syswonder.github.io/robonix-package-catalog/packages/<package-name>/`",
         "- Robot detail page: `https://syswonder.github.io/robonix-package-catalog/robots/<robot-name>/`",
         "",
@@ -1558,11 +1576,11 @@ def render_readme(path: Path, generated_at: str, packages: list[dict]) -> None:
         "",
         "| Method | Path | Parameters | Response |",
         "| --- | --- | --- | --- |",
-        "| `GET` | `/api/v1/catalog` | none | combined catalog object with both ordinary packages and robot deployments |",
-        "| `GET` | `/api/v1/packages` | none | ordinary primitive/service/skill packages only |",
-        "| `GET` | `/api/v1/robots` | none | robot deployment entries only |",
-        "| `GET` | `/api/v1/search` | none | plain combined catalog array, intended for client-side search/filter indexes |",
-        "| `GET` | `/api/v1/package/<package-name>` | `package-name`: exact catalog `name`, URL-encoded | one ordinary package or robot deployment object; missing entries return GitHub Pages `404` |",
+        "| `GET` | `/api/v1/catalog.json` | none | combined catalog object with both ordinary packages and robot deployments |",
+        "| `GET` | `/api/v1/packages.json` | none | ordinary primitive/service/skill packages only |",
+        "| `GET` | `/api/v1/robots.json` | none | robot deployment entries only |",
+        "| `GET` | `/api/v1/search.json` | none | plain combined catalog array, intended for client-side search/filter indexes |",
+        "| `GET` | `/api/v1/package/<package-name>.json` | `package-name`: exact catalog `name`, URL-encoded | one ordinary package or robot deployment object; missing entries return GitHub Pages `404` |",
         "",
         "Package object fields:",
         "",
@@ -1589,19 +1607,19 @@ def render_readme(path: Path, generated_at: str, packages: list[dict]) -> None:
         "",
         "```js",
         "const base = 'https://syswonder.github.io/robonix-package-catalog/api/v1';",
-        "const res = await fetch(`${base}/packages`);",
+        "const res = await fetch(`${base}/packages.json`);",
         "const catalog = await res.json();",
         "const mapping = catalog.packages.find(p => p.name === 'robonix.service.mapping');",
         "",
-        "const detail = await fetch(`${base}/package/${encodeURIComponent(mapping.name)}`)",
+        "const detail = await fetch(`${base}/package/${encodeURIComponent(mapping.name)}.json`)",
         "  .then(r => r.json());",
         "```",
         "",
         "### curl",
         "",
         "```bash",
-        "curl -s https://syswonder.github.io/robonix-package-catalog/api/v1/packages",
-        "curl -s https://syswonder.github.io/robonix-package-catalog/api/v1/package/robonix.service.mapping",
+        "curl -s https://syswonder.github.io/robonix-package-catalog/api/v1/packages.json",
+        "curl -s https://syswonder.github.io/robonix-package-catalog/api/v1/package/robonix.service.mapping.json",
         "```",
         "",
         "### Python",
@@ -1610,14 +1628,14 @@ def render_readme(path: Path, generated_at: str, packages: list[dict]) -> None:
         "import urllib.request, json",
         "",
         "base = 'https://syswonder.github.io/robonix-package-catalog/api/v1'",
-        "catalog = json.load(urllib.request.urlopen(f'{base}/packages'))",
+        "catalog = json.load(urllib.request.urlopen(f'{base}/packages.json'))",
         "mapping = next(p for p in catalog['packages'] if p['name'] == 'robonix.service.mapping')",
-        "detail = json.load(urllib.request.urlopen(f\"{base}/package/{mapping['name']}\"))",
+        "detail = json.load(urllib.request.urlopen(f\"{base}/package/{mapping['name']}.json\"))",
         "```",
         "",
         "### API schema",
         "",
-        "`GET /api/v1/packages` returns:",
+        "`GET /api/v1/packages.json` returns:",
         "",
         "```json",
         "{",
@@ -1642,11 +1660,11 @@ def render_readme(path: Path, generated_at: str, packages: list[dict]) -> None:
         "}",
         "```",
         "",
-        "`GET /api/v1/robots` returns robot deployments under a top-level `robots[]` field.",
+        "`GET /api/v1/robots.json` returns robot deployments under a top-level `robots[]` field.",
         "",
-        "`GET /api/v1/search` returns the combined catalog entries as a plain array.",
+        "`GET /api/v1/search.json` returns the combined catalog entries as a plain array.",
         "",
-        "`GET /api/v1/package/<package-name>` returns one package object.",
+        "`GET /api/v1/package/<package-name>.json` returns one package object.",
         "",
         "## Package Manifest",
         "",
@@ -1697,11 +1715,11 @@ def render_readme(path: Path, generated_at: str, packages: list[dict]) -> None:
         "CI validates `catalog.yaml`, fetches every package manifest through the GitHub",
         "API, and generates:",
         "",
-        "- `generated/api/v1/packages`",
-        "- `generated/api/v1/robots`",
-        "- `generated/api/v1/catalog`",
-        "- `generated/api/v1/search`",
-        "- `generated/api/v1/package/<package-name>`",
+        "- `generated/api/v1/packages.json`",
+        "- `generated/api/v1/robots.json`",
+        "- `generated/api/v1/catalog.json`",
+        "- `generated/api/v1/search.json`",
+        "- `generated/api/v1/package/<package-name>.json`",
         "- `public/index.html`",
         "- `public/packages/index.html`",
         "- `public/packages/<package-name>/index.html`",
@@ -1709,8 +1727,8 @@ def render_readme(path: Path, generated_at: str, packages: list[dict]) -> None:
         "- `public/robots/<robot-name>/index.html`",
         "- `public/api/...`",
         "",
-        "For compatibility, CI also writes `.json` aliases under `api/`, but new",
-        "integrations should use the `/api/v1/...` paths above.",
+        "For compatibility, CI also keeps extensionless `/api/v1/...` resources,",
+        "but browser-facing links and new integrations should use the `.json` paths above.",
         "",
         "The generated commit uses `[skip ci]`; normal CI only triggers from",
         "`catalog.yaml`, the builder script, the workflow, or manual dispatch.",
