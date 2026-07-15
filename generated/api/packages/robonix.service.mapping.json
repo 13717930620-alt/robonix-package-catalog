@@ -2,6 +2,7 @@
   "name": "robonix.service.mapping",
   "version": "0.5.0",
   "description": "SLAM mapping service. Algo + sensor inputs config-driven.",
+  "license": "MulanPSL-2.0",
   "tags": [
     "service",
     "mapping",

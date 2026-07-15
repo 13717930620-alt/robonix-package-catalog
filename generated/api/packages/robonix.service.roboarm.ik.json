@@ -2,6 +2,7 @@
   "name": "robonix.service.roboarm.ik",
   "version": "0.1.0",
   "description": "Roboarm-style Python IK executor service for Piper manipulation.",
+  "license": "MulanPSL-2.0",
   "tags": [
     "service",
     "manipulation",

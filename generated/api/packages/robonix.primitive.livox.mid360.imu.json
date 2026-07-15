@@ -2,6 +2,7 @@
   "name": "robonix.primitive.livox.mid360.imu",
   "version": "0.1.0",
   "description": "Livox MID-360 IMU atlas wrapper — depends on mid360_lidar_rbnx.",
+  "license": "MulanPSL-2.0",
   "tags": [
     "primitive",
     "imu",

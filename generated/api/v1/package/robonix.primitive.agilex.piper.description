@@ -2,6 +2,7 @@
   "name": "robonix.primitive.agilex.piper.description",
   "version": "0.1.0",
   "description": "Piper arm URDF + robot_state_publisher wrapper (TF stand-in until soma ships).",
+  "license": "MulanPSL-2.0",
   "tags": [
     "primitive",
     "description",

@@ -2,6 +2,7 @@
   "name": "robonix.primitive.intel.realsense_d435i.camera",
   "version": "0.1.0",
   "description": "Intel RealSense D435i driver wrapper — declares RGB + depth + extrinsics contracts.",
+  "license": "Apache-2.0",
   "tags": [
     "primitive",
     "camera",

@@ -2,6 +2,7 @@
   "name": "robonix.service.piper_moveit",
   "version": "0.1.0",
   "description": "MoveIt + grasp executor (atlas-routed manipulation service).",
+  "license": "MulanPSL-2.0",
   "tags": [
     "service",
     "manipulation",

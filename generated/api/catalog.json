@@ -1,11 +1,12 @@
 {
   "api_version": "1",
-  "generated_at": "2026-07-15T07:28:17+00:00",
+  "generated_at": "2026-07-15T07:28:56+00:00",
   "packages": [
     {
       "name": "robonix.primitive.agilex.piper.arm",
       "version": "0.1.0",
       "description": "AgileX Piper 6-DoF arm primitive — declares joint_states / arm_status / end_pose / pos_cmd.",
+      "license": "Apache-2.0",
       "tags": [
         "primitive",
         "arm",
@@ -37,6 +38,7 @@
       "name": "robonix.primitive.agilex.piper.description",
       "version": "0.1.0",
       "description": "Piper arm URDF + robot_state_publisher wrapper (TF stand-in until soma ships).",
+      "license": "MulanPSL-2.0",
       "tags": [
         "primitive",
         "description",
@@ -63,6 +65,7 @@
       "name": "robonix.primitive.agilex.piper.handeye",
       "version": "0.1.0",
       "description": "Hand-eye calibration TF publisher (vendored easy_handeye2 0.5.0).",
+      "license": "MulanPSL-2.0",
       "tags": [
         "primitive",
         "calibration",
@@ -90,6 +93,7 @@
       "name": "robonix.primitive.agilex.ranger_mini_v3.chassis",
       "version": "0.1.0",
       "description": "AgileX Ranger Mini chassis driver wrapper.",
+      "license": "Apache-2.0",
       "tags": [
         "primitive",
         "chassis",
@@ -119,6 +123,7 @@
       "name": "robonix.primitive.intel.realsense_d435i.camera",
       "version": "0.1.0",
       "description": "Intel RealSense D435i driver wrapper — declares RGB + depth + extrinsics contracts.",
+      "license": "Apache-2.0",
       "tags": [
         "primitive",
         "camera",
@@ -151,6 +156,7 @@
       "name": "robonix.primitive.livox.mid360.imu",
       "version": "0.1.0",
       "description": "Livox MID-360 IMU atlas wrapper — depends on mid360_lidar_rbnx.",
+      "license": "MulanPSL-2.0",
       "tags": [
         "primitive",
         "imu",
@@ -178,6 +184,7 @@
       "name": "robonix.primitive.livox.mid360.lidar",
       "version": "0.1.0",
       "description": "Livox MID-360 lidar driver wrapper.",
+      "license": "MulanPSL-2.0",
       "tags": [
         "primitive",
         "lidar",
@@ -207,6 +214,7 @@
       "name": "robonix.primitive.orbbec.dabai_dcw.camera",
       "version": "0.1.0",
       "description": "Orbbec Dabai DCW RGBD primitive — declares rgb + depth + camera_info.",
+      "license": "Apache-2.0",
       "tags": [
         "primitive",
         "camera",
@@ -238,6 +246,7 @@
       "name": "robonix.robot.agilex.piper_grasp",
       "version": "0.1.0",
       "description": "Robonix deploy manifest for AgileX Piper with Orbbec Dabai DCW and vertical grasp pipeline.",
+      "license": "NOASSERTION",
       "tags": [
         "robot",
         "deploy",
@@ -347,6 +356,7 @@
       "name": "robonix.robot.agilex.ranger_mini_v3",
       "version": "0.2.0",
       "description": "Robonix deployment for the AgileX Ranger Mini v3 robot.",
+      "license": "Apache-2.0",
       "tags": [
         "robot",
         "deploy",
@@ -578,6 +588,7 @@
       "name": "robonix.robot.wheeltec.r550",
       "version": "0.1.0",
       "description": "Robonix deploy manifest for the WHEELTEC R550 robot.",
+      "license": "NOASSERTION",
       "tags": [
         "robot",
         "deploy",
@@ -677,6 +688,7 @@
       "name": "robonix.service.grasp_pose",
       "version": "0.1.0",
       "description": "Geometric grasp-pose estimator (pure MCP).",
+      "license": "MulanPSL-2.0",
       "tags": [
         "service",
         "perception",
@@ -705,6 +717,7 @@
       "name": "robonix.service.mapping",
       "version": "0.5.0",
       "description": "SLAM mapping service. Algo + sensor inputs config-driven.",
+      "license": "MulanPSL-2.0",
       "tags": [
         "service",
         "mapping",
@@ -742,6 +755,7 @@
       "name": "robonix.service.navigation",
       "version": "0.1.0",
       "description": "Nav2 service wrapper exposing service/navigation/* over gRPC.",
+      "license": "Apache-2.0",
       "tags": [
         "service",
         "navigation",
@@ -771,6 +785,7 @@
       "name": "robonix.service.object_detect",
       "version": "0.1.0",
       "description": "LLM-based object detection — atlas MCP service, drop-in replacement for yolo_world_rbnx.",
+      "license": "MulanPSL-2.0",
       "tags": [
         "service",
         "perception",
@@ -800,6 +815,7 @@
       "name": "robonix.service.piper_moveit",
       "version": "0.1.0",
       "description": "MoveIt + grasp executor (atlas-routed manipulation service).",
+      "license": "MulanPSL-2.0",
       "tags": [
         "service",
         "manipulation",
@@ -830,6 +846,7 @@
       "name": "robonix.service.roboarm.ik",
       "version": "0.1.0",
       "description": "Roboarm-style Python IK executor service for Piper manipulation.",
+      "license": "MulanPSL-2.0",
       "tags": [
         "service",
         "manipulation",
@@ -861,6 +878,7 @@
       "name": "robonix.skill.explore",
       "version": "0.1.0",
       "description": "Frontier-based autonomous exploration skill.",
+      "license": "MulanPSL-2.0",
       "tags": [
         "skill",
         "explore",
@@ -891,6 +909,7 @@
       "name": "robonix.skill.pick.vertical_grasp",
       "version": "0.1.0",
       "description": "Pick-up-a-named-object skill — orchestrates perception + manipulation services.",
+      "license": "MulanPSL-2.0",
       "tags": [
         "skill",
         "pick",
@@ -919,6 +938,7 @@
       "name": "robonix.skill.vla.openvla",
       "version": "0.2.0",
       "description": "VLA client skill — LLM-callable entry point for vision-language-action inference and JOINT-SPACE execution.",
+      "license": "MulanPSL-2.0",
       "tags": [
         "skill",
         "vla",

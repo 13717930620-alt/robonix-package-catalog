@@ -2,6 +2,7 @@
   "name": "robonix.primitive.orbbec.dabai_dcw.camera",
   "version": "0.1.0",
   "description": "Orbbec Dabai DCW RGBD primitive — declares rgb + depth + camera_info.",
+  "license": "Apache-2.0",
   "tags": [
     "primitive",
     "camera",

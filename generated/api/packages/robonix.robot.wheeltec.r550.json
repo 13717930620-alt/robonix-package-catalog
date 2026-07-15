@@ -2,6 +2,7 @@
   "name": "robonix.robot.wheeltec.r550",
   "version": "0.1.0",
   "description": "Robonix deploy manifest for the WHEELTEC R550 robot.",
+  "license": "NOASSERTION",
   "tags": [
     "robot",
     "deploy",

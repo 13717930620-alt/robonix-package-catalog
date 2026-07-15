@@ -2,6 +2,7 @@
   "name": "robonix.skill.pick.vertical_grasp",
   "version": "0.1.0",
   "description": "Pick-up-a-named-object skill — orchestrates perception + manipulation services.",
+  "license": "MulanPSL-2.0",
   "tags": [
     "skill",
     "pick",

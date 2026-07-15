@@ -2,6 +2,7 @@
   "name": "robonix.robot.agilex.piper_grasp",
   "version": "0.1.0",
   "description": "Robonix deploy manifest for AgileX Piper with Orbbec Dabai DCW and vertical grasp pipeline.",
+  "license": "NOASSERTION",
   "tags": [
     "robot",
     "deploy",

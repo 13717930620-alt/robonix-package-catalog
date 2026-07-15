@@ -2,6 +2,7 @@
   "name": "robonix.service.object_detect",
   "version": "0.1.0",
   "description": "LLM-based object detection — atlas MCP service, drop-in replacement for yolo_world_rbnx.",
+  "license": "MulanPSL-2.0",
   "tags": [
     "service",
     "perception",

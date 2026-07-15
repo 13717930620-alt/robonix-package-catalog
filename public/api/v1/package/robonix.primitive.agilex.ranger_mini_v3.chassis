@@ -2,6 +2,7 @@
   "name": "robonix.primitive.agilex.ranger_mini_v3.chassis",
   "version": "0.1.0",
   "description": "AgileX Ranger Mini chassis driver wrapper.",
+  "license": "Apache-2.0",
   "tags": [
     "primitive",
     "chassis",

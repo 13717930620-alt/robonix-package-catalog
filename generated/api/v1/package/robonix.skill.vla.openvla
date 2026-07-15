@@ -2,6 +2,7 @@
   "name": "robonix.skill.vla.openvla",
   "version": "0.2.0",
   "description": "VLA client skill — LLM-callable entry point for vision-language-action inference and JOINT-SPACE execution.",
+  "license": "MulanPSL-2.0",
   "tags": [
     "skill",
     "vla",

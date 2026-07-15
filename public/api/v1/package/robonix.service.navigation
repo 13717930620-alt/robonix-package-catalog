@@ -2,6 +2,7 @@
   "name": "robonix.service.navigation",
   "version": "0.1.0",
   "description": "Nav2 service wrapper exposing service/navigation/* over gRPC.",
+  "license": "Apache-2.0",
   "tags": [
     "service",
     "navigation",

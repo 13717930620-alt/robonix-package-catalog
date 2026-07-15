@@ -61,6 +61,7 @@ Package object fields:
 | `name` | string | canonical package name, e.g. `robonix.service.mapping` |
 | `version` | string | package version from `package_manifest.yaml` |
 | `description` | string | short package description |
+| `license` | string | SPDX license identifier; legacy entries without one are exposed as `NOASSERTION` |
 | `tags` | string[] | UI/search tags |
 | `maintainers` | string[] | maintainers in `Name <email@domain>` format |
 | `repo` | string | GitHub repository URL |
@@ -117,6 +118,7 @@ detail = json.load(urllib.request.urlopen(f"{base}/package/{mapping['name']}"))
       "name": "robonix.service.mapping",
       "version": "0.4.0",
       "description": "Map and SLAM service package for Robonix.",
+      "license": "MulanPSL-2.0",
       "tags": ["service", "mapping", "slam"],
       "maintainers": ["wheatfox <wheatfox17@icloud.com>"],
       "repo": "https://github.com/syswonder/service-map-rbnx",
@@ -144,6 +146,7 @@ The catalog builder reads these fields from that file:
 - `package.name`
 - `package.version`
 - `package.description`
+- `package.license`
 - `package.tags`
 - `package.maintainers`
 - `capabilities[].name`
@@ -164,6 +167,7 @@ catalog:
   name: robonix.robot.agilex.ranger_mini_v3
   version: 0.1.0
   description: Robonix deploy manifest for the AgileX Ranger Mini v3 robot.
+  license: Apache-2.0
   tags: [robot, deploy, agilex, ranger_mini_v3]
   maintainers:
     - wheatfox <wheatfox17@icloud.com>
@@ -201,7 +205,7 @@ integrations should use the `/api/v1/...` paths above.
 The generated commit uses `[skip ci]`; normal CI only triggers from
 `catalog.yaml`, the builder script, the workflow, or manual dispatch.
 
-Generated on `2026-07-15T07:28:17+00:00`.
+Generated on `2026-07-15T07:28:56+00:00`.
 
 ## Packages
 

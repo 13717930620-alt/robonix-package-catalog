@@ -2,6 +2,7 @@
   "name": "robonix.robot.agilex.ranger_mini_v3",
   "version": "0.2.0",
   "description": "Robonix deployment for the AgileX Ranger Mini v3 robot.",
+  "license": "Apache-2.0",
   "tags": [
     "robot",
     "deploy",

@@ -2,6 +2,7 @@
   "name": "robonix.skill.explore",
   "version": "0.1.0",
   "description": "Frontier-based autonomous exploration skill.",
+  "license": "MulanPSL-2.0",
   "tags": [
     "skill",
     "explore",
