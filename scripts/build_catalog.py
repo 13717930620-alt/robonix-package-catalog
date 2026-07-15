@@ -143,12 +143,13 @@ def norm_list(value, field: str, package_name: str) -> list[str]:
     return value
 
 
-def validate_catalog_metadata(package_name: str, meta: dict, expected_name: str) -> tuple[str, str, list[str], list[str]]:
+def validate_catalog_metadata(package_name: str, meta: dict, expected_name: str) -> tuple[str, str, str, list[str], list[str]]:
     if not isinstance(meta, dict):
         fail(f"{package_name}: catalog metadata must be a mapping")
     manifest_name = meta.get("name")
     version = meta.get("version")
     description = meta.get("description")
+    license_name = meta.get("license")
     tags = meta.get("tags")
     maintainers = meta.get("maintainers")
     if manifest_name != expected_name:
@@ -157,6 +158,17 @@ def validate_catalog_metadata(package_name: str, meta: dict, expected_name: str)
         fail(f"{package_name}: version is required")
     if not isinstance(description, str) or not description.strip():
         fail(f"{package_name}: description is required")
+    # Older robot catalog blocks predate the license field. Preserve those
+    # repositories while exposing an explicit SPDX-compatible placeholder;
+    # all new templates and documentation require a real license value.
+    if license_name is None:
+        license_name = "NOASSERTION"
+        print(
+            f"warning: {package_name}: license is missing; using NOASSERTION for backward compatibility",
+            file=sys.stderr,
+        )
+    elif not isinstance(license_name, str) or not license_name.strip():
+        fail(f"{package_name}: license must be a non-empty SPDX license string")
     tags = norm_list(tags, "tags", package_name)
     maintainers = norm_list(maintainers, "maintainers", package_name)
     if not maintainers:
@@ -166,7 +178,7 @@ def validate_catalog_metadata(package_name: str, meta: dict, expected_name: str)
             fail(
                 f"{package_name}: maintainers entries must use 'Name <email@domain>' format: {maintainer!r}"
             )
-    return version, description, tags, maintainers
+    return version, description, license_name, tags, maintainers
 
 
 def collect_capabilities(package_name: str, manifest: dict) -> list[str]:
@@ -247,14 +259,14 @@ def collect(catalog_path: Path) -> list[dict]:
                 preview_image_url = preview.get("download_url") or ""
         if catalog_type == "robot":
             meta = manifest.get("catalog")
-            version, description, tags, maintainers = validate_catalog_metadata(name, meta, name)
+            version, description, license_name, tags, maintainers = validate_catalog_metadata(name, meta, name)
             cap_names = []
             deploy_dependencies = collect_deploy_dependencies(name, manifest)
         else:
             package = manifest.get("package")
             if not isinstance(package, dict):
                 fail(f"{name}: package_manifest.yaml missing package mapping")
-            version, description, tags, maintainers = validate_catalog_metadata(name, package, name)
+            version, description, license_name, tags, maintainers = validate_catalog_metadata(name, package, name)
             cap_names = collect_capabilities(name, manifest)
             deploy_dependencies = []
         kind = name.split(".")[1] if name.startswith("robonix.") and "." in name else ""
@@ -263,6 +275,7 @@ def collect(catalog_path: Path) -> list[dict]:
                 "name": name,
                 "version": version,
                 "description": description,
+                "license": license_name,
                 "tags": tags,
                 "repo": repo,
                 "maintainers": maintainers,
@@ -649,6 +662,7 @@ def render_listing_page(public_dir: Path, generated_at: str, packages: list[dict
                 p["version"],
                 p["kind"],
                 p["description"],
+                p["license"],
                 p["repo"],
                 " ".join(p["maintainers"]),
             ]
@@ -1044,6 +1058,7 @@ def render_package_pages(public_dir: Path, generated_at: str, packages: list[dic
         <h2>Package</h2>
         <div class="kv">
           <div>Version</div><div><code>{html.escape(p['version'])}</code></div>
+          <div>License</div><div><code>{html.escape(p['license'])}</code></div>
           <div>Kind</div><div>{html.escape(p['kind'])}</div>
           <div>Type</div><div>{html.escape(p['catalog_type'])}</div>
           <div>Maintainers</div><div>{html.escape(', '.join(p['maintainers']))}</div>
@@ -1133,6 +1148,7 @@ def render_readme(path: Path, generated_at: str, packages: list[dict]) -> None:
         "| `name` | string | canonical package name, e.g. `robonix.service.mapping` |",
         "| `version` | string | package version from `package_manifest.yaml` |",
         "| `description` | string | short package description |",
+        "| `license` | string | SPDX license identifier; legacy entries without one are exposed as `NOASSERTION` |",
         "| `tags` | string[] | UI/search tags |",
         "| `maintainers` | string[] | maintainers in `Name <email@domain>` format |",
         "| `repo` | string | GitHub repository URL |",
@@ -1189,6 +1205,7 @@ def render_readme(path: Path, generated_at: str, packages: list[dict]) -> None:
         "      \"name\": \"robonix.service.mapping\",",
         "      \"version\": \"0.4.0\",",
         "      \"description\": \"Map and SLAM service package for Robonix.\",",
+        "      \"license\": \"MulanPSL-2.0\",",
         "      \"tags\": [\"service\", \"mapping\", \"slam\"],",
         "      \"maintainers\": [\"wheatfox <wheatfox17@icloud.com>\"],",
         "      \"repo\": \"https://github.com/syswonder/service-map-rbnx\",",
@@ -1216,6 +1233,7 @@ def render_readme(path: Path, generated_at: str, packages: list[dict]) -> None:
         "- `package.name`",
         "- `package.version`",
         "- `package.description`",
+        "- `package.license`",
         "- `package.tags`",
         "- `package.maintainers`",
         "- `capabilities[].name`",
@@ -1236,6 +1254,7 @@ def render_readme(path: Path, generated_at: str, packages: list[dict]) -> None:
         "  name: robonix.robot.agilex.ranger_mini_v3",
         "  version: 0.1.0",
         "  description: Robonix deploy manifest for the AgileX Ranger Mini v3 robot.",
+        "  license: Apache-2.0",
         "  tags: [robot, deploy, agilex, ranger_mini_v3]",
         "  maintainers:",
         "    - wheatfox <wheatfox17@icloud.com>",

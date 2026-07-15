@@ -57,6 +57,7 @@ class RobotListingTests(unittest.TestCase):
             "version": "0.1.0",
             "kind": "robot",
             "description": "Example robot",
+            "license": "Apache-2.0",
             "repo": "https://github.com/syswonder/example-robot",
             "repo_name": "example-robot",
             "default_branch": "main",
@@ -83,6 +84,39 @@ class RobotListingTests(unittest.TestCase):
         self.assertIn('class="card-side"', rendered)
         self.assertIn('class="card-preview"', rendered)
         self.assertLess(rendered.index('class="card-actions"'), rendered.index('class="card-preview"'))
+
+
+class CatalogMetadataTests(unittest.TestCase):
+    def test_license_is_preserved(self):
+        metadata = {
+            "name": "robonix.robot.example",
+            "version": "0.1.0",
+            "description": "Example robot",
+            "license": "Apache-2.0",
+            "tags": ["robot"],
+            "maintainers": ["Example <example@example.com>"],
+        }
+
+        _, _, license_name, _, _ = BUILD_CATALOG.validate_catalog_metadata(
+            "robonix.robot.example", metadata, "robonix.robot.example"
+        )
+
+        self.assertEqual(license_name, "Apache-2.0")
+
+    def test_missing_legacy_license_uses_noassertion(self):
+        metadata = {
+            "name": "robonix.robot.legacy",
+            "version": "0.1.0",
+            "description": "Legacy robot",
+            "tags": ["robot"],
+            "maintainers": ["Example <example@example.com>"],
+        }
+
+        _, _, license_name, _, _ = BUILD_CATALOG.validate_catalog_metadata(
+            "robonix.robot.legacy", metadata, "robonix.robot.legacy"
+        )
+
+        self.assertEqual(license_name, "NOASSERTION")
 
 
 if __name__ == "__main__":
