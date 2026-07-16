@@ -28,8 +28,11 @@
       --signal: #3674ff;
       --signal-soft: #e9edff;
       --shadow: 0 8px 28px rgba(28, 38, 88, 0.06);
+      --site-header-height: 64px;
+      --sticky-gap: 14px;
     }
     * { box-sizing: border-box; }
+    html { min-height: 100%; background: var(--bg); }
     .visually-hidden {
       position: absolute !important;
       width: 1px !important;
@@ -44,8 +47,12 @@
     body {
       width: 100%;
       max-width: none;
+      min-height: 100vh;
+      min-height: 100dvh;
       padding: 0;
       margin: 0;
+      display: flex;
+      flex-direction: column;
       color: var(--ink);
       background:
         radial-gradient(circle at 18% -8%, rgba(54, 116, 255, 0.09), transparent 30rem),
@@ -76,6 +83,7 @@
       color: var(--ink);
       border-bottom: 1px solid rgba(221, 225, 236, 0.88);
       background: rgba(255, 255, 255, 0.9);
+      -webkit-backdrop-filter: blur(16px);
       backdrop-filter: blur(16px);
     }
     .site-header .shell { padding-block: 12px; }
@@ -126,7 +134,11 @@
       letter-spacing: 0.09em;
       text-transform: uppercase;
     }
-    main.shell { padding-block: 0 34px; }
+    main.shell {
+      width: min(100% - 48px, 1180px);
+      flex: 1 0 auto;
+      padding-block: 0 34px;
+    }
     .search-strip { padding: 16px 0 14px; }
     .catalog-frame {
       display: grid;
@@ -143,7 +155,15 @@
       margin-bottom: 0;
       transition: border-color 180ms ease, box-shadow 180ms ease, transform 180ms ease;
     }
-    .filters { padding: 14px; position: sticky; top: 14px; }
+    .filters {
+      padding: 14px;
+      position: sticky;
+      top: calc(var(--site-header-height) + var(--sticky-gap));
+      max-height: calc(100dvh - var(--site-header-height) - 28px);
+      overflow-y: auto;
+      overscroll-behavior: contain;
+      scrollbar-gutter: stable;
+    }
     .filters > summary { display: none; }
     .filter-content { min-width: 0; }
     .filters h2, .content h2 { margin: 0 0 9px; font-size: 15px; }
@@ -385,11 +405,18 @@
     .detail-hero h1 { font-family: var(--font-mono); }
     .back { display: inline-block; margin: 0 0 12px; color: var(--brand); }
     .generated { color: var(--muted); margin-top: 12px; font-size: 13px; }
-    footer {
+    .site-footer {
+      width: 100%;
+      max-width: none;
+      margin: 0;
+      padding: 0;
+      flex: 0 0 auto;
       color: var(--muted);
+      border-top: 1px solid var(--line);
+      background: var(--paper);
       font-size: 12px;
     }
-    footer.shell { padding-block: 18px 28px; }
+    .site-footer .shell { padding-block: 18px 28px; }
     .readme {
       line-height: 1.58;
       color: #1f2937;
@@ -485,6 +512,7 @@
     }
     @media (max-width: 860px) {
       .shell { width: min(100% - 28px, 1180px); }
+      main.shell { width: min(100% - 28px, 1180px); }
       .topline { align-items: stretch; flex-direction: column; }
       .api-links {
         display: grid;
@@ -496,7 +524,13 @@
       .catalog-frame, .detail-layout { grid-template-columns: 1fr; }
       .detail-side { order: -1; }
       .entry-grid { grid-template-columns: 1fr; }
-      .filters { padding: 0; position: static; }
+      .filters {
+        padding: 0;
+        position: static;
+        max-height: none;
+        overflow: visible;
+        scrollbar-gutter: auto;
+      }
       .filters > summary {
         display: block;
         padding: 12px 14px;
@@ -520,6 +554,7 @@
     @media (max-width: 520px) {
       body { font-size: 14px; }
       .shell { width: min(100% - 20px, 1180px); }
+      main.shell { width: min(100% - 20px, 1180px); }
       .site-header .shell { padding-block: 10px; }
       .brand { font-size: 17px; overflow-wrap: anywhere; }
       .brand small { display: none; }
@@ -659,6 +694,21 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
       </nav>
     </div>
   </header>
+  <script>
+    (() => {
+      const header = document.currentScript.previousElementSibling;
+      const updateHeaderHeight = () => {
+        const height = Math.ceil(header.getBoundingClientRect().height);
+        document.documentElement.style.setProperty('--site-header-height', `${height}px`);
+      };
+      updateHeaderHeight();
+      if ('ResizeObserver' in window) {
+        new ResizeObserver(updateHeaderHeight).observe(header);
+      } else {
+        window.addEventListener('resize', updateHeaderHeight, { passive: true });
+      }
+    })();
+  </script>
   <header class="shell detail-hero">
     <a class="back" href="../">Back to packages</a>
     <h1>robonix.service.object_detect</h1>
@@ -669,97 +719,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
       <section class="panel detail-main">
         <h2>README</h2>
         <article class="readme">
-          <h1>service-object-detect-rbnx</h1>
-<p>Robonix package for <strong>LLM/VLM-based object detection</strong>. It exposes an atlas-routed MCP service and replaces the older <code>yolo_world_rbnx</code> path. Owns the <code>service/perception/object_detect/*</code> namespace.</p>
-<p>Catalog name: <code>robonix.service.object_detect</code>.</p>
-<h2>Capability surface</h2>
-<table>
-<thead>
-<tr>
-<th>Contract</th>
-<th>Mode</th>
-<th>Transport</th>
-<th>Source / handler</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><code>robonix/service/perception/object_detect/driver</code></td>
-<td>rpc</td>
-<td>gRPC</td>
-<td><code>Driver(CMD_INIT, config_json)</code> — lifecycle gate</td>
-</tr>
-<tr>
-<td><code>robonix/service/perception/object_detect/detect_object</code></td>
-<td>rpc</td>
-<td>MCP</td>
-<td><code>DetectObject(object_name) → bbox_2d + object_center_3d</code></td>
-</tr>
-</tbody>
-</table>
-<p>There is no legacy <code>/yolo/detect_object</code> ROS-service fallback in this package.</p>
-<h2>Compared with the old <code>yolo_world</code> path</h2>
-<ul>
-<li>no GPU / ultralytics weights;</li>
-<li>RGB → OpenAI-compatible VLM → 2D bbox;</li>
-<li>in vertical-grasp mode the depth stream is completely unused (<code>skip_depth=true</code>); <code>service-grasp-pose-rbnx</code> maps the bbox center through the calibrated 2D homography and combines it with the configured tabletop z.</li>
-</ul>
-<h2>Boot ordering</h2>
-<p>Must come <strong>after</strong> <code>primitive-orbbec-dabai_dcw-camera-rbnx</code> in the deploy manifest — Init resolves the RGB topic (and, when <code>skip_depth=false</code>, the depth topic) at atlas-registration time.</p>
-<h2>Driver-init lifecycle</h2>
-<p><code>start.sh</code> brings up the atlas bridge — no ROS spawn. The bridge opens a gRPC server, registers the capability and declares only <code>object_detect/driver</code>, then blocks awaiting <code>Driver(CMD_INIT, config_json)</code>.</p>
-<p>When <code>rbnx boot</code> invokes Init the handler:</p>
-<ol>
-<li>validates the LLM endpoint / API key / model name;</li>
-<li>resolves <code>primitive/camera/rgb</code> and <code>primitive/camera/camera_info</code> via atlas (depth is skipped when <code>skip_depth=true</code>);</li>
-<li>declares <code>object_detect/detect_object</code> on atlas.</li>
-</ol>
-<h2>Layout</h2>
-<div class="highlight"><pre><span></span><code>service-object-detect-rbnx/
-├── package_manifest.yaml
-├── capabilities/
-│   └── service/perception/object_detect/{driver,detect_object}.v1.toml
-├── config/                     example .env / prompt templates
-├── llm_detect/                 Python package: atlas bridge + VLM client
-├── scripts/
-│   ├── build.sh                colcon build + rbnx codegen
-│   └── start.sh                source ROS, exec atlas_bridge
-└── src/                        vendored dependencies (if any)
-</code></pre></div>
-<h2>Config (passed via <code>Driver(CMD_INIT, config_json)</code>)</h2>
-<div class="highlight"><pre><span></span><code><span class="p">{</span>
-<span class="w">  </span><span class="nt">&quot;llm_base_url&quot;</span><span class="p">:</span><span class="w">       </span><span class="s2">&quot;https://api.ofox.ai/v1&quot;</span><span class="p">,</span>
-<span class="w">  </span><span class="nt">&quot;llm_api_key&quot;</span><span class="p">:</span><span class="w">        </span><span class="s2">&quot;sk-...&quot;</span><span class="p">,</span>
-<span class="w">  </span><span class="nt">&quot;llm_model&quot;</span><span class="p">:</span><span class="w">          </span><span class="s2">&quot;google/gemini-3.1-flash-lite&quot;</span><span class="p">,</span>
-<span class="w">  </span><span class="nt">&quot;temperature&quot;</span><span class="p">:</span><span class="w">        </span><span class="mf">0.0</span><span class="p">,</span>
-<span class="w">  </span><span class="nt">&quot;rotation_cam2arm&quot;</span><span class="p">:</span><span class="w">   </span><span class="kc">true</span><span class="p">,</span>
-<span class="w">  </span><span class="nt">&quot;skip_depth&quot;</span><span class="p">:</span><span class="w">         </span><span class="kc">true</span><span class="p">,</span>
-<span class="w">  </span><span class="nt">&quot;rgb_topic&quot;</span><span class="p">:</span><span class="w">          </span><span class="s2">&quot;&quot;</span><span class="p">,</span>
-<span class="w">  </span><span class="nt">&quot;camera_info_topic&quot;</span><span class="p">:</span><span class="w">  </span><span class="s2">&quot;&quot;</span>
-<span class="p">}</span>
-</code></pre></div>
-<ul>
-<li><code>rotation_cam2arm</code>: rotate the image 180° before sending to the LLM when the camera is mounted opposite to the arm.</li>
-<li><code>skip_depth</code>: vertical-grasp mode — bypass depth back-projection entirely. <code>env LLM_DETECT_SKIP_DEPTH=1</code> is the fallback.</li>
-<li>Empty topic strings mean "atlas-resolved"; defaults already match <code>primitive-orbbec-dabai_dcw-camera-rbnx</code>.</li>
-</ul>
-<h2>Build / run standalone</h2>
-<div class="highlight"><pre><span></span><code>bash<span class="w"> </span>scripts/build.sh<span class="w">                           </span><span class="c1"># colcon + rbnx codegen</span>
-<span class="nv">ROBONIX_ATLAS</span><span class="o">=</span><span class="m">127</span>.0.0.1:50051<span class="w"> </span><span class="se">\</span>
-<span class="w">    </span>bash<span class="w"> </span>scripts/start.sh<span class="w">                       </span><span class="c1"># registers, awaits Init</span>
-</code></pre></div>
-<h2>Verification</h2>
-<div class="highlight"><pre><span></span><code>rbnx<span class="w"> </span>caps<span class="w"> </span><span class="p">|</span><span class="w"> </span>grep<span class="w"> </span>object_detect
-<span class="c1"># Expected: llm_detect provider with</span>
-<span class="c1">#   robonix/service/perception/object_detect/{driver, detect_object}</span>
-
-<span class="c1"># End-to-end via the atlas MCP surface:</span>
-rbnx<span class="w"> </span>ask<span class="w"> </span><span class="s2">&quot;where is the paper on the desk?&quot;</span>
-
-<span class="c1"># The package intentionally has no direct ROS service surface.</span>
-</code></pre></div>
-<h2>License</h2>
-<p>This package: MulanPSL-2.0.</p>
+          <p>No README.md was found in this package repository.</p>
         </article>
       </section>
       <aside class="panel detail-side">
@@ -784,6 +744,6 @@ rbnx<span class="w"> </span>ask<span class="w"> </span><span class="s2">&quot;wh
       </aside>
     </div>
   </main>
-  <footer class="shell">Generated on 2026-07-15T13:24:35+00:00.</footer>
+  <footer class="site-footer"><div class="shell">Generated on 2026-07-16T04:54:40+00:00.</div></footer>
 </body>
 </html>

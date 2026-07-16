@@ -28,8 +28,11 @@
       --signal: #3674ff;
       --signal-soft: #e9edff;
       --shadow: 0 8px 28px rgba(28, 38, 88, 0.06);
+      --site-header-height: 64px;
+      --sticky-gap: 14px;
     }
     * { box-sizing: border-box; }
+    html { min-height: 100%; background: var(--bg); }
     .visually-hidden {
       position: absolute !important;
       width: 1px !important;
@@ -44,8 +47,12 @@
     body {
       width: 100%;
       max-width: none;
+      min-height: 100vh;
+      min-height: 100dvh;
       padding: 0;
       margin: 0;
+      display: flex;
+      flex-direction: column;
       color: var(--ink);
       background:
         radial-gradient(circle at 18% -8%, rgba(54, 116, 255, 0.09), transparent 30rem),
@@ -76,6 +83,7 @@
       color: var(--ink);
       border-bottom: 1px solid rgba(221, 225, 236, 0.88);
       background: rgba(255, 255, 255, 0.9);
+      -webkit-backdrop-filter: blur(16px);
       backdrop-filter: blur(16px);
     }
     .site-header .shell { padding-block: 12px; }
@@ -126,7 +134,11 @@
       letter-spacing: 0.09em;
       text-transform: uppercase;
     }
-    main.shell { padding-block: 0 34px; }
+    main.shell {
+      width: min(100% - 48px, 1180px);
+      flex: 1 0 auto;
+      padding-block: 0 34px;
+    }
     .search-strip { padding: 16px 0 14px; }
     .catalog-frame {
       display: grid;
@@ -143,7 +155,15 @@
       margin-bottom: 0;
       transition: border-color 180ms ease, box-shadow 180ms ease, transform 180ms ease;
     }
-    .filters { padding: 14px; position: sticky; top: 14px; }
+    .filters {
+      padding: 14px;
+      position: sticky;
+      top: calc(var(--site-header-height) + var(--sticky-gap));
+      max-height: calc(100dvh - var(--site-header-height) - 28px);
+      overflow-y: auto;
+      overscroll-behavior: contain;
+      scrollbar-gutter: stable;
+    }
     .filters > summary { display: none; }
     .filter-content { min-width: 0; }
     .filters h2, .content h2 { margin: 0 0 9px; font-size: 15px; }
@@ -385,11 +405,18 @@
     .detail-hero h1 { font-family: var(--font-mono); }
     .back { display: inline-block; margin: 0 0 12px; color: var(--brand); }
     .generated { color: var(--muted); margin-top: 12px; font-size: 13px; }
-    footer {
+    .site-footer {
+      width: 100%;
+      max-width: none;
+      margin: 0;
+      padding: 0;
+      flex: 0 0 auto;
       color: var(--muted);
+      border-top: 1px solid var(--line);
+      background: var(--paper);
       font-size: 12px;
     }
-    footer.shell { padding-block: 18px 28px; }
+    .site-footer .shell { padding-block: 18px 28px; }
     .readme {
       line-height: 1.58;
       color: #1f2937;
@@ -485,6 +512,7 @@
     }
     @media (max-width: 860px) {
       .shell { width: min(100% - 28px, 1180px); }
+      main.shell { width: min(100% - 28px, 1180px); }
       .topline { align-items: stretch; flex-direction: column; }
       .api-links {
         display: grid;
@@ -496,7 +524,13 @@
       .catalog-frame, .detail-layout { grid-template-columns: 1fr; }
       .detail-side { order: -1; }
       .entry-grid { grid-template-columns: 1fr; }
-      .filters { padding: 0; position: static; }
+      .filters {
+        padding: 0;
+        position: static;
+        max-height: none;
+        overflow: visible;
+        scrollbar-gutter: auto;
+      }
       .filters > summary {
         display: block;
         padding: 12px 14px;
@@ -520,6 +554,7 @@
     @media (max-width: 520px) {
       body { font-size: 14px; }
       .shell { width: min(100% - 20px, 1180px); }
+      main.shell { width: min(100% - 20px, 1180px); }
       .site-header .shell { padding-block: 10px; }
       .brand { font-size: 17px; overflow-wrap: anywhere; }
       .brand small { display: none; }
@@ -659,6 +694,21 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
       </nav>
     </div>
   </header>
+  <script>
+    (() => {
+      const header = document.currentScript.previousElementSibling;
+      const updateHeaderHeight = () => {
+        const height = Math.ceil(header.getBoundingClientRect().height);
+        document.documentElement.style.setProperty('--site-header-height', `${height}px`);
+      };
+      updateHeaderHeight();
+      if ('ResizeObserver' in window) {
+        new ResizeObserver(updateHeaderHeight).observe(header);
+      } else {
+        window.addEventListener('resize', updateHeaderHeight, { passive: true });
+      }
+    })();
+  </script>
   <header class="shell detail-hero">
     <a class="back" href="../">Back to robots</a>
     <h1>robonix.robot.agilex.ranger_mini_v3</h1>
@@ -669,159 +719,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
       <section class="panel detail-main">
         <h2>README</h2>
         <article class="readme">
-          <h1>AgileX Ranger Mini v3</h1>
-<p>Robonix deployment for the SysWonder Ranger Mini v3: Jetson Orin, Livox
-MID-360, Intel RealSense D435i, RTAB-Map, Scene, Nav2, and Explore.</p>
-<p>The deployment uses native ROS 2 packages on Jetson. Zenoh RMW is the default;
-<code>start.sh</code> starts a local <code>rmw_zenohd</code> for the lifetime of the boot.
-Scene, Mapping, and Nav2 are explicitly selected for their Jetson-native paths.
-Each package entry selects its own <code>package_manifest*.yaml</code>, so architecture and
-native/container choices are package properties rather than global environment
-variables. The same robot repository may therefore keep separate full/no-arm
-deployment manifests while selecting the appropriate package target for each
-component.</p>
-<p><img alt="SysWonder AgileX Ranger Mini v3 robot" src="https://raw.githubusercontent.com/syswonder/robot-agilex-ranger_mini_v3/main/assets/robot.jpg"></p>
-<h2>Hardware</h2>
-<table>
-<thead>
-<tr>
-<th>Component</th>
-<th>Model</th>
-<th>Deployment configuration</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>Mobile base</td>
-<td>AgileX Ranger Mini v3</td>
-<td>Four-wheel steer/drive chassis; <code>can_ranger</code> at 500 kbit/s; <code>base_link</code> footprint 0.74 m x 0.50 m</td>
-</tr>
-<tr>
-<td>Compute</td>
-<td>NVIDIA Jetson AGX Orin</td>
-<td>aarch64 Jetson-native packages, ROS 2 Humble, and <code>rmw_zenoh_cpp</code></td>
-</tr>
-<tr>
-<td>Manipulator</td>
-<td>AgileX Piper</td>
-<td>Six-axis arm with parallel gripper; <code>can_piper</code> at 1 Mbit/s</td>
-</tr>
-<tr>
-<td>3D lidar and IMU</td>
-<td>Livox MID-360</td>
-<td>Ethernet lidar at <code>192.168.1.161</code>; host interface <code>192.168.1.50</code>; lidar and integrated IMU are separate Robonix providers</td>
-</tr>
-<tr>
-<td>Front RGB-D camera</td>
-<td>Intel RealSense D435i</td>
-<td>640 x 480 at 30 FPS for RGB and aligned depth; spatial and temporal depth filters enabled; camera IMU disabled</td>
-</tr>
-<tr>
-<td>Wrist camera</td>
-<td>Orbbec Dabai DCW</td>
-<td>1280 x 720 YUYV color at 10 FPS; depth is disabled in the current pick pipeline</td>
-</tr>
-<tr>
-<td>Audio</td>
-<td>USB audio device</td>
-<td>16 kHz mono microphone and speaker through <code>plughw:CARD=Plus,DEV=0</code></td>
-</tr>
-</tbody>
-</table>
-<p>The exact provider IDs, device addresses, sensor profiles, and runtime options
-are defined in <a href="https://github.com/syswonder/robot-agilex-ranger_mini_v3/blob/main/robonix_manifest.yaml"><code>robonix_manifest.yaml</code></a>. The robot body,
-component hierarchy, footprint, and provider-to-component mapping are defined
-in <a href="https://github.com/syswonder/robot-agilex-ranger_mini_v3/blob/main/soma.yaml"><code>soma.yaml</code></a>. Vitals consumes Soma's body-health stream and
-aggregates Robonix module health on port <code>50093</code> for trusted operator clients.</p>
-<p>Robot-specific algorithm configuration is also deployment-owned:</p>
-<ul>
-<li><a href="https://github.com/syswonder/robot-agilex-ranger_mini_v3/blob/main/config/rtabmap_params.yaml"><code>config/rtabmap_params.yaml</code></a> contains the full
-  Ranger RTAB-Map parameter set.</li>
-<li><a href="https://github.com/syswonder/robot-agilex-ranger_mini_v3/blob/main/config/nav2_params.yaml"><code>config/nav2_params.yaml</code></a> contains the complete
-  Ranger Nav2 configuration.</li>
-<li><a href="https://github.com/syswonder/robot-agilex-ranger_mini_v3/blob/main/config/navigate.xml"><code>config/navigate.xml</code></a> contains the Ranger navigation
-  BehaviorTree.</li>
-</ul>
-<p>The manifest references these files with paths relative to this repository.
-The Mapping and Navigation provider repositories contain templates only; do
-not move Ranger dimensions, sensor limits, or controller policy upstream.</p>
-<p>Package target selection and algorithm configuration are separate. A package's
-<code>manifest:</code> chooses a build/start implementation such as Jetson native or a
-container. If a provider exposes a named <code>params_profile</code>, that name must be one
-the provider implements upstream; a robot manifest cannot invent a new profile.
-Robot-specific runtime values remain in this repository's parameter files (or
-documented config overrides) and do not create a new upstream profile.</p>
-<p>Scene is pinned to <code>realsense_camera</code>. That provider supplies both aligned RGB
-and depth (plus camera calibration); the wrist Orbbec cannot be selected by
-Atlas ordering. Scene obtains the robot's globally corrected pose from the
-Mapping <code>robonix/service/map/pose</code> contract and combines it with the complete
-URDF camera transform published by <code>robot_description</code>.</p>
-<h2>Prepare</h2>
-<p>Robonix <code>dev</code> is the recommended branch for ordinary deployments. This
-repository currently reproduces the Ranger integration stack on <code>dev-next</code>
-(including provider-pinned Scene RGB-D ingest); use <code>dev-next</code> until those
-changes are merged into <code>dev</code>. Then install the ROS dependencies once:</p>
-<div class="highlight"><pre><span></span><code><span class="nb">cd</span><span class="w"> </span>~/wheatfox/robonix
-git<span class="w"> </span>switch<span class="w"> </span>dev-next
-git<span class="w"> </span>pull<span class="w"> </span>--ff-only<span class="w"> </span>origin<span class="w"> </span>dev-next
-make<span class="w"> </span>install
-
-sudo<span class="w"> </span>apt<span class="w"> </span>install<span class="w"> </span>ros-humble-rmw-zenoh-cpp<span class="w"> </span><span class="se">\</span>
-<span class="w">  </span>ros-humble-rtabmap-ros<span class="w"> </span>ros-humble-navigation2<span class="w"> </span>ros-humble-nav2-bringup
-</code></pre></div>
-<p>Create a private environment file; never commit credentials:</p>
-<div class="highlight"><pre><span></span><code>cp<span class="w"> </span>.env.example<span class="w"> </span>.env
-<span class="nv">$EDITOR</span><span class="w"> </span>.env
-</code></pre></div>
-<p><code>start.sh</code> loads this ignored file automatically and exports it to every
-Robonix child process. Keep VLM and Tencent SecretId/SecretKey here; keep
-non-secret backend, AppID, engine, voice, and region settings in
-<code>robonix_manifest.yaml</code>.</p>
-<h2>Build and boot</h2>
-<div class="highlight"><pre><span></span><code>bash<span class="w"> </span>build.sh
-bash<span class="w"> </span>start.sh
-</code></pre></div>
-<p>The wrappers set <code>ROBONIX_DEPLOY_DIR</code>, source ROS Humble, and keep the Zenoh
-router lifecycle tied to <code>rbnx boot</code>. Each package's selected manifest chooses
-its Jetson-native build and start commands.</p>
-<p>Operator pages:</p>
-<ul>
-<li>Scene: <code>http://&lt;robot-host&gt;:50107/</code></li>
-<li>Mapping: <code>http://&lt;robot-host&gt;:8091/</code></li>
-<li>Atlas for Robonix Client: <code>&lt;robot-host&gt;:50051</code></li>
-<li>Liaison for Robonix Client: <code>&lt;robot-host&gt;:50081</code></li>
-</ul>
-<p>Static deployment checks do not start hardware:</p>
-<div class="highlight"><pre><span></span><code>python3<span class="w"> </span>-m<span class="w"> </span>unittest<span class="w"> </span>-v<span class="w"> </span><span class="se">\</span>
-<span class="w">  </span>test_manifest_config.py<span class="w"> </span>test_nav2_config.py<span class="w"> </span>test_nav2_acceptance.py
-</code></pre></div>
-<h2>RViz</h2>
-<p>The deploy keeps the complete v0.1 RViz configuration and an updated mapping
-variant. The updated file preserves the original map, costmap, scan, path,
-goal, TF, particle-cloud, and footprint displays, and adds the Soma-backed
-RobotModel plus the live MID-360 <code>/scanner/cloud</code> display.</p>
-<div class="highlight"><pre><span></span><code><span class="nb">source</span><span class="w"> </span>/opt/ros/humble/setup.bash
-<span class="nb">export</span><span class="w"> </span><span class="nv">RMW_IMPLEMENTATION</span><span class="o">=</span>rmw_zenoh_cpp
-rviz2<span class="w"> </span>-d<span class="w"> </span>rviz/ranger_mapping.rviz
-</code></pre></div>
-<p>The unchanged historical configuration is <code>rviz/ranger_v0.1.rviz</code>.</p>
-<h2>Safety and bring-up order</h2>
-<p>The checked-in full manifest includes the chassis, Piper arm, Nav2, and skills;
-starting it exposes physical motion capabilities. Keep the hardware emergency
-stop available and clear the workspace before full bring-up.</p>
-<p>After the chassis is powered on:</p>
-<ol>
-<li>Verify <code>can_ranger</code> is UP and odometry is publishing.</li>
-<li>Send zero Twist and confirm the watchdog holds the base stopped.</li>
-<li>Use a low-speed, short-duration command in a clear area.</li>
-<li>Verify Mapping pose and Nav2 costmaps before sending a nearby goal.</li>
-<li>Only then test Explore.</li>
-</ol>
-<h2>Robot description</h2>
-<p><code>soma.yaml</code> and <code>urdf/ranger_mini.urdf</code> are served by Soma. The description
-contains the body footprint and sensor tree used by Pilot and other consumers.
-Mount transforms remain calibration-sensitive; update the URDF after physical
-measurement rather than compensating in Scene or Mapping.</p>
+          <p>No README.md was found in this package repository.</p>
         </article>
       </section>
       <aside class="panel detail-side">
@@ -844,26 +742,26 @@ measurement rather than compensating in Scene or Mapping.</p>
 <li><span>primitive</span> <code>mid360_lidar</code><br><a href="../../packages/robonix.primitive.livox.mid360.lidar/">robonix.primitive.livox.mid360.lidar</a></li>
 <li><span>primitive</span> <code>mid360_imu</code><br><a href="../../packages/robonix.primitive.livox.mid360.imu/">robonix.primitive.livox.mid360.imu</a></li>
 <li><span>primitive</span> <code>realsense_camera</code><br><a href="../../packages/robonix.primitive.intel.realsense_d435i.camera/">robonix.primitive.intel.realsense_d435i.camera</a></li>
-<li><span>primitive</span> <code>orbbec_camera</code><br>/home/syswonder/lhw/rbnx_piper_packages/rbnx-boot/cache/OrbbecSDK_rbnx</li>
+<li><span>primitive</span> <code>orbbec_camera</code><br><a href="../../packages/robonix.primitive.orbbec.dabai_dcw.camera/">robonix.primitive.orbbec.dabai_dcw.camera</a></li>
 <li><span>primitive</span> <code>ranger_chassis</code><br><a href="../../packages/robonix.primitive.agilex.ranger_mini_v3.chassis/">robonix.primitive.agilex.ranger_mini_v3.chassis</a></li>
-<li><span>primitive</span> <code>piper_ctl</code><br>/home/syswonder/lhw/rbnx_piper_packages/rbnx-boot/cache/piper_ctl_rbnx</li>
+<li><span>primitive</span> <code>piper_ctl</code><br><a href="../../packages/robonix.primitive.agilex.piper.arm/">robonix.primitive.agilex.piper.arm</a></li>
 <li><span>primitive</span> <code>audio_driver</code><br>${ROBONIX_SOURCE_PATH}/examples/webots/primitives/audio_driver</li>
 <li><span>primitive</span> <code>audio_client_bridge</code><br>${ROBONIX_SOURCE_PATH}/examples/webots/primitives/audio_client_bridge</li>
 <li><span>service</span> <code>memory</code><br>${ROBONIX_SOURCE_PATH}/services/memsearch</li>
 <li><span>service</span> <code>speech</code><br>${ROBONIX_SOURCE_PATH}/services/speech</li>
 <li><span>service</span> <code>voiceprint</code><br>${ROBONIX_SOURCE_PATH}/services/voiceprint</li>
-<li><span>service</span> <code>llm_detect</code><br>/home/syswonder/lhw/rbnx_piper_packages/rbnx-boot/cache/llm_detect_rbnx</li>
-<li><span>service</span> <code>grasp_pose</code><br>/home/syswonder/lhw/rbnx_piper_packages/rbnx-boot/cache/grasp_pose_rbnx</li>
-<li><span>service</span> <code>roboarm_ik</code><br>/home/syswonder/lhw/rbnx_piper_packages/rbnx-boot/cache/roboarm_ik_rbnx</li>
+<li><span>service</span> <code>llm_detect</code><br><a href="../../packages/robonix.service.object_detect/">robonix.service.object_detect</a></li>
+<li><span>service</span> <code>grasp_pose</code><br><a href="../../packages/robonix.service.grasp_pose/">robonix.service.grasp_pose</a></li>
+<li><span>service</span> <code>roboarm_ik</code><br><a href="../../packages/robonix.service.roboarm.ik/">robonix.service.roboarm.ik</a></li>
 <li><span>service</span> <code>mapping</code><br><a href="../../packages/robonix.service.mapping/">robonix.service.mapping</a></li>
 <li><span>service</span> <code>nav2</code><br><a href="../../packages/robonix.service.navigation/">robonix.service.navigation</a></li>
 <li><span>skill</span> <code>explore</code><br><a href="../../packages/robonix.skill.explore/">robonix.skill.explore</a></li>
 <li><span>skill</span> <code>greet</code><br>./skills/greet</li>
-<li><span>skill</span> <code>pick</code><br>/home/syswonder/lhw/rbnx_piper_packages/rbnx-boot/cache/pick_skill_rbnx</li>
+<li><span>skill</span> <code>pick</code><br><a href="../../packages/robonix.skill.pick.vertical_grasp/">robonix.skill.pick.vertical_grasp</a></li>
         </ul>
       </aside>
     </div>
   </main>
-  <footer class="shell">Generated on 2026-07-15T13:24:35+00:00.</footer>
+  <footer class="site-footer"><div class="shell">Generated on 2026-07-16T04:54:40+00:00.</div></footer>
 </body>
 </html>

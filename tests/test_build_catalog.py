@@ -1,8 +1,11 @@
 import importlib.util
+import io
 import tempfile
 import unittest
 from pathlib import Path
 from unittest import mock
+
+from PIL import Image
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -83,7 +86,33 @@ class RobotListingTests(unittest.TestCase):
 
         self.assertIn('class="card-side"', rendered)
         self.assertIn('class="card-preview"', rendered)
+        self.assertIn('width="380" height="285"', rendered)
+        self.assertIn('decoding="async" fetchpriority="low"', rendered)
         self.assertLess(rendered.index('class="card-actions"'), rendered.index('class="card-preview"'))
+
+    def test_robot_preview_is_resized_to_responsive_webp_assets(self):
+        image_buffer = io.BytesIO()
+        Image.new("RGB", (1600, 900), (39, 54, 137)).save(image_buffer, "JPEG", quality=95)
+        package = {
+            "name": "robonix.robot.example",
+            "preview_image_url": "https://raw.githubusercontent.com/syswonder/example/main/assets/robot.jpg",
+        }
+
+        with tempfile.TemporaryDirectory() as tmp, mock.patch.object(
+            BUILD_CATALOG, "download_bytes", return_value=image_buffer.getvalue()
+        ):
+            public = Path(tmp)
+            BUILD_CATALOG.prepare_preview_images(public, [package])
+            small = public / package["_preview_image_380"]
+            large = public / package["_preview_image_720"]
+
+            self.assertTrue(small.is_file())
+            self.assertTrue(large.is_file())
+            with Image.open(small) as preview:
+                self.assertEqual(preview.format, "WEBP")
+                self.assertEqual(preview.size, (380, 285))
+            with Image.open(large) as preview:
+                self.assertEqual(preview.size, (720, 540))
 
     def test_listing_has_mobile_navigation_filters_and_api_rows(self):
         package = {
@@ -117,6 +146,10 @@ class RobotListingTests(unittest.TestCase):
         self.assertIn('<details class="panel filters" open>', rendered)
         self.assertIn("<summary>Filters and catalog summary</summary>", rendered)
         self.assertIn("filters.open = false", rendered)
+        self.assertIn("top: calc(var(--site-header-height) + var(--sticky-gap))", rendered)
+        self.assertIn("max-height: calc(100dvh - var(--site-header-height) - 28px)", rendered)
+        self.assertIn("new ResizeObserver(updateHeaderHeight).observe(header)", rendered)
+        self.assertIn("max-height: none", rendered)
         self.assertIn("@media (max-width: 520px)", rendered)
         self.assertIn(".topline { align-items: stretch; flex-direction: column; }", rendered)
         self.assertIn("@media (prefers-reduced-motion: reduce)", rendered)
@@ -165,6 +198,17 @@ class RobotListingTests(unittest.TestCase):
         self.assertNotIn('class="brand-bus"', rendered)
         self.assertIn("fetch(file)", api_viewer)
         self.assertIn("../v1/${resource}.json", api_viewer)
+        self.assertIn("min-height: 100dvh", rendered)
+        self.assertIn("flex-direction: column", rendered)
+        self.assertIn('class="site-footer"', rendered)
+        self.assertIn(".site-footer {", rendered)
+        self.assertIn("max-width: none", rendered)
+        self.assertIn("-webkit-backdrop-filter: blur(16px)", rendered)
+
+    def test_catalog_workflow_supports_manual_refresh(self):
+        workflow = (ROOT / ".github/workflows/catalog.yml").read_text()
+        self.assertIn("workflow_dispatch:", workflow)
+        self.assertIn("python scripts/build_catalog.py", workflow)
 
     def test_api_writer_keeps_extensionless_resource_and_json_preview(self):
         with tempfile.TemporaryDirectory() as tmp:

@@ -3,6 +3,7 @@ import argparse
 import base64
 import datetime as dt
 import html
+import io
 import json
 import os
 import posixpath
@@ -17,6 +18,7 @@ from pathlib import Path
 import bleach
 import markdown
 import yaml
+from PIL import Image, ImageOps, UnidentifiedImageError
 from pygments.formatters import HtmlFormatter
 
 
@@ -24,6 +26,8 @@ GITHUB_RE = re.compile(r"^https://github\.com/([^/]+)/([^/#?]+?)(?:\.git)?/?$")
 MAINTAINER_RE = re.compile(r"^[^<>\n]+ <[^<>\s@]+@[^<>\s@]+\.[^<>\s@]+>$")
 VENDOR_ASSETS = Path("assets/vendor/pico")
 LEGACY_MISSING_LICENSE = {"robonix.robot.wheeltec.r550"}
+PREVIEW_SIZES = ((380, 285), (720, 540))
+PREVIEW_WEBP_QUALITY = 76
 
 
 def fail(msg: str) -> None:
@@ -70,6 +74,52 @@ def github_optional_json(url: str) -> dict | None:
         fail(f"GitHub request failed {e.code}: {url}\n{body}")
     except Exception as e:
         fail(f"GitHub request failed: {url}: {e}")
+
+
+def download_bytes(url: str) -> bytes:
+    headers = {"User-Agent": "robonix-package-catalog"}
+    token = os.environ.get("GITHUB_TOKEN")
+    if token and urllib.parse.urlparse(url).hostname in {
+        "api.github.com",
+        "raw.githubusercontent.com",
+    }:
+        headers["Authorization"] = f"Bearer {token}"
+    request = urllib.request.Request(url, headers=headers)
+    with urllib.request.urlopen(request, timeout=30) as response:
+        return response.read()
+
+
+def prepare_preview_images(public_dir: Path, packages: list[dict]) -> None:
+    preview_dir = public_dir / "assets" / "previews"
+    for package in packages:
+        source_url = package.get("preview_image_url")
+        if not source_url:
+            continue
+        try:
+            source_bytes = download_bytes(source_url)
+            with Image.open(io.BytesIO(source_bytes)) as source:
+                source = ImageOps.exif_transpose(source).convert("RGB")
+                preview_dir.mkdir(parents=True, exist_ok=True)
+                for width, height in PREVIEW_SIZES:
+                    preview = ImageOps.fit(
+                        source,
+                        (width, height),
+                        method=Image.Resampling.LANCZOS,
+                    )
+                    asset = f"assets/previews/{package_slug(package['name'])}-{width}.webp"
+                    preview.save(
+                        public_dir / asset,
+                        "WEBP",
+                        quality=PREVIEW_WEBP_QUALITY,
+                        method=6,
+                        optimize=True,
+                    )
+                    package[f"_preview_image_{width}"] = asset
+        except (OSError, UnidentifiedImageError, urllib.error.URLError) as error:
+            print(
+                f"warning: {package['name']}: could not optimize preview image: {error}",
+                file=sys.stderr,
+            )
 
 
 def parse_repo(url: str) -> tuple[str, str]:
@@ -373,8 +423,11 @@ def render_css() -> str:
       --signal: #3674ff;
       --signal-soft: #e9edff;
       --shadow: 0 8px 28px rgba(28, 38, 88, 0.06);
+      --site-header-height: 64px;
+      --sticky-gap: 14px;
     }
     * { box-sizing: border-box; }
+    html { min-height: 100%; background: var(--bg); }
     .visually-hidden {
       position: absolute !important;
       width: 1px !important;
@@ -389,8 +442,12 @@ def render_css() -> str:
     body {
       width: 100%;
       max-width: none;
+      min-height: 100vh;
+      min-height: 100dvh;
       padding: 0;
       margin: 0;
+      display: flex;
+      flex-direction: column;
       color: var(--ink);
       background:
         radial-gradient(circle at 18% -8%, rgba(54, 116, 255, 0.09), transparent 30rem),
@@ -421,6 +478,7 @@ def render_css() -> str:
       color: var(--ink);
       border-bottom: 1px solid rgba(221, 225, 236, 0.88);
       background: rgba(255, 255, 255, 0.9);
+      -webkit-backdrop-filter: blur(16px);
       backdrop-filter: blur(16px);
     }
     .site-header .shell { padding-block: 12px; }
@@ -471,7 +529,11 @@ def render_css() -> str:
       letter-spacing: 0.09em;
       text-transform: uppercase;
     }
-    main.shell { padding-block: 0 34px; }
+    main.shell {
+      width: min(100% - 48px, 1180px);
+      flex: 1 0 auto;
+      padding-block: 0 34px;
+    }
     .search-strip { padding: 16px 0 14px; }
     .catalog-frame {
       display: grid;
@@ -488,7 +550,15 @@ def render_css() -> str:
       margin-bottom: 0;
       transition: border-color 180ms ease, box-shadow 180ms ease, transform 180ms ease;
     }
-    .filters { padding: 14px; position: sticky; top: 14px; }
+    .filters {
+      padding: 14px;
+      position: sticky;
+      top: calc(var(--site-header-height) + var(--sticky-gap));
+      max-height: calc(100dvh - var(--site-header-height) - 28px);
+      overflow-y: auto;
+      overscroll-behavior: contain;
+      scrollbar-gutter: stable;
+    }
     .filters > summary { display: none; }
     .filter-content { min-width: 0; }
     .filters h2, .content h2 { margin: 0 0 9px; font-size: 15px; }
@@ -730,11 +800,18 @@ def render_css() -> str:
     .detail-hero h1 { font-family: var(--font-mono); }
     .back { display: inline-block; margin: 0 0 12px; color: var(--brand); }
     .generated { color: var(--muted); margin-top: 12px; font-size: 13px; }
-    footer {
+    .site-footer {
+      width: 100%;
+      max-width: none;
+      margin: 0;
+      padding: 0;
+      flex: 0 0 auto;
       color: var(--muted);
+      border-top: 1px solid var(--line);
+      background: var(--paper);
       font-size: 12px;
     }
-    footer.shell { padding-block: 18px 28px; }
+    .site-footer .shell { padding-block: 18px 28px; }
     .readme {
       line-height: 1.58;
       color: #1f2937;
@@ -830,6 +907,7 @@ def render_css() -> str:
     }
     @media (max-width: 860px) {
       .shell { width: min(100% - 28px, 1180px); }
+      main.shell { width: min(100% - 28px, 1180px); }
       .topline { align-items: stretch; flex-direction: column; }
       .api-links {
         display: grid;
@@ -841,7 +919,13 @@ def render_css() -> str:
       .catalog-frame, .detail-layout { grid-template-columns: 1fr; }
       .detail-side { order: -1; }
       .entry-grid { grid-template-columns: 1fr; }
-      .filters { padding: 0; position: static; }
+      .filters {
+        padding: 0;
+        position: static;
+        max-height: none;
+        overflow: visible;
+        scrollbar-gutter: auto;
+      }
       .filters > summary {
         display: block;
         padding: 12px 14px;
@@ -865,6 +949,7 @@ def render_css() -> str:
     @media (max-width: 520px) {
       body { font-size: 14px; }
       .shell { width: min(100% - 20px, 1180px); }
+      main.shell { width: min(100% - 20px, 1180px); }
       .site-header .shell { padding-block: 10px; }
       .brand { font-size: 17px; overflow-wrap: anywhere; }
       .brand small { display: none; }
@@ -933,7 +1018,22 @@ def render_navigation(root: str, current: str = "") -> str:
         {page_link('api/view/', 'API', 'api')}
       </nav>
     </div>
-  </header>"""
+  </header>
+  <script>
+    (() => {{
+      const header = document.currentScript.previousElementSibling;
+      const updateHeaderHeight = () => {{
+        const height = Math.ceil(header.getBoundingClientRect().height);
+        document.documentElement.style.setProperty('--site-header-height', `${{height}}px`);
+      }};
+      updateHeaderHeight();
+      if ('ResizeObserver' in window) {{
+        new ResizeObserver(updateHeaderHeight).observe(header);
+      }} else {{
+        window.addEventListener('resize', updateHeaderHeight, {{ passive: true }});
+      }}
+    }})();
+  </script>"""
 
 
 def detail_base(package: dict) -> str:
@@ -963,10 +1063,21 @@ def render_listing_page(public_dir: Path, generated_at: str, packages: list[dict
             + [d.get("name", "") for d in p.get("deploy_dependencies", [])]
         )
         preview_html = ""
-        if p.get("preview_image_url"):
+        if p.get("_preview_image_380"):
+            small = f"../{p['_preview_image_380']}"
+            large = f"../{p['_preview_image_720']}"
+            preview_html = (
+                f'<img class="card-preview" src="{html.escape(small)}" '
+                f'srcset="{html.escape(small)} 380w, {html.escape(large)} 720w" '
+                f'sizes="(max-width: 520px) calc(100vw - 48px), 190px" '
+                f'width="380" height="285" alt="{html.escape(p["name"])} preview" '
+                f'loading="lazy" decoding="async" fetchpriority="low">'
+            )
+        elif p.get("preview_image_url"):
             preview_html = (
                 f'<img class="card-preview" src="{html.escape(p["preview_image_url"])}" '
-                f'alt="{html.escape(p["name"])} preview" loading="lazy">'
+                f'width="380" height="285" alt="{html.escape(p["name"])} preview" '
+                f'loading="lazy" decoding="async" fetchpriority="low">'
             )
         cards.append(
             f"""<article class="package-card" data-kind="{html.escape(p['kind'])}" data-tags="{html.escape(' '.join(p['tags']))}" data-search="{html.escape(search_text.lower())}">
@@ -1081,7 +1192,7 @@ const detail = await fetch(`${{base}}/package/${{encodeURIComponent('robonix.ser
       </div>
     </details>
   </main>
-  <footer class="shell">Generated on {html.escape(generated_at)}.</footer>
+  <footer class="site-footer"><div class="shell">Generated on {html.escape(generated_at)}.</div></footer>
   <script>
     const input = document.getElementById('q');
     const cards = Array.from(document.querySelectorAll('.package-card'));
@@ -1168,6 +1279,7 @@ def render_site(public_dir: Path, generated_at: str, packages: list[dict]) -> No
     robot_entries = [p for p in packages if p.get("catalog_type") == "robot"]
     public_dir.mkdir(parents=True, exist_ok=True)
     copy_assets(public_dir)
+    prepare_preview_images(public_dir, packages)
     render_listing_page(public_dir, generated_at, package_entries, page="packages", title="Packages", empty_label="packages")
     render_listing_page(public_dir, generated_at, robot_entries, page="robots", title="Robot deployments", empty_label="robot deployments")
     home_results = []
@@ -1260,7 +1372,7 @@ def render_site(public_dir: Path, generated_at: str, packages: list[dict]) -> No
       </div>
     </details>
   </main>
-  <footer class="shell">Generated on {html.escape(generated_at)}.</footer>
+  <footer class="site-footer"><div class="shell">Generated on {html.escape(generated_at)}.</div></footer>
   <script>
     const catalogSearch = document.getElementById('catalogSearch');
     const entryGrid = document.getElementById('entryGrid');
@@ -1321,7 +1433,7 @@ def render_api_viewer(public_dir: Path, generated_at: str) -> None:
       <pre class="api-json"><code id="apiJson">Loading JSON…</code></pre>
     </section>
   </main>
-  <footer class="shell">Generated on {html.escape(generated_at)}.</footer>
+  <footer class="site-footer"><div class="shell">Generated on {html.escape(generated_at)}.</div></footer>
   <script>
     const params = new URLSearchParams(window.location.search);
     const packageName = params.get('package');
@@ -1516,7 +1628,7 @@ def render_package_pages(public_dir: Path, generated_at: str, packages: list[dic
       </aside>
     </div>
   </main>
-  <footer class="shell">Generated on {html.escape(generated_at)}.</footer>
+  <footer class="site-footer"><div class="shell">Generated on {html.escape(generated_at)}.</div></footer>
 </body>
 </html>
 """,
@@ -1702,8 +1814,9 @@ def render_readme(path: Path, generated_at: str, packages: list[dict]) -> None:
         "```",
         "",
         "A robot deployment repository may add `assets/robot.jpg`. When present,",
-        "the catalog exposes its raw URL as `preview_image_url` and displays the",
-        "photo in the robot deployment list. Repositories without the file keep",
+        "the catalog exposes its raw URL as `preview_image_url`, then generates",
+        "380 px and 720 px WebP previews for responsive robot list cards. Repositories",
+        "without the file keep",
         "the same metadata and layout without an image placeholder.",
         "",
         "The builder also parses `primitive:`, `service:`, and `skill:` entries from",

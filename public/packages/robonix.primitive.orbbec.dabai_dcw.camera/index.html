@@ -28,8 +28,11 @@
       --signal: #3674ff;
       --signal-soft: #e9edff;
       --shadow: 0 8px 28px rgba(28, 38, 88, 0.06);
+      --site-header-height: 64px;
+      --sticky-gap: 14px;
     }
     * { box-sizing: border-box; }
+    html { min-height: 100%; background: var(--bg); }
     .visually-hidden {
       position: absolute !important;
       width: 1px !important;
@@ -44,8 +47,12 @@
     body {
       width: 100%;
       max-width: none;
+      min-height: 100vh;
+      min-height: 100dvh;
       padding: 0;
       margin: 0;
+      display: flex;
+      flex-direction: column;
       color: var(--ink);
       background:
         radial-gradient(circle at 18% -8%, rgba(54, 116, 255, 0.09), transparent 30rem),
@@ -76,6 +83,7 @@
       color: var(--ink);
       border-bottom: 1px solid rgba(221, 225, 236, 0.88);
       background: rgba(255, 255, 255, 0.9);
+      -webkit-backdrop-filter: blur(16px);
       backdrop-filter: blur(16px);
     }
     .site-header .shell { padding-block: 12px; }
@@ -126,7 +134,11 @@
       letter-spacing: 0.09em;
       text-transform: uppercase;
     }
-    main.shell { padding-block: 0 34px; }
+    main.shell {
+      width: min(100% - 48px, 1180px);
+      flex: 1 0 auto;
+      padding-block: 0 34px;
+    }
     .search-strip { padding: 16px 0 14px; }
     .catalog-frame {
       display: grid;
@@ -143,7 +155,15 @@
       margin-bottom: 0;
       transition: border-color 180ms ease, box-shadow 180ms ease, transform 180ms ease;
     }
-    .filters { padding: 14px; position: sticky; top: 14px; }
+    .filters {
+      padding: 14px;
+      position: sticky;
+      top: calc(var(--site-header-height) + var(--sticky-gap));
+      max-height: calc(100dvh - var(--site-header-height) - 28px);
+      overflow-y: auto;
+      overscroll-behavior: contain;
+      scrollbar-gutter: stable;
+    }
     .filters > summary { display: none; }
     .filter-content { min-width: 0; }
     .filters h2, .content h2 { margin: 0 0 9px; font-size: 15px; }
@@ -385,11 +405,18 @@
     .detail-hero h1 { font-family: var(--font-mono); }
     .back { display: inline-block; margin: 0 0 12px; color: var(--brand); }
     .generated { color: var(--muted); margin-top: 12px; font-size: 13px; }
-    footer {
+    .site-footer {
+      width: 100%;
+      max-width: none;
+      margin: 0;
+      padding: 0;
+      flex: 0 0 auto;
       color: var(--muted);
+      border-top: 1px solid var(--line);
+      background: var(--paper);
       font-size: 12px;
     }
-    footer.shell { padding-block: 18px 28px; }
+    .site-footer .shell { padding-block: 18px 28px; }
     .readme {
       line-height: 1.58;
       color: #1f2937;
@@ -485,6 +512,7 @@
     }
     @media (max-width: 860px) {
       .shell { width: min(100% - 28px, 1180px); }
+      main.shell { width: min(100% - 28px, 1180px); }
       .topline { align-items: stretch; flex-direction: column; }
       .api-links {
         display: grid;
@@ -496,7 +524,13 @@
       .catalog-frame, .detail-layout { grid-template-columns: 1fr; }
       .detail-side { order: -1; }
       .entry-grid { grid-template-columns: 1fr; }
-      .filters { padding: 0; position: static; }
+      .filters {
+        padding: 0;
+        position: static;
+        max-height: none;
+        overflow: visible;
+        scrollbar-gutter: auto;
+      }
       .filters > summary {
         display: block;
         padding: 12px 14px;
@@ -520,6 +554,7 @@
     @media (max-width: 520px) {
       body { font-size: 14px; }
       .shell { width: min(100% - 20px, 1180px); }
+      main.shell { width: min(100% - 20px, 1180px); }
       .site-header .shell { padding-block: 10px; }
       .brand { font-size: 17px; overflow-wrap: anywhere; }
       .brand small { display: none; }
@@ -659,6 +694,21 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
       </nav>
     </div>
   </header>
+  <script>
+    (() => {
+      const header = document.currentScript.previousElementSibling;
+      const updateHeaderHeight = () => {
+        const height = Math.ceil(header.getBoundingClientRect().height);
+        document.documentElement.style.setProperty('--site-header-height', `${height}px`);
+      };
+      updateHeaderHeight();
+      if ('ResizeObserver' in window) {
+        new ResizeObserver(updateHeaderHeight).observe(header);
+      } else {
+        window.addEventListener('resize', updateHeaderHeight, { passive: true });
+      }
+    })();
+  </script>
   <header class="shell detail-hero">
     <a class="back" href="../">Back to packages</a>
     <h1>robonix.primitive.orbbec.dabai_dcw.camera</h1>
@@ -669,115 +719,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
       <section class="panel detail-main">
         <h2>README</h2>
         <article class="readme">
-          <h1>primitive-orbbec-dabai_dcw-camera-rbnx</h1>
-<p>Robonix package wrapping the <strong>Orbbec Dabai DCW</strong> RGBD camera. Owns the <code>primitive/camera/*</code> namespace. Exposes the camera's RGB + depth + camera_info streams under generic contracts so consumers (grasp / detection / scene / vision skills) resolve topic names through atlas — no hardcoded <code>/camera/color/image_raw</code> paths on the consumer side.</p>
-<p>Catalog name: <code>robonix.primitive.orbbec.dabai_dcw.camera</code>.</p>
-<h2>Capability surface</h2>
-<table>
-<thead>
-<tr>
-<th>Contract</th>
-<th>Mode</th>
-<th>Transport</th>
-<th>Source / handler</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><code>robonix/primitive/camera/driver</code></td>
-<td>rpc</td>
-<td>gRPC</td>
-<td><code>Driver(CMD_INIT, config_json)</code> — lifecycle gate</td>
-</tr>
-<tr>
-<td><code>robonix/primitive/camera/rgb</code></td>
-<td>topic_out</td>
-<td>ROS 2</td>
-<td><code>/&lt;camera_name&gt;/color/image_raw</code> (sensor_msgs/Image)</td>
-</tr>
-<tr>
-<td><code>robonix/primitive/camera/depth</code></td>
-<td>topic_out</td>
-<td>ROS 2</td>
-<td><code>/&lt;camera_name&gt;/depth/image_raw</code> (sensor_msgs/Image; HW-aligned to color when <code>depth_registration=true</code>)</td>
-</tr>
-<tr>
-<td><code>robonix/primitive/camera/camera_info</code></td>
-<td>topic_out</td>
-<td>ROS 2</td>
-<td><code>/&lt;camera_name&gt;/color/camera_info</code> (sensor_msgs/CameraInfo)</td>
-</tr>
-</tbody>
-</table>
-<p><code>camera_info</code> is <strong>package-locally defined</strong> (see <code>capabilities/primitive/camera/camera_info.v1.toml</code>) because the robonix global tree does not ship that contract yet; codegen + atlas merge package-level capabilities automatically. <code>service-object-detect-rbnx</code> uses it to synchronize RGB frames and, when depth is enabled, to back-project detections. The current vertical-grasp deploy skips depth and lets <code>service-grasp-pose-rbnx</code> map bbox pixels through a calibrated 2D homography.</p>
-<p>Aspirational contracts (<code>extrinsics</code>, <code>snapshot</code>, <code>depth_snapshot</code>) listed in the global <code>capabilities/primitive/camera/</code> are intentionally <strong>not</strong> declared here — per the packaging rules, manifest entries must correspond to real <code>declare_ros2_*/@cap.mcp(...)</code> handlers.</p>
-<h2>Boot ordering</h2>
-<p>Boot this <strong>before</strong> any consumer of <code>primitive/camera/*</code>. In the current vertical-grasp pipeline, <code>service-object-detect-rbnx</code> resolves <code>rgb</code> and <code>camera_info</code> during its <code>Driver(CMD_INIT)</code> call. <code>service-grasp-pose-rbnx</code> does not consume camera topics directly; it receives the bbox from detection and uses the deploy's homography.</p>
-<h2>Driver-init lifecycle</h2>
-<p><code>start.sh</code> brings up the atlas bridge — no ROS spawn. The bridge opens a gRPC server, registers the provider, declares only <code>primitive/camera/driver</code> (auto-emitted by the framework when codegen produces a <code>Driver</code> Servicer), then blocks on <code>Driver(CMD_INIT, config_json)</code>.</p>
-<p>When <code>rbnx boot</code> invokes Init it passes the manifest's <code>config:</code> block as JSON. The lifecycle then runs:</p>
-<ol>
-<li><code>CMD_INIT</code>: parse and validate cfg (camera name, resolution / fps, <code>depth_registration</code>, USB pin, sentinel timeout);</li>
-<li><code>CMD_ACTIVATE</code>: spawn <code>ros2 launch orbbec_camera dabai_dcw.launch.py …</code>;</li>
-<li>wait for the first <code>sensor_msgs/Image</code> on the configured RGB topic (sentinel);</li>
-<li>declare <code>primitive/camera/{rgb, depth, camera_info}</code> on atlas.</li>
-</ol>
-<p>Atlas only ever advertises endpoints we've confirmed are publishing. <code>CMD_DEACTIVATE</code> / <code>CMD_SHUTDOWN</code> kill the orbbec subprocess. Idempotent.</p>
-<p>If the camera is not connected or the driver stalls, the sentinel times out and Init returns <code>state="error"</code>.</p>
-<h2>Layout</h2>
-<div class="highlight"><pre><span></span><code>primitive-orbbec-dabai_dcw-camera-rbnx/
-├── package_manifest.yaml
-├── capabilities/
-│   └── primitive/camera/camera_info.v1.toml   # package-local contract
-├── orbbec_camera/
-│   ├── __init__.py
-│   └── main.py                                # lifecycle + sentinel
-├── scripts/
-│   ├── build.sh                               # colcon build src + rbnx codegen
-│   └── start.sh                               # source ROS, exec main
-└── src/
-    └── OrbbecSDK_ROS2/                        # VENDORED orbbec/OrbbecSDK_ROS2
-        ├── orbbec_camera/                     # ROS 2 driver pkg
-        ├── orbbec_camera_msgs/
-        └── orbbec_description/
-</code></pre></div>
-<h2>Config (passed via <code>Driver(CMD_INIT, config_json)</code>)</h2>
-<div class="highlight"><pre><span></span><code><span class="nt">camera_name</span><span class="p">:</span><span class="w">        </span><span class="l l-Scalar l-Scalar-Plain">camera</span><span class="w">        </span><span class="c1"># ROS namespace; topic prefix</span>
-<span class="nt">depth_registration</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span><span class="w">          </span><span class="c1"># HW-align depth to color frame</span>
-<span class="nt">enable_d2c_viewer</span><span class="p">:</span><span class="w">  </span><span class="l l-Scalar l-Scalar-Plain">false</span><span class="w">         </span><span class="c1"># debug RViz; off in deploy</span>
-<span class="nt">color_width</span><span class="p">:</span><span class="w">        </span><span class="l l-Scalar l-Scalar-Plain">640</span>
-<span class="nt">color_height</span><span class="p">:</span><span class="w">       </span><span class="l l-Scalar l-Scalar-Plain">480</span>
-<span class="nt">color_fps</span><span class="p">:</span><span class="w">          </span><span class="l l-Scalar l-Scalar-Plain">10</span><span class="w">            </span><span class="c1"># dabai_dcw firmware default</span>
-<span class="nt">depth_width</span><span class="p">:</span><span class="w">        </span><span class="l l-Scalar l-Scalar-Plain">640</span>
-<span class="nt">depth_height</span><span class="p">:</span><span class="w">       </span><span class="l l-Scalar l-Scalar-Plain">400</span>
-<span class="nt">depth_fps</span><span class="p">:</span><span class="w">          </span><span class="l l-Scalar l-Scalar-Plain">10</span>
-<span class="nt">serial_number</span><span class="p">:</span><span class="w">      </span><span class="s">&quot;&quot;</span><span class="w">            </span><span class="c1"># pin to specific device when multiple connected</span>
-<span class="nt">usb_port</span><span class="p">:</span><span class="w">           </span><span class="s">&quot;&quot;</span>
-<span class="nt">sentinel_timeout_s</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">30.0</span><span class="w">          </span><span class="c1"># max wait for first RGB frame in on_activate</span>
-<span class="c1"># Topic-name overrides (rarely needed):</span>
-<span class="c1"># rgb_topic:          /&lt;camera_name&gt;/color/image_raw</span>
-<span class="c1"># depth_topic:        /&lt;camera_name&gt;/depth/image_raw</span>
-<span class="c1"># camera_info_topic:  /&lt;camera_name&gt;/color/camera_info</span>
-</code></pre></div>
-<h2>Build / run standalone</h2>
-<div class="highlight"><pre><span></span><code>bash<span class="w"> </span>scripts/build.sh<span class="w">                           </span><span class="c1"># colcon build vendored src + rbnx codegen</span>
-<span class="nv">ROBONIX_ATLAS</span><span class="o">=</span><span class="m">127</span>.0.0.1:50051<span class="w"> </span><span class="se">\</span>
-<span class="w">    </span>bash<span class="w"> </span>scripts/start.sh<span class="w">                       </span><span class="c1"># registers, awaits Init</span>
-</code></pre></div>
-<p>To drive the lifecycle manually (without <code>rbnx boot</code>), call the camera's <code>Driver</code> service with <code>CMD_INIT</code> and a config JSON, then call <code>CMD_ACTIVATE</code>. Init only validates configuration; Activate returns after the first RGB frame is observed and the three topic streams are declared.</p>
-<h2>Verification</h2>
-<div class="highlight"><pre><span></span><code>rbnx<span class="w"> </span>caps<span class="w"> </span><span class="p">|</span><span class="w"> </span>grep<span class="w"> </span>camera
-<span class="c1"># Expected: orbbec_camera provider with</span>
-<span class="c1">#   robonix/primitive/camera/{driver, rgb, depth, camera_info}</span>
-
-ros2<span class="w"> </span>topic<span class="w"> </span>hz<span class="w"> </span>/camera/color/image_raw<span class="w">           </span><span class="c1"># ~10 Hz with default fps</span>
-ros2<span class="w"> </span>topic<span class="w"> </span>hz<span class="w"> </span>/camera/depth/image_raw<span class="w">           </span><span class="c1"># ~10 Hz</span>
-ros2<span class="w"> </span>topic<span class="w"> </span><span class="nb">echo</span><span class="w"> </span>/camera/color/camera_info<span class="w"> </span>--once<span class="w">  </span><span class="c1"># K, D, R, P intrinsics</span>
-</code></pre></div>
-<h2>Vendor / upstream</h2>
-<p><code>src/OrbbecSDK_ROS2/</code> is a verbatim copy of <a href="https://github.com/orbbec/OrbbecSDK_ROS2">orbbec/OrbbecSDK_ROS2</a>. The Dabai DCW firmware-blob SDK ships under <code>orbbec_camera/SDK/{include,lib}/</code>. If anything diverges from upstream, drop a <code>*.patch</code> alongside <code>src/</code> documenting the diff.</p>
-<h2>License</h2>
-<p>This package: Apache-2.0. Vendored OrbbecSDK_ROS2: see its LICENSE file.</p>
+          <p>No README.md was found in this package repository.</p>
         </article>
       </section>
       <aside class="panel detail-side">
@@ -804,6 +746,6 @@ ros2<span class="w"> </span>topic<span class="w"> </span><span class="nb">echo</
       </aside>
     </div>
   </main>
-  <footer class="shell">Generated on 2026-07-15T13:24:35+00:00.</footer>
+  <footer class="site-footer"><div class="shell">Generated on 2026-07-16T04:54:40+00:00.</div></footer>
 </body>
 </html>

@@ -28,8 +28,11 @@
       --signal: #3674ff;
       --signal-soft: #e9edff;
       --shadow: 0 8px 28px rgba(28, 38, 88, 0.06);
+      --site-header-height: 64px;
+      --sticky-gap: 14px;
     }
     * { box-sizing: border-box; }
+    html { min-height: 100%; background: var(--bg); }
     .visually-hidden {
       position: absolute !important;
       width: 1px !important;
@@ -44,8 +47,12 @@
     body {
       width: 100%;
       max-width: none;
+      min-height: 100vh;
+      min-height: 100dvh;
       padding: 0;
       margin: 0;
+      display: flex;
+      flex-direction: column;
       color: var(--ink);
       background:
         radial-gradient(circle at 18% -8%, rgba(54, 116, 255, 0.09), transparent 30rem),
@@ -76,6 +83,7 @@
       color: var(--ink);
       border-bottom: 1px solid rgba(221, 225, 236, 0.88);
       background: rgba(255, 255, 255, 0.9);
+      -webkit-backdrop-filter: blur(16px);
       backdrop-filter: blur(16px);
     }
     .site-header .shell { padding-block: 12px; }
@@ -126,7 +134,11 @@
       letter-spacing: 0.09em;
       text-transform: uppercase;
     }
-    main.shell { padding-block: 0 34px; }
+    main.shell {
+      width: min(100% - 48px, 1180px);
+      flex: 1 0 auto;
+      padding-block: 0 34px;
+    }
     .search-strip { padding: 16px 0 14px; }
     .catalog-frame {
       display: grid;
@@ -143,7 +155,15 @@
       margin-bottom: 0;
       transition: border-color 180ms ease, box-shadow 180ms ease, transform 180ms ease;
     }
-    .filters { padding: 14px; position: sticky; top: 14px; }
+    .filters {
+      padding: 14px;
+      position: sticky;
+      top: calc(var(--site-header-height) + var(--sticky-gap));
+      max-height: calc(100dvh - var(--site-header-height) - 28px);
+      overflow-y: auto;
+      overscroll-behavior: contain;
+      scrollbar-gutter: stable;
+    }
     .filters > summary { display: none; }
     .filter-content { min-width: 0; }
     .filters h2, .content h2 { margin: 0 0 9px; font-size: 15px; }
@@ -385,11 +405,18 @@
     .detail-hero h1 { font-family: var(--font-mono); }
     .back { display: inline-block; margin: 0 0 12px; color: var(--brand); }
     .generated { color: var(--muted); margin-top: 12px; font-size: 13px; }
-    footer {
+    .site-footer {
+      width: 100%;
+      max-width: none;
+      margin: 0;
+      padding: 0;
+      flex: 0 0 auto;
       color: var(--muted);
+      border-top: 1px solid var(--line);
+      background: var(--paper);
       font-size: 12px;
     }
-    footer.shell { padding-block: 18px 28px; }
+    .site-footer .shell { padding-block: 18px 28px; }
     .readme {
       line-height: 1.58;
       color: #1f2937;
@@ -485,6 +512,7 @@
     }
     @media (max-width: 860px) {
       .shell { width: min(100% - 28px, 1180px); }
+      main.shell { width: min(100% - 28px, 1180px); }
       .topline { align-items: stretch; flex-direction: column; }
       .api-links {
         display: grid;
@@ -496,7 +524,13 @@
       .catalog-frame, .detail-layout { grid-template-columns: 1fr; }
       .detail-side { order: -1; }
       .entry-grid { grid-template-columns: 1fr; }
-      .filters { padding: 0; position: static; }
+      .filters {
+        padding: 0;
+        position: static;
+        max-height: none;
+        overflow: visible;
+        scrollbar-gutter: auto;
+      }
       .filters > summary {
         display: block;
         padding: 12px 14px;
@@ -520,6 +554,7 @@
     @media (max-width: 520px) {
       body { font-size: 14px; }
       .shell { width: min(100% - 20px, 1180px); }
+      main.shell { width: min(100% - 20px, 1180px); }
       .site-header .shell { padding-block: 10px; }
       .brand { font-size: 17px; overflow-wrap: anywhere; }
       .brand small { display: none; }
@@ -659,6 +694,21 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
       </nav>
     </div>
   </header>
+  <script>
+    (() => {
+      const header = document.currentScript.previousElementSibling;
+      const updateHeaderHeight = () => {
+        const height = Math.ceil(header.getBoundingClientRect().height);
+        document.documentElement.style.setProperty('--site-header-height', `${height}px`);
+      };
+      updateHeaderHeight();
+      if ('ResizeObserver' in window) {
+        new ResizeObserver(updateHeaderHeight).observe(header);
+      } else {
+        window.addEventListener('resize', updateHeaderHeight, { passive: true });
+      }
+    })();
+  </script>
   <main class="shell">
     <section class="page-intro">
       <span class="eyebrow">Robonix ecosystem index</span>
@@ -1163,7 +1213,7 @@ const detail = await fetch(`${base}/package/${encodeURIComponent('robonix.servic
       </div>
     </details>
   </main>
-  <footer class="shell">Generated on 2026-07-15T13:24:35+00:00.</footer>
+  <footer class="site-footer"><div class="shell">Generated on 2026-07-16T04:54:40+00:00.</div></footer>
   <script>
     const input = document.getElementById('q');
     const cards = Array.from(document.querySelectorAll('.package-card'));

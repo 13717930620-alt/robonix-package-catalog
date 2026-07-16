@@ -28,8 +28,11 @@
       --signal: #3674ff;
       --signal-soft: #e9edff;
       --shadow: 0 8px 28px rgba(28, 38, 88, 0.06);
+      --site-header-height: 64px;
+      --sticky-gap: 14px;
     }
     * { box-sizing: border-box; }
+    html { min-height: 100%; background: var(--bg); }
     .visually-hidden {
       position: absolute !important;
       width: 1px !important;
@@ -44,8 +47,12 @@
     body {
       width: 100%;
       max-width: none;
+      min-height: 100vh;
+      min-height: 100dvh;
       padding: 0;
       margin: 0;
+      display: flex;
+      flex-direction: column;
       color: var(--ink);
       background:
         radial-gradient(circle at 18% -8%, rgba(54, 116, 255, 0.09), transparent 30rem),
@@ -76,6 +83,7 @@
       color: var(--ink);
       border-bottom: 1px solid rgba(221, 225, 236, 0.88);
       background: rgba(255, 255, 255, 0.9);
+      -webkit-backdrop-filter: blur(16px);
       backdrop-filter: blur(16px);
     }
     .site-header .shell { padding-block: 12px; }
@@ -126,7 +134,11 @@
       letter-spacing: 0.09em;
       text-transform: uppercase;
     }
-    main.shell { padding-block: 0 34px; }
+    main.shell {
+      width: min(100% - 48px, 1180px);
+      flex: 1 0 auto;
+      padding-block: 0 34px;
+    }
     .search-strip { padding: 16px 0 14px; }
     .catalog-frame {
       display: grid;
@@ -143,7 +155,15 @@
       margin-bottom: 0;
       transition: border-color 180ms ease, box-shadow 180ms ease, transform 180ms ease;
     }
-    .filters { padding: 14px; position: sticky; top: 14px; }
+    .filters {
+      padding: 14px;
+      position: sticky;
+      top: calc(var(--site-header-height) + var(--sticky-gap));
+      max-height: calc(100dvh - var(--site-header-height) - 28px);
+      overflow-y: auto;
+      overscroll-behavior: contain;
+      scrollbar-gutter: stable;
+    }
     .filters > summary { display: none; }
     .filter-content { min-width: 0; }
     .filters h2, .content h2 { margin: 0 0 9px; font-size: 15px; }
@@ -385,11 +405,18 @@
     .detail-hero h1 { font-family: var(--font-mono); }
     .back { display: inline-block; margin: 0 0 12px; color: var(--brand); }
     .generated { color: var(--muted); margin-top: 12px; font-size: 13px; }
-    footer {
+    .site-footer {
+      width: 100%;
+      max-width: none;
+      margin: 0;
+      padding: 0;
+      flex: 0 0 auto;
       color: var(--muted);
+      border-top: 1px solid var(--line);
+      background: var(--paper);
       font-size: 12px;
     }
-    footer.shell { padding-block: 18px 28px; }
+    .site-footer .shell { padding-block: 18px 28px; }
     .readme {
       line-height: 1.58;
       color: #1f2937;
@@ -485,6 +512,7 @@
     }
     @media (max-width: 860px) {
       .shell { width: min(100% - 28px, 1180px); }
+      main.shell { width: min(100% - 28px, 1180px); }
       .topline { align-items: stretch; flex-direction: column; }
       .api-links {
         display: grid;
@@ -496,7 +524,13 @@
       .catalog-frame, .detail-layout { grid-template-columns: 1fr; }
       .detail-side { order: -1; }
       .entry-grid { grid-template-columns: 1fr; }
-      .filters { padding: 0; position: static; }
+      .filters {
+        padding: 0;
+        position: static;
+        max-height: none;
+        overflow: visible;
+        scrollbar-gutter: auto;
+      }
       .filters > summary {
         display: block;
         padding: 12px 14px;
@@ -520,6 +554,7 @@
     @media (max-width: 520px) {
       body { font-size: 14px; }
       .shell { width: min(100% - 20px, 1180px); }
+      main.shell { width: min(100% - 20px, 1180px); }
       .site-header .shell { padding-block: 10px; }
       .brand { font-size: 17px; overflow-wrap: anywhere; }
       .brand small { display: none; }
@@ -659,6 +694,21 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
       </nav>
     </div>
   </header>
+  <script>
+    (() => {
+      const header = document.currentScript.previousElementSibling;
+      const updateHeaderHeight = () => {
+        const height = Math.ceil(header.getBoundingClientRect().height);
+        document.documentElement.style.setProperty('--site-header-height', `${height}px`);
+      };
+      updateHeaderHeight();
+      if ('ResizeObserver' in window) {
+        new ResizeObserver(updateHeaderHeight).observe(header);
+      } else {
+        window.addEventListener('resize', updateHeaderHeight, { passive: true });
+      }
+    })();
+  </script>
   <header class="shell detail-hero">
     <a class="back" href="../">Back to robots</a>
     <h1>robonix.robot.wheeltec.r550</h1>
@@ -669,87 +719,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
       <section class="panel detail-main">
         <h2>README</h2>
         <article class="readme">
-          <h1>wheeltec_r550_deploy</h1>
-<p>Robonix deploy manifest for the WHEELTEC R550 robot at SysWonder lab.</p>
-<p>Hardware: Jetson Orin (aarch64, Tegra-special CUDA stack), WHEELTEC R550 chassis, Livox MID-360 3D LiDAR + integrated 6-axis IMU (Ethernet), Intel RealSense D435i RGBD camera (USB 3.0, with internal IMU).</p>
-<h2>Packages</h2>
-<p>All package URLs in <code>robonix_manifest.yaml</code> resolve from the SysWonder GitHub organization:</p>
-<table>
-<thead>
-<tr>
-<th>Package</th>
-<th>Repo</th>
-<th>Owns</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><code>mid360_lidar_rbnx</code></td>
-<td>syswonder/primitive-livox-mid360-lidar-rbnx</td>
-<td>primitive/lidar/*</td>
-</tr>
-<tr>
-<td><code>mid360_imu_rbnx</code></td>
-<td>syswonder/primitive-livox-mid360-imu-rbnx</td>
-<td>primitive/imu/*</td>
-</tr>
-<tr>
-<td><code>realsense_camera_rbnx</code></td>
-<td>syswonder/primitive-intel-realsense_d435i-camera-rbnx</td>
-<td>primitive/camera/*</td>
-</tr>
-<tr>
-<td><code>wheeltec_chassis_rbnx</code></td>
-<td>syswonder/primitive-wheeltec-r550-chassis-rbnx</td>
-<td>primitive/chassis/*</td>
-</tr>
-<tr>
-<td><code>mapping_rbnx</code></td>
-<td>syswonder/service-map-rbnx</td>
-<td>service/map/*</td>
-</tr>
-</tbody>
-</table>
-<div class="highlight"><pre><span></span><code><span class="c1"># on the Jetson, in this directory:</span>
-rbnx<span class="w"> </span>build<span class="w"> </span>.<span class="w">         </span><span class="c1"># clones each url: package and runs its build.sh</span>
-rbnx<span class="w"> </span>boot<span class="w">  </span>.<span class="w">         </span><span class="c1"># spawns each one and runs Driver(CMD_INIT, config)</span>
-</code></pre></div>
-<p><code>rbnx build</code> writes everything to <code>rbnx-build/cache/&lt;name&gt;/</code> so the original working dir on the Jetson is never touched.</p>
-<h2>URDF — required, not shipped</h2>
-<p>Soma needs a WHEELTEC R550 URDF (<code>urdf_path</code> in the system.soma block). The URDF must include <code>base_link</code> (chassis frame; convention: ground projection of the geometric centre, X forward, Z up), <code>livox_frame</code> mount transform from <code>base_link</code>, and <code>camera_link</code> + <code>camera_color_optical_frame</code> mount transforms.</p>
-<p>Until a calibrated URDF is in hand, an interim path is to launch <code>static_transform_publisher</code> for each frame manually. Sketch (drop in a side-launch, replace x y z and roll pitch yaw with your measured mount values):</p>
-<div class="highlight"><pre><span></span><code><span class="nt">&lt;launch&gt;</span>
-<span class="w">  </span><span class="nt">&lt;node</span><span class="w"> </span><span class="na">pkg=</span><span class="s">&quot;tf2_ros&quot;</span><span class="w"> </span><span class="na">exec=</span><span class="s">&quot;static_transform_publisher&quot;</span><span class="w"> </span><span class="na">name=</span><span class="s">&quot;tf_lidar&quot;</span>
-<span class="w">        </span><span class="na">args=</span><span class="s">&quot;0.20 0 0.40  0 0 0  base_link livox_frame&quot;</span><span class="nt">/&gt;</span>
-<span class="w">  </span><span class="nt">&lt;node</span><span class="w"> </span><span class="na">pkg=</span><span class="s">&quot;tf2_ros&quot;</span><span class="w"> </span><span class="na">exec=</span><span class="s">&quot;static_transform_publisher&quot;</span><span class="w"> </span><span class="na">name=</span><span class="s">&quot;tf_camera&quot;</span>
-<span class="w">        </span><span class="na">args=</span><span class="s">&quot;0.30 0 0.35  0 0 0  base_link camera_link&quot;</span><span class="nt">/&gt;</span>
-<span class="nt">&lt;/launch&gt;</span>
-</code></pre></div>
-<p>Then leave <code>system.soma</code> commented out in the manifest until the URDF is ready, and run that side-launch in another shell.</p>
-<h2>Verifying the bring-up</h2>
-<p>After <code>rbnx boot</code>:</p>
-<div class="highlight"><pre><span></span><code>ros2<span class="w"> </span>topic<span class="w"> </span>hz<span class="w"> </span>/scanner/cloud<span class="w">   </span><span class="c1"># ~10 Hz lidar PointCloud2</span>
-ros2<span class="w"> </span>topic<span class="w"> </span>hz<span class="w"> </span>/livox/imu<span class="w">       </span><span class="c1"># ~200 Hz sensor_msgs/Imu</span>
-ros2<span class="w"> </span>topic<span class="w"> </span>hz<span class="w"> </span>/camera_435i/color/image_raw<span class="w">                    </span><span class="c1"># ~30 Hz</span>
-ros2<span class="w"> </span>topic<span class="w"> </span>hz<span class="w"> </span>/camera_435i/aligned_depth_to_color/image_raw<span class="w">   </span><span class="c1"># ~30 Hz</span>
-ros2<span class="w"> </span>topic<span class="w"> </span>hz<span class="w"> </span>/map<span class="w">             </span><span class="c1"># 1 Hz-ish OccupancyGrid (from rtabmap)</span>
-ros2<span class="w"> </span>topic<span class="w"> </span><span class="nb">echo</span><span class="w"> </span>/robonix/map/pose<span class="w"> </span>--once
-rbnx<span class="w"> </span>caps<span class="w">                      </span><span class="c1"># all the contracts above should be listed</span>
-</code></pre></div>
-<p>Open RViz and load the rtabmap visualization config to see the map build up.</p>
-<h2>Defer / boot sequencing</h2>
-<p>The deploy manifest is an unordered list. Boot ordering happens at runtime via the defer protocol: a package whose dep isn't ready returns <code>Driver_Response(state="deferred")</code> and <code>rbnx boot</code> retries it periodically until the system reaches steady state. There's no explicit dep graph in the manifest — each package only declares what it needs at the moment its Init runs.</p>
-<p>Concretely, the cascade for this stack:</p>
-<div class="highlight"><pre><span></span><code>mid360_lidar.Init    →  spawns livox driver, declares lidar3d
-                        (also makes /livox/imu live on the bus)
-mid360_imu.Init      →  defers if /livox/imu silent; succeeds on retry
-                        once mid360_lidar&#39;s launch is publishing
-realsense_camera.Init→  spawns realsense, declares rgb + depth
-mapping.Init         →  queries atlas for lidar3d, rgb, depth, imu;
-                        defers any not yet present; succeeds when all are
-</code></pre></div>
-<h2>License</h2>
-<p>Manifest + this README: MulanPSL-2.0. Each <code>url:</code> package retains its own license.</p>
+          <p>No README.md was found in this package repository.</p>
         </article>
       </section>
       <aside class="panel detail-side">
@@ -779,6 +749,6 @@ mapping.Init         →  queries atlas for lidar3d, rgb, depth, imu;
       </aside>
     </div>
   </main>
-  <footer class="shell">Generated on 2026-07-15T13:24:35+00:00.</footer>
+  <footer class="site-footer"><div class="shell">Generated on 2026-07-16T04:54:40+00:00.</div></footer>
 </body>
 </html>

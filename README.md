@@ -174,8 +174,9 @@ catalog:
 ```
 
 A robot deployment repository may add `assets/robot.jpg`. When present,
-the catalog exposes its raw URL as `preview_image_url` and displays the
-photo in the robot deployment list. Repositories without the file keep
+the catalog exposes its raw URL as `preview_image_url`, then generates
+380 px and 720 px WebP previews for responsive robot list cards. Repositories
+without the file keep
 the same metadata and layout without an image placeholder.
 
 The builder also parses `primitive:`, `service:`, and `skill:` entries from
@@ -205,7 +206,7 @@ but browser-facing links and new integrations should use the `.json` paths above
 The generated commit uses `[skip ci]`; normal CI only triggers from
 `catalog.yaml`, the builder script, the workflow, or manual dispatch.
 
-Generated on `2026-07-15T13:24:35+00:00`.
+Generated on `2026-07-16T04:54:40+00:00`.
 
 ## Packages
 

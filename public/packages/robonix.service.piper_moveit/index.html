@@ -28,8 +28,11 @@
       --signal: #3674ff;
       --signal-soft: #e9edff;
       --shadow: 0 8px 28px rgba(28, 38, 88, 0.06);
+      --site-header-height: 64px;
+      --sticky-gap: 14px;
     }
     * { box-sizing: border-box; }
+    html { min-height: 100%; background: var(--bg); }
     .visually-hidden {
       position: absolute !important;
       width: 1px !important;
@@ -44,8 +47,12 @@
     body {
       width: 100%;
       max-width: none;
+      min-height: 100vh;
+      min-height: 100dvh;
       padding: 0;
       margin: 0;
+      display: flex;
+      flex-direction: column;
       color: var(--ink);
       background:
         radial-gradient(circle at 18% -8%, rgba(54, 116, 255, 0.09), transparent 30rem),
@@ -76,6 +83,7 @@
       color: var(--ink);
       border-bottom: 1px solid rgba(221, 225, 236, 0.88);
       background: rgba(255, 255, 255, 0.9);
+      -webkit-backdrop-filter: blur(16px);
       backdrop-filter: blur(16px);
     }
     .site-header .shell { padding-block: 12px; }
@@ -126,7 +134,11 @@
       letter-spacing: 0.09em;
       text-transform: uppercase;
     }
-    main.shell { padding-block: 0 34px; }
+    main.shell {
+      width: min(100% - 48px, 1180px);
+      flex: 1 0 auto;
+      padding-block: 0 34px;
+    }
     .search-strip { padding: 16px 0 14px; }
     .catalog-frame {
       display: grid;
@@ -143,7 +155,15 @@
       margin-bottom: 0;
       transition: border-color 180ms ease, box-shadow 180ms ease, transform 180ms ease;
     }
-    .filters { padding: 14px; position: sticky; top: 14px; }
+    .filters {
+      padding: 14px;
+      position: sticky;
+      top: calc(var(--site-header-height) + var(--sticky-gap));
+      max-height: calc(100dvh - var(--site-header-height) - 28px);
+      overflow-y: auto;
+      overscroll-behavior: contain;
+      scrollbar-gutter: stable;
+    }
     .filters > summary { display: none; }
     .filter-content { min-width: 0; }
     .filters h2, .content h2 { margin: 0 0 9px; font-size: 15px; }
@@ -385,11 +405,18 @@
     .detail-hero h1 { font-family: var(--font-mono); }
     .back { display: inline-block; margin: 0 0 12px; color: var(--brand); }
     .generated { color: var(--muted); margin-top: 12px; font-size: 13px; }
-    footer {
+    .site-footer {
+      width: 100%;
+      max-width: none;
+      margin: 0;
+      padding: 0;
+      flex: 0 0 auto;
       color: var(--muted);
+      border-top: 1px solid var(--line);
+      background: var(--paper);
       font-size: 12px;
     }
-    footer.shell { padding-block: 18px 28px; }
+    .site-footer .shell { padding-block: 18px 28px; }
     .readme {
       line-height: 1.58;
       color: #1f2937;
@@ -485,6 +512,7 @@
     }
     @media (max-width: 860px) {
       .shell { width: min(100% - 28px, 1180px); }
+      main.shell { width: min(100% - 28px, 1180px); }
       .topline { align-items: stretch; flex-direction: column; }
       .api-links {
         display: grid;
@@ -496,7 +524,13 @@
       .catalog-frame, .detail-layout { grid-template-columns: 1fr; }
       .detail-side { order: -1; }
       .entry-grid { grid-template-columns: 1fr; }
-      .filters { padding: 0; position: static; }
+      .filters {
+        padding: 0;
+        position: static;
+        max-height: none;
+        overflow: visible;
+        scrollbar-gutter: auto;
+      }
       .filters > summary {
         display: block;
         padding: 12px 14px;
@@ -520,6 +554,7 @@
     @media (max-width: 520px) {
       body { font-size: 14px; }
       .shell { width: min(100% - 20px, 1180px); }
+      main.shell { width: min(100% - 20px, 1180px); }
       .site-header .shell { padding-block: 10px; }
       .brand { font-size: 17px; overflow-wrap: anywhere; }
       .brand small { display: none; }
@@ -659,6 +694,21 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
       </nav>
     </div>
   </header>
+  <script>
+    (() => {
+      const header = document.currentScript.previousElementSibling;
+      const updateHeaderHeight = () => {
+        const height = Math.ceil(header.getBoundingClientRect().height);
+        document.documentElement.style.setProperty('--site-header-height', `${height}px`);
+      };
+      updateHeaderHeight();
+      if ('ResizeObserver' in window) {
+        new ResizeObserver(updateHeaderHeight).observe(header);
+      } else {
+        window.addEventListener('resize', updateHeaderHeight, { passive: true });
+      }
+    })();
+  </script>
   <header class="shell detail-hero">
     <a class="back" href="../">Back to packages</a>
     <h1>robonix.service.piper_moveit</h1>
@@ -669,243 +719,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
       <section class="panel detail-main">
         <h2>README</h2>
         <article class="readme">
-          <h1>service-piper-moveit-rbnx</h1>
-<p>Robonix package for <strong>arm motion planning + execution</strong> on the Piper + Orbbec Dabai DCW grasp pipeline. Wraps the upstream MoveIt config (<code>piper_with_gripper_moveit</code>) plus the C++ <code>moveit_control_node_yolo</code> grasp executor. Owns the <code>service/manipulation/*</code> namespace.</p>
-<p>Catalog name: <code>robonix.service.piper_moveit</code>.</p>
-<h2>Capability surface</h2>
-<table>
-<thead>
-<tr>
-<th>Contract</th>
-<th>Mode</th>
-<th>Transport</th>
-<th>Source / handler</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><code>robonix/service/manipulation/driver</code></td>
-<td>rpc</td>
-<td>gRPC</td>
-<td><code>Driver(CMD_INIT, config_json)</code> — lifecycle gate</td>
-</tr>
-<tr>
-<td><code>robonix/service/manipulation/execute_grasp</code></td>
-<td>rpc</td>
-<td>gRPC/MCP</td>
-<td><code>ExecuteGrasp(pose, gripper_width, timeout) → result</code></td>
-</tr>
-<tr>
-<td><code>robonix/service/manipulation/reset</code></td>
-<td>rpc</td>
-<td>gRPC</td>
-<td><code>Reset() → move arm to safe home pose</code></td>
-</tr>
-</tbody>
-</table>
-<p>Extra contract TOMLs shipped under <code>capabilities/service/manipulation/</code> (<code>demo</code>, <code>demo_place</code>) are handler helpers used during bring-up; they are not exposed in the deploy manifest.</p>
-<h2>Design intent (most-conservative path)</h2>
-<p>The C++ <code>moveit_control_node_yolo</code> is battle-tested upstream. The MoveIt <code>MoveGroupInterface</code> Python API is less stable than its C++ counterpart. Re-implementing the planning + execution logic in Python carries real risk for zero gain. So we <strong>vendor the C++ source verbatim</strong> and put a typed front door on it via ROS topic + status poll:</p>
-<table>
-<thead>
-<tr>
-<th>component</th>
-<th>provenance</th>
-<th>what we do</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>MoveIt config (URDF/SRDF/…)</td>
-<td>upstream <code>piper_with_gripper_moveit</code></td>
-<td>vendor verbatim, colcon-build</td>
-</tr>
-<tr>
-<td><code>moveit_control_node_yolo</code></td>
-<td>upstream <code>piper_moveit_control</code></td>
-<td>vendor verbatim, colcon-build</td>
-</tr>
-<tr>
-<td>Top-level launch</td>
-<td>upstream <code>piper_moveit.launch.py</code></td>
-<td><strong>fork</strong> (see below)</td>
-</tr>
-<tr>
-<td>atlas Service wrapper</td>
-<td>new (<code>piper_moveit/main.py</code>)</td>
-<td>only Python we own</td>
-</tr>
-</tbody>
-</table>
-<h3>Signalling flow</h3>
-<div class="highlight"><pre><span></span><code>                 Pilot LLM (or skill-pick-rbnx)
-                          │
-                          ▼
-          MCP   manipulation/execute_grasp  (PoseStamped + width)
-                          │
-                          ▼
-              ┌─ publishes /graspnet/grasps  (graspnet_msgs/GraspPose)
-              │
-              ▼
-       C++ moveit_control_node_yolo  (vendored)
-              │
-              ├─ tf2 transform → arm/base_link
-              ├─ MoveGroupInterface plan
-              └─ execute via FollowJointTrajectory action
-                          │
-                          ▼
-              primitive-agilex-piper-arm-rbnx executes on real hardware
-                          │
-                          ▼
-              piper_ctl publishes /arm/arm_status (PiperStatusMsg)
-                          │
-                          ▼
-   ◄─── execute_grasp polls busy → idle, returns success/elapsed
-</code></pre></div>
-<h2>Launch fork (<code>launch/piper_moveit_rbnx.launch.py</code>)</h2>
-<p>Four deltas from upstream <code>piper_moveit.launch.py</code>:</p>
-<ol>
-<li><strong>Removed fake <code>ros2_control_node</code></strong> — upstream's launch spawns a simulated joint driver publishing <code>/arm/joint_states</code>. With <code>primitive-agilex-piper-arm-rbnx</code> already publishing real hardware joint states, running both = two publishers fighting on the topic = MoveIt plans against garbage.</li>
-<li><strong>Removed RViz</strong> — robonix-managed deploy is headless. Bring up RViz manually in another shell if needed:
-   <div class="highlight"><pre><span></span><code>ros2 launch piper_with_gripper_moveit moveit_rviz.launch.py
-</code></pre></div></li>
-<li><strong><code>move_group joint_states</code> remap target switched</strong> from <code>/arm/joint_states</code> (which had no real publisher after we removed the fake controller) to <code>/arm/joint_states_single</code> (what <code>primitive-agilex-piper-arm-rbnx</code> actually publishes).</li>
-<li><strong>Added <code>link6 → arm/link6</code> static TF bridge</strong> to glue the unprefixed TF tree (<code>primitive-agilex-piper-description-rbnx</code> publishes; <code>primitive-agilex-piper-handeye-rbnx</code> publishes <code>link6 → camera_color_optical_frame</code> into) onto the prefixed one (this launch publishes via <code>frame_prefix="arm/"</code> for MoveIt's planning frame). Without the bridge, the C++ node's <code>tf_buffer_-&gt;transform(grasp_pose_in_camera_frame, "arm/base_link")</code> call fails because the camera frame and <code>arm/base_link</code> are in different subtrees.</li>
-</ol>
-<p>The rest (<code>rsp.launch.py</code>, <code>static_virtual_joint_tfs.launch.py</code>) is included verbatim via <code>IncludeLaunchDescription</code>, so future upstream tweaks don't need a re-fork.</p>
-<h3>Why no <code>spawn_controllers.launch.py</code>?</h3>
-<p>Upstream uses <code>spawn_controllers</code> to start <code>joint_trajectory_controller</code> + <code>gripper_controller</code> ros2_control instances. Those drive the fake <code>controller_manager</code> we removed. The C++ node does not talk to <code>controller_manager</code> — it submits <code>FollowJointTrajectory</code> action goals directly to whoever advertises the action server. <code>primitive-agilex-piper-arm-rbnx</code> must advertise that action server for the real-hardware path to work.</p>
-<h2>Frame tree (post-boot)</h2>
-<p>Two parallel subtrees, joined at <code>link6 ↔ arm/link6</code>:</p>
-<div class="highlight"><pre><span></span><code>unprefixed (piper_description + easy_handeye2):    prefixed (this package):
-    base_link                                          arm/world  ──┐
-       └── link1 ── ... ── link6                       arm/base_link │ static
-                              ├── camera_*             arm/link1     │ joints
-                              │                        ...           │ from URDF
-                              └── arm/link6 ◄═════════ arm/link6 ────┘
-                                  (identity static TF — the bridge)
-</code></pre></div>
-<p>Both subtrees describe the <strong>same physical robot</strong>, just under different frame-name conventions. The bridge means <code>tf_buffer_-&gt;transform(camera_color_optical_frame_pose, arm/base_link)</code> walks: <code>camera_* → link6 → arm/link6 → arm/base_link</code>, and works.</p>
-<h2>Boot ordering</h2>
-<ul>
-<li>Requires <code>primitive-agilex-piper-arm-rbnx</code> (publishes <code>/arm/arm_status</code>; the sentinel waits for the first sample);</li>
-<li>Requires <code>primitive-agilex-piper-handeye-rbnx</code> (static <code>link6 → camera_color_optical_frame</code> TF used inside <code>execute_grasp</code>);</li>
-<li>Requires <code>primitive-agilex-piper-description-rbnx</code> (provides the unprefixed TF subtree);</li>
-<li>Independent of <code>service-object-detect-rbnx</code> / <code>service-grasp-pose-rbnx</code> at boot time (no perception dep during Init).</li>
-</ul>
-<h2>Driver-init lifecycle</h2>
-<div class="highlight"><pre><span></span><code>on_init ── parse cfg
-       ── log atlas deps (informational)
-       ── spawn rclpy bridge thread
-            (publisher /graspnet/grasps,
-             subscriber /arm/arm_status)
-       ── spawn `ros2 launch piper_moveit_rbnx.launch.py`
-            (RSP + move_group + cpp executor)
-       ── sentinel-wait for first /arm/arm_status sample
-            (proves piper_ctl_rbnx is alive)
-
-on_deactivate ── kill launch group + stop rclpy thread
-</code></pre></div>
-<p><code>on_init</code> is heavy — sentinel timeout default 60 s because launch takes ~5–10 s to bring up <code>move_group</code>, and we need real piper joint feedback to flow before we declare ourselves ACTIVE.</p>
-<h2><code>execute_grasp</code> semantics — two-phase wait</h2>
-<ol>
-<li><strong>busy phase</strong> (≤ ⅓ × <code>timeout_s</code>): wait for <code>/arm/arm_status</code> to transition to non-zero (i.e. arm started moving). If never: either the C++ node did not pick up our publish, or the goal was already physically satisfied → fail conservatively.</li>
-<li><strong>idle phase</strong> (remaining budget): wait for return to 0 (idle).</li>
-</ol>
-<p><code>success=True</code> iff both phases complete in budget.</p>
-<h2>Layout</h2>
-<div class="highlight"><pre><span></span><code>service-piper-moveit-rbnx/
-├── package_manifest.yaml
-├── capabilities/
-│   ├── service/manipulation/{driver,execute_grasp,reset,demo,demo_place}.v1.toml
-│   └── lib/manipulation/srv/ExecuteGrasp.srv
-├── launch/
-│   └── piper_moveit_rbnx.launch.py   # fork of upstream launch
-├── piper_moveit/
-│   ├── __init__.py
-│   └── main.py                       # robonix Service + rclpy bridge
-├── scripts/
-│   ├── build.sh                      # colcon + rbnx codegen --mcp
-│   └── start.sh
-└── src/                              # vendored ROS packages
-    ├── piper_moveit/                 # piper_with_gripper_moveit + piper_no_gripper_moveit
-    ├── piper_moveit_control/         # C++ moveit_control_node_yolo
-    ├── piper_humble/                 # empty shell (referenced by cmakelists)
-    ├── piper_msgs/                   # PiperStatusMsg etc.
-    └── graspnet_msgs/                # GraspPose etc. (full version)
-</code></pre></div>
-<h2>Config (passed via <code>Driver(CMD_INIT, config_json)</code>)</h2>
-<div class="highlight"><pre><span></span><code><span class="nt">arm_group_name</span><span class="p">:</span><span class="w">       </span><span class="l l-Scalar l-Scalar-Plain">arm</span><span class="w">                              </span><span class="c1"># MoveIt SRDF group</span>
-<span class="nt">end_effector_link</span><span class="p">:</span><span class="w">    </span><span class="l l-Scalar l-Scalar-Plain">arm/link6</span><span class="w">                        </span><span class="c1"># in prefixed tree</span>
-<span class="nt">gripper_action_name</span><span class="p">:</span><span class="w">  </span><span class="l l-Scalar l-Scalar-Plain">/gripper_controller/follow_joint_trajectory</span>
-<span class="nt">sentinel_timeout_s</span><span class="p">:</span><span class="w">   </span><span class="l l-Scalar l-Scalar-Plain">60.0</span><span class="w">                             </span><span class="c1"># wait for /arm/arm_status</span>
-</code></pre></div>
-<p>All four are optional (defaults match upstream). <code>end_effector_link</code> intentionally uses the prefixed <code>arm/link6</code> — MoveIt's planning frame is <code>arm/world</code>, so the EE link lives in the prefixed subtree.</p>
-<h2>Build / run standalone</h2>
-<div class="highlight"><pre><span></span><code>bash<span class="w"> </span>scripts/build.sh<span class="w">                                 </span><span class="c1"># colcon (~30–60 s)</span>
-<span class="nv">ROBONIX_ATLAS</span><span class="o">=</span><span class="m">127</span>.0.0.1:50051<span class="w"> </span><span class="se">\</span>
-<span class="w">    </span>bash<span class="w"> </span>scripts/start.sh
-</code></pre></div>
-<h2>Verification</h2>
-<div class="highlight"><pre><span></span><code><span class="c1"># 1. atlas-side</span>
-rbnx<span class="w"> </span>caps<span class="w"> </span><span class="p">|</span><span class="w"> </span>grep<span class="w"> </span>manipulation
-<span class="c1"># expect: piper_moveit ACTIVE, contracts:</span>
-<span class="c1">#   robonix/service/manipulation/{driver, execute_grasp, reset}</span>
-
-<span class="c1"># 2. ROS-side (the cpp bridge is up)</span>
-ros2<span class="w"> </span>topic<span class="w"> </span>info<span class="w"> </span>/graspnet/grasps<span class="w">                 </span><span class="c1"># expect 1+ subscribers (cpp node)</span>
-ros2<span class="w"> </span>node<span class="w"> </span>list<span class="w"> </span><span class="p">|</span><span class="w"> </span>grep<span class="w"> </span>moveit_control<span class="w">             </span><span class="c1"># the cpp node</span>
-
-<span class="c1"># 3. TF bridge</span>
-ros2<span class="w"> </span>run<span class="w"> </span>tf2_ros<span class="w"> </span>tf2_echo<span class="w"> </span>arm/base_link<span class="w"> </span>camera_color_optical_frame
-<span class="c1"># Expect a transform composed of:</span>
-<span class="c1">#   arm/base_link ← arm/joint{1..6} ← arm/link6  (RSP, prefixed)</span>
-<span class="c1">#   arm/link6 ←IDENTITY← link6                   (the bridge)</span>
-<span class="c1">#   link6 ← &lt;calib&gt; ← camera_color_optical_frame (easy_handeye2)</span>
-
-<span class="c1"># 4. Direct execute_grasp test (CAREFUL — this moves the real arm).</span>
-<span class="c1">#    Park the arm in safe position first.</span>
-rbnx<span class="w"> </span>ask<span class="w"> </span><span class="s2">&quot;move the arm 30cm up, no rotation&quot;</span>
-</code></pre></div>
-<h2>Failure modes</h2>
-<table>
-<thead>
-<tr>
-<th>symptom</th>
-<th>cause</th>
-<th>fix</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><code>sentinel: no /arm/arm_status sample within 60s</code></td>
-<td>piper_ctl_rbnx not ACTIVE, or <code>auto_can_setup</code> failed</td>
-<td><code>rbnx caps \| grep piper_ctl</code> to confirm; bring up CAN manually if needed</td>
-</tr>
-<tr>
-<td><code>execute_grasp: timeout: arm_status never went busy</code></td>
-<td>C++ node did not subscribe <code>/graspnet/grasps</code>; or move_group rejected the goal silently</td>
-<td>check <code>ros2 topic info /graspnet/grasps</code> for subs; check <code>move_group</code> logs</td>
-</tr>
-<tr>
-<td>MoveIt plans against wrong joint values</td>
-<td><code>/arm/joint_states_single</code> remap not taking effect</td>
-<td>check the launch fork — verify <code>joint_states_topic</code> in <code>move_group_configuration</code></td>
-</tr>
-<tr>
-<td>TF lookup error in cpp <code>arm/base_link → camera_color_optical_frame</code></td>
-<td>Static bridge <code>link6 ↔ arm/link6</code> not running, OR easy_handeye2 calib not staged</td>
-<td>check <code>ros2 run tf2_ros tf2_echo link6 arm/link6</code> is identity; verify easy_handeye2 is ACTIVE</td>
-</tr>
-<tr>
-<td><code>FollowJointTrajectory action server not advertised</code></td>
-<td>piper_ctl_rbnx does not expose this action</td>
-<td>bridge work in piper_ctl_rbnx — out of scope for this package</td>
-</tr>
-</tbody>
-</table>
-<h2>License</h2>
-<p>This package: MulanPSL-2.0. Vendored MoveIt config + grasp executor: see their respective LICENSE files.</p>
+          <p>No README.md was found in this package repository.</p>
         </article>
       </section>
       <aside class="panel detail-side">
@@ -931,6 +745,6 @@ rbnx<span class="w"> </span>ask<span class="w"> </span><span class="s2">&quot;mo
       </aside>
     </div>
   </main>
-  <footer class="shell">Generated on 2026-07-15T13:24:35+00:00.</footer>
+  <footer class="site-footer"><div class="shell">Generated on 2026-07-16T04:54:40+00:00.</div></footer>
 </body>
 </html>

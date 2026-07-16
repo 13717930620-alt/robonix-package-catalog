@@ -1,6 +1,6 @@
 {
   "api_version": "1",
-  "generated_at": "2026-07-15T13:24:35+00:00",
+  "generated_at": "2026-07-16T04:54:40+00:00",
   "robots": [
     {
       "name": "robonix.robot.agilex.ranger_mini_v3",
@@ -73,12 +73,12 @@
         {
           "section": "primitive",
           "name": "orbbec_camera",
-          "repo": "",
-          "path": "/home/syswonder/lhw/rbnx_piper_packages/rbnx-boot/cache/OrbbecSDK_rbnx",
-          "branch": "",
+          "repo": "https://github.com/syswonder/primitive-orbbec-dabai_dcw-camera-rbnx",
+          "path": "",
+          "branch": "main",
           "manifest": "",
-          "package_name": "",
-          "package_url": ""
+          "package_name": "robonix.primitive.orbbec.dabai_dcw.camera",
+          "package_url": "../robonix.primitive.orbbec.dabai_dcw.camera/"
         },
         {
           "section": "primitive",
@@ -93,12 +93,12 @@
         {
           "section": "primitive",
           "name": "piper_ctl",
-          "repo": "",
-          "path": "/home/syswonder/lhw/rbnx_piper_packages/rbnx-boot/cache/piper_ctl_rbnx",
-          "branch": "",
+          "repo": "https://github.com/syswonder/primitive-agilex-piper-arm-rbnx",
+          "path": "",
+          "branch": "main",
           "manifest": "",
-          "package_name": "",
-          "package_url": ""
+          "package_name": "robonix.primitive.agilex.piper.arm",
+          "package_url": "../robonix.primitive.agilex.piper.arm/"
         },
         {
           "section": "primitive",
@@ -153,32 +153,32 @@
         {
           "section": "service",
           "name": "llm_detect",
-          "repo": "",
-          "path": "/home/syswonder/lhw/rbnx_piper_packages/rbnx-boot/cache/llm_detect_rbnx",
-          "branch": "",
+          "repo": "https://github.com/syswonder/service-object-detect-rbnx",
+          "path": "",
+          "branch": "main",
           "manifest": "",
-          "package_name": "",
-          "package_url": ""
+          "package_name": "robonix.service.object_detect",
+          "package_url": "../robonix.service.object_detect/"
         },
         {
           "section": "service",
           "name": "grasp_pose",
-          "repo": "",
-          "path": "/home/syswonder/lhw/rbnx_piper_packages/rbnx-boot/cache/grasp_pose_rbnx",
-          "branch": "",
+          "repo": "https://github.com/syswonder/service-grasp-pose-rbnx",
+          "path": "",
+          "branch": "main",
           "manifest": "",
-          "package_name": "",
-          "package_url": ""
+          "package_name": "robonix.service.grasp_pose",
+          "package_url": "../robonix.service.grasp_pose/"
         },
         {
           "section": "service",
           "name": "roboarm_ik",
-          "repo": "",
-          "path": "/home/syswonder/lhw/rbnx_piper_packages/rbnx-boot/cache/roboarm_ik_rbnx",
-          "branch": "",
+          "repo": "https://github.com/syswonder/service-roboarm-ik-rbnx",
+          "path": "",
+          "branch": "main",
           "manifest": "",
-          "package_name": "",
-          "package_url": ""
+          "package_name": "robonix.service.roboarm.ik",
+          "package_url": "../robonix.service.roboarm.ik/"
         },
         {
           "section": "service",
@@ -223,12 +223,12 @@
         {
           "section": "skill",
           "name": "pick",
-          "repo": "",
-          "path": "/home/syswonder/lhw/rbnx_piper_packages/rbnx-boot/cache/pick_skill_rbnx",
-          "branch": "",
+          "repo": "https://github.com/syswonder/skill-pick-vertical-grasp-rbnx",
+          "path": "",
+          "branch": "main",
           "manifest": "",
-          "package_name": "",
-          "package_url": ""
+          "package_name": "robonix.skill.pick.vertical_grasp",
+          "package_url": "../robonix.skill.pick.vertical_grasp/"
         }
       ],
       "readme_url": "https://github.com/syswonder/robot-agilex-ranger_mini_v3/blob/main/README.md",
