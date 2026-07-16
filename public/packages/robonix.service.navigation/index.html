@@ -719,7 +719,68 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
       <section class="panel detail-main">
         <h2>README</h2>
         <article class="readme">
-          <p>No README.md was found in this package repository.</p>
+          <h1>service-navigation-rbnx</h1>
+<p>Robonix wrapper around a system-installed ROS 2 Nav2 stack. The service
+discovers map, odometry, and lidar inputs through Atlas and exposes
+<code>robonix/service/navigation/*</code> over gRPC and MCP.</p>
+<h2>Deployment config</h2>
+<p>Navigation behavior belongs to the robot deployment, not this provider. Each
+robot must carry a complete Nav2 YAML and reference it with <code>params_file</code>:</p>
+<div class="highlight"><pre><span></span><code><span class="nt">service</span><span class="p">:</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">nav2</span>
+<span class="w">    </span><span class="nt">url</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">https://github.com/syswonder/service-navigation-rbnx</span>
+<span class="w">    </span><span class="nt">branch</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">main</span>
+<span class="w">    </span><span class="nt">config</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">params_file</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">config/nav2_params.yaml</span>
+<span class="w">      </span><span class="nt">provider_ids</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">map</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">mapping</span>
+<span class="w">        </span><span class="nt">odom</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">chassis</span>
+<span class="w">        </span><span class="nt">scan</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">lidar</span>
+</code></pre></div>
+<p>Relative paths are resolved from the directory containing
+<code>robonix_manifest.yaml</code>. <code>config/nav2_params.example.yml</code> is a neutral example,
+not a robot profile. Copy it into the deploy repository and set the robot's
+frames, footprint, velocity and acceleration limits, costmap layers, goal
+tolerances, topics, and planner/controller plugins there.</p>
+<p>For a 3D lidar, bind <code>scan_cloud</code> and declare the adapter explicitly:</p>
+<div class="highlight"><pre><span></span><code><span class="w">      </span><span class="nt">params_file</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">config/nav2_params.yaml</span>
+<span class="w">      </span><span class="nt">provider_ids</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">map</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">mapping</span>
+<span class="w">        </span><span class="nt">odom</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">chassis</span>
+<span class="w">        </span><span class="nt">scan_cloud</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">lidar3d</span>
+<span class="w">      </span><span class="nt">scan_projection</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">enabled</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
+<span class="w">        </span><span class="nt">target_frame</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">base_link</span>
+<span class="w">        </span><span class="nt">min_height_m</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.1</span>
+<span class="w">        </span><span class="nt">max_height_m</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1.5</span>
+<span class="w">        </span><span class="nt">range_max_m</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">12.0</span>
+</code></pre></div>
+<p>Optional <code>bt_xml_file</code> points to a deploy-owned BehaviorTree XML. Existing
+<code>params_profile</code> deployments remain supported and emit a migration warning;
+new deployments should not use that field. See <code>config.spec</code> for every
+accepted instance field and default.</p>
+<h2>Runtime</h2>
+<p>At <code>Driver(CMD_INIT)</code>, the wrapper:</p>
+<ol>
+<li>resolves the selected Atlas providers;</li>
+<li>resolves and materializes the deployment-owned Nav2 YAML;</li>
+<li>starts an optional PointCloud2-to-LaserScan adapter;</li>
+<li>starts Nav2 and waits for the <code>navigate_to_pose</code> action server;</li>
+<li>exposes navigate, status, and cancel capabilities.</li>
+</ol>
+<p>Missing required providers return <code>deferred</code>. Invalid config or a Nav2 startup
+failure returns <code>error</code> and tears down every child process.</p>
+<h2>Build and tests</h2>
+<div class="highlight"><pre><span></span><code>bash<span class="w"> </span>scripts/build.sh
+python3<span class="w"> </span>-m<span class="w"> </span>unittest<span class="w"> </span>-v<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>test_configuration.py<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>test_runtime_integration.py<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>test_rotation_guard.py<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>test_scan_filter.py
+</code></pre></div>
+<p>Jetson native builds require ROS 2 Humble and Nav2 packages compatible with the
+host JetPack image. Docker manifests remain available for simulator and CI
+deployments.</p>
         </article>
       </section>
       <aside class="panel detail-side">
@@ -746,6 +807,6 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
       </aside>
     </div>
   </main>
-  <footer class="site-footer"><div class="shell">Generated on 2026-07-16T04:54:40+00:00.</div></footer>
+  <footer class="site-footer"><div class="shell">Generated on 2026-07-16T11:02:21+00:00.</div></footer>
 </body>
 </html>

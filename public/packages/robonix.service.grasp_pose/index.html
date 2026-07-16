@@ -719,7 +719,94 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
       <section class="panel detail-main">
         <h2>README</h2>
         <article class="readme">
-          <p>No README.md was found in this package repository.</p>
+          <h1>grasp_pose_rbnx</h1>
+<p>gRPC geometric grasp-pose estimator for the Piper + Orbbec vertical grasp
+pipeline.</p>
+<h2>What It Does</h2>
+<p><code>grasp_pose_rbnx</code> owns:</p>
+<div class="highlight"><pre><span></span><code>robonix/service/perception/grasp_pose/driver
+robonix/service/perception/grasp_pose/grasp_request
+</code></pre></div>
+<p>It accepts a detector-provided RGB bbox and returns a vertical grasp pose in
+<code>arm/base_link</code>. It does not publish <code>/graspnet/grasps</code>, does not host
+<code>/graspnet/grasp_request</code>, and does not build or import <code>graspnet_msgs</code>.</p>
+<p>Runtime path:</p>
+<div class="highlight"><pre><span></span><code>pick_skill
+  -&gt; llm_detect.detect_object
+  -&gt; grasp_pose.grasp_request
+  -&gt; roboarm_ik.execute_grasp
+</code></pre></div>
+<h2>Algorithm</h2>
+<p>For each <code>grasp_request</code>:</p>
+<ol>
+<li>Require <code>bbox_2d = [x_min, y_min, x_max, y_max]</code>.</li>
+<li>Compute bbox center pixel <code>(u, v)</code>.</li>
+<li>Project <code>[u, v, 1]</code> through the required 3x3 homography to get
+   arm-plane <code>(x, y)</code>.</li>
+<li>Apply optional global <code>bias_x</code> / <code>bias_y</code>.</li>
+<li>Estimate gripper yaw from the bbox long edge.</li>
+<li>Apply <code>catch_offset</code> along the yaw direction.</li>
+<li>Use <code>default_desktop_height</code> as the final grasp z.</li>
+<li>Return a vertical-down <code>PoseStamped</code> in <code>output_frame</code>, default
+   <code>arm/base_link</code>.</li>
+</ol>
+<p>Depth, camera intrinsics, and TF are intentionally not used.</p>
+<h2>Required Config</h2>
+<p>Runtime config comes from <code>robonix_manifest.yaml</code>:</p>
+<div class="highlight"><pre><span></span><code><span class="nt">hand_eye_calibration_file</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/absolute/path/to/2d_homography.npy</span>
+<span class="nt">default_desktop_height</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">-0.205</span>
+</code></pre></div>
+<p>You may provide an inline <code>homography_matrix</code> instead of
+<code>hand_eye_calibration_file</code>.</p>
+<p>Useful optional knobs:</p>
+<div class="highlight"><pre><span></span><code><span class="nt">bias_x</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.0</span>
+<span class="nt">bias_y</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.0</span>
+<span class="nt">catch_offset</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.0</span>
+<span class="nt">box_rotation_deg</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.0</span>
+<span class="nt">gripper_width_default</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.04</span>
+<span class="nt">output_frame</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">arm/base_link</span>
+<span class="nt">approach_dist</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.10</span>
+</code></pre></div>
+<h2>Build / Run</h2>
+<div class="highlight"><pre><span></span><code>bash<span class="w"> </span>scripts/build.sh
+rbnx<span class="w"> </span>boot
+</code></pre></div>
+<p><code>scripts/build.sh</code> runs <code>rbnx codegen</code> for protobuf/gRPC stubs.</p>
+<h2>Debugging</h2>
+<p>Check:</p>
+<div class="highlight"><pre><span></span><code>rbnx-boot/logs/grasp_pose.log
+</code></pre></div>
+<p>Common failure causes:</p>
+<table>
+<thead>
+<tr>
+<th>symptom</th>
+<th>likely cause</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>bbox_2d is required</code></td>
+<td>caller did not pass the detection bbox</td>
+</tr>
+<tr>
+<td><code>hand_eye_calibration_file does not exist</code></td>
+<td>missing/stale 2D calibration file</td>
+</tr>
+<tr>
+<td><code>missing required roboarm config: default_desktop_height</code></td>
+<td>grasp height not configured</td>
+</tr>
+<tr>
+<td>grasp XY wrong</td>
+<td>stale homography or wrong camera/image orientation</td>
+</tr>
+<tr>
+<td>z too high/low</td>
+<td>incorrect <code>default_desktop_height</code></td>
+</tr>
+</tbody>
+</table>
         </article>
       </section>
       <aside class="panel detail-side">
@@ -744,6 +831,6 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
       </aside>
     </div>
   </main>
-  <footer class="site-footer"><div class="shell">Generated on 2026-07-16T04:54:40+00:00.</div></footer>
+  <footer class="site-footer"><div class="shell">Generated on 2026-07-16T11:02:21+00:00.</div></footer>
 </body>
 </html>

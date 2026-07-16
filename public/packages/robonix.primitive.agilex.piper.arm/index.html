@@ -719,7 +719,181 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
       <section class="panel detail-main">
         <h2>README</h2>
         <article class="readme">
-          <p>No README.md was found in this package repository.</p>
+          <h1>primitive-agilex-piper-arm-rbnx</h1>
+<p>Robonix package wrapping the <strong>AgileX Piper 6-DoF arm</strong> hardware driver. Owns the <code>primitive/arm/*</code> namespace.</p>
+<p>Catalog name: <code>robonix.primitive.agilex.piper.arm</code>.</p>
+<blockquote>
+<p>Naming note: internal directory / binary name is <code>piper_ctl</code> (<code>_ctl</code> = low-level control), while the contract namespace is <code>arm</code>. Piper is an arm, so calling this <code>piper_chassis_rbnx</code> would mislead.</p>
+</blockquote>
+<h2>Capability surface</h2>
+<table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Mode</th>
+<th>Transport</th>
+<th>Source / handler</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>robonix/primitive/arm/driver</code></td>
+<td>rpc</td>
+<td>gRPC</td>
+<td><code>Driver(CMD_INIT, config_json)</code> — lifecycle gate</td>
+</tr>
+<tr>
+<td><code>robonix/primitive/arm/joint_states</code></td>
+<td>topic_out</td>
+<td>ROS 2</td>
+<td><code>/&lt;ns&gt;/joint_states_single</code> (sensor_msgs/JointState)</td>
+</tr>
+<tr>
+<td><code>robonix/primitive/arm/arm_status</code></td>
+<td>topic_out</td>
+<td>ROS 2</td>
+<td><code>/&lt;ns&gt;/arm_status</code> (piper_msgs/PiperStatusMsg)</td>
+</tr>
+<tr>
+<td><code>robonix/primitive/arm/end_pose</code></td>
+<td>topic_out</td>
+<td>ROS 2</td>
+<td><code>/&lt;ns&gt;/end_pose</code> (geometry_msgs/Pose)</td>
+</tr>
+<tr>
+<td><code>robonix/primitive/arm/pos_cmd</code></td>
+<td>topic_in</td>
+<td>ROS 2</td>
+<td><code>/&lt;ns&gt;/pos_cmd</code> (piper_msgs/PosCmd) — driver subscribes; consumers publish</td>
+</tr>
+</tbody>
+</table>
+<p>All five contracts are <strong>package-locally defined</strong> (see <code>capabilities/primitive/arm/*.v1.toml</code>) because the robonix global tree does not ship <code>primitive/arm/*</code> yet (it has chassis / camera / lidar / imu / audio). The two vendor-specific message types (<code>PiperStatusMsg</code>, <code>PosCmd</code>) are also shipped at package level, at <code>capabilities/lib/piper_msgs/msg/*.msg</code>.</p>
+<blockquote>
+<p><strong>Single-source-of-truth</strong> for the two <code>.msg</code> IDLs is the vendored <code>src/piper_msgs/msg/</code> directory. The mirrored copies under <code>capabilities/lib/piper_msgs/msg/</code> are what <code>rbnx codegen</code> / atlas's contract registry actually scan. Keep them in sync — if upstream <code>piper_msgs</code> ever changes, update both. Plain file copies are used rather than symlinks to keep <code>git diff</code> legible.</p>
+</blockquote>
+<h2>Boot ordering</h2>
+<p>Boot this <strong>before</strong> any consumer of <code>primitive/arm/*</code>. In the vertical-grasp pipeline:</p>
+<ul>
+<li><code>primitive-agilex-piper-description-rbnx</code> consumes <code>arm/joint_states</code> to drive <code>robot_state_publisher</code>;</li>
+<li><code>service-roboarm-ik-rbnx</code> executes arm/gripper commands and consumes Piper feedback;</li>
+<li><code>skill-pick-vertical-grasp-rbnx</code> monitors <code>/arm/joint_states_single</code> to verify that the gripper is holding an object.</li>
+</ul>
+<p>rbnx-cli has no defer/retry, so providers MUST come first in YAML declaration order.</p>
+<h2>Driver-init lifecycle</h2>
+<p><code>start.sh</code> brings up the atlas bridge — no ROS spawn. The bridge opens a gRPC server, registers the provider, declares only <code>primitive/arm/driver</code> (auto-emitted by the framework when codegen produces a <code>Driver</code> Servicer), then blocks on <code>Driver(CMD_INIT, config_json)</code>.</p>
+<p>When <code>rbnx boot</code> invokes Init it passes the manifest's <code>config:</code> block as JSON. The lifecycle then runs:</p>
+<ol>
+<li><code>CMD_INIT</code>: validate cfg (CAN port, bitrate, gripper flags, sentinel timeout);</li>
+<li><code>CMD_ACTIVATE</code>: optionally run <code>scripts/can_activate.sh</code> when <code>auto_can_setup=true</code>;</li>
+<li>spawn <code>ros2 launch piper start_single_piper.launch.py …</code>;</li>
+<li>wait for the first <code>sensor_msgs/JointState</code> on <code>/&lt;ns&gt;/joint_states_single</code> as proof the CAN link came up;</li>
+<li>declare <code>arm/joint_states</code>, <code>arm/arm_status</code>, <code>arm/end_pose</code>, and <code>arm/pos_cmd</code> on atlas.</li>
+</ol>
+<p><code>CMD_DEACTIVATE</code> / <code>CMD_SHUTDOWN</code> kill the piper subprocess. Idempotent.</p>
+<h2>CAN bring-up — TWO paths</h2>
+<p>The Piper arm uses USB-CAN (MCP251xFD or similar). The CAN interface must be <strong>up</strong> and named <code>can_piper</code> (or whatever you set <code>can_port:</code> to) before <code>piper_ctrl_single_node</code> can talk to it. The CAN interface name is config-driven — the package never hardcodes a device name.</p>
+<p>If the configured USB address or interface name looks wrong, inspect
+the current host mapping first:</p>
+<div class="highlight"><pre><span></span><code>bash<span class="w"> </span>scripts/find_all_can_port.sh
+</code></pre></div>
+<p>Use the reported USB bus path, for example <code>1-4.2:1.0</code>, as
+<code>can_usb_address</code>. Do not guess when multiple CAN interfaces are
+present; Jetson onboard <code>*.mttcan</code> interfaces and USB-CAN adapters can
+coexist.</p>
+<h3>Path A — recommended for production (default)</h3>
+<p>Bring <code>can_piper</code> up <strong>outside <code>rbnx boot</code></strong>, ahead of time. On a Jetson with udev rules, this is once-per-boot:</p>
+<div class="highlight"><pre><span></span><code><span class="c1"># Run once per host boot, BEFORE `rbnx boot`:</span>
+bash<span class="w"> </span>scripts/can_activate.sh<span class="w"> </span>can_piper<span class="w"> </span><span class="m">1000000</span><span class="w"> </span><span class="s2">&quot;1-4.2:1.0&quot;</span>
+<span class="c1"># Replace &quot;1-4.2:1.0&quot; with the USB bus path of your Piper.</span>
+<span class="c1"># To list candidates:</span>
+<span class="c1">#   lsusb -t</span>
+<span class="c1">#   sudo ethtool -i can0 | grep bus-info</span>
+</code></pre></div>
+<p><code>auto_can_setup</code> stays <code>false</code> in the manifest. This path keeps the deploy free of sudo coupling — the operator approves the sudo prompt once, interactively, then <code>rbnx boot</code> runs unattended.</p>
+<h3>Path B — convenience for dev laptops</h3>
+<p>Set <code>auto_can_setup: true</code> in the manifest config block. <code>on_activate</code> will run <code>scripts/can_activate.sh</code> itself before spawning the driver. Requires <strong>passwordless sudo</strong> for the operator (otherwise the script blocks on the prompt and <code>CMD_ACTIVATE</code> times out).</p>
+<div class="highlight"><pre><span></span><code><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">piper_ctl</span>
+<span class="w">  </span><span class="nt">path</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">../packages/piper_ctl_rbnx</span>
+<span class="w">  </span><span class="nt">config</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">can_port</span><span class="p">:</span><span class="w">        </span><span class="l l-Scalar l-Scalar-Plain">can_piper</span>
+<span class="w">    </span><span class="nt">can_bitrate</span><span class="p">:</span><span class="w">     </span><span class="l l-Scalar l-Scalar-Plain">1000000</span>
+<span class="w">    </span><span class="nt">can_usb_address</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;1-4.2:1.0&quot;</span>
+<span class="w">    </span><span class="nt">auto_can_setup</span><span class="p">:</span><span class="w">  </span><span class="l l-Scalar l-Scalar-Plain">true</span>
+</code></pre></div>
+<p>Path B is more convenient when the USB-CAN's bus path shifts between sessions, but couples the deploy to sudoers state — not ideal for production.</p>
+<h2>Layout</h2>
+<div class="highlight"><pre><span></span><code>primitive-agilex-piper-arm-rbnx/
+├── package_manifest.yaml
+├── capabilities/
+│   ├── primitive/arm/
+│   │   ├── driver.v1.toml
+│   │   ├── joint_states.v1.toml
+│   │   ├── arm_status.v1.toml
+│   │   ├── end_pose.v1.toml
+│   │   └── pos_cmd.v1.toml
+│   └── lib/piper_msgs/msg/                  # IDL for codegen
+│       ├── PiperStatusMsg.msg               # mirror of src/piper_msgs/msg/
+│       └── PosCmd.msg
+├── piper_ctl/
+│   ├── __init__.py
+│   └── main.py                              # lifecycle + sentinel
+├── scripts/
+│   ├── build.sh                             # colcon + rbnx codegen
+│   ├── start.sh                             # source ROS, exec main
+│   ├── find_all_can_port.sh                 # print CAN interface ↔ USB bus mapping
+│   └── can_activate.sh                      # vendored from upstream piper_ros
+└── src/                                     # vendored (no .git, no build/install)
+    ├── piper/                               # main ROS 2 driver (rclpy)
+    ├── piper_msgs/                          # PiperStatusMsg + PosCmd + Enable.srv
+    └── graspnet_msgs/                       # GraspPose.msg — required by piper/package.xml
+</code></pre></div>
+<h2>Config (passed via <code>Driver(CMD_INIT, config_json)</code>)</h2>
+<div class="highlight"><pre><span></span><code><span class="nt">can_port</span><span class="p">:</span><span class="w">            </span><span class="l l-Scalar l-Scalar-Plain">can_piper</span><span class="w">        </span><span class="c1"># CAN interface name</span>
+<span class="nt">can_bitrate</span><span class="p">:</span><span class="w">         </span><span class="l l-Scalar l-Scalar-Plain">1000000</span>
+<span class="nt">can_usb_address</span><span class="p">:</span><span class="w">     </span><span class="s">&quot;&quot;</span><span class="w">               </span><span class="c1"># pin via USB bus path; &quot;&quot; = first detected</span>
+<span class="nt">auto_can_setup</span><span class="p">:</span><span class="w">      </span><span class="l l-Scalar l-Scalar-Plain">false</span><span class="w">            </span><span class="c1"># see &quot;CAN bring-up&quot; above</span>
+<span class="nt">auto_enable</span><span class="p">:</span><span class="w">         </span><span class="l l-Scalar l-Scalar-Plain">true</span><span class="w">             </span><span class="c1"># forwarded to start_single_piper auto_enable</span>
+<span class="nt">gripper_exist</span><span class="p">:</span><span class="w">       </span><span class="l l-Scalar l-Scalar-Plain">true</span>
+<span class="nt">gripper_val_mutiple</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">2</span><span class="w">                </span><span class="c1"># upstream typo preserved</span>
+<span class="nt">arm_namespace</span><span class="p">:</span><span class="w">       </span><span class="l l-Scalar l-Scalar-Plain">/arm</span><span class="w">             </span><span class="c1"># see note in main.py docstring</span>
+<span class="nt">sentinel_timeout_s</span><span class="p">:</span><span class="w">  </span><span class="l l-Scalar l-Scalar-Plain">30.0</span><span class="w">             </span><span class="c1"># max wait for first JointState in on_activate</span>
+<span class="c1"># Topic-name overrides (rarely needed; default derives from arm_namespace):</span>
+<span class="c1"># joint_states_topic: /arm/joint_states_single</span>
+<span class="c1"># arm_status_topic:   /arm/arm_status</span>
+<span class="c1"># end_pose_topic:     /arm/end_pose</span>
+<span class="c1"># pos_cmd_topic:      /arm/pos_cmd</span>
+</code></pre></div>
+<h2>Build / run standalone</h2>
+<div class="highlight"><pre><span></span><code>bash<span class="w"> </span>scripts/build.sh<span class="w">                                  </span><span class="c1"># colcon + rbnx codegen</span>
+<span class="nv">ROBONIX_ATLAS</span><span class="o">=</span><span class="m">127</span>.0.0.1:50051<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>bash<span class="w"> </span>scripts/start.sh<span class="w">                              </span><span class="c1"># registers, awaits Init</span>
+</code></pre></div>
+<p>To drive the lifecycle manually (without <code>rbnx boot</code>), call the arm's <code>Driver</code> service with <code>CMD_INIT</code> and a JSON config blob, then call <code>CMD_ACTIVATE</code>. Init only validates configuration; Activate returns after the first JointState is observed and the four data topics are declared.</p>
+<h2>Verification</h2>
+<div class="highlight"><pre><span></span><code>rbnx<span class="w"> </span>caps<span class="w"> </span><span class="p">|</span><span class="w"> </span>grep<span class="w"> </span>arm
+<span class="c1"># Expected: piper_ctl provider with</span>
+<span class="c1">#   robonix/primitive/arm/{driver, joint_states, arm_status, end_pose, pos_cmd}</span>
+
+ros2<span class="w"> </span>topic<span class="w"> </span>hz<span class="w"> </span>/arm/joint_states_single<span class="w">             </span><span class="c1"># ~200 Hz</span>
+ros2<span class="w"> </span>topic<span class="w"> </span><span class="nb">echo</span><span class="w"> </span>/arm/arm_status<span class="w"> </span>--once<span class="w">             </span><span class="c1"># PiperStatusMsg fields</span>
+ros2<span class="w"> </span>topic<span class="w"> </span><span class="nb">echo</span><span class="w"> </span>/arm/end_pose<span class="w"> </span>--once<span class="w">               </span><span class="c1"># geometry_msgs/Pose</span>
+
+<span class="c1"># Reverse cmd path (CAREFUL — moves the arm; clear the workspace first):</span>
+ros2<span class="w"> </span>topic<span class="w"> </span>pub<span class="w"> </span>--once<span class="w"> </span>/arm/pos_cmd<span class="w"> </span>piper_msgs/msg/PosCmd<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span><span class="s2">&quot;{x: 0.30, y: 0.0, z: 0.25, roll: 0.0, pitch: 1.57, yaw: 0.0,</span>
+<span class="s2">      gripper: 0.05, mode1: 0, mode2: 0}&quot;</span>
+</code></pre></div>
+<h2>Vendor / upstream</h2>
+<p><code>src/piper/</code>, <code>src/piper_msgs/</code>, <code>src/graspnet_msgs/</code> are verbatim copies from <a href="https://github.com/agilexrobotics/piper_ros">agilexrobotics/piper_ros</a>. The other packages in the upstream workspace are deliberately <strong>not</strong> vendored here and land in their own robonix packages:</p>
+<ul>
+<li><code>piper_description</code> / <code>piper_with_gripper_moveit</code> → <code>primitive-agilex-piper-description-rbnx</code>.</li>
+<li><code>piper_humble</code> / <code>piper_moveit_control</code> → <code>service-piper-moveit-rbnx</code>.</li>
+<li><code>piper_gazebo</code> / <code>piper_mujoco</code> / <code>piper_sim</code> → not migrated (sim-only).</li>
+</ul>
+<p>If anything diverges from upstream, drop a <code>*.patch</code> alongside <code>src/</code> documenting the diff.</p>
+<h2>License</h2>
+<p>This package: Apache-2.0. Vendored piper_ros / piper_msgs / graspnet_msgs: see their respective LICENSE files.</p>
         </article>
       </section>
       <aside class="panel detail-side">
@@ -747,6 +921,6 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
       </aside>
     </div>
   </main>
-  <footer class="site-footer"><div class="shell">Generated on 2026-07-16T04:54:40+00:00.</div></footer>
+  <footer class="site-footer"><div class="shell">Generated on 2026-07-16T11:02:21+00:00.</div></footer>
 </body>
 </html>

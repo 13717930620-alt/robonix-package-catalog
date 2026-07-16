@@ -719,7 +719,104 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
       <section class="panel detail-main">
         <h2>README</h2>
         <article class="readme">
-          <p>No README.md was found in this package repository.</p>
+          <h1>orbbec_camera_rbnx</h1>
+<p>Robonix package wrapping the <strong>Orbbec Gemini 330-series</strong> (and other Orbbec) RGBD cameras. Owns the <code>primitive/camera/*</code> namespace. Exposes the camera's RGB + aligned-depth streams under generic contracts so that mapping, scene, and any vision skill can resolve topic names through atlas (no hardcoded <code>/camera/...</code> paths on the consumer side).</p>
+<p>Uses the apt-installed <code>ros-humble-orbbec-camera</code> / <code>ros-humble-orbbec-description</code> packages — no source build needed.</p>
+<h2>Capability surface</h2>
+<table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Mode</th>
+<th>Transport</th>
+<th>Source / handler</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>robonix/primitive/camera/driver</code></td>
+<td>rpc</td>
+<td>gRPC</td>
+<td><code>Driver(CMD_INIT, config_json)</code> — lifecycle gate</td>
+</tr>
+<tr>
+<td><code>robonix/primitive/camera/rgb</code></td>
+<td>topic_out</td>
+<td>ROS 2</td>
+<td><code>/&lt;cam&gt;/color/image_raw</code> (sensor_msgs/Image)</td>
+</tr>
+<tr>
+<td><code>robonix/primitive/camera/depth</code></td>
+<td>topic_out</td>
+<td>ROS 2</td>
+<td><code>/&lt;cam&gt;/depth/image_raw</code> (sensor_msgs/Image, 16UC1)</td>
+</tr>
+<tr>
+<td><code>robonix/primitive/camera/extrinsics</code></td>
+<td>topic_out</td>
+<td>ROS 2</td>
+<td>latched TransformStamped (TODO)</td>
+</tr>
+<tr>
+<td><code>robonix/primitive/camera/snapshot</code></td>
+<td>rpc</td>
+<td>MCP</td>
+<td>one-shot RGB capture</td>
+</tr>
+<tr>
+<td><code>robonix/primitive/camera/depth_snapshot</code></td>
+<td>rpc</td>
+<td>MCP</td>
+<td>one-shot depth capture (8-bit JPEG visualization)</td>
+</tr>
+</tbody>
+</table>
+<h2>Driver-init lifecycle</h2>
+<p><code>start.sh</code> only brings up the atlas bridge process. The bridge opens a gRPC server on port <code>ORBBEC_DRIVER_PORT</code> (default 50233), registers the capability and declares only <code>primitive/camera/driver</code> on atlas, then blocks on heartbeat awaiting <code>Driver(CMD_INIT, config_json)</code>.</p>
+<p>When <code>rbnx boot</code> invokes Init it passes the manifest's <code>config:</code> block as JSON. The handler parses config (camera name, model, profiles, depth_registration, IMU on/off), spawns <code>ros2 launch orbbec_camera orbbec_camera.launch.py …</code>, waits for the first frame on the configured RGB topic, declares <code>primitive/camera/{rgb, depth}</code> on atlas, and returns ok. Atlas only ever advertises endpoints we've confirmed are publishing.</p>
+<h2>Layout</h2>
+<div class="highlight"><pre><span></span><code>orbbec_camera_rbnx/
+├── package_manifest.yaml
+├── orbbec_camera/
+│   └── main.py                    driver gRPC + lazy Init
+├── scripts/
+│   ├── build.sh                   rbnx codegen only (no colcon — apt-installed)
+│   └── start.sh                   source ROS, exec atlas_bridge
+└── .gitignore
+</code></pre></div>
+<h2>Config (passed via <code>Driver(CMD_INIT, config_json)</code>)</h2>
+<div class="highlight"><pre><span></span><code><span class="p">{</span>
+<span class="w">  </span><span class="nt">&quot;camera_name&quot;</span><span class="p">:</span><span class="w">          </span><span class="s2">&quot;camera&quot;</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">&quot;camera_model&quot;</span><span class="p">:</span><span class="w">         </span><span class="s2">&quot;gemini330_series&quot;</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">&quot;color_profile&quot;</span><span class="p">:</span><span class="w">        </span><span class="s2">&quot;640x480x30&quot;</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">&quot;depth_profile&quot;</span><span class="p">:</span><span class="w">        </span><span class="s2">&quot;640x480x30&quot;</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">&quot;depth_registration&quot;</span><span class="p">:</span><span class="w">   </span><span class="kc">true</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">&quot;enable_color&quot;</span><span class="p">:</span><span class="w">         </span><span class="kc">true</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">&quot;enable_depth&quot;</span><span class="p">:</span><span class="w">         </span><span class="kc">true</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">&quot;enable_point_cloud&quot;</span><span class="p">:</span><span class="w">   </span><span class="kc">false</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">&quot;enable_imu&quot;</span><span class="p">:</span><span class="w">           </span><span class="kc">false</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">&quot;sentinel_timeout_s&quot;</span><span class="p">:</span><span class="w">   </span><span class="mf">30.0</span>
+<span class="p">}</span>
+</code></pre></div>
+<p>Supported <code>camera_model</code> values (from <code>/opt/ros/humble/share/orbbec_camera/config/</code>):
+- <code>gemini330_series</code> — default, covers Gemini 335/336/330/335L/336L/330L/335Lg/335Le
+- <code>gemini2</code>, <code>gemini2L</code>, <code>gemini210</code>
+- <code>femto_bolt</code>, <code>femto_mega</code>, <code>femto</code>
+- <code>astra2</code>, <code>astra</code>
+- <code>gemini305</code>, <code>gemini345</code>, <code>gemini345_lg</code>, <code>gemini435_le</code>
+- <code>lidar</code> — Pulsar ME450 / SL450</p>
+<h2>Build / run standalone</h2>
+<div class="highlight"><pre><span></span><code>bash<span class="w"> </span>scripts/build.sh
+bash<span class="w"> </span>scripts/start.sh<span class="w">        </span><span class="c1"># registers driver iface, waits for INIT</span>
+</code></pre></div>
+<h2>Prerequisites</h2>
+<div class="highlight"><pre><span></span><code>sudo<span class="w"> </span>apt<span class="w"> </span>install<span class="w"> </span>ros-humble-orbbec-camera<span class="w"> </span>ros-humble-orbbec-description
+<span class="c1"># Register udev rules (required for USB camera access)</span>
+sudo<span class="w"> </span>cp<span class="w"> </span>/opt/ros/humble/share/orbbec_camera/udev/99-obsensor-libusb.rules<span class="w"> </span>/etc/udev/rules.d/
+sudo<span class="w"> </span>udevadm<span class="w"> </span>control<span class="w"> </span>--reload-rules<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span>sudo<span class="w"> </span>udevadm<span class="w"> </span>trigger
+</code></pre></div>
+<h2>License</h2>
+<p>Apache-2.0 (matches orbbec_camera upstream).</p>
         </article>
       </section>
       <aside class="panel detail-side">
@@ -748,6 +845,6 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
       </aside>
     </div>
   </main>
-  <footer class="site-footer"><div class="shell">Generated on 2026-07-16T04:54:40+00:00.</div></footer>
+  <footer class="site-footer"><div class="shell">Generated on 2026-07-16T11:02:21+00:00.</div></footer>
 </body>
 </html>

@@ -719,7 +719,90 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
       <section class="panel detail-main">
         <h2>README</h2>
         <article class="readme">
-          <p>No README.md was found in this package repository.</p>
+          <h1>mid360_lidar_rbnx</h1>
+<p>Robonix package wrapping the <strong>Livox MID-360</strong> LiDAR (Ethernet, 360° dome, 40 m range, integrated 6-axis IMU). Owns the <code>primitive/lidar/*</code> namespace. Publishes the lidar PointCloud2 on the host DDS bus and atlas-registers it under generic contracts so that mapping, navigation, and scene services discover the topic name through atlas — no hardcoded <code>/scanner/cloud</code> paths on the consumer side.</p>
+<p>The MID-360 also produces an IMU stream (<code>/livox/imu</code>, published as a side-effect of the same upstream launch). The <code>primitive/imu/*</code> contract surface for that IMU lives in a separate package, <a href="https://github.com/syswonder/primitive-livox-mid360-imu-rbnx"><code>mid360_imu_rbnx</code></a>. Robonix's invariant is "one primitive namespace = one package".</p>
+<h2>Capability surface</h2>
+<p>The <code>mode</code> is the abstract communication pattern declared in the contract TOML (<code>rpc</code> / <code>topic_in</code> / <code>topic_out</code>). The <code>transport</code> column records how this package realises it on the wire. Both columns matter — the same mode can ride different middleware (e.g. an <code>rpc</code> mode can be a gRPC method or an MCP tool).</p>
+<table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Mode</th>
+<th>Transport</th>
+<th>Source / handler</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>robonix/primitive/lidar/driver</code></td>
+<td>rpc</td>
+<td>gRPC</td>
+<td><code>Driver(CMD_INIT, config_json)</code> — lifecycle</td>
+</tr>
+<tr>
+<td><code>robonix/primitive/lidar/lidar3d</code></td>
+<td>topic_out</td>
+<td>ROS 2</td>
+<td><code>/scanner/cloud</code> (PointCloud2)</td>
+</tr>
+<tr>
+<td><code>robonix/primitive/lidar/lidar_snapshot</code></td>
+<td>rpc</td>
+<td>MCP</td>
+<td>one-shot capture (TODO)</td>
+</tr>
+</tbody>
+</table>
+<h2>Driver-init lifecycle</h2>
+<p><code>start.sh</code> brings up the atlas bridge process — no ROS spawn at this point. The bridge opens a gRPC server on <code>MID360_DRIVER_PORT</code> (default 50231), <code>RegisterCapability</code>s + declares <strong>only</strong> <code>primitive/lidar/driver</code> on atlas, then blocks on heartbeat awaiting <code>Driver(CMD_INIT, config_json)</code>.</p>
+<p>When <code>rbnx boot</code> invokes Init it passes the manifest's <code>config:</code> block as JSON. The handler resolves the host's IP for <code>Livox/host_net_info</code> (config override <code>host_ip:</code>, env <code>LIVOX_HOST_IP</code>, or auto-detect via <code>ip route get &lt;lidar_ip&gt;</code>), generates an MID360 config JSON with the right IPs, spawns <code>ros2 launch livox_ros_driver2 msg_MID360_launch.py</code> with the appropriate environment (<code>LIVOX_MID360_CONFIG</code>, <code>LIVOX_XFER_FORMAT</code>), waits for the first PointCloud2 on the configured topic, declares <code>primitive/lidar/lidar3d</code> on atlas, and returns ok. Atlas only ever advertises endpoints we've confirmed are publishing.</p>
+<h2>Layout</h2>
+<div class="highlight"><pre><span></span><code>mid360_lidar_rbnx/
+├── package_manifest.yaml         robonix dev-packaging spec
+├── mid360_driver/
+│   └── atlas_bridge.py           driver gRPC + lazy Init + livox spawn
+├── scripts/
+│   ├── build.sh                  colcon build vendored src + rbnx codegen
+│   └── start.sh                  source ROS, exec atlas_bridge
+├── src/
+│   ├── livox_ros_driver2/        VENDORED upstream + our patches
+│   └── livox_ros_driver2.patch   diff vs upstream HEAD at vendoring time
+└── .gitignore                    excludes rbnx-build/
+</code></pre></div>
+<h2>What we patched on top of upstream</h2>
+<p><code>src/livox_ros_driver2.patch</code> documents the diff against <a href="https://github.com/Livox-SDK/livox_ros_driver2">Livox-SDK/livox_ros_driver2</a>. The vendored copy already has them applied:</p>
+<ol>
+<li><code>config/MID360_config.json</code> — host_net_info IPs <code>192.168.1.5 → .50</code>, lidar IP <code>.12 → .161</code>. Atlas_bridge can override at runtime via the <code>host_ip</code> / <code>lidar_ip</code> config keys; the JSON file just provides the baseline.</li>
+<li><code>launch_ROS2/msg_MID360_launch.py</code> — <code>xfer_format</code> default <code>1 → 2</code> (PointCloud2 XYZIT instead of Livox CustomMsg). Now also reads <code>LIVOX_XFER_FORMAT</code> / <code>LIVOX_PUBLISH_FREQ</code> / <code>LIVOX_FRAME_ID</code> from the env so atlas_bridge can pass config through.</li>
+<li><code>src/lddc.cpp</code> — global publisher topic <code>livox/lidar → scanner/cloud</code>. <code>multi_topic=1</code> keeps publishing per-lidar topics under <code>livox/lidar_*</code> unchanged.</li>
+</ol>
+<h2>Config (passed via <code>Driver(CMD_INIT, config_json)</code>)</h2>
+<div class="highlight"><pre><span></span><code><span class="p">{</span>
+<span class="w">  </span><span class="nt">&quot;lidar_topic&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;/scanner/cloud&quot;</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">&quot;lidar_ip&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;192.168.1.161&quot;</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">&quot;host_ip&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;&quot;</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">&quot;xfer_format&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">2</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">&quot;publish_freq&quot;</span><span class="p">:</span><span class="w"> </span><span class="mf">10.0</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">&quot;frame_id&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;livox_frame&quot;</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">&quot;sentinel_timeout_s&quot;</span><span class="p">:</span><span class="w"> </span><span class="mf">30.0</span>
+<span class="p">}</span>
+</code></pre></div>
+<p><code>host_ip: ""</code> triggers auto-detect via <code>ip route get &lt;lidar_ip&gt;</code>. Override only when route resolution can't pick the right interface (e.g. the Jetson has multiple Ethernet ports and the route picks the wrong one).</p>
+<h2>Build / run standalone</h2>
+<div class="highlight"><pre><span></span><code>bash<span class="w"> </span>scripts/build.sh<span class="w">           </span><span class="c1"># or:  rbnx build -p .</span>
+bash<span class="w"> </span>scripts/start.sh<span class="w">           </span><span class="c1"># or:  rbnx boot  -p .</span>
+<span class="c1"># the driver gRPC will sit awaiting Driver(CMD_INIT). For a smoke test</span>
+<span class="c1"># without rbnx boot, drive it manually with grpcurl or a local Python script.</span>
+</code></pre></div>
+<p>After Init the lidar should appear on:</p>
+<div class="highlight"><pre><span></span><code>ros2<span class="w"> </span>topic<span class="w"> </span>hz<span class="w"> </span>/scanner/cloud<span class="w">   </span><span class="c1"># ~10 Hz PointCloud2</span>
+ros2<span class="w"> </span>topic<span class="w"> </span>hz<span class="w"> </span>/livox/imu<span class="w">       </span><span class="c1"># ~200 Hz sensor_msgs/Imu (consumed by mid360_imu_rbnx)</span>
+</code></pre></div>
+<h2>Network — host-side prereqs</h2>
+<p>The lidar's IP is config-driven; the host's IP is not. Whatever the lidar's configured IP is (we ship <code>192.168.1.161</code> as default; flash to a different value via Livox Viewer 2 if your network policy dictates), the host's NIC must live on the same /24 subnet (e.g. <code>192.168.1.50/24</code> for a <code>192.168.1.0/24</code> lidar) and have a route to the lidar IP. How you set that up is host-specific — <code>nmcli</code>, <code>systemd-networkd</code>, plain <code>ip addr</code>, whatever your distro standardises on. The package can't subsume that step because Ethernet IP config is inherently host-state.</p>
+<h2>License</h2>
+<p>This package: MulanPSL-2.0. Vendored <code>livox_ros_driver2/</code>: see <code>src/livox_ros_driver2/LICENSE</code> (BSD).</p>
         </article>
       </section>
       <aside class="panel detail-side">
@@ -745,6 +828,6 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
       </aside>
     </div>
   </main>
-  <footer class="site-footer"><div class="shell">Generated on 2026-07-16T04:54:40+00:00.</div></footer>
+  <footer class="site-footer"><div class="shell">Generated on 2026-07-16T11:02:21+00:00.</div></footer>
 </body>
 </html>

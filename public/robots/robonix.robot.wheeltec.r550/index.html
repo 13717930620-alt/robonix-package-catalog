@@ -719,7 +719,87 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
       <section class="panel detail-main">
         <h2>README</h2>
         <article class="readme">
-          <p>No README.md was found in this package repository.</p>
+          <h1>wheeltec_r550_deploy</h1>
+<p>Robonix deploy manifest for the WHEELTEC R550 robot at SysWonder lab.</p>
+<p>Hardware: Jetson Orin (aarch64, Tegra-special CUDA stack), WHEELTEC R550 chassis, Livox MID-360 3D LiDAR + integrated 6-axis IMU (Ethernet), Intel RealSense D435i RGBD camera (USB 3.0, with internal IMU).</p>
+<h2>Packages</h2>
+<p>All package URLs in <code>robonix_manifest.yaml</code> resolve from the SysWonder GitHub organization:</p>
+<table>
+<thead>
+<tr>
+<th>Package</th>
+<th>Repo</th>
+<th>Owns</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>mid360_lidar_rbnx</code></td>
+<td>syswonder/primitive-livox-mid360-lidar-rbnx</td>
+<td>primitive/lidar/*</td>
+</tr>
+<tr>
+<td><code>mid360_imu_rbnx</code></td>
+<td>syswonder/primitive-livox-mid360-imu-rbnx</td>
+<td>primitive/imu/*</td>
+</tr>
+<tr>
+<td><code>realsense_camera_rbnx</code></td>
+<td>syswonder/primitive-intel-realsense_d435i-camera-rbnx</td>
+<td>primitive/camera/*</td>
+</tr>
+<tr>
+<td><code>wheeltec_chassis_rbnx</code></td>
+<td>syswonder/primitive-wheeltec-r550-chassis-rbnx</td>
+<td>primitive/chassis/*</td>
+</tr>
+<tr>
+<td><code>mapping_rbnx</code></td>
+<td>syswonder/service-map-rbnx</td>
+<td>service/map/*</td>
+</tr>
+</tbody>
+</table>
+<div class="highlight"><pre><span></span><code><span class="c1"># on the Jetson, in this directory:</span>
+rbnx<span class="w"> </span>build<span class="w"> </span>.<span class="w">         </span><span class="c1"># clones each url: package and runs its build.sh</span>
+rbnx<span class="w"> </span>boot<span class="w">  </span>.<span class="w">         </span><span class="c1"># spawns each one and runs Driver(CMD_INIT, config)</span>
+</code></pre></div>
+<p><code>rbnx build</code> writes everything to <code>rbnx-build/cache/&lt;name&gt;/</code> so the original working dir on the Jetson is never touched.</p>
+<h2>URDF — required, not shipped</h2>
+<p>Soma needs a WHEELTEC R550 URDF (<code>urdf_path</code> in the system.soma block). The URDF must include <code>base_link</code> (chassis frame; convention: ground projection of the geometric centre, X forward, Z up), <code>livox_frame</code> mount transform from <code>base_link</code>, and <code>camera_link</code> + <code>camera_color_optical_frame</code> mount transforms.</p>
+<p>Until a calibrated URDF is in hand, an interim path is to launch <code>static_transform_publisher</code> for each frame manually. Sketch (drop in a side-launch, replace x y z and roll pitch yaw with your measured mount values):</p>
+<div class="highlight"><pre><span></span><code><span class="nt">&lt;launch&gt;</span>
+<span class="w">  </span><span class="nt">&lt;node</span><span class="w"> </span><span class="na">pkg=</span><span class="s">&quot;tf2_ros&quot;</span><span class="w"> </span><span class="na">exec=</span><span class="s">&quot;static_transform_publisher&quot;</span><span class="w"> </span><span class="na">name=</span><span class="s">&quot;tf_lidar&quot;</span>
+<span class="w">        </span><span class="na">args=</span><span class="s">&quot;0.20 0 0.40  0 0 0  base_link livox_frame&quot;</span><span class="nt">/&gt;</span>
+<span class="w">  </span><span class="nt">&lt;node</span><span class="w"> </span><span class="na">pkg=</span><span class="s">&quot;tf2_ros&quot;</span><span class="w"> </span><span class="na">exec=</span><span class="s">&quot;static_transform_publisher&quot;</span><span class="w"> </span><span class="na">name=</span><span class="s">&quot;tf_camera&quot;</span>
+<span class="w">        </span><span class="na">args=</span><span class="s">&quot;0.30 0 0.35  0 0 0  base_link camera_link&quot;</span><span class="nt">/&gt;</span>
+<span class="nt">&lt;/launch&gt;</span>
+</code></pre></div>
+<p>Then leave <code>system.soma</code> commented out in the manifest until the URDF is ready, and run that side-launch in another shell.</p>
+<h2>Verifying the bring-up</h2>
+<p>After <code>rbnx boot</code>:</p>
+<div class="highlight"><pre><span></span><code>ros2<span class="w"> </span>topic<span class="w"> </span>hz<span class="w"> </span>/scanner/cloud<span class="w">   </span><span class="c1"># ~10 Hz lidar PointCloud2</span>
+ros2<span class="w"> </span>topic<span class="w"> </span>hz<span class="w"> </span>/livox/imu<span class="w">       </span><span class="c1"># ~200 Hz sensor_msgs/Imu</span>
+ros2<span class="w"> </span>topic<span class="w"> </span>hz<span class="w"> </span>/camera_435i/color/image_raw<span class="w">                    </span><span class="c1"># ~30 Hz</span>
+ros2<span class="w"> </span>topic<span class="w"> </span>hz<span class="w"> </span>/camera_435i/aligned_depth_to_color/image_raw<span class="w">   </span><span class="c1"># ~30 Hz</span>
+ros2<span class="w"> </span>topic<span class="w"> </span>hz<span class="w"> </span>/map<span class="w">             </span><span class="c1"># 1 Hz-ish OccupancyGrid (from rtabmap)</span>
+ros2<span class="w"> </span>topic<span class="w"> </span><span class="nb">echo</span><span class="w"> </span>/robonix/map/pose<span class="w"> </span>--once
+rbnx<span class="w"> </span>caps<span class="w">                      </span><span class="c1"># all the contracts above should be listed</span>
+</code></pre></div>
+<p>Open RViz and load the rtabmap visualization config to see the map build up.</p>
+<h2>Defer / boot sequencing</h2>
+<p>The deploy manifest is an unordered list. Boot ordering happens at runtime via the defer protocol: a package whose dep isn't ready returns <code>Driver_Response(state="deferred")</code> and <code>rbnx boot</code> retries it periodically until the system reaches steady state. There's no explicit dep graph in the manifest — each package only declares what it needs at the moment its Init runs.</p>
+<p>Concretely, the cascade for this stack:</p>
+<div class="highlight"><pre><span></span><code>mid360_lidar.Init    →  spawns livox driver, declares lidar3d
+                        (also makes /livox/imu live on the bus)
+mid360_imu.Init      →  defers if /livox/imu silent; succeeds on retry
+                        once mid360_lidar&#39;s launch is publishing
+realsense_camera.Init→  spawns realsense, declares rgb + depth
+mapping.Init         →  queries atlas for lidar3d, rgb, depth, imu;
+                        defers any not yet present; succeeds when all are
+</code></pre></div>
+<h2>License</h2>
+<p>Manifest + this README: MulanPSL-2.0. Each <code>url:</code> package retains its own license.</p>
         </article>
       </section>
       <aside class="panel detail-side">
@@ -749,6 +829,6 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
       </aside>
     </div>
   </main>
-  <footer class="site-footer"><div class="shell">Generated on 2026-07-16T04:54:40+00:00.</div></footer>
+  <footer class="site-footer"><div class="shell">Generated on 2026-07-16T11:02:21+00:00.</div></footer>
 </body>
 </html>

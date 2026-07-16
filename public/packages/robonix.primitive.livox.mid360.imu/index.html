@@ -719,7 +719,49 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
       <section class="panel detail-main">
         <h2>README</h2>
         <article class="readme">
-          <p>No README.md was found in this package repository.</p>
+          <h1>mid360_imu_rbnx</h1>
+<p>Robonix package owning the <code>primitive/imu/*</code> namespace for the Ranger Mini's MID-360 embedded IMU. The IMU stream itself is produced by the upstream <code>livox_ros_driver2</code> launch (spawned by <a href="https://github.com/syswonder/primitive-livox-mid360-lidar-rbnx"><code>mid360_lidar_rbnx</code></a>) and published on <code>/livox/imu</code>. <strong>This package does NOT spawn any ROS process</strong> — it's a pure topic shim that atlas-registers the existing topic.</p>
+<p>The split exists because robonix's invariant is "one primitive namespace = one package". Mixing <code>primitive/lidar/*</code> and <code>primitive/imu/*</code> in the same package would let two namespaces share one capability_id, breaking that rule.</p>
+<h2>Capability surface</h2>
+<table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Mode</th>
+<th>Transport</th>
+<th>Source / handler</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>robonix/primitive/imu/driver</code></td>
+<td>rpc</td>
+<td>gRPC</td>
+<td><code>Driver(CMD_INIT, config_json)</code> — lifecycle</td>
+</tr>
+<tr>
+<td><code>robonix/primitive/imu/imu</code></td>
+<td>topic_out</td>
+<td>ROS 2</td>
+<td><code>/livox/imu</code> (sensor_msgs/Imu)</td>
+</tr>
+</tbody>
+</table>
+<h2>Driver-init lifecycle</h2>
+<p><code>start.sh</code> brings up the atlas bridge. The bridge opens a gRPC server (default port 50233), registers the capability and declares only <code>primitive/imu/driver</code> on atlas, then blocks awaiting <code>Driver(CMD_INIT, config_json)</code>.</p>
+<p>When <code>rbnx boot</code> calls Init, the handler subscribes to the configured IMU topic and waits for the first <code>sensor_msgs/Imu</code> message — that's the sentinel proving the upstream livox driver is alive on this host's DDS bus. Once it arrives, we declare <code>primitive/imu/imu</code> on atlas and return ok.</p>
+<h2>Boot ordering — defer, no dep graph</h2>
+<p>Robonix doesn't track package startup dependencies. The deploy manifest is an unordered list. Instead, packages defer themselves at runtime: if <code>mid360_lidar_rbnx</code>'s Init hasn't completed yet, <code>/livox/imu</code> is silent. Our Init does a short probe (default 2 s), and on miss falls back to the full sentinel timeout (default 30 s). When <code>rbnx-cli</code> grows defer-queue handling, this falls back to returning <code>Driver_Response(state="deferred")</code> after the short probe so the boot loop retries us out-of-band.</p>
+<p>This pattern is intentionally simpler than a topological dep graph: each package only declares what it needs at the moment its Init runs, so there's no manifest-drift problem when contracts change shape.</p>
+<h2>Config (passed via <code>Driver(CMD_INIT, config_json)</code>)</h2>
+<div class="highlight"><pre><span></span><code><span class="p">{</span>
+<span class="w">  </span><span class="nt">&quot;imu_topic&quot;</span><span class="p">:</span><span class="w">          </span><span class="s2">&quot;/livox/imu&quot;</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">&quot;defer_probe_s&quot;</span><span class="p">:</span><span class="w">      </span><span class="mf">2.0</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">&quot;sentinel_timeout_s&quot;</span><span class="p">:</span><span class="w"> </span><span class="mf">30.0</span>
+<span class="p">}</span>
+</code></pre></div>
+<h2>License</h2>
+<p>MulanPSL-2.0.</p>
         </article>
       </section>
       <aside class="panel detail-side">
@@ -744,6 +786,6 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
       </aside>
     </div>
   </main>
-  <footer class="site-footer"><div class="shell">Generated on 2026-07-16T04:54:40+00:00.</div></footer>
+  <footer class="site-footer"><div class="shell">Generated on 2026-07-16T11:02:21+00:00.</div></footer>
 </body>
 </html>

@@ -1,6 +1,6 @@
 {
   "api_version": "1",
-  "generated_at": "2026-07-16T04:54:40+00:00",
+  "generated_at": "2026-07-16T11:02:21+00:00",
   "robots": [
     {
       "name": "robonix.robot.agilex.ranger_mini_v3",
@@ -294,11 +294,11 @@
         },
         {
           "section": "primitive",
-          "name": "lite3_description",
-          "repo": "https://github.com/syswonder/primitive-deep_robotics-lite3_description.git",
+          "name": "robot_description",
+          "repo": "https://github.com/syswonder/primitive-robot-description-rbnx",
           "path": "",
           "branch": "main",
-          "manifest": "",
+          "manifest": "package_manifest.native.yaml",
           "package_name": "",
           "package_url": ""
         },

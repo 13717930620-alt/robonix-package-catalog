@@ -719,7 +719,196 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
       <section class="panel detail-main">
         <h2>README</h2>
         <article class="readme">
-          <p>No README.md was found in this package repository.</p>
+          <h1>primitive-agilex-piper-handeye-rbnx</h1>
+<p>Robonix package for hand-eye calibration TF publishing on the Piper + Orbbec Dabai DCW grasp pipeline. Vendors <code>easy_handeye2</code> 0.5.0.</p>
+<p>Catalog name: <code>robonix.primitive.agilex.piper.handeye</code>.</p>
+<blockquote>
+<p>⚠️  <strong>THE VENDORED CALIB IS A PLACEHOLDER (identity transform).</strong>
+Pick-and-place will silently miss every grasp until you replace <code>config/calibrations/my_eih_calib.calib</code> with a real calibration result. See <a href="#replacing-the-calibration">Replacing the calibration</a>.</p>
+</blockquote>
+<h2>What it does</h2>
+<p>Runs upstream <code>easy_handeye2</code>'s <code>handeye_publisher</code> node, which broadcasts a single static TF on <code>/tf_static</code> based on a calibration YAML. In eye-in-hand mode (the default we ship), that's:</p>
+<div class="highlight"><pre><span></span><code>link6 → camera_color_optical_frame
+</code></pre></div>
+<ul>
+<li><code>link6</code> is published by <code>primitive-agilex-piper-description-rbnx</code>.</li>
+<li><code>camera_color_optical_frame</code> is published by <code>primitive-orbbec-dabai_dcw-camera-rbnx</code> once the camera is up.</li>
+</ul>
+<p>With this package running, the chain <code>base_link → link1..link6 → camera_color_optical_frame</code> is complete and downstream consumers (<code>service-grasp-pose-rbnx</code>, <code>skill-pick-rbnx</code>) can transform pixel detections into base-frame poses.</p>
+<h2>Capability surface</h2>
+<div class="highlight"><pre><span></span><code><span class="nt">capabilities</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[]</span>
+</code></pre></div>
+<p>Nothing routed on atlas. TF is a global ROS 2 side-channel (<code>/tf_static</code>); atlas-routing would add indirection with no benefit — every consumer uses <code>tf2_ros::Buffer</code> to look up transforms, not an atlas-routed RPC. This package just <code>RegisterPrimitive</code> on atlas so <code>rbnx boot</code>'s <code>wait_for_registration</code> loop unblocks.</p>
+<h2>Driver-init lifecycle</h2>
+<p>There is <strong>no <code>Driver(CMD_INIT)</code> handler</strong>. The package registers a provider on atlas so <code>rbnx boot</code> proceeds, but does not receive a config JSON. <code>start.sh</code>:</p>
+<ol>
+<li>stages the calibration file into <code>~/.ros2/easy_handeye2/calibrations/&lt;name&gt;.calib</code> (upstream hardcodes that path);</li>
+<li>runs <code>ros2 launch easy_handeye2 publish.launch.py name:=&lt;name&gt;</code>.</li>
+</ol>
+<h3>Calib staging quirk (important for debugging)</h3>
+<p>Upstream's <code>easy_handeye2/easy_handeye2/__init__.py</code> hardcodes:</p>
+<div class="highlight"><pre><span></span><code><span class="n">CALIBRATIONS_DIRECTORY</span> <span class="o">=</span> <span class="n">pathlib</span><span class="o">.</span><span class="n">Path</span><span class="p">(</span>
+    <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">expanduser</span><span class="p">(</span><span class="s1">&#39;~/.ros2/easy_handeye2/calibrations&#39;</span><span class="p">))</span>
+</code></pre></div>
+<p>…and <code>handeye_publisher</code> reads <code>&lt;CALIBRATIONS_DIRECTORY&gt;/&lt;name&gt;.calib</code> where <code>&lt;name&gt;</code> is the launch arg. We do not modify upstream (stays vendor-clean for future re-imports), so at start time <code>atlas_register_and_launch.py</code> copies <code>config/calibrations/&lt;name&gt;.calib</code> into <code>~/.ros2/easy_handeye2/calibrations/&lt;name&gt;.calib</code> and then runs the launch.</p>
+<p>If <code>~/.ros2/easy_handeye2/calibrations/&lt;name&gt;.calib</code> already exists (operator placed a fresh calib there directly via the upstream calibration GUI), we leave it alone and warn — overwriting would clobber the operator's most recent calibration with a stale vendored copy. Set <code>EASY_HANDEYE2_FORCE_STAGE=1</code> if you really do want to overwrite (i.e. you've intentionally committed a new calib to this package and want it to win).</p>
+<h2>Boot ordering</h2>
+<p>Independent of <code>primitive-agilex-piper-description-rbnx</code> — the two publish disjoint <code>/tf_static</code> subtrees. Recommend listing this <strong>after</strong> description just for readability.</p>
+<h2>Layout</h2>
+<div class="highlight"><pre><span></span><code>primitive-agilex-piper-handeye-rbnx/
+├── package_manifest.yaml
+├── config/calibrations/
+│   └── my_eih_calib.calib              # ← YAML serialization of
+│                                       #    HandeyeCalibration msg
+│                                       #    (currently identity!)
+├── scripts/
+│   ├── build.sh                        # rbnx codegen + colcon build
+│   ├── start.sh                        # source ROS + overlay, exec ↓
+│   └── atlas_register_and_launch.py    # register + stage calib +
+│                                       # spawn `ros2 launch easy_handeye2
+│                                       # publish.launch.py`
+└── src/
+    ├── easy_handeye2/                  # upstream 0.5.0 (vendored)
+    └── easy_handeye2_msgs/             # upstream 0.5.0 (vendored)
+</code></pre></div>
+<h2>Config / overrides</h2>
+<p>This package has <strong>no <code>*/driver</code> capability</strong>, so <code>rbnx boot v0.1</code> cannot deliver per-package config via <code>Driver(CMD_INIT, config_json)</code>. <strong>The <code>config:</code> block in the deploy manifest is ignored.</strong> Use the top-level <code>env:</code> block instead:</p>
+<div class="highlight"><pre><span></span><code><span class="nt">env</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">EASY_HANDEYE2_CALIB_NAME</span><span class="p">:</span><span class="w">    </span><span class="l l-Scalar l-Scalar-Plain">my_eih_calib</span><span class="w">                </span><span class="c1"># default</span>
+<span class="w">  </span><span class="nt">EASY_HANDEYE2_CALIB_PATH</span><span class="p">:</span><span class="w">    </span><span class="l l-Scalar l-Scalar-Plain">/abs/path/to.calib</span><span class="w">          </span><span class="c1"># absolute (wins)</span>
+<span class="w">  </span><span class="nt">EASY_HANDEYE2_FORCE_STAGE</span><span class="p">:</span><span class="w">   </span><span class="s">&quot;0&quot;</span><span class="w">                         </span><span class="c1"># overwrite ~/.ros2 staged</span>
+</code></pre></div>
+<table>
+<thead>
+<tr>
+<th>env var</th>
+<th>resolution priority</th>
+<th>default</th>
+<th>meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>EASY_HANDEYE2_CALIB_PATH</code></td>
+<td>1 (highest)</td>
+<td>unset</td>
+<td>absolute path to a <code>.calib</code> file. Basename (minus <code>.calib</code>) becomes the launch <code>name:=</code>.</td>
+</tr>
+<tr>
+<td><code>EASY_HANDEYE2_CALIB_NAME</code></td>
+<td>2</td>
+<td><code>my_eih_calib</code></td>
+<td>resolves to <code>&lt;pkg&gt;/config/calibrations/&lt;name&gt;.calib</code>.</td>
+</tr>
+<tr>
+<td><code>EASY_HANDEYE2_FORCE_STAGE</code></td>
+<td>—</td>
+<td><code>0</code></td>
+<td><code>1</code> = overwrite <code>~/.ros2/easy_handeye2/calibrations/&lt;name&gt;.calib</code>.</td>
+</tr>
+<tr>
+<td><code>ROBONIX_ATLAS</code></td>
+<td>—</td>
+<td><code>127.0.0.1:50051</code></td>
+<td>atlas gRPC endpoint.</td>
+</tr>
+</tbody>
+</table>
+<h2>Replacing the calibration</h2>
+<p>The shipped <code>config/calibrations/my_eih_calib.calib</code> is an <strong>identity transform with eye-in-hand metadata</strong> — <code>robot_effector_frame: link6</code> / <code>tracking_base_frame: camera_color_optical_frame</code>. The TF it publishes will be zero-translation, identity-rotation. <strong>You must replace it.</strong></p>
+<h3>Option A — Calibrate fresh on the real hardware (recommended)</h3>
+<p>Standard <code>easy_handeye2</code> workflow. Requires the camera to actually see an ArUco marker mounted at <code>tracking_marker_frame</code>.</p>
+<div class="highlight"><pre><span></span><code><span class="c1"># 1. Bring up Piper + Orbbec + Piper URDF.</span>
+<span class="nb">cd</span><span class="w"> </span>&lt;deploy_dir&gt;
+rbnx<span class="w"> </span>boot
+
+<span class="c1"># 2. In another shell — run the upstream calibration GUI.</span>
+ros2<span class="w"> </span>launch<span class="w"> </span>easy_handeye2<span class="w"> </span>calibrate.launch.py<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>calibration_type:<span class="o">=</span>eye_in_hand<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>name:<span class="o">=</span>my_eih_calib<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>robot_base_frame:<span class="o">=</span>base_link<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>robot_effector_frame:<span class="o">=</span>link6<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>tracking_base_frame:<span class="o">=</span>camera_color_optical_frame<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>tracking_marker_frame:<span class="o">=</span>tracking_marker
+
+<span class="c1"># 3. Take 10-20 samples (move arm to varied poses, click &quot;Take</span>
+<span class="c1">#    Sample&quot;), then &quot;Compute&quot; → &quot;Save&quot;. Upstream writes:</span>
+<span class="c1">#      ~/.ros2/easy_handeye2/calibrations/my_eih_calib.calib</span>
+
+<span class="c1"># 4. Copy that result back into this package:</span>
+cp<span class="w"> </span>~/.ros2/easy_handeye2/calibrations/my_eih_calib.calib<span class="w"> </span><span class="se">\</span>
+<span class="w">   </span>&lt;this_package&gt;/config/calibrations/
+
+<span class="c1"># 5. git commit + push. Other deploy machines pick up the new calib</span>
+<span class="c1">#    automatically next time they pull + rebuild.</span>
+</code></pre></div>
+<h3>Option B — Swap in a pre-existing calib file</h3>
+<div class="highlight"><pre><span></span><code>cp<span class="w"> </span>my_existing.calib<span class="w"> </span><span class="se">\</span>
+<span class="w">   </span>&lt;this_package&gt;/config/calibrations/my_eih_calib.calib
+</code></pre></div>
+<p>…or point at it via env (no copy needed):</p>
+<div class="highlight"><pre><span></span><code><span class="nt">env</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">EASY_HANDEYE2_CALIB_PATH</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/home/user/calibrations/my_existing.calib</span>
+</code></pre></div>
+<p>The basename (minus <code>.calib</code>) becomes the launch <code>name:=</code>.</p>
+<h2>Verification</h2>
+<div class="highlight"><pre><span></span><code>rbnx<span class="w"> </span>caps<span class="w"> </span><span class="p">|</span><span class="w"> </span>grep<span class="w"> </span>easy_handeye2
+<span class="c1"># expect: easy_handeye2 provider, 0 capabilities</span>
+
+ros2<span class="w"> </span>run<span class="w"> </span>tf2_ros<span class="w"> </span>tf2_echo<span class="w"> </span>link6<span class="w"> </span>camera_color_optical_frame
+<span class="c1"># expect: a constant transform (the static calibration result)</span>
+<span class="c1"># - with the placeholder calib, this is identity (translation 0,</span>
+<span class="c1">#   quaternion (0,0,0,1)) which means &quot;camera at the center of</span>
+<span class="c1">#   link6 with no rotation&quot; — physically wrong.</span>
+
+<span class="c1"># Full chain check:</span>
+ros2<span class="w"> </span>run<span class="w"> </span>tf2_ros<span class="w"> </span>tf2_echo<span class="w"> </span>base_link<span class="w"> </span>camera_color_optical_frame
+<span class="c1"># expect: a transform that varies as the arm moves (joint TF</span>
+<span class="c1"># from RSP) but with the calibration step constant.</span>
+</code></pre></div>
+<h2>Frame contract</h2>
+<table>
+<thead>
+<tr>
+<th>frame</th>
+<th>published by</th>
+<th>role</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>base_link</code></td>
+<td><code>primitive-agilex-piper-description-rbnx</code></td>
+<td>arm root</td>
+</tr>
+<tr>
+<td><code>link1</code>..<code>link6</code></td>
+<td><code>primitive-agilex-piper-description-rbnx</code></td>
+<td>joint-driven</td>
+</tr>
+<tr>
+<td><code>camera_color_optical_frame</code></td>
+<td><code>primitive-orbbec-dabai_dcw-camera-rbnx</code></td>
+<td>RGB sensor frame</td>
+</tr>
+<tr>
+<td><code>link6 → camera_color_optical_frame</code></td>
+<td><strong>this package</strong></td>
+<td>static hand-eye TF</td>
+</tr>
+</tbody>
+</table>
+<p>If <code>tracking_base_frame</code> in the calib differs from <code>camera_color_optical_frame</code> (e.g. you use the depth sensor frame instead), update both this calib AND the grasp-pose consumer's frame expectation.</p>
+<h2>Why we vendor instead of <code>apt install ros-humble-easy-handeye2</code></h2>
+<ol>
+<li><strong>Reproducibility across deploy machines</strong> — vendoring guarantees byte-for-byte the same publisher behavior across different Jetsons.</li>
+<li><strong>Calib file format pinning</strong> — the YAML schema is upstream's <code>HandeyeCalibration</code> msg with <code>set_message_fields</code>. If upstream adds a field and we apt-upgrade, our placeholder + operator's old <code>.calib</code> files break. Vendoring isolates us from that.</li>
+<li><strong>No build surprises</strong> — upstream's <code>package.xml</code> declares <code>python-transforms3d-pip</code>, <code>python3-opencv</code>, <code>rqt_gui</code> as <code>exec_depend</code> for the calibration GUI. We only run <code>handeye_publisher</code> (which does not import any of those), so we silently tolerate them being absent on the build machine.</li>
+</ol>
+<h2>Multi-arm note</h2>
+<p>If two arms are present (future), each must have its own calib file with a unique <code>name</code>. Spawn this package twice in the deploy manifest with different <code>EASY_HANDEYE2_CALIB_NAME</code> per instance. The <code>link6</code> / <code>camera_color_optical_frame</code> frame names will need to differ between instances too — that is a <code>piper_description</code> / OrbbecSDK URDF/namespace issue, outside this package's scope.</p>
+<h2>License</h2>
+<p>This package: MulanPSL-2.0. Vendored <code>easy_handeye2</code> / <code>easy_handeye2_msgs</code>: see their respective LICENSE files.</p>
         </article>
       </section>
       <aside class="panel detail-side">
@@ -743,6 +932,6 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
       </aside>
     </div>
   </main>
-  <footer class="site-footer"><div class="shell">Generated on 2026-07-16T04:54:40+00:00.</div></footer>
+  <footer class="site-footer"><div class="shell">Generated on 2026-07-16T11:02:21+00:00.</div></footer>
 </body>
 </html>

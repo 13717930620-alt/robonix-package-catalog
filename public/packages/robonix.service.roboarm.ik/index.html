@@ -719,7 +719,31 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
       <section class="panel detail-main">
         <h2>README</h2>
         <article class="readme">
-          <p>No README.md was found in this package repository.</p>
+          <h1>roboarm_ik_rbnx</h1>
+<p>Robonix-managed manipulation executor ported from
+<code>/home/syswonder/lhw/roboarm</code>.</p>
+<p>It is an alternative to <code>piper_moveit_rbnx</code>: start exactly one of them in
+<code>robonix_manifest.yaml</code>. Both expose <code>robonix/service/manipulation/*</code>; running
+both at the same time can make atlas resolution ambiguous and can double-command
+the arm.</p>
+<p>Execution path:</p>
+<div class="highlight"><pre><span></span><code>pick_skill/yolo_grasp -&gt; manipulation/execute_grasp
+  -&gt; roboarm IK on Piper URDF link6
+  -&gt; /arm/joint_states
+  -&gt; piper_ctl_rbnx
+  -&gt; CAN
+</code></pre></div>
+<p>ROS compatibility:</p>
+<ul>
+<li>subscribes <code>/arm/joint_states_single</code></li>
+<li>publishes <code>/arm/joint_states</code></li>
+<li>exposes <code>/moveit_control/reset</code> as <code>std_srvs/srv/Trigger</code></li>
+</ul>
+<p>It does not start MoveIt, <code>move_group</code>, or the C++ moveit control node.</p>
+<p>For <code>pick_skill.put_down</code>, configure <code>put_down_joints_deg</code> with six joint
+angles in degrees. The executor carries the held object to that pose, opens the
+gripper there, and then returns the arm to <code>teach_safe_joints_deg</code>. If the
+put-down pose cannot be reached, it reports failure without opening the gripper.</p>
         </article>
       </section>
       <aside class="panel detail-side">
@@ -747,6 +771,6 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
       </aside>
     </div>
   </main>
-  <footer class="site-footer"><div class="shell">Generated on 2026-07-16T04:54:40+00:00.</div></footer>
+  <footer class="site-footer"><div class="shell">Generated on 2026-07-16T11:02:21+00:00.</div></footer>
 </body>
 </html>

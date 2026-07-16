@@ -58,11 +58,11 @@
     },
     {
       "section": "primitive",
-      "name": "lite3_description",
-      "repo": "https://github.com/syswonder/primitive-deep_robotics-lite3_description.git",
+      "name": "robot_description",
+      "repo": "https://github.com/syswonder/primitive-robot-description-rbnx",
       "path": "",
       "branch": "main",
-      "manifest": "",
+      "manifest": "package_manifest.native.yaml",
       "package_name": "",
       "package_url": ""
     },

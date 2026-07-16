@@ -719,7 +719,97 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
       <section class="panel detail-main">
         <h2>README</h2>
         <article class="readme">
-          <p>No README.md was found in this package repository.</p>
+          <h1>service-object-detect-rbnx</h1>
+<p>Robonix package for <strong>LLM/VLM-based object detection</strong>. It exposes an atlas-routed MCP service and replaces the older <code>yolo_world_rbnx</code> path. Owns the <code>service/perception/object_detect/*</code> namespace.</p>
+<p>Catalog name: <code>robonix.service.object_detect</code>.</p>
+<h2>Capability surface</h2>
+<table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Mode</th>
+<th>Transport</th>
+<th>Source / handler</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>robonix/service/perception/object_detect/driver</code></td>
+<td>rpc</td>
+<td>gRPC</td>
+<td><code>Driver(CMD_INIT, config_json)</code> — lifecycle gate</td>
+</tr>
+<tr>
+<td><code>robonix/service/perception/object_detect/detect_object</code></td>
+<td>rpc</td>
+<td>MCP</td>
+<td><code>DetectObject(object_name) → bbox_2d + object_center_3d</code></td>
+</tr>
+</tbody>
+</table>
+<p>There is no legacy <code>/yolo/detect_object</code> ROS-service fallback in this package.</p>
+<h2>Compared with the old <code>yolo_world</code> path</h2>
+<ul>
+<li>no GPU / ultralytics weights;</li>
+<li>RGB → OpenAI-compatible VLM → 2D bbox;</li>
+<li>in vertical-grasp mode the depth stream is completely unused (<code>skip_depth=true</code>); <code>service-grasp-pose-rbnx</code> maps the bbox center through the calibrated 2D homography and combines it with the configured tabletop z.</li>
+</ul>
+<h2>Boot ordering</h2>
+<p>Must come <strong>after</strong> <code>primitive-orbbec-dabai_dcw-camera-rbnx</code> in the deploy manifest — Init resolves the RGB topic (and, when <code>skip_depth=false</code>, the depth topic) at atlas-registration time.</p>
+<h2>Driver-init lifecycle</h2>
+<p><code>start.sh</code> brings up the atlas bridge — no ROS spawn. The bridge opens a gRPC server, registers the capability and declares only <code>object_detect/driver</code>, then blocks awaiting <code>Driver(CMD_INIT, config_json)</code>.</p>
+<p>When <code>rbnx boot</code> invokes Init the handler:</p>
+<ol>
+<li>validates the LLM endpoint / API key / model name;</li>
+<li>resolves <code>primitive/camera/rgb</code> and <code>primitive/camera/camera_info</code> via atlas (depth is skipped when <code>skip_depth=true</code>);</li>
+<li>declares <code>object_detect/detect_object</code> on atlas.</li>
+</ol>
+<h2>Layout</h2>
+<div class="highlight"><pre><span></span><code>service-object-detect-rbnx/
+├── package_manifest.yaml
+├── capabilities/
+│   └── service/perception/object_detect/{driver,detect_object}.v1.toml
+├── config/                     example .env / prompt templates
+├── llm_detect/                 Python package: atlas bridge + VLM client
+├── scripts/
+│   ├── build.sh                colcon build + rbnx codegen
+│   └── start.sh                source ROS, exec atlas_bridge
+└── src/                        vendored dependencies (if any)
+</code></pre></div>
+<h2>Config (passed via <code>Driver(CMD_INIT, config_json)</code>)</h2>
+<div class="highlight"><pre><span></span><code><span class="p">{</span>
+<span class="w">  </span><span class="nt">&quot;llm_base_url&quot;</span><span class="p">:</span><span class="w">       </span><span class="s2">&quot;https://api.ofox.ai/v1&quot;</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">&quot;llm_api_key&quot;</span><span class="p">:</span><span class="w">        </span><span class="s2">&quot;sk-...&quot;</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">&quot;llm_model&quot;</span><span class="p">:</span><span class="w">          </span><span class="s2">&quot;google/gemini-3.1-flash-lite&quot;</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">&quot;temperature&quot;</span><span class="p">:</span><span class="w">        </span><span class="mf">0.0</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">&quot;rotation_cam2arm&quot;</span><span class="p">:</span><span class="w">   </span><span class="kc">true</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">&quot;skip_depth&quot;</span><span class="p">:</span><span class="w">         </span><span class="kc">true</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">&quot;rgb_topic&quot;</span><span class="p">:</span><span class="w">          </span><span class="s2">&quot;&quot;</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">&quot;camera_info_topic&quot;</span><span class="p">:</span><span class="w">  </span><span class="s2">&quot;&quot;</span>
+<span class="p">}</span>
+</code></pre></div>
+<ul>
+<li><code>rotation_cam2arm</code>: rotate the image 180° before sending to the LLM when the camera is mounted opposite to the arm.</li>
+<li><code>skip_depth</code>: vertical-grasp mode — bypass depth back-projection entirely. <code>env LLM_DETECT_SKIP_DEPTH=1</code> is the fallback.</li>
+<li>Empty topic strings mean "atlas-resolved"; defaults already match <code>primitive-orbbec-dabai_dcw-camera-rbnx</code>.</li>
+</ul>
+<h2>Build / run standalone</h2>
+<div class="highlight"><pre><span></span><code>bash<span class="w"> </span>scripts/build.sh<span class="w">                           </span><span class="c1"># colcon + rbnx codegen</span>
+<span class="nv">ROBONIX_ATLAS</span><span class="o">=</span><span class="m">127</span>.0.0.1:50051<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>bash<span class="w"> </span>scripts/start.sh<span class="w">                       </span><span class="c1"># registers, awaits Init</span>
+</code></pre></div>
+<h2>Verification</h2>
+<div class="highlight"><pre><span></span><code>rbnx<span class="w"> </span>caps<span class="w"> </span><span class="p">|</span><span class="w"> </span>grep<span class="w"> </span>object_detect
+<span class="c1"># Expected: llm_detect provider with</span>
+<span class="c1">#   robonix/service/perception/object_detect/{driver, detect_object}</span>
+
+<span class="c1"># End-to-end via the atlas MCP surface:</span>
+rbnx<span class="w"> </span>ask<span class="w"> </span><span class="s2">&quot;where is the paper on the desk?&quot;</span>
+
+<span class="c1"># The package intentionally has no direct ROS service surface.</span>
+</code></pre></div>
+<h2>License</h2>
+<p>This package: MulanPSL-2.0.</p>
         </article>
       </section>
       <aside class="panel detail-side">
@@ -744,6 +834,6 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
       </aside>
     </div>
   </main>
-  <footer class="site-footer"><div class="shell">Generated on 2026-07-16T04:54:40+00:00.</div></footer>
+  <footer class="site-footer"><div class="shell">Generated on 2026-07-16T11:02:21+00:00.</div></footer>
 </body>
 </html>

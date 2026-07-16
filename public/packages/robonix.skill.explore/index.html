@@ -719,7 +719,42 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
       <section class="panel detail-main">
         <h2>README</h2>
         <article class="readme">
-          <p>No README.md was found in this package repository.</p>
+          <h1>explore_rbnx</h1>
+<p>Autonomous frontier exploration skill for robonix. Driven by the
+LLM/pilot via <code>rbnx ask "explore"</code> (or any equivalent intent that
+triggers the <code>robonix/skill/explore/explore</code> tool).</p>
+<p>See <code>CAPABILITY.md</code> for the full interface + behaviour spec.</p>
+<h2>Quickstart</h2>
+<div class="highlight"><pre><span></span><code><span class="c1"># from the package root</span>
+bash<span class="w"> </span>scripts/build.sh<span class="w">   </span><span class="c1"># rbnx codegen + docker build</span>
+<span class="c1"># then add to your deploy manifest under skill: and rbnx boot</span>
+</code></pre></div>
+<p>Manifest snippet:</p>
+<div class="highlight"><pre><span></span><code><span class="nt">skill</span><span class="p">:</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">explore</span>
+<span class="w">    </span><span class="nt">path</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">../../../explore_rbnx</span>
+<span class="w">    </span><span class="nt">config</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">{}</span>
+</code></pre></div>
+<p>The skill registers 3 MCP tools with atlas. Pilot's tool catalog
+will include <code>robonix/skill/explore/{explore, status, cancel}</code>.</p>
+<h2>Layout</h2>
+<div class="highlight"><pre><span></span><code>explore_rbnx/
+├── package_manifest.yaml    # 3 caps + build/start hooks
+├── capabilities/            # package-local TOMLs + .srv files
+│   ├── explore.v1.toml
+│   ├── status.v1.toml
+│   ├── cancel.v1.toml
+│   └── srv/{Explore,GetExploreStatus,CancelExplore}.srv
+├── explore_skill/           # python module
+│   ├── atlas_bridge.py      # entrypoint: register + serve MCP
+│   ├── frontier.py          # WFD + clustering + scoring + safety
+│   └── controller.py        # state machine, frontier loop, sweep
+├── scripts/{build,start}.sh
+├── docker/{Dockerfile, entrypoint.sh, no_shm_profile.xml}
+├── CAPABILITY.md            # LLM-readable spec (registered with atlas)
+└── README.md
+</code></pre></div>
+<p>License: MulanPSL-2.0</p>
         </article>
       </section>
       <aside class="panel detail-side">
@@ -746,6 +781,6 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
       </aside>
     </div>
   </main>
-  <footer class="site-footer"><div class="shell">Generated on 2026-07-16T04:54:40+00:00.</div></footer>
+  <footer class="site-footer"><div class="shell">Generated on 2026-07-16T11:02:21+00:00.</div></footer>
 </body>
 </html>

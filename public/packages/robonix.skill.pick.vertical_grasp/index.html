@@ -719,7 +719,125 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
       <section class="panel detail-main">
         <h2>README</h2>
         <article class="readme">
-          <p>No README.md was found in this package repository.</p>
+          <h1>skill-pick-vertical-grasp-rbnx</h1>
+<p>Robonix user-facing pick skill for the Piper + Orbbec Dabai DCW vertical-grasp
+pipeline. It owns <code>robonix/skill/pick/*</code>.</p>
+<p>Catalog name: <code>robonix.skill.pick.vertical_grasp</code>.</p>
+<h2>Capability surface</h2>
+<table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Transport</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>robonix/skill/pick/driver</code></td>
+<td>gRPC</td>
+<td>Lifecycle (<code>CMD_INIT</code> / lazy <code>CMD_ACTIVATE</code>)</td>
+</tr>
+<tr>
+<td><code>robonix/skill/pick/pick</code></td>
+<td>MCP</td>
+<td>Pick one named object and leave it held</td>
+</tr>
+<tr>
+<td><code>robonix/skill/pick/put_down</code></td>
+<td>MCP</td>
+<td>Put down the held object at the configured fixed pose</td>
+</tr>
+</tbody>
+</table>
+<p><code>pick</code> accepts only an open-vocabulary <code>object_name</code>:</p>
+<div class="highlight"><pre><span></span><code><span class="p">{</span><span class="nt">&quot;object_name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;comb&quot;</span><span class="p">}</span>
+</code></pre></div>
+<p>The call is synchronous, uses a fixed 60 s budget, and makes one grasp
+attempt. <code>put_down</code> has an empty request.</p>
+<h2>Runtime paths</h2>
+<div class="highlight"><pre><span></span><code>pilot / executor
+  -&gt; pick_skill.pick(object_name)                    MCP
+  -&gt; llm_detect.detect_object                        MCP
+  -&gt; grasp_pose.grasp_request                        gRPC
+  -&gt; roboarm_ik.execute_grasp (approach/grasp/lift) gRPC
+  -&gt; return while holding the object
+
+pilot / executor
+  -&gt; pick_skill.put_down()                           MCP
+  -&gt; roboarm_ik.put_down                             gRPC
+</code></pre></div>
+<p>Atlas resolves all endpoints. There is no legacy ROS-service or
+<code>/graspnet</code> fallback in this skill.</p>
+<h2>Lifecycle and dependencies</h2>
+<p>At boot, <code>CMD_INIT</code> only parses configuration and the skill remains
+<code>INITIALIZED</code>. On the first tool call, <code>CMD_ACTIVATE</code> resolves upstream
+endpoints.</p>
+<p>Pipeline mode requires:</p>
+<ul>
+<li><code>service/perception/object_detect/detect_object</code> over MCP;</li>
+<li><code>service/perception/grasp_pose/grasp_request</code> over gRPC;</li>
+<li><code>service/manipulation/execute_grasp</code> over gRPC.</li>
+</ul>
+<p>The following manipulation endpoints are optional during activation:</p>
+<ul>
+<li><code>reset</code>: observation-pose setup and failure recovery;</li>
+<li><code>teach_safe</code>: optional post-pick parking while keeping the gripper closed;</li>
+<li><code>put_down</code>: fixed-pose release used by the <code>put_down</code> tool.</li>
+</ul>
+<p>If <code>put_down</code> is unavailable, picking can still succeed and leave the object
+held, but the <code>put_down</code> tool returns an error. In <code>vla</code> mode,
+<code>robonix/skill/vla/execute</code> over MCP replaces the three pipeline dependencies.</p>
+<h2>Pipeline mode</h2>
+<ol>
+<li>If <code>reset</code> is available, move to the calibrated observation pose.</li>
+<li>Detect <code>object_name</code> with <code>llm_detect</code>.</li>
+<li>Compute one vertical grasp pose with <code>grasp_pose</code> (<code>retry=0</code>).</li>
+<li>Execute approach, descend/close, and lift through <code>roboarm_ik</code>.</li>
+<li>Verify fresh gripper feedback on <code>/arm/joint_states_single</code>.</li>
+<li>On success, leave the object held. If configured, move to the teach-safe
+   pose while keeping the gripper closed.</li>
+<li>On failure, run a best-effort reset for recovery.</li>
+</ol>
+<p>The grasp z and approach distance come from <code>grasp_pose</code>; the skill does not
+perform camera calibration or IK itself.</p>
+<h2>Configuration</h2>
+<div class="highlight"><pre><span></span><code><span class="nt">mode</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">pipeline</span><span class="w">                         </span><span class="c1"># pipeline or vla</span>
+<span class="nt">vla_max_steps</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">50</span><span class="w">                     </span><span class="c1"># used only in vla mode</span>
+<span class="nt">gripper_open_width</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.08</span><span class="w">              </span><span class="c1"># metres</span>
+<span class="nt">gripper_close_width</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.0</span><span class="w">              </span><span class="c1"># metres</span>
+<span class="nt">gripper_grasp_threshold_width</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.005</span><span class="w">  </span><span class="c1"># measured width above this means held</span>
+<span class="nt">gripper_feedback_timeout_s</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">2.0</span>
+<span class="nt">gripper_joint_states_topic</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/arm/joint_states_single</span>
+<span class="nt">park_at_teach_safe_after_pick</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">false</span>
+</code></pre></div>
+<p>The deploy may override <code>park_at_teach_safe_after_pick</code>; other values shown
+above are the implementation defaults.</p>
+<h2>Layout</h2>
+<div class="highlight"><pre><span></span><code>skill-pick-vertical-grasp-rbnx/
+├── package_manifest.yaml
+├── capabilities/
+│   ├── driver.v1.toml
+│   ├── pick.v1.toml
+│   ├── put_down.v1.toml
+│   ├── lib/{pick,manipulation}/srv/
+│   └── service/{perception,manipulation}/
+├── pick_skill/atlas_bridge.py
+└── scripts/{build,start}.sh
+</code></pre></div>
+<p>This is a pure-Python orchestration package. Its build is codegen-only; it
+does not vendor a ROS package.</p>
+<h2>Build and verification</h2>
+<div class="highlight"><pre><span></span><code>bash<span class="w"> </span>scripts/build.sh
+
+<span class="c1"># With the deploy running:</span>
+rbnx<span class="w"> </span>caps<span class="w"> </span><span class="p">|</span><span class="w"> </span>grep<span class="w"> </span>pick
+rbnx<span class="w"> </span>ask<span class="w"> </span><span class="s2">&quot;please pick up the comb&quot;</span>
+</code></pre></div>
+<p>After a successful pick, call <code>put_down</code> before requesting another object if
+the object should be released.</p>
+<h2>License</h2>
+<p>MulanPSL-2.0.</p>
         </article>
       </section>
       <aside class="panel detail-side">
@@ -745,6 +863,6 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
       </aside>
     </div>
   </main>
-  <footer class="site-footer"><div class="shell">Generated on 2026-07-16T04:54:40+00:00.</div></footer>
+  <footer class="site-footer"><div class="shell">Generated on 2026-07-16T11:02:21+00:00.</div></footer>
 </body>
 </html>

@@ -719,7 +719,58 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
       <section class="panel detail-main">
         <h2>README</h2>
         <article class="readme">
-          <p>No README.md was found in this package repository.</p>
+          <h1>Deep Robotics Lite3</h1>
+<p>Minimal Robonix deployment for a Deep Robotics Lite3 with a Livox MID-360
+and an Orbbec Gemini 330-series RGB-D camera.</p>
+<p>The deployment contains only the robot packages needed for chassis control,
+sensing, mapping, and Nav2 navigation. Mapping uses the same
+<code>syswonder/service-map-rbnx</code> package as the Ranger Mini V3 deployment, with
+RTAB-Map selected as its backend.</p>
+<h2>Configure</h2>
+<p>Install Robonix and the ROS 2 dependencies required by the packages, then
+create the local credentials file:</p>
+<div class="highlight"><pre><span></span><code>cp<span class="w"> </span>.env.example<span class="w"> </span>.env
+<span class="nv">$EDITOR</span><span class="w"> </span>.env
+</code></pre></div>
+<p><code>.env</code> is ignored by Git. Do not put VLM credentials in the manifest.</p>
+<h2>Deploy</h2>
+<div class="highlight"><pre><span></span><code>./build.sh
+./start.sh
+</code></pre></div>
+<p>Stop the deployment with:</p>
+<div class="highlight"><pre><span></span><code>./stop.sh
+</code></pre></div>
+<p><code>stop.sh</code> is idempotent and also recovers interrupted boots: it reaps only
+processes and ProcessManager records belonging to this deployment, then checks
+that the Lite3 feedback port (UDP 43897) is free before returning success.</p>
+<p>The three scripts accept additional arguments and pass them directly to the
+corresponding <code>rbnx build</code>, <code>rbnx boot</code>, or <code>rbnx shutdown</code> command.</p>
+<p>Tencent speech also requires these values in the ignored <code>.env</code> file:</p>
+<div class="highlight"><pre><span></span><code>TENCENT_ASR_APPID=
+TENCENTCLOUD_SECRET_ID=
+TENCENTCLOUD_SECRET_KEY=
+</code></pre></div>
+<h2>Robonix client</h2>
+<p>Start the robot deployment first, then run the client on the computer whose
+microphone and speaker should be used:</p>
+<div class="highlight"><pre><span></span><code><span class="nb">cd</span><span class="w"> </span>~/cxk/robonix-client
+<span class="nb">source</span><span class="w"> </span>.venv/bin/activate
+robonix-client<span class="w"> </span>--robot-host<span class="w"> </span>&lt;lite3-jetson-ip&gt;
+</code></pre></div>
+<p>Open <code>http://127.0.0.1:7860</code>, connect to Atlas on port <code>50051</code>, and select
+<code>audio_client_bridge</code> for both input and output on the Audio page. The bridge
+uses port <code>60002</code> and should only be reachable over a trusted LAN or Tailscale.</p>
+<h2>Included packages</h2>
+<ul>
+<li>Lite3 quadruped chassis and robot description</li>
+<li>Livox MID-360 lidar</li>
+<li>Orbbec RGB-D camera</li>
+<li>PointCloud2-to-LaserScan conversion</li>
+<li>Mapping service with the RTAB-Map backend</li>
+<li>Nav2 navigation</li>
+</ul>
+<p>Soma loads <code>soma.yaml</code> and the deployment-local <code>urdf/Lite3.urdf</code>. Sensor
+mount transforms in that URDF should be updated after physical calibration.</p>
         </article>
       </section>
       <aside class="panel detail-side">
@@ -741,7 +792,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
           <li><span>primitive</span> <code>lite3_quadruped</code><br><a href="https://github.com/syswonder/primitive-deep_robotics-lite3_quadruped.git">https://github.com/syswonder/primitive-deep_robotics-lite3_quadruped.git</a></li>
 <li><span>primitive</span> <code>mid360_lidar</code><br><a href="../../packages/robonix.primitive.livox.mid360.lidar/">robonix.primitive.livox.mid360.lidar</a></li>
 <li><span>primitive</span> <code>mid360_imu</code><br><a href="../../packages/robonix.primitive.livox.mid360.imu/">robonix.primitive.livox.mid360.imu</a></li>
-<li><span>primitive</span> <code>lite3_description</code><br><a href="https://github.com/syswonder/primitive-deep_robotics-lite3_description.git">https://github.com/syswonder/primitive-deep_robotics-lite3_description.git</a></li>
+<li><span>primitive</span> <code>robot_description</code><br><a href="https://github.com/syswonder/primitive-robot-description-rbnx">https://github.com/syswonder/primitive-robot-description-rbnx</a></li>
 <li><span>primitive</span> <code>orbbec_camera</code><br><a href="https://github.com/syswonder/primitive-orbbec-camera.git">https://github.com/syswonder/primitive-orbbec-camera.git</a></li>
 <li><span>primitive</span> <code>audio_client_bridge</code><br>${ROBONIX_SOURCE_PATH}/examples/webots/primitives/audio_client_bridge</li>
 <li><span>service</span> <code>pcld2lscan</code><br><a href="https://github.com/syswonder/service-pcld2lscan-rbnx.git">https://github.com/syswonder/service-pcld2lscan-rbnx.git</a></li>
@@ -752,6 +803,6 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
       </aside>
     </div>
   </main>
-  <footer class="site-footer"><div class="shell">Generated on 2026-07-16T04:54:40+00:00.</div></footer>
+  <footer class="site-footer"><div class="shell">Generated on 2026-07-16T11:02:21+00:00.</div></footer>
 </body>
 </html>
