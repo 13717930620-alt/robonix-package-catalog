@@ -998,7 +998,7 @@ def render_css() -> str:
         text-transform: uppercase;
       }
     }
-    """
+    """.strip()
     return base_css + "\n" + HtmlFormatter(style="friendly").get_style_defs(".highlight")
 
 
@@ -1079,6 +1079,7 @@ def render_listing_page(public_dir: Path, generated_at: str, packages: list[dict
                 f'width="380" height="285" alt="{html.escape(p["name"])} preview" '
                 f'loading="lazy" decoding="async" fetchpriority="low">'
             )
+        preview_line = f"\n          {preview_html}" if preview_html else ""
         cards.append(
             f"""<article class="package-card" data-kind="{html.escape(p['kind'])}" data-tags="{html.escape(' '.join(p['tags']))}" data-search="{html.escape(search_text.lower())}">
         <div>
@@ -1098,8 +1099,7 @@ def render_listing_page(public_dir: Path, generated_at: str, packages: list[dict
           <div class="card-actions">
             <a href="{detail_href}">Details</a>
             <a href="{html.escape(p['repo'])}">GitHub</a>
-          </div>
-          {preview_html}
+          </div>{preview_line}
         </div>
       </article>"""
         )

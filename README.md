@@ -206,7 +206,7 @@ but browser-facing links and new integrations should use the `.json` paths above
 The generated commit uses `[skip ci]`; normal CI only triggers from
 `catalog.yaml`, the builder script, the workflow, or manual dispatch.
 
-Generated on `2026-07-16T13:05:14+00:00`.
+Generated on `2026-07-16T14:20:52+00:00`.
 
 ## Packages
 
@@ -216,6 +216,8 @@ Generated on `2026-07-16T13:05:14+00:00`.
 | [`robonix.primitive.agilex.piper.description`](https://syswonder.github.io/robonix-package-catalog/packages/robonix.primitive.agilex.piper.description/) | `0.1.0` | `primitive` | lhw2002426 <lhw2002426@users.noreply.github.com> | primitive, description, urdf, agilex, piper, ros2 | [repo](https://github.com/syswonder/primitive-agilex-piper-description-rbnx) |
 | [`robonix.primitive.agilex.piper.handeye`](https://syswonder.github.io/robonix-package-catalog/packages/robonix.primitive.agilex.piper.handeye/) | `0.1.0` | `primitive` | lhw2002426 <lhw2002426@users.noreply.github.com> | primitive, calibration, handeye, easy_handeye2, agilex, piper, ros2 | [repo](https://github.com/syswonder/primitive-agilex-piper-handeye-rbnx) |
 | [`robonix.primitive.agilex.ranger_mini_v3.chassis`](https://syswonder.github.io/robonix-package-catalog/packages/robonix.primitive.agilex.ranger_mini_v3.chassis/) | `0.1.0` | `primitive` | wheatfox <wheatfox17@icloud.com> | primitive, chassis, agilex, ranger_mini_v3, ros2 | [repo](https://github.com/syswonder/primitive-agilex-ranger_mini_v3-chassis-rbnx) |
+| [`robonix.primitive.audio.alsa`](https://syswonder.github.io/robonix-package-catalog/packages/robonix.primitive.audio.alsa/) | `0.1.0` | `primitive` | wheatfox <wheatfox17@icloud.com> | primitive, audio, alsa, microphone, speaker | [repo](https://github.com/syswonder/primitive-audio-driver-rbnx) |
+| [`robonix.primitive.audio.client_bridge`](https://syswonder.github.io/robonix-package-catalog/packages/robonix.primitive.audio.client_bridge/) | `0.1.0` | `primitive` | wheatfox <wheatfox17@icloud.com> | primitive, audio, client, websocket, microphone, speaker | [repo](https://github.com/syswonder/primitive-audio-client-bridge-rbnx) |
 | [`robonix.primitive.deep_robotics.lite3.description`](https://syswonder.github.io/robonix-package-catalog/packages/robonix.primitive.deep_robotics.lite3.description/) | `0.1.0` | `primitive` | Bunnycxk <2501213313@stu.pku.edu.cn> | primitive, description, urdf, tf, deep_robotics, lite3, ros2 | [repo](https://github.com/syswonder/primitive-deep_robotics-lite3_description) |
 | [`robonix.primitive.deep_robotics.lite3.quadruped`](https://syswonder.github.io/robonix-package-catalog/packages/robonix.primitive.deep_robotics.lite3.quadruped/) | `0.1.0` | `primitive` | Bunnycxk <2501213313@stu.pku.edu.cn> | primitive, chassis, deep_robotics, lite3, quadruped, ros2 | [repo](https://github.com/syswonder/primitive-deep_robotics-lite3_quadruped) |
 | [`robonix.primitive.intel.realsense_d435i.camera`](https://syswonder.github.io/robonix-package-catalog/packages/robonix.primitive.intel.realsense_d435i.camera/) | `0.1.0` | `primitive` | wheatfox <wheatfox17@icloud.com> | primitive, camera, intel, realsense_d435i, rgbd | [repo](https://github.com/syswonder/primitive-intel-realsense_d435i-camera-rbnx) |

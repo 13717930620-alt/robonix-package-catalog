@@ -1,4 +1,8 @@
 packages:
+  - name: robonix.primitive.audio.alsa
+    repo: https://github.com/syswonder/primitive-audio-driver-rbnx
+  - name: robonix.primitive.audio.client_bridge
+    repo: https://github.com/syswonder/primitive-audio-client-bridge-rbnx
   - name: robonix.primitive.agilex.ranger_mini_v3.chassis
     repo: https://github.com/syswonder/primitive-agilex-ranger_mini_v3-chassis-rbnx
   - name: robonix.primitive.deep_robotics.lite3.quadruped

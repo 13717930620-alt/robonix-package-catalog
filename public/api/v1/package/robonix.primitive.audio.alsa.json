@@ -1,0 +1,32 @@
+{
+  "name": "robonix.primitive.audio.alsa",
+  "version": "0.1.0",
+  "description": "ALSA microphone capture and speaker playback primitive for Robonix.",
+  "license": "MulanPSL-2.0",
+  "tags": [
+    "primitive",
+    "audio",
+    "alsa",
+    "microphone",
+    "speaker"
+  ],
+  "repo": "https://github.com/syswonder/primitive-audio-driver-rbnx",
+  "maintainers": [
+    "wheatfox <wheatfox17@icloud.com>"
+  ],
+  "repo_name": "primitive-audio-driver-rbnx",
+  "default_branch": "main",
+  "kind": "primitive",
+  "catalog_type": "package",
+  "manifest": "package_manifest.yaml",
+  "capabilities": [
+    "robonix/primitive/audio/mic",
+    "robonix/primitive/audio/speaker",
+    "robonix/primitive/audio/driver",
+    "robonix/primitive/audio/list_devices",
+    "robonix/primitive/audio/select_device"
+  ],
+  "deploy_dependencies": [],
+  "readme_url": "https://github.com/syswonder/primitive-audio-driver-rbnx/blob/main/README.md",
+  "preview_image_url": ""
+}

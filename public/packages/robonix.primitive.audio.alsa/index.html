@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>robonix.primitive.intel.realsense_d435i.camera - Robonix Package Catalog</title>
+  <title>robonix.primitive.audio.alsa - Robonix Package Catalog</title>
   <link rel="stylesheet" href="../../assets/vendor/pico/pico.classless.min.css">
   <style>
 @import url("https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Noto+Sans+SC:wght@400;500;700&display=swap");
@@ -709,124 +709,113 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
   </script>
   <header class="shell detail-hero">
     <a class="back" href="../">Back to packages</a>
-    <h1>robonix.primitive.intel.realsense_d435i.camera</h1>
-    <p class="lede">Intel RealSense D435i driver wrapper — declares RGB + depth + extrinsics contracts.</p>
+    <h1>robonix.primitive.audio.alsa</h1>
+    <p class="lede">ALSA microphone capture and speaker playback primitive for Robonix.</p>
   </header>
   <main class="shell">
     <div class="detail-layout">
       <section class="panel detail-main">
         <h2>README</h2>
         <article class="readme">
-          <h1>realsense_camera_rbnx</h1>
-<p>Robonix package wrapping the <strong>Intel RealSense D435i</strong> RGBD camera. Owns the <code>primitive/camera/*</code> namespace. Exposes the camera's RGB + aligned-depth streams under generic contracts so that mapping, scene, and any vision skill can resolve topic names through atlas (no hardcoded <code>/camera_435i/...</code> paths on the consumer side).</p>
-<h2>Capability surface</h2>
+          <h1>Robonix ALSA Audio Primitive</h1>
+<p>This package exposes a Linux host's ALSA microphone and speaker through the
+standard Robonix audio contracts. It is a reusable hardware primitive and does
+not depend on Webots.</p>
+<h2>Requirements</h2>
+<ul>
+<li>Linux with <code>arecord</code> and <code>aplay</code> from <code>alsa-utils</code></li>
+<li>Robonix installed and initialized with <code>rbnx setup</code></li>
+<li><code>uv</code> available on <code>PATH</code></li>
+<li>at least one ALSA capture or playback device</li>
+</ul>
+<p>On Debian or Ubuntu:</p>
+<div class="highlight"><pre><span></span><code>sudo<span class="w"> </span>apt-get<span class="w"> </span>update
+sudo<span class="w"> </span>apt-get<span class="w"> </span>install<span class="w"> </span>-y<span class="w"> </span>alsa-utils
+</code></pre></div>
+<h2>Deployment</h2>
+<p>Reference the package from a robot deployment manifest:</p>
+<div class="highlight"><pre><span></span><code><span class="nt">primitive</span><span class="p">:</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">audio_driver</span>
+<span class="w">    </span><span class="nt">url</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">https://github.com/syswonder/primitive-audio-driver-rbnx</span>
+<span class="w">    </span><span class="nt">branch</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">main</span>
+<span class="w">    </span><span class="nt">config</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">mic_device</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">null</span>
+<span class="w">      </span><span class="nt">speaker_device</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">null</span>
+</code></pre></div>
+<p>When a device is <code>null</code>, the primitive scans ALSA and selects a suitable
+device. Use <code>arecord -l</code> and <code>aplay -l</code> to find explicit device identifiers
+such as <code>hw:1,0</code>. The complete configuration surface and defaults are in
+<a href="https://github.com/syswonder/primitive-audio-driver-rbnx/blob/main/config.spec"><code>config.spec</code></a>.</p>
+<p>Build and start it through the robot deployment:</p>
+<div class="highlight"><pre><span></span><code>rbnx<span class="w"> </span>build
+rbnx<span class="w"> </span>boot
+</code></pre></div>
+<p><code>rbnx build</code> generates the contract bindings and creates a package-owned Python
+environment. During <code>Driver(CMD_INIT)</code>, the primitive scans ALSA and initializes
+the selected capture and playback devices.</p>
+<h2>Capabilities</h2>
 <table>
 <thead>
 <tr>
 <th>Contract</th>
-<th>Mode</th>
-<th>Transport</th>
-<th>Source / handler</th>
+<th>Purpose</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td><code>robonix/primitive/camera/driver</code></td>
-<td>rpc</td>
-<td>gRPC</td>
-<td><code>Driver(CMD_INIT, config_json)</code> — lifecycle gate</td>
+<td><code>robonix/primitive/audio/mic</code></td>
+<td>Streams raw microphone PCM to a caller.</td>
 </tr>
 <tr>
-<td><code>robonix/primitive/camera/rgb</code></td>
-<td>topic_out</td>
-<td>ROS 2</td>
-<td><code>/&lt;cam&gt;/color/image_raw</code> (sensor_msgs/Image)</td>
+<td><code>robonix/primitive/audio/speaker</code></td>
+<td>Plays caller-provided raw PCM.</td>
 </tr>
 <tr>
-<td><code>robonix/primitive/camera/depth</code></td>
-<td>topic_out</td>
-<td>ROS 2</td>
-<td><code>/&lt;cam&gt;/aligned_depth_to_color/image_raw</code></td>
+<td><code>robonix/primitive/audio/list_devices</code></td>
+<td>Lists ALSA devices and the current route.</td>
 </tr>
 <tr>
-<td><code>robonix/primitive/camera/extrinsics</code></td>
-<td>topic_out</td>
-<td>ROS 2</td>
-<td>latched TransformStamped (TODO: republish from /tf_static)</td>
+<td><code>robonix/primitive/audio/select_device</code></td>
+<td>Changes the input or output device.</td>
 </tr>
 <tr>
-<td><code>robonix/primitive/camera/snapshot</code></td>
-<td>rpc</td>
-<td>MCP</td>
-<td>one-shot RGB capture (TODO)</td>
-</tr>
-<tr>
-<td><code>robonix/primitive/camera/depth_snapshot</code></td>
-<td>rpc</td>
-<td>MCP</td>
-<td>one-shot depth capture (TODO)</td>
+<td><code>robonix/primitive/audio/driver</code></td>
+<td>Provides the standard lifecycle interface.</td>
 </tr>
 </tbody>
 </table>
-<p>The D435i's internal IMU is <strong>deliberately not</strong> registered under <code>primitive/imu/imu</code> — the Ranger Mini's MID-360 IMU is canonical for that contract (better noise, co-located with the lidar for SLAM). The camera IMU is still published to <code>/&lt;cam&gt;/imu</code> for anyone who wants it directly.</p>
-<h2>Driver-init lifecycle</h2>
-<p><code>start.sh</code> only brings up the atlas bridge process. The bridge opens a gRPC server on port <code>REALSENSE_DRIVER_PORT</code> (default 50232), registers the capability and declares only <code>primitive/camera/driver</code> on atlas, then blocks on heartbeat awaiting <code>Driver(CMD_INIT, config_json)</code>.</p>
-<p>When <code>rbnx boot</code> invokes Init it passes the manifest's <code>config:</code> block as JSON. The handler parses config (camera name, RGB/depth profiles, align_depth, IMU on/off), spawns <code>ros2 launch realsense2_camera rs_launch.py …</code>, waits for the first frame on the configured RGB topic, declares <code>primitive/camera/{rgb, depth}</code> on atlas, and returns ok. Atlas only ever advertises endpoints we've confirmed are publishing.</p>
-<h2>Layout</h2>
-<div class="highlight"><pre><span></span><code>realsense_camera_rbnx/
-├── package_manifest.yaml
-├── realsense_camera/
-│   └── atlas_bridge.py           driver gRPC + lazy Init
-├── scripts/
-│   ├── build.sh                  colcon build vendored src + rbnx codegen
-│   └── start.sh                  source ROS, exec atlas_bridge
-├── src/
-│   └── realsense-ros/            VENDORED IntelRealSense/realsense-ros
-└── .gitignore
+<p>The microphone path defaults to mono, 16-bit PCM and probes a supported sample
+rate, preferring 16 kHz. The speaker path defaults to mono, 16-bit PCM at
+24 kHz. Consumers must send PCM matching the configured format.</p>
+<h2>Development checks</h2>
+<div class="highlight"><pre><span></span><code>python3<span class="w"> </span>-m<span class="w"> </span>unittest<span class="w"> </span>-v<span class="w"> </span>test_speaker_driver.py
+rbnx<span class="w"> </span>build
 </code></pre></div>
-<h2>Config (passed via <code>Driver(CMD_INIT, config_json)</code>)</h2>
-<div class="highlight"><pre><span></span><code><span class="p">{</span>
-<span class="w">  </span><span class="nt">&quot;camera_name&quot;</span><span class="p">:</span><span class="w">        </span><span class="s2">&quot;camera_435i&quot;</span><span class="p">,</span>
-<span class="w">  </span><span class="nt">&quot;rgb_profile&quot;</span><span class="p">:</span><span class="w">        </span><span class="s2">&quot;640x480x30&quot;</span><span class="p">,</span>
-<span class="w">  </span><span class="nt">&quot;depth_profile&quot;</span><span class="p">:</span><span class="w">      </span><span class="s2">&quot;848x480x30&quot;</span><span class="p">,</span>
-<span class="w">  </span><span class="nt">&quot;align_depth&quot;</span><span class="p">:</span><span class="w">        </span><span class="kc">true</span><span class="p">,</span>
-<span class="w">  </span><span class="nt">&quot;enable_imu&quot;</span><span class="p">:</span><span class="w">         </span><span class="kc">true</span><span class="p">,</span>
-<span class="w">  </span><span class="nt">&quot;enable_sync&quot;</span><span class="p">:</span><span class="w">        </span><span class="kc">true</span><span class="p">,</span>
-<span class="w">  </span><span class="nt">&quot;sentinel_timeout_s&quot;</span><span class="p">:</span><span class="w"> </span><span class="mf">30.0</span>
-<span class="p">}</span>
-</code></pre></div>
-<p><code>rgb_topic</code> / <code>depth_topic</code> can be overridden directly if your launch uses a non-default namespace.</p>
-<h2>Build / run standalone</h2>
-<div class="highlight"><pre><span></span><code>bash<span class="w"> </span>scripts/build.sh
-bash<span class="w"> </span>scripts/start.sh<span class="w">        </span><span class="c1"># registers driver iface, waits for INIT</span>
-</code></pre></div>
-<p>To drive Init manually (without rbnx boot): from any robonix gRPC client, call <code>PrimitiveCameraDriver.Driver</code> with <code>command=0</code> and <code>config_json='{}'</code> against <code>127.0.0.1:50232</code>.</p>
-<h2>License</h2>
-<p>This package: Apache-2.0 (matches realsense-ros upstream).</p>
+<p>The package uses <code>arecord</code> and <code>aplay</code> only at runtime; the unit test does not
+access an audio device.</p>
         </article>
       </section>
       <aside class="panel detail-side">
         <h2>Package</h2>
         <div class="kv">
           <div>Version</div><div><code>0.1.0</code></div>
-          <div>License</div><div><code>Apache-2.0</code></div>
+          <div>License</div><div><code>MulanPSL-2.0</code></div>
           <div>Kind</div><div>primitive</div>
           <div>Type</div><div>package</div>
           <div>Maintainers</div><div>wheatfox &lt;wheatfox17@icloud.com&gt;</div>
-          <div>Repository</div><div><a href="https://github.com/syswonder/primitive-intel-realsense_d435i-camera-rbnx">primitive-intel-realsense_d435i-camera-rbnx</a></div>
+          <div>Repository</div><div><a href="https://github.com/syswonder/primitive-audio-driver-rbnx">primitive-audio-driver-rbnx</a></div>
           <div>Branch</div><div><code>main</code></div>
           <div>Manifest</div><div><code>package_manifest.yaml</code></div>
-          <div>API</div><div><a href="../../api/view/?package=robonix.primitive.intel.realsense_d435i.camera">package metadata</a></div>
+          <div>API</div><div><a href="../../api/view/?package=robonix.primitive.audio.alsa">package metadata</a></div>
         </div>
-        <div class="tags"><button class="tag tag-blue" data-tag="primitive">primitive</button> <button class="tag tag-cyan" data-tag="camera">camera</button> <button class="tag tag-gray" data-tag="intel">intel</button> <button class="tag tag-gray" data-tag="realsense_d435i">realsense_d435i</button> <button class="tag tag-gray" data-tag="rgbd">rgbd</button></div>
+        <div class="tags"><button class="tag tag-blue" data-tag="primitive">primitive</button> <button class="tag tag-gray" data-tag="audio">audio</button> <button class="tag tag-gray" data-tag="alsa">alsa</button> <button class="tag tag-gray" data-tag="microphone">microphone</button> <button class="tag tag-gray" data-tag="speaker">speaker</button></div>
         <h2>Capabilities</h2>
         <ul class="cap-list">
-          <li>robonix/primitive/camera/driver</li>
-<li>robonix/primitive/camera/rgb</li>
-<li>robonix/primitive/camera/depth</li>
-<li>robonix/primitive/camera/extrinsics</li>
-<li>robonix/primitive/camera/snapshot</li>
-<li>robonix/primitive/camera/depth_snapshot</li>
+          <li>robonix/primitive/audio/mic</li>
+<li>robonix/primitive/audio/speaker</li>
+<li>robonix/primitive/audio/driver</li>
+<li>robonix/primitive/audio/list_devices</li>
+<li>robonix/primitive/audio/select_device</li>
         </ul>
       </aside>
     </div>
