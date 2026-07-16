@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>robonix.skill.explore - Robonix Package Catalog</title>
+  <title>robonix.robot.unitree.go2 - Robonix Package Catalog</title>
   <link rel="stylesheet" href="../../assets/vendor/pico/pico.classless.min.css">
   <style>
 
@@ -688,8 +688,8 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
         <span>Robonix <small>Package Catalog</small></span>
       </a>
       <nav class="api-links" aria-label="Catalog navigation">
-        <a href="../../packages/" aria-current="page">Packages</a>
-        <a href="../../robots/">Robots</a>
+        <a href="../../packages/">Packages</a>
+        <a href="../../robots/" aria-current="page">Robots</a>
         <a href="../../api/view/">API</a>
       </nav>
     </div>
@@ -710,73 +710,104 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
     })();
   </script>
   <header class="shell detail-hero">
-    <a class="back" href="../">Back to packages</a>
-    <h1>robonix.skill.explore</h1>
-    <p class="lede">Frontier-based autonomous exploration skill.</p>
+    <a class="back" href="../">Back to robots</a>
+    <h1>robonix.robot.unitree.go2</h1>
+    <p class="lede">Safe Robonix deployment for Unitree Go2 with mapping, semantic navigation and read-only UI.</p>
   </header>
   <main class="shell">
     <div class="detail-layout">
       <section class="panel detail-main">
         <h2>README</h2>
         <article class="readme">
-          <h1>explore_rbnx</h1>
-<p>Autonomous frontier exploration skill for robonix. Driven by the
-LLM/pilot via <code>rbnx ask "explore"</code> (or any equivalent intent that
-triggers the <code>robonix/skill/explore/explore</code> tool).</p>
-<p>See <code>CAPABILITY.md</code> for the full interface + behaviour spec.</p>
-<h2>Quickstart</h2>
-<div class="highlight"><pre><span></span><code><span class="c1"># from the package root</span>
-bash<span class="w"> </span>scripts/build.sh<span class="w">   </span><span class="c1"># rbnx codegen + docker build</span>
-<span class="c1"># then add to your deploy manifest under skill: and rbnx boot</span>
+          <h1>Robonix deployment for Unitree Go2</h1>
+<p>This repository adapts a Unitree Go2 to Robonix and Nav2 using only the
+high-level Unitree Sport service. It standardizes chassis odometry, IMU,
+onboard lidar and video; supplies the Go2 model/TF tree; configures RTAB-Map
+and Nav2; maps Chinese semantic landmark names to verified map poses; and
+provides a read-only browser dashboard.</p>
+<p>All non-DDS control/capability/audio/dashboard listeners are loopback-only.
+The Scene debug UI and Mapping administration UI are disabled; remote viewing
+uses an authenticated SSH tunnel.</p>
+<p>The first supported task is:</p>
+<blockquote>
+<p>“走到前面自动售货机那里”</p>
+</blockquote>
+<p>The production path is:</p>
+<div class="highlight"><pre><span></span><code>Chinese speech -&gt; Robonix ASR/Liaison/Pilot
+-&gt; semantic_navigation.navigate_landmark(&quot;自动售货机&quot;)
+-&gt; verified pose in the active saved map
+-&gt; Robonix navigation service -&gt; Nav2 NavigateToPose
+-&gt; guarded /cmd_vel -&gt; Go2 chassis adapter -&gt; Unitree SportClient
 </code></pre></div>
-<p>Manifest snippet:</p>
-<div class="highlight"><pre><span></span><code><span class="nt">skill</span><span class="p">:</span>
-<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">explore</span>
-<span class="w">    </span><span class="nt">path</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">../../../explore_rbnx</span>
-<span class="w">    </span><span class="nt">config</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">{}</span>
+<p>Motion is <strong>off by default</strong> and boot never arms the chassis. No posture or
+low-level motor API is implemented. Read <a href="https://github.com/syswonder/robot-unitree-go2/blob/main/docs/SAFETY.md">docs/SAFETY.md</a>
+before connecting hardware.</p>
+<h2>Clone and inspect safely</h2>
+<div class="highlight"><pre><span></span><code>git<span class="w"> </span>clone<span class="w"> </span>--recursive<span class="w"> </span>https://github.com/syswonder/robot-unitree-go2.git
+<span class="nb">cd</span><span class="w"> </span>robot-unitree-go2
+git<span class="w"> </span>submodule<span class="w"> </span>update<span class="w"> </span>--init<span class="w"> </span>--recursive
+./scripts/validate_offline.sh
 </code></pre></div>
-<p>The skill registers 3 MCP tools with atlas. Pilot's tool catalog
-will include <code>robonix/skill/explore/{explore, status, cancel}</code>.</p>
-<h2>Layout</h2>
-<div class="highlight"><pre><span></span><code>explore_rbnx/
-├── package_manifest.yaml    # 3 caps + build/start hooks
-├── capabilities/            # package-local TOMLs + .srv files
-│   ├── explore.v1.toml
-│   ├── status.v1.toml
-│   ├── cancel.v1.toml
-│   └── srv/{Explore,GetExploreStatus,CancelExplore}.srv
-├── explore_skill/           # python module
-│   ├── atlas_bridge.py      # entrypoint: register + serve MCP
-│   ├── frontier.py          # WFD + clustering + scoring + safety
-│   └── controller.py        # state machine, frontier loop, sweep
-├── scripts/{build,start}.sh
-├── docker/{Dockerfile, entrypoint.sh, no_shm_profile.xml}
-├── CAPABILITY.md            # LLM-readable spec (registered with atlas)
-└── README.md
-</code></pre></div>
-<p>License: MulanPSL-2.0</p>
+<p>The validation command is offline: it does not initialize ROS/DDS, start a
+Unitree SDK client or contact hardware. See
+<a href="https://github.com/syswonder/robot-unitree-go2/blob/main/docs/KNOWN_LIMITATIONS.md">known upstream and commissioning limits</a> before
+attempting a build or boot.</p>
+<h2>What is ready without hardware</h2>
+<ul>
+<li>Deployment/Catalog manifests and Soma robot model.</li>
+<li>Pinned official <code>unitree_ros2</code> and <code>unitree_sdk2</code> git submodules; Unitree
+  motion examples are never built or run by this repository.</li>
+<li>Official Go2 model assets with a <code>base_link</code> navigation root.</li>
+<li>Fail-closed chassis and sensor adapters with process isolation.</li>
+<li>Conservative RTAB-Map/Nav2 configuration and non-spinning recovery tree.</li>
+<li>Deterministic Chinese landmark resolver and exact-phrase tests.</li>
+<li>Read-only UI for image, lidar, map, pose, odometry and task state.</li>
+<li>Static and offline unit tests; no test publishes a velocity command.</li>
+</ul>
+<h2>Hardware-dependent gates</h2>
+<p>The operator must identify the dedicated wired NIC, verify the real Go2 topic
+names/QoS/frames, measure sensor extrinsics, create/load the laboratory map,
+and save a verified approach pose in
+<code>config/semantic_landmarks.local.yaml</code>, including the exact <code>(map_id,
+generation)</code> from the mapping lifecycle while it is in localization mode.
+Until those checks pass, semantic navigation rejects the target and motion
+remains disarmed.</p>
+<p>See <a href="https://github.com/syswonder/robot-unitree-go2/blob/main/docs/HARDWARE_CHECKLIST.md">docs/HARDWARE_CHECKLIST.md</a> for the exact
+operator steps and <a href="https://github.com/syswonder/robot-unitree-go2/blob/main/docs/DEPLOYMENT.md">docs/DEPLOYMENT.md</a> for build/start
+commands.</p>
+<h2>Licenses</h2>
+<p>Integration code is Apache-2.0. The aggregate deployment also redistributes
+BSD-3-Clause Unitree code/model assets, MIT dependencies and the private
+CycloneDDS runtime under EPL-2.0 OR EDL-1.0. See <a href="https://github.com/syswonder/robot-unitree-go2/blob/main/NOTICE">NOTICE</a>,
+<a href="https://github.com/syswonder/robot-unitree-go2/blob/main/THIRD_PARTY.md">THIRD_PARTY.md</a>, and the authoritative license files retained
+in the pinned submodules.</p>
         </article>
       </section>
       <aside class="panel detail-side">
         <h2>Package</h2>
         <div class="kv">
           <div>Version</div><div><code>0.1.0</code></div>
-          <div>License</div><div><code>MulanPSL-2.0</code></div>
-          <div>Kind</div><div>skill</div>
-          <div>Type</div><div>package</div>
-          <div>Maintainers</div><div>wheatfox &lt;wheatfox17@icloud.com&gt;</div>
-          <div>Repository</div><div><a href="https://github.com/syswonder/skill-explore-rbnx">skill-explore-rbnx</a></div>
+          <div>License</div><div><code>Apache-2.0 AND BSD-3-Clause AND MIT AND (EPL-2.0 OR EDL-1.0)</code></div>
+          <div>Kind</div><div>robot</div>
+          <div>Type</div><div>robot</div>
+          <div>Maintainers</div><div>Origamii520 &lt;Origamii520@users.noreply.github.com&gt;</div>
+          <div>Repository</div><div><a href="https://github.com/syswonder/robot-unitree-go2">robot-unitree-go2</a></div>
           <div>Branch</div><div><code>main</code></div>
-          <div>Manifest</div><div><code>package_manifest.yaml</code></div>
-          <div>API</div><div><a href="../../api/view/?package=robonix.skill.explore">package metadata</a></div>
+          <div>Manifest</div><div><code>robonix_manifest.yaml</code></div>
+          <div>API</div><div><a href="../../api/view/?package=robonix.robot.unitree.go2">package metadata</a></div>
         </div>
-        <div class="tags"><button class="tag tag-gold" data-tag="skill">skill</button> <button class="tag tag-gold" data-tag="explore">explore</button> <button class="tag tag-gray" data-tag="frontier">frontier</button> <button class="tag tag-green" data-tag="navigation">navigation</button> <button class="tag tag-blue" data-tag="mapping">mapping</button></div>
-        <h2>Capabilities</h2>
+        <div class="tags"><button class="tag tag-red" data-tag="robot">robot</button> <button class="tag tag-slate" data-tag="deploy">deploy</button> <button class="tag tag-gray" data-tag="unitree">unitree</button> <button class="tag tag-gray" data-tag="go2">go2</button> <button class="tag tag-gray" data-tag="quadruped">quadruped</button> <button class="tag tag-purple" data-tag="lidar">lidar</button> <button class="tag tag-cyan" data-tag="camera">camera</button> <button class="tag tag-slate" data-tag="imu">imu</button> <button class="tag tag-blue" data-tag="mapping">mapping</button> <button class="tag tag-green" data-tag="navigation">navigation</button> <button class="tag tag-gray" data-tag="speech">speech</button></div>
+        <h2>Deployment Packages</h2>
         <ul class="cap-list">
-          <li>robonix/skill/explore/driver</li>
-<li>robonix/skill/explore/explore</li>
-<li>robonix/skill/explore/explore/status</li>
-<li>robonix/skill/explore/explore/cancel</li>
+          <li><span>primitive</span> <code>go2_chassis</code><br>${ROBONIX_DEPLOY_DIR}/packages/go2_chassis</li>
+<li><span>primitive</span> <code>go2_sensors</code><br>${ROBONIX_DEPLOY_DIR}/packages/go2_sensors</li>
+<li><span>primitive</span> <code>robot_description</code><br>${ROBONIX_DEPLOY_DIR}/packages/go2_description</li>
+<li><span>primitive</span> <code>audio_client_bridge</code><br>${ROBONIX_SOURCE_PATH}/examples/webots/primitives/audio_client_bridge</li>
+<li><span>service</span> <code>mapping</code><br><a href="../../packages/robonix.service.mapping/">robonix.service.mapping</a></li>
+<li><span>service</span> <code>speech</code><br>${ROBONIX_SOURCE_PATH}/services/speech</li>
+<li><span>service</span> <code>nav2</code><br><a href="../../packages/robonix.service.navigation/">robonix.service.navigation</a></li>
+<li><span>service</span> <code>go2_dashboard</code><br>${ROBONIX_DEPLOY_DIR}/packages/go2_dashboard</li>
+<li><span>skill</span> <code>semantic_navigation</code><br>${ROBONIX_DEPLOY_DIR}/packages/semantic_navigation</li>
         </ul>
       </aside>
     </div>
