@@ -49,3 +49,5 @@ robots:
     repo: https://github.com/syswonder/robot-deep_robotics-lite3
   - name: robonix.robot.wheeltec.r550
     repo: https://github.com/syswonder/robot-wheeltec-r550
+  - name: robonix.robot.unitree.go2
+    repo: https://github.com/syswonder/robot-unitree-go2
