@@ -25,6 +25,7 @@ from pygments.formatters import HtmlFormatter
 GITHUB_RE = re.compile(r"^https://github\.com/([^/]+)/([^/#?]+?)(?:\.git)?/?$")
 MAINTAINER_RE = re.compile(r"^[^<>\n]+ <[^<>\s@]+@[^<>\s@]+\.[^<>\s@]+>$")
 VENDOR_ASSETS = Path("assets/vendor/pico")
+BRAND_MARK_ASSET = Path("assets/robonix-mark.svg")
 LEGACY_MISSING_LICENSE = {"robonix.robot.wheeltec.r550"}
 PREVIEW_SIZES = ((380, 285), (720, 540))
 PREVIEW_WEBP_QUALITY = 76
@@ -368,10 +369,12 @@ def write_api(path: Path, data) -> None:
 
 
 def copy_assets(public_dir: Path) -> None:
-    asset_dir = public_dir / "assets" / "vendor" / "pico"
-    asset_dir.mkdir(parents=True, exist_ok=True)
-    shutil.copyfile(VENDOR_ASSETS / "pico.classless.min.css", asset_dir / "pico.classless.min.css")
-    shutil.copyfile(VENDOR_ASSETS / "LICENSE.md", asset_dir / "LICENSE.md")
+    asset_dir = public_dir / "assets"
+    vendor_dir = asset_dir / "vendor" / "pico"
+    vendor_dir.mkdir(parents=True, exist_ok=True)
+    shutil.copyfile(BRAND_MARK_ASSET, asset_dir / BRAND_MARK_ASSET.name)
+    shutil.copyfile(VENDOR_ASSETS / "pico.classless.min.css", vendor_dir / "pico.classless.min.css")
+    shutil.copyfile(VENDOR_ASSETS / "LICENSE.md", vendor_dir / "LICENSE.md")
 
 
 def tag_class(tag: str) -> str:
@@ -486,10 +489,18 @@ def render_css() -> str:
     .brand {
       display: inline-flex;
       align-items: center;
+      gap: 10px;
       color: var(--ink);
       font-weight: 700;
       font-size: 17px;
       letter-spacing: -0.01em;
+    }
+    .brand-mark {
+      display: block;
+      width: 34px;
+      height: 30px;
+      flex: 0 0 auto;
+      object-fit: contain;
     }
     .brand:hover { color: var(--brand); text-decoration: none; }
     .brand small { color: var(--muted); font-size: 12px; font-weight: 500; }
@@ -1002,6 +1013,10 @@ def render_css() -> str:
     return base_css + "\n" + HtmlFormatter(style="friendly").get_style_defs(".highlight")
 
 
+def render_favicon(root: str) -> str:
+    return f'<link rel="icon" type="image/svg+xml" href="{root}assets/robonix-mark.svg">'
+
+
 def render_navigation(root: str, current: str = "") -> str:
     def page_link(path: str, label: str, page: str) -> str:
         active = ' aria-current="page"' if current == page else ""
@@ -1010,6 +1025,7 @@ def render_navigation(root: str, current: str = "") -> str:
     return f"""<header class="site-header">
     <div class="shell topline">
       <a class="brand" href="{root}">
+        <img class="brand-mark" src="{root}assets/robonix-mark.svg" alt="" aria-hidden="true" width="34" height="30">
         <span>Robonix <small>Package Catalog</small></span>
       </a>
       <nav class="api-links" aria-label="Catalog navigation">
@@ -1122,6 +1138,7 @@ def render_listing_page(public_dir: Path, generated_at: str, packages: list[dict
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>{html.escape(title)} - Robonix Package Catalog</title>
+  {render_favicon('../')}
   <link rel="stylesheet" href="../assets/vendor/pico/pico.classless.min.css">
   <style>
 {render_css()}
@@ -1308,6 +1325,7 @@ def render_site(public_dir: Path, generated_at: str, packages: list[dict]) -> No
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Robonix Package Catalog</title>
+  {render_favicon('')}
   <link rel="stylesheet" href="assets/vendor/pico/pico.classless.min.css">
   <style>
 {render_css()}
@@ -1416,6 +1434,7 @@ def render_api_viewer(public_dir: Path, generated_at: str) -> None:
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Catalog API - Robonix Package Catalog</title>
+  {render_favicon('../../')}
   <link rel="stylesheet" href="../../assets/vendor/pico/pico.classless.min.css">
   <style>
 {render_css()}
@@ -1587,6 +1606,7 @@ def render_package_pages(public_dir: Path, generated_at: str, packages: list[dic
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>{html.escape(p['name'])} - Robonix Package Catalog</title>
+  {render_favicon('../../')}
   <link rel="stylesheet" href="../../assets/vendor/pico/pico.classless.min.css">
   <style>
 {render_css()}

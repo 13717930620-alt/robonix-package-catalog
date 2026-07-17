@@ -5,12 +5,14 @@ on:
     branches: [main]
     paths:
       - catalog.yaml
+      - assets/**
       - scripts/build_catalog.py
       - tests/**
       - .github/workflows/catalog.yml
   pull_request:
     paths:
       - catalog.yaml
+      - assets/**
       - scripts/build_catalog.py
       - tests/**
       - .github/workflows/catalog.yml

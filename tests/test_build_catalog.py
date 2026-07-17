@@ -162,6 +162,14 @@ class RobotListingTests(unittest.TestCase):
         self.assertIn('data-label="Response"', rendered)
         self.assertIn('href="../api/view/?resource=packages"', rendered)
         self.assertNotIn('<span><code>example-robot</code></span>', rendered)
+        self.assertIn(
+            '<link rel="icon" type="image/svg+xml" href="../assets/robonix-mark.svg">',
+            rendered,
+        )
+        self.assertIn(
+            'class="brand-mark" src="../assets/robonix-mark.svg" alt="" aria-hidden="true"',
+            rendered,
+        )
 
     def test_homepage_is_search_first_and_links_package_layers(self):
         package = {
@@ -186,6 +194,7 @@ class RobotListingTests(unittest.TestCase):
             BUILD_CATALOG.render_site(public, "2026-07-14T00:00:00+00:00", [package])
             rendered = (public / "index.html").read_text()
             api_viewer = (public / "api" / "view" / "index.html").read_text()
+            copied_mark = (public / "assets" / "robonix-mark.svg").read_bytes()
 
         self.assertIn("Find what your robot can run.", rendered)
         self.assertIn('id="catalogSearch"', rendered)
@@ -204,11 +213,29 @@ class RobotListingTests(unittest.TestCase):
         self.assertIn(".site-footer {", rendered)
         self.assertIn("max-width: none", rendered)
         self.assertIn("-webkit-backdrop-filter: blur(16px)", rendered)
+        self.assertEqual(copied_mark, (ROOT / "assets" / "robonix-mark.svg").read_bytes())
+        self.assertIn(
+            '<link rel="icon" type="image/svg+xml" href="assets/robonix-mark.svg">',
+            rendered,
+        )
+        self.assertIn(
+            'class="brand-mark" src="assets/robonix-mark.svg" alt="" aria-hidden="true"',
+            rendered,
+        )
+        self.assertIn(
+            '<link rel="icon" type="image/svg+xml" href="../../assets/robonix-mark.svg">',
+            api_viewer,
+        )
+        self.assertIn(
+            'class="brand-mark" src="../../assets/robonix-mark.svg" alt="" aria-hidden="true"',
+            api_viewer,
+        )
 
     def test_catalog_workflow_supports_manual_refresh(self):
         workflow = (ROOT / ".github/workflows/catalog.yml").read_text()
         self.assertIn("workflow_dispatch:", workflow)
         self.assertIn("python scripts/build_catalog.py", workflow)
+        self.assertGreaterEqual(workflow.count("- assets/**"), 2)
 
     def test_api_writer_keeps_extensionless_resource_and_json_preview(self):
         with tempfile.TemporaryDirectory() as tmp:
