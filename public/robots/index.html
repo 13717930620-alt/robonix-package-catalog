@@ -4,6 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Robot deployments - Robonix Package Catalog</title>
+  <link rel="icon" type="image/svg+xml" href="../assets/robonix-mark.svg">
   <link rel="stylesheet" href="../assets/vendor/pico/pico.classless.min.css">
   <style>
 @import url("https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Noto+Sans+SC:wght@400;500;700&display=swap");
@@ -90,10 +91,18 @@
     .brand {
       display: inline-flex;
       align-items: center;
+      gap: 10px;
       color: var(--ink);
       font-weight: 700;
       font-size: 17px;
       letter-spacing: -0.01em;
+    }
+    .brand-mark {
+      display: block;
+      width: 34px;
+      height: 30px;
+      flex: 0 0 auto;
+      object-fit: contain;
     }
     .brand:hover { color: var(--brand); text-decoration: none; }
     .brand small { color: var(--muted); font-size: 12px; font-weight: 500; }
@@ -683,6 +692,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
   <header class="site-header">
     <div class="shell topline">
       <a class="brand" href="../">
+        <img class="brand-mark" src="../assets/robonix-mark.svg" alt="" aria-hidden="true" width="34" height="30">
         <span>Robonix <small>Package Catalog</small></span>
       </a>
       <nav class="api-links" aria-label="Catalog navigation">
@@ -851,7 +861,7 @@ const detail = await fetch(`${base}/package/${encodeURIComponent('robonix.servic
       </div>
     </details>
   </main>
-  <footer class="site-footer"><div class="shell">Generated on 2026-07-16T14:23:34+00:00.</div></footer>
+  <footer class="site-footer"><div class="shell">Generated on 2026-07-17T07:04:59+00:00.</div></footer>
   <script>
     const input = document.getElementById('q');
     const cards = Array.from(document.querySelectorAll('.package-card'));
