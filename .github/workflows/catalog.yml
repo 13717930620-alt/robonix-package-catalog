@@ -17,6 +17,9 @@ on:
       - tests/**
       - .github/workflows/catalog.yml
   workflow_dispatch:
+  schedule:
+    # Re-fetch package repositories and refresh Pages every day at 02:17 CST.
+    - cron: "17 18 * * *"
 
 permissions:
   contents: write
