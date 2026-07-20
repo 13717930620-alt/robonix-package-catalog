@@ -58,17 +58,17 @@
     },
     {
       "section": "primitive",
-      "name": "realsense_camera",
-      "repo": "https://github.com/syswonder/primitive-intel-realsense_d435i-camera-rbnx",
+      "name": "orbbec_camera",
+      "repo": "https://github.com/syswonder/primitive-orbbec-camera",
       "path": "",
       "branch": "main",
       "manifest": "",
-      "package_name": "robonix.primitive.intel.realsense_d435i.camera",
-      "package_url": "../robonix.primitive.intel.realsense_d435i.camera/"
+      "package_name": "robonix.primitive.orbbec.gemini330.camera",
+      "package_url": "../robonix.primitive.orbbec.gemini330.camera/"
     },
     {
       "section": "primitive",
-      "name": "orbbec_camera",
+      "name": "orbbec_wrist_camera",
       "repo": "https://github.com/syswonder/primitive-orbbec-dabai_dcw-camera-rbnx",
       "path": "",
       "branch": "main",
@@ -99,22 +99,22 @@
     {
       "section": "primitive",
       "name": "audio_driver",
-      "repo": "",
-      "path": "${ROBONIX_SOURCE_PATH}/examples/webots/primitives/audio_driver",
-      "branch": "",
+      "repo": "https://github.com/syswonder/primitive-audio-driver-rbnx",
+      "path": "",
+      "branch": "main",
       "manifest": "",
-      "package_name": "",
-      "package_url": ""
+      "package_name": "robonix.primitive.audio.alsa",
+      "package_url": "../robonix.primitive.audio.alsa/"
     },
     {
       "section": "primitive",
       "name": "audio_client_bridge",
-      "repo": "",
-      "path": "${ROBONIX_SOURCE_PATH}/examples/webots/primitives/audio_client_bridge",
-      "branch": "",
+      "repo": "https://github.com/syswonder/primitive-audio-client-bridge-rbnx",
+      "path": "",
+      "branch": "main",
       "manifest": "",
-      "package_name": "",
-      "package_url": ""
+      "package_name": "robonix.primitive.audio.client_bridge",
+      "package_url": "../robonix.primitive.audio.client_bridge/"
     },
     {
       "section": "service",

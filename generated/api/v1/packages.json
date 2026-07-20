@@ -1,11 +1,11 @@
 {
   "api_version": "1",
-  "generated_at": "2026-07-17T07:04:59+00:00",
+  "generated_at": "2026-07-20T10:33:15+00:00",
   "packages": [
     {
       "name": "robonix.primitive.agilex.piper.arm",
       "version": "0.1.0",
-      "description": "AgileX Piper 6-DoF arm primitive — declares joint_states / arm_status / end_pose / pos_cmd.",
+      "description": "AgileX Piper 6-DoF arm primitive — declares joint_states / joint_command / end_pose / pos_command / arm_status.",
       "license": "Apache-2.0",
       "tags": [
         "primitive",
@@ -26,9 +26,10 @@
       "capabilities": [
         "robonix/primitive/arm/driver",
         "robonix/primitive/arm/joint_states",
-        "robonix/primitive/arm/arm_status",
+        "robonix/primitive/arm/joint_command",
         "robonix/primitive/arm/end_pose",
-        "robonix/primitive/arm/pos_cmd"
+        "robonix/primitive/arm/pos_command",
+        "robonix/primitive/arm/arm_status"
       ],
       "deploy_dependencies": [],
       "readme_url": "https://github.com/syswonder/primitive-agilex-piper-arm-rbnx/blob/main/README.md",
@@ -331,7 +332,6 @@
       "catalog_type": "package",
       "manifest": "package_manifest.yaml",
       "capabilities": [
-        "robonix/primitive/lidar/driver",
         "robonix/primitive/lidar/lidar3d",
         "robonix/primitive/lidar/lidar_snapshot"
       ],
@@ -373,7 +373,7 @@
     },
     {
       "name": "robonix.primitive.orbbec.gemini330.camera",
-      "version": "0.1.0",
+      "version": "0.1.1",
       "description": "Orbbec Gemini 330-series RGBD camera driver wrapper — declares RGB + depth + extrinsics contracts.",
       "license": "Apache-2.0",
       "tags": [
@@ -394,7 +394,6 @@
       "catalog_type": "package",
       "manifest": "package_manifest.yaml",
       "capabilities": [
-        "robonix/primitive/camera/driver",
         "robonix/primitive/camera/rgb",
         "robonix/primitive/camera/depth",
         "robonix/primitive/camera/extrinsics",
@@ -456,7 +455,6 @@
       "catalog_type": "package",
       "manifest": "package_manifest.yaml",
       "capabilities": [
-        "robonix/service/map/driver",
         "robonix/service/map/occupancy_grid",
         "robonix/service/map/pointcloud",
         "robonix/service/map/pose",

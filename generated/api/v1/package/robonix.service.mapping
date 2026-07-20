@@ -20,7 +20,6 @@
   "catalog_type": "package",
   "manifest": "package_manifest.yaml",
   "capabilities": [
-    "robonix/service/map/driver",
     "robonix/service/map/occupancy_grid",
     "robonix/service/map/pointcloud",
     "robonix/service/map/pose",

@@ -836,6 +836,10 @@ the odom frame before SLAM. Bind only the sensor roles Mapping should consume.</
 </table>
 <p>Add a target by adding a <code>package_manifest.&lt;target&gt;.yaml</code> plus a case branch
 in <code>scripts/build.sh</code> — the rest of the package is unchanged.</p>
+<p>The generated ROS 2 overlay intentionally builds only Robonix's custom <code>map</code>
+interface package. Standard interfaces such as <code>sensor_msgs</code> continue to come
+from the target's ROS 2 Humble installation, preserving its support libraries
+and CMake exports for consumers such as <code>cv_bridge</code>.</p>
 <h2>Saving &amp; re-using a map</h2>
 <p>Mapping starts with a fresh runtime database. Call <code>save_map(map_id)</code> after
 coverage is complete; the named map lives under <code>{MAPPING_MAPS_DIR}/{map_id}/</code>
@@ -858,9 +862,11 @@ frame is loaded from the saved db. Without <code>map_mode: localization</code> t
 map origin resets to the robot's boot pose each run.</p>
 </blockquote>
 <h2>Web UI (live map + runtime map ops)</h2>
-<p>Set <code>MAPPING_WEBUI_PORT</code> (e.g. <code>8091</code>) to enable a dependency-light operator
-page (stdlib <code>http.server</code> + Pillow), served on <code>0.0.0.0</code> so it's reachable
-from a laptop on the robot LAN (<code>http://&lt;robot-ip&gt;:8091</code>). Off by default.</p>
+<p>A dependency-light operator page (stdlib <code>http.server</code> + Pillow) is enabled on
+port <code>8091</code> by default; set deployment config <code>webui_port: 0</code> to disable it.
+It binds <code>127.0.0.1</code> by default because the map controls are unauthenticated.
+An authenticated overlay deployment may explicitly set <code>webui_host</code> (or
+<code>MAPPING_WEBUI_HOST</code>); otherwise use the local browser or an SSH tunnel.</p>
 <p>It runs <strong>inside the mapping bridge process</strong>, so its buttons call the same
 <code>map_ops</code> impls the gRPC/MCP capabilities use — no extra round trip — and it
 reads the live <code>/map</code> + pose straight off the bridge's rclpy node.</p>
@@ -902,6 +908,7 @@ untrusted network.</p>
 ├── launch/rtabmap_2d.launch.py           sensor-agnostic rtabmap launch
 ├── scripts/
 │   ├── build.sh                          per-target build
+│   ├── build_ros2_overlay.sh             isolated map interface build
 │   ├── start.sh                          native↔docker dispatch
 │   ├── start_engine.sh                   in-container SLAM launcher
 │   ├── start_native.sh                   host-process launcher
@@ -937,8 +944,7 @@ untrusted network.</p>
         <div class="tags"><button class="tag tag-green" data-tag="service">service</button> <button class="tag tag-blue" data-tag="mapping">mapping</button> <button class="tag tag-blue" data-tag="slam">slam</button> <button class="tag tag-gray" data-tag="rtabmap">rtabmap</button> <button class="tag tag-gray" data-tag="ros2">ros2</button></div>
         <h2>Capabilities</h2>
         <ul class="cap-list">
-          <li>robonix/service/map/driver</li>
-<li>robonix/service/map/occupancy_grid</li>
+          <li>robonix/service/map/occupancy_grid</li>
 <li>robonix/service/map/pointcloud</li>
 <li>robonix/service/map/pose</li>
 <li>robonix/service/map/odom</li>
@@ -952,6 +958,6 @@ untrusted network.</p>
       </aside>
     </div>
   </main>
-  <footer class="site-footer"><div class="shell">Generated on 2026-07-17T07:04:59+00:00.</div></footer>
+  <footer class="site-footer"><div class="shell">Generated on 2026-07-20T10:33:15+00:00.</div></footer>
 </body>
 </html>

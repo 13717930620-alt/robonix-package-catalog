@@ -1,0 +1,77 @@
+{
+  "name": "robonix.robot.wowrobo.roboarm",
+  "version": "0.1.0",
+  "description": "Roboarm LeRobot Koch 五自由度机械臂 Robonix 部署。",
+  "license": "Apache-2.0",
+  "tags": [
+    "robot",
+    "deploy",
+    "robonix",
+    "manipulator",
+    "lerobo"
+  ],
+  "repo": "https://github.com/syswonder/robot-wowrobo-roboarm",
+  "maintainers": [
+    "Yuzheng Gao <2300013159@stuu.pku.edu.cn>"
+  ],
+  "repo_name": "robot-wowrobo-roboarm",
+  "default_branch": "main",
+  "kind": "robot",
+  "catalog_type": "robot",
+  "manifest": "robonix_manifest.yaml",
+  "capabilities": [],
+  "deploy_dependencies": [
+    {
+      "section": "primitive",
+      "name": "roboarm_arm",
+      "repo": "",
+      "path": "primitives/roboarm_arm",
+      "branch": "",
+      "manifest": "",
+      "package_name": "",
+      "package_url": ""
+    },
+    {
+      "section": "primitive",
+      "name": "orbbec_camera_roboarm",
+      "repo": "",
+      "path": "primitives/orbbec_camera_roboarm",
+      "branch": "",
+      "manifest": "",
+      "package_name": "",
+      "package_url": ""
+    },
+    {
+      "section": "primitive",
+      "name": "audio_driver",
+      "repo": "https://github.com/syswonder/primitive-audio-driver-rbnx",
+      "path": "",
+      "branch": "main",
+      "manifest": "",
+      "package_name": "robonix.primitive.audio.alsa",
+      "package_url": "../robonix.primitive.audio.alsa/"
+    },
+    {
+      "section": "service",
+      "name": "speech",
+      "repo": "",
+      "path": "${ROBONIX_SOURCE_PATH}/services/speech",
+      "branch": "",
+      "manifest": "",
+      "package_name": "",
+      "package_url": ""
+    },
+    {
+      "section": "skill",
+      "name": "roboarm_grasp",
+      "repo": "",
+      "path": "skills/roboarm_grasp",
+      "branch": "",
+      "manifest": "",
+      "package_name": "",
+      "package_url": ""
+    }
+  ],
+  "readme_url": "https://github.com/syswonder/robot-wowrobo-roboarm/blob/main/README.md",
+  "preview_image_url": ""
+}

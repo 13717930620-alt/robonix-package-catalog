@@ -729,7 +729,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
         <article class="readme">
           <h1>AgileX Ranger Mini v3</h1>
 <p>Robonix deployment for the SysWonder Ranger Mini v3: Jetson Orin, Livox
-MID-360, Intel RealSense D435i, RTAB-Map, Scene, Nav2, and Explore.</p>
+MID-360, Orbbec Gemini 336L, RTAB-Map, Scene, Nav2, and Explore.</p>
 <p>The deployment uses native ROS 2 packages on Jetson. Zenoh RMW is the default;
 <code>start.sh</code> starts a local <code>rmw_zenohd</code> for the lifetime of the boot.
 Scene, Mapping, and Nav2 are explicitly selected for their Jetson-native paths.
@@ -771,12 +771,12 @@ component.</p>
 </tr>
 <tr>
 <td>Front RGB-D camera</td>
-<td>Intel RealSense D435i</td>
-<td>640 x 480 at 30 FPS for RGB and aligned depth; spatial and temporal depth filters enabled; camera IMU disabled</td>
+<td>Orbbec Gemini 336L</td>
+<td>640 x 480 at 30 FPS for RGB and aligned depth; selected by serial number; camera IMU disabled</td>
 </tr>
 <tr>
 <td>Wrist camera</td>
-<td>Orbbec Dabai DCW</td>
+<td>Orbbec Dabai DC1</td>
 <td>1280 x 720 YUYV color at 10 FPS; depth is disabled in the current pick pipeline</td>
 </tr>
 <tr>
@@ -817,11 +817,12 @@ container. If a provider exposes a named <code>params_profile</code>, that name 
 the provider implements upstream; a robot manifest cannot invent a new profile.
 Robot-specific runtime values remain in this repository's parameter files (or
 documented config overrides) and do not create a new upstream profile.</p>
-<p>Scene is pinned to <code>realsense_camera</code>. That provider supplies both aligned RGB
-and depth (plus camera calibration); the wrist Orbbec cannot be selected by
-Atlas ordering. Scene obtains the robot's globally corrected pose from the
-Mapping <code>robonix/service/map/pose</code> contract and combines it with the complete
-URDF camera transform published by <code>robot_description</code>.</p>
+<p>Scene is pinned to the front Gemini provider <code>orbbec_camera</code>. That provider
+supplies both aligned RGB and depth (plus camera calibration); the wrist DC1 is
+exposed separately as <code>orbbec_wrist_camera</code> and cannot be selected by Atlas
+ordering. Scene obtains the robot's globally corrected pose from the Mapping
+<code>robonix/service/map/pose</code> contract and combines it with the complete URDF
+camera transform published by <code>robot_description</code>.</p>
 <h2>Prepare</h2>
 <p>Robonix <code>dev</code> is the recommended branch for ordinary deployments. This
 repository currently reproduces the Ranger integration stack on <code>dev-next</code>
@@ -911,12 +912,12 @@ than compensating in Scene or Mapping.</p>
           <li><span>primitive</span> <code>robot_description</code><br><a href="https://github.com/syswonder/primitive-robot-description-rbnx">https://github.com/syswonder/primitive-robot-description-rbnx</a></li>
 <li><span>primitive</span> <code>mid360_lidar</code><br><a href="../../packages/robonix.primitive.livox.mid360.lidar/">robonix.primitive.livox.mid360.lidar</a></li>
 <li><span>primitive</span> <code>mid360_imu</code><br><a href="../../packages/robonix.primitive.livox.mid360.imu/">robonix.primitive.livox.mid360.imu</a></li>
-<li><span>primitive</span> <code>realsense_camera</code><br><a href="../../packages/robonix.primitive.intel.realsense_d435i.camera/">robonix.primitive.intel.realsense_d435i.camera</a></li>
-<li><span>primitive</span> <code>orbbec_camera</code><br><a href="../../packages/robonix.primitive.orbbec.dabai_dcw.camera/">robonix.primitive.orbbec.dabai_dcw.camera</a></li>
+<li><span>primitive</span> <code>orbbec_camera</code><br><a href="../../packages/robonix.primitive.orbbec.gemini330.camera/">robonix.primitive.orbbec.gemini330.camera</a></li>
+<li><span>primitive</span> <code>orbbec_wrist_camera</code><br><a href="../../packages/robonix.primitive.orbbec.dabai_dcw.camera/">robonix.primitive.orbbec.dabai_dcw.camera</a></li>
 <li><span>primitive</span> <code>ranger_chassis</code><br><a href="../../packages/robonix.primitive.agilex.ranger_mini_v3.chassis/">robonix.primitive.agilex.ranger_mini_v3.chassis</a></li>
 <li><span>primitive</span> <code>piper_ctl</code><br><a href="../../packages/robonix.primitive.agilex.piper.arm/">robonix.primitive.agilex.piper.arm</a></li>
-<li><span>primitive</span> <code>audio_driver</code><br>${ROBONIX_SOURCE_PATH}/examples/webots/primitives/audio_driver</li>
-<li><span>primitive</span> <code>audio_client_bridge</code><br>${ROBONIX_SOURCE_PATH}/examples/webots/primitives/audio_client_bridge</li>
+<li><span>primitive</span> <code>audio_driver</code><br><a href="../../packages/robonix.primitive.audio.alsa/">robonix.primitive.audio.alsa</a></li>
+<li><span>primitive</span> <code>audio_client_bridge</code><br><a href="../../packages/robonix.primitive.audio.client_bridge/">robonix.primitive.audio.client_bridge</a></li>
 <li><span>service</span> <code>memory</code><br>${ROBONIX_SOURCE_PATH}/services/memsearch</li>
 <li><span>service</span> <code>speech</code><br>${ROBONIX_SOURCE_PATH}/services/speech</li>
 <li><span>service</span> <code>voiceprint</code><br>${ROBONIX_SOURCE_PATH}/services/voiceprint</li>
@@ -932,6 +933,6 @@ than compensating in Scene or Mapping.</p>
       </aside>
     </div>
   </main>
-  <footer class="site-footer"><div class="shell">Generated on 2026-07-17T07:04:59+00:00.</div></footer>
+  <footer class="site-footer"><div class="shell">Generated on 2026-07-20T10:33:15+00:00.</div></footer>
 </body>
 </html>

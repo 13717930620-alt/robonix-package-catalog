@@ -1,6 +1,6 @@
 {
   "name": "robonix.primitive.orbbec.gemini330.camera",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Orbbec Gemini 330-series RGBD camera driver wrapper — declares RGB + depth + extrinsics contracts.",
   "license": "Apache-2.0",
   "tags": [
@@ -21,7 +21,6 @@
   "catalog_type": "package",
   "manifest": "package_manifest.yaml",
   "capabilities": [
-    "robonix/primitive/camera/driver",
     "robonix/primitive/camera/rgb",
     "robonix/primitive/camera/depth",
     "robonix/primitive/camera/extrinsics",

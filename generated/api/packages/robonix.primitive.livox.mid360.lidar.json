@@ -20,7 +20,6 @@
   "catalog_type": "package",
   "manifest": "package_manifest.yaml",
   "capabilities": [
-    "robonix/primitive/lidar/driver",
     "robonix/primitive/lidar/lidar3d",
     "robonix/primitive/lidar/lidar_snapshot"
   ],

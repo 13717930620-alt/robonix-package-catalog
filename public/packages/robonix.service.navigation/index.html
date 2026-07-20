@@ -767,6 +767,12 @@ tolerances, topics, and planner/controller plugins there.</p>
 <code>params_profile</code> deployments remain supported and emit a migration warning;
 new deployments should not use that field. See <code>config.spec</code> for every
 accepted instance field and default.</p>
+<p>The final velocity guard publishes to <code>/cmd_vel</code> by default for compatibility.
+Set <code>config.velocity_output_topic</code> to a fully-qualified non-motion sink such as
+<code>/robonix/nomotion/cmd_vel</code> while integrating a physical robot. The
+<code>ROBONIX_VELOCITY_OUTPUT_TOPIC</code> environment variable is the fallback when the
+config field is absent; an explicit empty, relative, or malformed topic fails
+startup before the guard creates any ROS endpoint.</p>
 <h2>Runtime</h2>
 <p>At <code>Driver(CMD_INIT)</code>, the wrapper:</p>
 <ol>
@@ -779,6 +785,12 @@ accepted instance field and default.</p>
 <p>Missing required providers return <code>deferred</code>. Invalid config or a Nav2 startup
 failure returns <code>error</code> and tears down every child process.</p>
 <h2>Build and tests</h2>
+<p>Navigation generates only its Atlas MCP bindings on every deployment target.
+It deliberately does not generate, build, or source a Robonix ROS 2 IDL
+overlay: the provider talks to Nav2 through the ROS 2 interfaces supplied by
+the selected Humble installation, while its own public capability transport is
+gRPC/MCP. Jetson native builds source only the system ROS 2 installation and
+the locally built terminal-controller plugin overlay.</p>
 <div class="highlight"><pre><span></span><code>bash<span class="w"> </span>scripts/build.sh
 python3<span class="w"> </span>-m<span class="w"> </span>unittest<span class="w"> </span>-v<span class="w"> </span><span class="se">\</span>
 <span class="w">  </span>test_configuration.py<span class="w"> </span><span class="se">\</span>
@@ -815,6 +827,6 @@ deployments.</p>
       </aside>
     </div>
   </main>
-  <footer class="site-footer"><div class="shell">Generated on 2026-07-17T07:04:59+00:00.</div></footer>
+  <footer class="site-footer"><div class="shell">Generated on 2026-07-20T10:33:15+00:00.</div></footer>
 </body>
 </html>

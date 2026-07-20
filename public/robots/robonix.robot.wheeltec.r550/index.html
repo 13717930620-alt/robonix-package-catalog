@@ -720,94 +720,313 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
   <header class="shell detail-hero">
     <a class="back" href="../">Back to robots</a>
     <h1>robonix.robot.wheeltec.r550</h1>
-    <p class="lede">Robonix deploy manifest for the WHEELTEC R550 robot.</p>
+    <p class="lede">Wheeltec R550 mini_tank — 2D SLAM mapping deploy (N10P lidar + rtabmap).</p>
   </header>
   <main class="shell">
     <div class="detail-layout">
       <section class="panel detail-main">
         <h2>README</h2>
         <article class="readme">
-          <h1>wheeltec_r550_deploy</h1>
-<p>Robonix deploy manifest for the WHEELTEC R550 robot at SysWonder lab.</p>
-<p>Hardware: Jetson Orin (aarch64, Tegra-special CUDA stack), WHEELTEC R550 chassis, Livox MID-360 3D LiDAR + integrated 6-axis IMU (Ethernet), Intel RealSense D435i RGBD camera (USB 3.0, with internal IMU).</p>
-<h2>Packages</h2>
-<p>All package URLs in <code>robonix_manifest.yaml</code> resolve from the SysWonder GitHub organization:</p>
+          <h1>Wheeltec R550 mini_tank</h1>
+<p>Robonix deployment for the SysWonder Wheeltec R550 mini_tank: Jetson Orin,
+LSLIDAR N10P, Orbbec Astra S, RTAB-Map, Scene, Nav2, and VLM pilot.</p>
+<p>The deployment uses native ROS 2 packages on Jetson. Each package entry selects
+its own <code>package_manifest*.yaml</code>, so architecture and native/container choices are
+package properties rather than global environment variables.</p>
+<h2>Hardware</h2>
 <table>
 <thead>
 <tr>
-<th>Package</th>
-<th>Repo</th>
-<th>Owns</th>
+<th>Component</th>
+<th>Model</th>
+<th>Deployment configuration</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td><code>mid360_lidar_rbnx</code></td>
-<td>syswonder/primitive-livox-mid360-lidar-rbnx</td>
-<td>primitive/lidar/*</td>
+<td>Mobile base</td>
+<td>Wheeltec R550 mini_tank</td>
+<td>Differential-drive tracked chassis; <code>base_link</code> footprint 0.55 m × 0.40 m; built-in 6-axis IMU</td>
 </tr>
 <tr>
-<td><code>mid360_imu_rbnx</code></td>
-<td>syswonder/primitive-livox-mid360-imu-rbnx</td>
-<td>primitive/imu/*</td>
+<td>Compute</td>
+<td>NVIDIA Jetson Orin</td>
+<td>aarch64 Jetson-native packages, ROS 2 Humble, and <code>rmw_fastrtps_cpp</code></td>
 </tr>
 <tr>
-<td><code>realsense_camera_rbnx</code></td>
-<td>syswonder/primitive-intel-realsense_d435i-camera-rbnx</td>
-<td>primitive/camera/*</td>
+<td>2D lidar</td>
+<td>LSLIDAR N10P</td>
+<td>360° 2D laser scanner; publishes <code>/scan</code> with <code>frame_id=laser</code></td>
 </tr>
 <tr>
-<td><code>wheeltec_chassis_rbnx</code></td>
-<td>syswonder/primitive-wheeltec-r550-chassis-rbnx</td>
-<td>primitive/chassis/*</td>
-</tr>
-<tr>
-<td><code>mapping_rbnx</code></td>
-<td>syswonder/service-map-rbnx</td>
-<td>service/map/*</td>
+<td>RGB-D camera</td>
+<td>Orbbec Astra S</td>
+<td>640×480 at 30 FPS for RGB and depth; USB 3.0; provides snapshot MCP tools for VLM perception</td>
 </tr>
 </tbody>
 </table>
-<div class="highlight"><pre><span></span><code><span class="c1"># on the Jetson, in this directory:</span>
-rbnx<span class="w"> </span>build<span class="w"> </span>.<span class="w">         </span><span class="c1"># clones each url: package and runs its build.sh</span>
-rbnx<span class="w"> </span>boot<span class="w">  </span>.<span class="w">         </span><span class="c1"># spawns each one and runs Driver(CMD_INIT, config)</span>
+<p>The exact provider IDs, device addresses, sensor profiles, and runtime options
+are defined in <a href="https://github.com/syswonder/robot-wheeltec-r550/blob/main/robonix_manifest.yaml"><code>robonix_manifest.yaml</code></a>. The robot body,
+component hierarchy, footprint, and provider-to-component mapping are defined
+in <a href="https://github.com/syswonder/robot-wheeltec-r550/blob/main/soma.yaml"><code>soma.yaml</code></a>.</p>
+<p>Robot-specific algorithm configuration is also deployment-owned:</p>
+<ul>
+<li><a href="https://github.com/syswonder/robot-wheeltec-r550/blob/main/config/rtabmap_params.yaml"><code>config/rtabmap_params.yaml</code></a> contains the full
+  R550 RTAB-Map parameter set.</li>
+<li><a href="https://github.com/syswonder/robot-wheeltec-r550/blob/main/config/param_mini_tank.yaml"><code>config/param_mini_tank.yaml</code></a> contains the
+  complete R550 Nav2 configuration.</li>
+<li><a href="https://github.com/syswonder/robot-wheeltec-r550/blob/main/config/navigate.xml"><code>config/navigate.xml</code></a> contains the R550 navigation
+  BehaviorTree.</li>
+<li><a href="https://github.com/syswonder/robot-wheeltec-r550/blob/main/urdf/mini_tank_robot.urdf"><code>urdf/mini_tank_robot.urdf</code></a> is the kinematic
+  model consumed by <code>robot_description</code>. The manifest references this
+  deployment asset through absolute path so a clone does not depend on a
+  cache path or another checkout.</li>
+</ul>
+<p>The manifest references these files with paths relative to this repository.
+The Mapping and Navigation provider repositories contain templates only; do
+not move R550 dimensions, sensor limits, or controller policy upstream.</p>
+<p>Package target selection and algorithm configuration are separate. A package's
+<code>manifest:</code> chooses a build/start implementation such as Jetson native or a
+container. Robot-specific runtime values remain in this repository's parameter
+files (or documented config overrides) and do not create a new upstream profile.</p>
+<p>Scene is pinned to the front Astra S provider <code>astra_s_camera</code>. That provider
+supplies RGB, depth, and camera intrinsics for visual scene queries. Scene
+obtains the robot's globally corrected pose from the Mapping
+<code>robonix/service/map/pose</code> contract and combines it with the complete URDF
+camera transform published by <code>robot_description</code>.</p>
+<h2>Prepare</h2>
+<div class="highlight"><pre><span></span><code><span class="c1"># 1. Install Robonix toolchain</span>
+<span class="nb">cd</span><span class="w"> </span>~/robonix
+git<span class="w"> </span>switch<span class="w"> </span>dev
+git<span class="w"> </span>pull<span class="w"> </span>--ff-only<span class="w"> </span>origin<span class="w"> </span>dev
+make<span class="w"> </span>install
+
+<span class="c1"># 2. Install ROS 2 system dependencies</span>
+sudo<span class="w"> </span>apt<span class="w"> </span>install<span class="w"> </span>ros-humble-rtabmap-ros<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>ros-humble-navigation2<span class="w"> </span>ros-humble-nav2-bringup<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>ros-humble-imu-filter-madgwick
+
+<span class="c1"># 3. Source the Wheeltec ROS 2 workspace</span>
+<span class="nb">source</span><span class="w"> </span>~/wheeltec_ros2/install/setup.bash
 </code></pre></div>
-<p><code>rbnx build</code> writes everything to <code>rbnx-build/cache/&lt;name&gt;/</code> so the original working dir on the Jetson is never touched.</p>
-<h2>URDF — required, not shipped</h2>
-<p>Soma needs a WHEELTEC R550 URDF (<code>urdf_path</code> in the system.soma block). The URDF must include <code>base_link</code> (chassis frame; convention: ground projection of the geometric centre, X forward, Z up), <code>livox_frame</code> mount transform from <code>base_link</code>, and <code>camera_link</code> + <code>camera_color_optical_frame</code> mount transforms.</p>
-<p>Until a calibrated URDF is in hand, an interim path is to launch <code>static_transform_publisher</code> for each frame manually. Sketch (drop in a side-launch, replace x y z and roll pitch yaw with your measured mount values):</p>
-<div class="highlight"><pre><span></span><code><span class="nt">&lt;launch&gt;</span>
-<span class="w">  </span><span class="nt">&lt;node</span><span class="w"> </span><span class="na">pkg=</span><span class="s">&quot;tf2_ros&quot;</span><span class="w"> </span><span class="na">exec=</span><span class="s">&quot;static_transform_publisher&quot;</span><span class="w"> </span><span class="na">name=</span><span class="s">&quot;tf_lidar&quot;</span>
-<span class="w">        </span><span class="na">args=</span><span class="s">&quot;0.20 0 0.40  0 0 0  base_link livox_frame&quot;</span><span class="nt">/&gt;</span>
-<span class="w">  </span><span class="nt">&lt;node</span><span class="w"> </span><span class="na">pkg=</span><span class="s">&quot;tf2_ros&quot;</span><span class="w"> </span><span class="na">exec=</span><span class="s">&quot;static_transform_publisher&quot;</span><span class="w"> </span><span class="na">name=</span><span class="s">&quot;tf_camera&quot;</span>
-<span class="w">        </span><span class="na">args=</span><span class="s">&quot;0.30 0 0.35  0 0 0  base_link camera_link&quot;</span><span class="nt">/&gt;</span>
-<span class="nt">&lt;/launch&gt;</span>
+<p>Set VLM credentials in your shell before boot (or edit <code>boot.sh</code>):</p>
+<div class="highlight"><pre><span></span><code><span class="nb">export</span><span class="w"> </span><span class="nv">VLM_BASE_URL</span><span class="o">=</span><span class="s2">&quot;https://your-llm-endpoint/v1&quot;</span>
+<span class="nb">export</span><span class="w"> </span><span class="nv">VLM_API_KEY</span><span class="o">=</span><span class="s2">&quot;sk-...&quot;</span>
+<span class="nb">export</span><span class="w"> </span><span class="nv">VLM_MODEL</span><span class="o">=</span><span class="s2">&quot;qwen-vl-max&quot;</span>
 </code></pre></div>
-<p>Then leave <code>system.soma</code> commented out in the manifest until the URDF is ready, and run that side-launch in another shell.</p>
-<h2>Verifying the bring-up</h2>
-<p>After <code>rbnx boot</code>:</p>
-<div class="highlight"><pre><span></span><code>ros2<span class="w"> </span>topic<span class="w"> </span>hz<span class="w"> </span>/scanner/cloud<span class="w">   </span><span class="c1"># ~10 Hz lidar PointCloud2</span>
-ros2<span class="w"> </span>topic<span class="w"> </span>hz<span class="w"> </span>/livox/imu<span class="w">       </span><span class="c1"># ~200 Hz sensor_msgs/Imu</span>
-ros2<span class="w"> </span>topic<span class="w"> </span>hz<span class="w"> </span>/camera_435i/color/image_raw<span class="w">                    </span><span class="c1"># ~30 Hz</span>
-ros2<span class="w"> </span>topic<span class="w"> </span>hz<span class="w"> </span>/camera_435i/aligned_depth_to_color/image_raw<span class="w">   </span><span class="c1"># ~30 Hz</span>
-ros2<span class="w"> </span>topic<span class="w"> </span>hz<span class="w"> </span>/map<span class="w">             </span><span class="c1"># 1 Hz-ish OccupancyGrid (from rtabmap)</span>
+<h2>Build and boot</h2>
+<div class="highlight"><pre><span></span><code>bash<span class="w"> </span>boot.sh
+</code></pre></div>
+<p>The wrapper sources ROS Humble, runs pre-flight checks (<code>rbnx</code> CLI, ROS 2,
+<code>turn_on_wheeltec_robot</code>, <code>rtabmap_slam</code>, <code>imu_filter_madgwick</code>), and then
+execs <code>rbnx boot -f robonix_manifest.yaml</code>. <code>--no-build</code> skips the build step
+for repeated boots. <code>--shutdown</code> tears down a running stack.</p>
+<p>Operator pages:</p>
+<ul>
+<li>Mapping: <code>http://&lt;robot-host&gt;:8091/</code></li>
+<li>Liaison for Robonix Client: <code>&lt;robot-host&gt;:50081</code></li>
+</ul>
+<h2>RViz</h2>
+<p>The deploy keeps a complete RViz configuration with laser scans, map, costmap,
+TF tree, and robot model displays.</p>
+<div class="highlight"><pre><span></span><code><span class="nb">source</span><span class="w"> </span>/opt/ros/humble/setup.bash
+rviz2<span class="w"> </span>-d<span class="w"> </span>config/wheeltec.rviz
+</code></pre></div>
+<h2>Safety and bring-up order</h2>
+<p>The checked-in full manifest includes the chassis, lidar, camera, mapping, and
+Nav2; starting it exposes physical motion capabilities. Keep the hardware
+emergency stop available and clear the workspace before full bring-up.</p>
+<p>After the chassis is powered on:</p>
+<ol>
+<li>Verify odometry is publishing: <code>ros2 topic hz /odom_combined</code></li>
+<li>Send zero Twist and confirm the watchdog holds the base stopped.</li>
+<li>Use a low-speed, short-duration command in a clear area.</li>
+<li>Verify Mapping pose and Nav2 costmaps before sending a nearby goal.</li>
+</ol>
+<h2>Robot description</h2>
+<p><code>soma.yaml</code> and <code>urdf/mini_tank_robot.urdf</code> are served by Soma. The description
+contains the body footprint and sensor tree used by Pilot and other consumers.
+Mount transforms remain calibration-sensitive; update the body URDF after
+physical measurement rather than compensating in Scene or Mapping.</p>
+<p>The component tree in <code>soma.yaml</code> nests sensors under their physical mount:</p>
+<div class="highlight"><pre><span></span><code>base (mobile_base, base_link)
+  ├── lidar (lidar_2d, laser)
+  ├── imu (imu, gyro_link)
+  └── front_rgbd (rgbd_camera, camera_link)
+</code></pre></div>
+<h2>Capability contracts</h2>
+<table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Owner</th>
+<th>Transport</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>robonix/primitive/robot_description/driver</code></td>
+<td>robot_description</td>
+<td>gRPC</td>
+</tr>
+<tr>
+<td><code>robonix/primitive/chassis/driver</code></td>
+<td>r550_chassis</td>
+<td>gRPC</td>
+</tr>
+<tr>
+<td><code>robonix/primitive/chassis/odom</code></td>
+<td>r550_chassis</td>
+<td>ROS 2 <code>/odom_combined</code></td>
+</tr>
+<tr>
+<td><code>robonix/primitive/chassis/move</code></td>
+<td>r550_chassis</td>
+<td>gRPC</td>
+</tr>
+<tr>
+<td><code>robonix/primitive/chassis/twist_in</code></td>
+<td>r550_chassis</td>
+<td>ROS 2 <code>/cmd_vel</code></td>
+</tr>
+<tr>
+<td><code>robonix/primitive/imu/imu</code></td>
+<td>r550_chassis</td>
+<td>ROS 2 <code>/imu_data</code></td>
+</tr>
+<tr>
+<td><code>robonix/primitive/lidar/lidar</code></td>
+<td>n10p_lslidar</td>
+<td>ROS 2 <code>/scan</code></td>
+</tr>
+<tr>
+<td><code>robonix/primitive/camera/rgb</code></td>
+<td>astra_s_camera</td>
+<td>ROS 2 <code>/camera/color/image_raw</code></td>
+</tr>
+<tr>
+<td><code>robonix/primitive/camera/depth</code></td>
+<td>astra_s_camera</td>
+<td>ROS 2 <code>/camera/depth/image_raw</code></td>
+</tr>
+<tr>
+<td><code>robonix/primitive/camera/intrinsics</code></td>
+<td>astra_s_camera</td>
+<td>ROS 2 <code>/camera/color/camera_info</code></td>
+</tr>
+<tr>
+<td><code>robonix/primitive/camera/snapshot</code></td>
+<td>astra_s_camera</td>
+<td>MCP</td>
+</tr>
+<tr>
+<td><code>robonix/primitive/camera/depth_snapshot</code></td>
+<td>astra_s_camera</td>
+<td>MCP</td>
+</tr>
+<tr>
+<td><code>robonix/service/map/occupancy_grid</code></td>
+<td>mapping</td>
+<td>ROS 2 <code>/map</code></td>
+</tr>
+<tr>
+<td><code>robonix/service/map/pointcloud</code></td>
+<td>mapping</td>
+<td>ROS 2 <code>/rtabmap/cloud_map</code></td>
+</tr>
+<tr>
+<td><code>robonix/service/map/pose</code></td>
+<td>mapping</td>
+<td>ROS 2 <code>/robonix/map/pose</code></td>
+</tr>
+<tr>
+<td><code>robonix/service/map/odom</code></td>
+<td>mapping</td>
+<td>ROS 2 <code>/rtabmap/odom</code></td>
+</tr>
+<tr>
+<td><code>robonix/service/map/save_map</code></td>
+<td>mapping</td>
+<td>gRPC + MCP</td>
+</tr>
+<tr>
+<td><code>robonix/service/map/load_map</code></td>
+<td>mapping</td>
+<td>gRPC + MCP</td>
+</tr>
+<tr>
+<td><code>robonix/service/map/pose_estimate</code></td>
+<td>mapping</td>
+<td>gRPC + MCP</td>
+</tr>
+<tr>
+<td><code>robonix/service/navigation/navigate</code></td>
+<td>nav2</td>
+<td>gRPC + MCP</td>
+</tr>
+<tr>
+<td><code>robonix/service/navigation/navigate/status</code></td>
+<td>nav2</td>
+<td>gRPC + MCP</td>
+</tr>
+<tr>
+<td><code>robonix/service/navigation/navigate/cancel</code></td>
+<td>nav2</td>
+<td>gRPC + MCP</td>
+</tr>
+</tbody>
+</table>
+<h2>Provider dependency graph</h2>
+<div class="highlight"><pre><span></span><code>robot_description                     ← no deps, must boot first
+    │  /robot_description (URDF) → TF tree
+    ▼
+r550_chassis                          ← needs /robot_description for joint states
+    │  /odom_combined  /imu_data  /cmd_vel
+    │  TF: base_footprint → base_link, base_footprint → gyro_link
+    │
+    ├──► n10p_lslidar                 ← needs base_link TF
+    │       /scan (LaserScan, frame_id=laser)
+    │
+    └──► astra_s_camera               ← needs camera_link TF
+            /camera/color/image_raw   /camera/depth/image_raw
+            + snapshot MCP tools
+            │
+            ├──► mapping              ← lidar2d + odom
+            │       /map  /rtabmap/cloud_map  /robonix/map/pose
+            │       Web UI → :8091
+            │
+            ├──► nav2                 ← map + odom + scan
+            │       navigation/{navigate, status, cancel}
+            │
+            └──► scene                ← camera (astra_s_camera)
+                    scene/{list_objects, goal_near}
+</code></pre></div>
+<p>Boot order follows this dependency chain: system caps first (atlas → soma →
+executor → pilot → liaison → scene), then primitives in declaration order
+(robot_description → chassis → lidar → camera), then services (mapping →
+nav2). Services use the Atlas defer-queue: nav2 waits for mapping, which waits
+for lidar + chassis.</p>
+<h2>Verification</h2>
+<div class="highlight"><pre><span></span><code><span class="c1"># Capability status — all non-skill caps should show ACTIVE</span>
+rbnx<span class="w"> </span>caps<span class="w"> </span>-v
+
+<span class="c1"># Registered contracts</span>
+rbnx<span class="w"> </span>contracts
+
+<span class="c1"># Sensor health</span>
+ros2<span class="w"> </span>topic<span class="w"> </span>hz<span class="w"> </span>/scan<span class="w">                    </span><span class="c1"># ~10 Hz</span>
+ros2<span class="w"> </span>topic<span class="w"> </span>hz<span class="w"> </span>/odom_combined<span class="w">           </span><span class="c1"># ~30 Hz</span>
+ros2<span class="w"> </span>topic<span class="w"> </span>hz<span class="w"> </span>/imu_data<span class="w">                </span><span class="c1"># ~200 Hz</span>
+ros2<span class="w"> </span>topic<span class="w"> </span>hz<span class="w"> </span>/camera/color/image_raw<span class="w">  </span><span class="c1"># ~30 Hz</span>
+ros2<span class="w"> </span>topic<span class="w"> </span>hz<span class="w"> </span>/camera/depth/image_raw<span class="w">  </span><span class="c1"># ~30 Hz</span>
+ros2<span class="w"> </span>topic<span class="w"> </span>hz<span class="w"> </span>/map<span class="w">                     </span><span class="c1"># ~1 Hz</span>
+
+<span class="c1"># Pose</span>
 ros2<span class="w"> </span>topic<span class="w"> </span><span class="nb">echo</span><span class="w"> </span>/robonix/map/pose<span class="w"> </span>--once
-rbnx<span class="w"> </span>caps<span class="w">                      </span><span class="c1"># all the contracts above should be listed</span>
+
+<span class="c1"># Chat</span>
+rbnx<span class="w"> </span>chat
 </code></pre></div>
-<p>Open RViz and load the rtabmap visualization config to see the map build up.</p>
-<h2>Defer / boot sequencing</h2>
-<p>The deploy manifest is an unordered list. Boot ordering happens at runtime via the defer protocol: a package whose dep isn't ready returns <code>Driver_Response(state="deferred")</code> and <code>rbnx boot</code> retries it periodically until the system reaches steady state. There's no explicit dep graph in the manifest — each package only declares what it needs at the moment its Init runs.</p>
-<p>Concretely, the cascade for this stack:</p>
-<div class="highlight"><pre><span></span><code>mid360_lidar.Init    →  spawns livox driver, declares lidar3d
-                        (also makes /livox/imu live on the bus)
-mid360_imu.Init      →  defers if /livox/imu silent; succeeds on retry
-                        once mid360_lidar&#39;s launch is publishing
-realsense_camera.Init→  spawns realsense, declares rgb + depth
-mapping.Init         →  queries atlas for lidar3d, rgb, depth, imu;
-                        defers any not yet present; succeeds when all are
-</code></pre></div>
-<h2>License</h2>
-<p>Manifest + this README: MulanPSL-2.0. Each <code>url:</code> package retains its own license.</p>
         </article>
       </section>
       <aside class="panel detail-side">
@@ -817,26 +1036,25 @@ mapping.Init         →  queries atlas for lidar3d, rgb, depth, imu;
           <div>License</div><div><code>NOASSERTION</code></div>
           <div>Kind</div><div>robot</div>
           <div>Type</div><div>robot</div>
-          <div>Maintainers</div><div>Xiangrui Cheng &lt;sherry-part@users.noreply.github.com&gt;</div>
+          <div>Maintainers</div><div>Xiangrui Cheng &lt;ccc_7020@qq.com&gt;</div>
           <div>Repository</div><div><a href="https://github.com/syswonder/robot-wheeltec-r550">robot-wheeltec-r550</a></div>
           <div>Branch</div><div><code>main</code></div>
           <div>Manifest</div><div><code>robonix_manifest.yaml</code></div>
           <div>API</div><div><a href="../../api/view/?package=robonix.robot.wheeltec.r550">package metadata</a></div>
         </div>
-        <div class="tags"><button class="tag tag-red" data-tag="robot">robot</button> <button class="tag tag-slate" data-tag="deploy">deploy</button> <button class="tag tag-gray" data-tag="wheeltec">wheeltec</button> <button class="tag tag-gray" data-tag="r550">r550</button> <button class="tag tag-purple" data-tag="lidar">lidar</button> <button class="tag tag-cyan" data-tag="camera">camera</button> <button class="tag tag-green" data-tag="navigation">navigation</button> <button class="tag tag-blue" data-tag="mapping">mapping</button></div>
+        <div class="tags"><button class="tag tag-red" data-tag="robot">robot</button> <button class="tag tag-slate" data-tag="deploy">deploy</button> <button class="tag tag-gray" data-tag="robonix">robonix</button></div>
         <h2>Deployment Packages</h2>
         <ul class="cap-list">
-          <li><span>primitive</span> <code>mid360_lidar</code><br><a href="../../packages/robonix.primitive.livox.mid360.lidar/">robonix.primitive.livox.mid360.lidar</a></li>
-<li><span>primitive</span> <code>mid360_imu</code><br><a href="../../packages/robonix.primitive.livox.mid360.imu/">robonix.primitive.livox.mid360.imu</a></li>
-<li><span>primitive</span> <code>realsense_camera</code><br><a href="../../packages/robonix.primitive.intel.realsense_d435i.camera/">robonix.primitive.intel.realsense_d435i.camera</a></li>
-<li><span>primitive</span> <code>wheeltec_chassis</code><br><a href="https://github.com/syswonder/primitive-wheeltec-r550-chassis-rbnx">https://github.com/syswonder/primitive-wheeltec-r550-chassis-rbnx</a></li>
-<li><span>service</span> <code>mapping</code><br><a href="../../packages/robonix.service.mapping/">robonix.service.mapping</a></li>
-<li><span>service</span> <code>nav2</code><br><a href="../../packages/robonix.service.navigation/">robonix.service.navigation</a></li>
-<li><span>skill</span> <code>explore</code><br><a href="../../packages/robonix.skill.explore/">robonix.skill.explore</a></li>
+          <li><span>primitive</span> <code>robot_description</code><br>/home/wheeltec/Desktop/rbnx_deploy/wheeltec_robot/primitives/robot_description</li>
+<li><span>primitive</span> <code>r550_chassis</code><br>/home/wheeltec/Desktop/rbnx_deploy/wheeltec_robot/primitives/r550_chassis</li>
+<li><span>primitive</span> <code>n10p_lslidar</code><br>/home/wheeltec/Desktop/rbnx_deploy/wheeltec_robot/primitives/n10p_lslidar</li>
+<li><span>primitive</span> <code>astra_s_camera</code><br>./primitives/astra_s_camera</li>
+<li><span>service</span> <code>mapping</code><br>/home/wheeltec/Desktop/rbnx_deploy/wheeltec_robot/services/service-map-rbnx</li>
+<li><span>service</span> <code>nav2</code><br>./services/service-navigation-rbnx</li>
         </ul>
       </aside>
     </div>
   </main>
-  <footer class="site-footer"><div class="shell">Generated on 2026-07-17T07:04:59+00:00.</div></footer>
+  <footer class="site-footer"><div class="shell">Generated on 2026-07-20T10:33:15+00:00.</div></footer>
 </body>
 </html>

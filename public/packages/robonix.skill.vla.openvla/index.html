@@ -732,11 +732,11 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 <p>Catalog name: <code>robonix.skill.vla.openvla</code>.</p>
 <h2>Overview</h2>
 <p>Closed-loop VLA control pipeline:</p>
-<div class="highlight"><pre><span></span><code>Camera topics ─► observe ─► VLA Server (inference) ─► safety filter ─► /arm/joint_states ─► piper_ctl ─► arm
+<div class="highlight"><pre><span></span><code>Camera topics ─► observe ─► VLA Server (inference) ─► safety filter ─► /arm/joint_command ─► piper_ctl ─► arm
                     ▲                                                                            │
                     └──────────────────── joint_states feedback ◄─────────────────────────────────┘
 </code></pre></div>
-<p><strong>Key architecture decision</strong>: actions are sent directly to <code>primitive-agilex-piper-arm-rbnx</code> (<code>/arm/joint_states</code>), <strong>bypassing MoveIt entirely</strong>. VLA outputs are already planned trajectories — re-planning through MoveIt would destroy learned behavior and add 3–5 s latency per step.</p>
+<p><strong>Key architecture decision</strong>: actions are sent directly to <code>primitive-agilex-piper-arm-rbnx</code> (<code>/arm/joint_command</code>), <strong>bypassing MoveIt entirely</strong>. VLA outputs are already planned trajectories — re-planning through MoveIt would destroy learned behavior and add 3–5 s latency per step.</p>
 <h2>Capability surface</h2>
 <table>
 <thead>
@@ -816,7 +816,7 @@ bash<span class="w"> </span>scripts/build.sh
 <span class="nt">full_image_topic</span><span class="p">:</span><span class="w">     </span><span class="l l-Scalar l-Scalar-Plain">/camera/color/image_raw</span>
 <span class="nt">wrist_image_topic</span><span class="p">:</span><span class="w">    </span><span class="l l-Scalar l-Scalar-Plain">/wrist_camera/color/image_raw</span>
 <span class="nt">joint_states_topic</span><span class="p">:</span><span class="w">   </span><span class="l l-Scalar l-Scalar-Plain">/arm/joint_states_single</span><span class="w">     </span><span class="c1"># piper_ctl publishes proprio here</span>
-<span class="nt">joint_cmd_topic</span><span class="p">:</span><span class="w">      </span><span class="l l-Scalar l-Scalar-Plain">/arm/joint_states</span><span class="w">            </span><span class="c1"># piper_ctl subscribes here for joint ctl</span>
+<span class="nt">joint_cmd_topic</span><span class="p">:</span><span class="w">      </span><span class="l l-Scalar l-Scalar-Plain">/arm/joint_command</span><span class="w">            </span><span class="c1"># piper_ctl subscribes here for joint ctl</span>
 
 <span class="nt">image_resize</span><span class="p">:</span><span class="w">  </span><span class="p p-Indicator">[</span><span class="nv">256</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">256</span><span class="p p-Indicator">]</span><span class="w">                          </span><span class="c1"># Resize before sending to VLA</span>
 <span class="nt">action_hz</span><span class="p">:</span><span class="w">     </span><span class="l l-Scalar l-Scalar-Plain">10.0</span><span class="w">                                </span><span class="c1"># Control frequency</span>
@@ -929,6 +929,6 @@ rbnx<span class="w"> </span>ask<span class="w"> </span><span class="s2">&quot;pu
       </aside>
     </div>
   </main>
-  <footer class="site-footer"><div class="shell">Generated on 2026-07-17T07:04:59+00:00.</div></footer>
+  <footer class="site-footer"><div class="shell">Generated on 2026-07-20T10:33:15+00:00.</div></footer>
 </body>
 </html>

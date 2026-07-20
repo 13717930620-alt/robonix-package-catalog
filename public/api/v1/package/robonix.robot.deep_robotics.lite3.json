@@ -88,16 +88,6 @@
     },
     {
       "section": "service",
-      "name": "pcld2lscan",
-      "repo": "https://github.com/syswonder/service-pcld2lscan-rbnx.git",
-      "path": "",
-      "branch": "main",
-      "manifest": "",
-      "package_name": "",
-      "package_url": ""
-    },
-    {
-      "section": "service",
       "name": "mapping",
       "repo": "https://github.com/syswonder/service-map-rbnx",
       "path": "",

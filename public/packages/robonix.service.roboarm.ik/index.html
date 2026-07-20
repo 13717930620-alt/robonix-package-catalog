@@ -737,14 +737,14 @@ the arm.</p>
 <p>Execution path:</p>
 <div class="highlight"><pre><span></span><code>pick_skill/yolo_grasp -&gt; manipulation/execute_grasp
   -&gt; roboarm IK on Piper URDF link6
-  -&gt; /arm/joint_states
+  -&gt; /arm/joint_command
   -&gt; piper_ctl_rbnx
   -&gt; CAN
 </code></pre></div>
 <p>ROS compatibility:</p>
 <ul>
-<li>subscribes <code>/arm/joint_states_single</code></li>
-<li>publishes <code>/arm/joint_states</code></li>
+<li>subscribes <code>/arm/joint_states_single</code> (proprio feedback from <code>primitive/arm/joint_states</code>)</li>
+<li>publishes <code>/arm/joint_command</code> (joint target for <code>primitive/arm/joint_command</code>)</li>
 <li>exposes <code>/moveit_control/reset</code> as <code>std_srvs/srv/Trigger</code></li>
 </ul>
 <p>It does not start MoveIt, <code>move_group</code>, or the C++ moveit control node.</p>
@@ -779,6 +779,6 @@ put-down pose cannot be reached, it reports failure without opening the gripper.
       </aside>
     </div>
   </main>
-  <footer class="site-footer"><div class="shell">Generated on 2026-07-17T07:04:59+00:00.</div></footer>
+  <footer class="site-footer"><div class="shell">Generated on 2026-07-20T10:33:15+00:00.</div></footer>
 </body>
 </html>
