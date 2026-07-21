@@ -206,7 +206,7 @@ but browser-facing links and new integrations should use the `.json` paths above
 The generated commit uses `[skip ci]`; normal CI only triggers from
 `catalog.yaml`, the builder script, the workflow, or manual dispatch.
 
-Generated on `2026-07-20T19:57:25+00:00`.
+Generated on `2026-07-21T19:52:27+00:00`.
 
 ## Packages
 

@@ -60,6 +60,26 @@
       "package_url": ""
     },
     {
+      "section": "primitive",
+      "name": "audio_driver",
+      "repo": "https://github.com/syswonder/primitive-audio-driver-rbnx",
+      "path": "",
+      "branch": "main",
+      "manifest": "",
+      "package_name": "robonix.primitive.audio.alsa",
+      "package_url": "../robonix.primitive.audio.alsa/"
+    },
+    {
+      "section": "primitive",
+      "name": "audio_client_bridge",
+      "repo": "https://github.com/syswonder/primitive-audio-client-bridge-rbnx",
+      "path": "",
+      "branch": "main",
+      "manifest": "",
+      "package_name": "robonix.primitive.audio.client_bridge",
+      "package_url": "../robonix.primitive.audio.client_bridge/"
+    },
+    {
       "section": "service",
       "name": "mapping",
       "repo": "",
@@ -76,6 +96,26 @@
       "path": "./services/service-navigation-rbnx",
       "branch": "",
       "manifest": "package_manifest.jetson-docker.yaml",
+      "package_name": "",
+      "package_url": ""
+    },
+    {
+      "section": "service",
+      "name": "speech",
+      "repo": "",
+      "path": "${ROBONIX_SOURCE_PATH}/services/speech",
+      "branch": "",
+      "manifest": "",
+      "package_name": "",
+      "package_url": ""
+    },
+    {
+      "section": "skill",
+      "name": "explore",
+      "repo": "",
+      "path": "./skills/skill-explore-rbnx",
+      "branch": "",
+      "manifest": "",
       "package_name": "",
       "package_url": ""
     }
