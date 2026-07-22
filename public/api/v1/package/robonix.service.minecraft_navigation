@@ -1,0 +1,31 @@
+{
+  "name": "robonix.service.minecraft_navigation",
+  "version": "0.1.0",
+  "description": "Minecraft occupancy-grid navigation service.",
+  "license": "MulanPSL-2.0",
+  "tags": [
+    "service",
+    "minecraft",
+    "navigation",
+    "path-planning",
+    "costmap"
+  ],
+  "repo": "https://github.com/syswonder/service-minecraft-navigation-rbnx",
+  "maintainers": [
+    "ZZJJWarth <jzeng25@stu.pku.edu.cn>"
+  ],
+  "repo_name": "service-minecraft-navigation-rbnx",
+  "default_branch": "main",
+  "kind": "service",
+  "catalog_type": "package",
+  "manifest": "package_manifest.yaml",
+  "capabilities": [
+    "robonix/service/navigation/driver",
+    "robonix/service/navigation/navigate",
+    "robonix/service/navigation/navigate/status",
+    "robonix/service/navigation/navigate/cancel"
+  ],
+  "deploy_dependencies": [],
+  "readme_url": "https://github.com/syswonder/service-minecraft-navigation-rbnx/blob/main/README.md",
+  "preview_image_url": ""
+}

@@ -1,0 +1,31 @@
+{
+  "name": "robonix.skill.minecraft_explore",
+  "version": "0.1.0",
+  "description": "Frontier-based exploration skill for the Minecraft example.",
+  "license": "MulanPSL-2.0",
+  "tags": [
+    "skill",
+    "minecraft",
+    "exploration",
+    "frontier",
+    "navigation"
+  ],
+  "repo": "https://github.com/syswonder/skill-minecraft-explore-rbnx",
+  "maintainers": [
+    "ZZJJWarth <jzeng25@stu.pku.edu.cn>"
+  ],
+  "repo_name": "skill-minecraft-explore-rbnx",
+  "default_branch": "main",
+  "kind": "skill",
+  "catalog_type": "package",
+  "manifest": "package_manifest.yaml",
+  "capabilities": [
+    "robonix/skill/explore/driver",
+    "robonix/skill/explore/explore",
+    "robonix/skill/explore/explore/status",
+    "robonix/skill/explore/explore/cancel"
+  ],
+  "deploy_dependencies": [],
+  "readme_url": "https://github.com/syswonder/skill-minecraft-explore-rbnx/blob/main/README.md",
+  "preview_image_url": ""
+}

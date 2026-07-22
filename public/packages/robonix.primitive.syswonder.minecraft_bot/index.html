@@ -1,0 +1,965 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>robonix.primitive.syswonder.minecraft_bot - Robonix Package Catalog</title>
+  <link rel="icon" type="image/svg+xml" href="../../assets/robonix-mark.svg">
+  <link rel="stylesheet" href="../../assets/vendor/pico/pico.classless.min.css">
+  <style>
+@import url("https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Noto+Sans+SC:wght@400;500;700&display=swap");
+
+    :root {
+      color-scheme: light;
+      --font-sans: "Noto Sans CJK SC", "Noto Sans SC", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      --font-mono: "JetBrains Mono", "Noto Sans CJK SC", "Noto Sans SC", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      --pico-font-family: var(--font-sans);
+      --pico-border-radius: 6px;
+      --pico-spacing: 0.75rem;
+      --bg: #f7f8fc;
+      --paper: #ffffff;
+      --soft: #f1f3f9;
+      --ink: #11172a;
+      --muted: #5f677a;
+      --line: #dde1ec;
+      --line-strong: #bdc5d8;
+      --brand: #283689;
+      --brand-deep: #17205f;
+      --signal: #3674ff;
+      --signal-soft: #e9edff;
+      --shadow: 0 8px 28px rgba(28, 38, 88, 0.06);
+      --site-header-height: 64px;
+      --sticky-gap: 14px;
+    }
+    * { box-sizing: border-box; }
+    html { min-height: 100%; background: var(--bg); }
+    .visually-hidden {
+      position: absolute !important;
+      width: 1px !important;
+      height: 1px !important;
+      padding: 0 !important;
+      margin: -1px !important;
+      overflow: hidden !important;
+      clip: rect(0, 0, 0, 0) !important;
+      white-space: nowrap !important;
+      border: 0 !important;
+    }
+    body {
+      width: 100%;
+      max-width: none;
+      min-height: 100vh;
+      min-height: 100dvh;
+      padding: 0;
+      margin: 0;
+      display: flex;
+      flex-direction: column;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at 18% -8%, rgba(54, 116, 255, 0.09), transparent 30rem),
+        var(--bg);
+      font-family: var(--font-sans);
+      font-size: 15px;
+      letter-spacing: 0;
+    }
+    a { color: var(--brand); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    :focus-visible {
+      outline: 3px solid rgba(54, 116, 255, 0.42);
+      outline-offset: 3px;
+    }
+    .shell {
+      width: min(100% - 48px, 1180px);
+      max-width: 1180px;
+      margin: 0 auto;
+    }
+    .site-header {
+      width: 100%;
+      max-width: none;
+      margin: 0;
+      padding: 0;
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      color: var(--ink);
+      border-bottom: 1px solid rgba(221, 225, 236, 0.88);
+      background: rgba(255, 255, 255, 0.9);
+      -webkit-backdrop-filter: blur(16px);
+      backdrop-filter: blur(16px);
+    }
+    .site-header .shell { padding-block: 12px; }
+    .topline { display: flex; justify-content: space-between; gap: 16px; align-items: center; }
+    .brand {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      color: var(--ink);
+      font-weight: 700;
+      font-size: 17px;
+      letter-spacing: -0.01em;
+    }
+    .brand-mark {
+      display: block;
+      width: 34px;
+      height: 30px;
+      flex: 0 0 auto;
+      object-fit: contain;
+    }
+    .brand:hover { color: var(--brand); text-decoration: none; }
+    .brand small { color: var(--muted); font-size: 12px; font-weight: 500; }
+    .api-links { display: flex; gap: 8px; flex-wrap: wrap; justify-content: flex-end; }
+    .api-links a {
+      color: #344054;
+      border: 1px solid transparent;
+      background: transparent;
+      border-radius: 6px;
+      padding: 7px 9px;
+      font-size: 13px;
+      font-weight: 600;
+      transition: color 160ms ease, background 160ms ease, border-color 160ms ease;
+    }
+    .api-links a:hover, .api-links a[aria-current="page"] {
+      color: var(--brand);
+      border-color: #d9def4;
+      background: var(--signal-soft);
+      text-decoration: none;
+    }
+    h1 {
+      margin: 0;
+      font-family: var(--font-sans);
+      font-size: 22px;
+      line-height: 1.35;
+      letter-spacing: 0;
+      overflow-wrap: anywhere;
+      word-break: break-word;
+    }
+    .lede { color: var(--muted); max-width: 720px; margin: 8px 0 0; line-height: 1.55; font-size: 15px; }
+    .page-intro { padding: 28px 0 16px; }
+    .page-intro .eyebrow, .catalog-hero .eyebrow, .api-viewer .eyebrow {
+      color: var(--brand);
+      font-family: var(--font-mono);
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.09em;
+      text-transform: uppercase;
+    }
+    main.shell {
+      width: min(100% - 48px, 1180px);
+      flex: 1 0 auto;
+      padding-block: 0 34px;
+    }
+    .search-strip { padding: 16px 0 14px; }
+    .catalog-frame {
+      display: grid;
+      grid-template-columns: 265px 1fr;
+      gap: 14px;
+      align-items: start;
+    }
+    .panel {
+      background: var(--paper);
+      border: 1px solid var(--line);
+      box-shadow: var(--shadow);
+      border-radius: 8px;
+      overflow: hidden;
+      margin-bottom: 0;
+      transition: border-color 180ms ease, box-shadow 180ms ease, transform 180ms ease;
+    }
+    .filters {
+      padding: 14px;
+      position: sticky;
+      top: calc(var(--site-header-height) + var(--sticky-gap));
+      max-height: calc(100dvh - var(--site-header-height) - 28px);
+      overflow-y: auto;
+      overscroll-behavior: contain;
+      scrollbar-gutter: stable;
+    }
+    .filters > summary { display: none; }
+    .filter-content { min-width: 0; }
+    .filters h2, .content h2 { margin: 0 0 9px; font-size: 15px; }
+    .stat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 7px; margin-bottom: 14px; }
+    .stat { border: 1px solid var(--line); border-radius: 6px; padding: 8px; background: var(--soft); }
+    .stat strong { display: block; font-size: 20px; line-height: 1.15; }
+    .stat span { color: var(--muted); font-size: 12px; }
+    .filter-group { border-top: 1px solid var(--line); padding-top: 11px; margin-top: 11px; }
+    .filter-buttons { display: flex; gap: 6px; flex-wrap: wrap; }
+    .filter-button {
+      border: 1px solid var(--line);
+      background: #fff;
+      color: var(--ink);
+      border-radius: 999px;
+      padding: 5px 9px;
+      cursor: pointer;
+      font-size: 13px;
+      margin: 0;
+    }
+    .filter-button { transition: color 150ms ease, border-color 150ms ease, background 150ms ease; }
+    .filter-button:hover { border-color: var(--brand); }
+    .filter-button.active { background: var(--brand); color: #fff; border-color: var(--brand); }
+    .content { padding: 14px; min-width: 0; }
+    .api-reference {
+      margin-top: 14px;
+      padding: 0;
+      font-size: 14px;
+      line-height: 1.45;
+    }
+    .api-reference > summary {
+      cursor: pointer;
+      padding: 14px 18px;
+      color: var(--ink);
+      font-weight: 700;
+    }
+    .api-reference[open] > summary { border-bottom: 1px solid var(--line); }
+    .api-reference-body { padding: 16px 18px 18px; }
+    .api-reference h2 { margin: 0 0 8px; font-size: 16px; line-height: 1.3; }
+    .api-reference p { margin: 0 0 10px; font-size: 14px; line-height: 1.45; }
+    .api-reference table {
+      margin: 10px 0 12px;
+      width: 100%;
+      font-size: 13px;
+    }
+    .api-reference td,
+    .api-reference th {
+      vertical-align: top;
+      padding: 7px 8px;
+    }
+    .api-reference pre {
+      margin: 0;
+      overflow-x: auto;
+      border: 1px solid var(--line);
+      background: #f8fafc;
+      border-radius: 6px;
+      padding: 10px;
+      font-size: 12px;
+      line-height: 1.45;
+    }
+    .api-reference code { font-size: 0.92em; }
+    .api-viewer { padding-block: 30px 40px; }
+    .api-viewer-head { margin-bottom: 16px; }
+    .api-viewer-head h1 { margin-top: 7px; }
+    .api-viewer-endpoint { margin: 10px 0 0; color: var(--muted); }
+    .api-json-panel { padding: 14px; }
+    .api-json {
+      width: 100%;
+      min-height: 420px;
+      max-height: calc(100vh - 260px);
+      margin: 0;
+      overflow: auto;
+      border: 0;
+      background: #f8fafc;
+      color: #1d2939;
+      font-family: var(--font-mono);
+      font-size: 12px;
+      line-height: 1.5;
+      white-space: pre;
+    }
+    .api-json code { padding: 0; background: transparent; }
+    .muted { color: var(--muted); }
+    .toolbar { display: flex; justify-content: space-between; gap: 12px; align-items: center; margin-bottom: 10px; }
+    .search {
+      width: min(620px, 100%);
+      border: 1px solid var(--line-strong);
+      background: #fff;
+      border-radius: 6px;
+      padding: 9px 11px;
+      font-size: 15px;
+      margin: 0;
+    }
+    .count { color: var(--muted); white-space: nowrap; }
+    .clear-filters {
+      display: none;
+      width: auto;
+      margin: 0;
+      padding: 5px 8px;
+      border: 0;
+      background: transparent;
+      color: var(--brand);
+      font-size: 13px;
+    }
+    .clear-filters.visible { display: inline-block; }
+    .package-list { display: grid; gap: 9px; }
+    .package-card {
+      border: 1px solid var(--line);
+      background: #fff;
+      border-radius: 7px;
+      padding: 12px;
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 12px;
+      margin: 0;
+      animation: rise-in 360ms cubic-bezier(.2, .7, .2, 1) both;
+    }
+    .package-card:nth-child(2) { animation-delay: 35ms; }
+    .package-card:nth-child(3) { animation-delay: 70ms; }
+    .package-card:nth-child(4) { animation-delay: 105ms; }
+    .package-card:hover { border-color: #bcc6ec; box-shadow: var(--shadow); transform: translateY(-2px); }
+    @keyframes rise-in {
+      from { opacity: 0; transform: translateY(7px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .kind-label {
+      display: inline-block;
+      margin-bottom: 5px;
+      color: var(--brand);
+      font-family: var(--font-mono);
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+    .package-title { display: flex; gap: 8px; align-items: baseline; flex-wrap: wrap; margin-bottom: 5px; }
+    .package-title a {
+      font-family: var(--font-mono);
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--ink);
+      overflow-wrap: anywhere;
+    }
+    .version {
+      font-family: var(--font-mono);
+      color: var(--muted);
+      font-size: 12px;
+      border: 1px solid var(--line);
+      border-radius: 4px;
+      padding: 2px 5px;
+      background: var(--soft);
+    }
+    .description { color: #343941; margin: 0 0 8px; line-height: 1.38; }
+    .meta-line { color: var(--muted); font-size: 13px; display: flex; gap: 14px; flex-wrap: wrap; }
+    .meta-line strong, .meta-line code { overflow-wrap: anywhere; }
+    .meta-line code { font-size: 12px; }
+    .card-actions { display: flex; gap: 8px; align-items: start; }
+    .card-actions a {
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      padding: 6px 8px;
+      background: var(--soft);
+      color: #29303a;
+      font-size: 13px;
+      margin: 0;
+      font-weight: 600;
+      transition: background 160ms ease, border-color 160ms ease, color 160ms ease;
+    }
+    .card-actions a:first-child { color: #fff; border-color: var(--brand); background: var(--brand); }
+    .card-actions a:hover { border-color: var(--brand); text-decoration: none; }
+    .card-side {
+      display: grid;
+      gap: 10px;
+      justify-items: end;
+      align-content: start;
+    }
+    .card-preview {
+      display: block;
+      width: 190px;
+      aspect-ratio: 4 / 3;
+      object-fit: cover;
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      background: var(--soft);
+    }
+    .tags { display: flex; gap: 5px; flex-wrap: wrap; margin-top: 8px; }
+    .tag {
+      border: 0;
+      border-radius: 999px;
+      padding: 3px 7px;
+      font-size: 12px;
+      cursor: pointer;
+      color: #1c2732;
+      margin: 0;
+    }
+    .tag-blue { background: #dcecf7; color: #164965; }
+    .tag-green { background: #dff0df; color: #23562a; }
+    .tag-gold { background: #f3e6bd; color: #6b4b10; }
+    .tag-cyan { background: #d8f0f0; color: #165456; }
+    .tag-purple { background: #eadff4; color: #4d2d68; }
+    .tag-slate { background: #e4e8ee; color: #344052; }
+    .tag-red { background: #f5ded8; color: #7b2c1f; }
+    .tag-gray { background: #ece8df; color: #4a4b4d; }
+    .detail-layout {
+      display: grid;
+      grid-template-columns: 1fr 340px;
+      gap: 14px;
+      align-items: start;
+      margin-top: 16px;
+    }
+    .detail-main, .detail-side { padding: 14px; }
+    .detail-main h2, .detail-side h2 { margin: 0 0 10px; font-size: 18px; }
+    .detail-side h2:not(:first-child) { margin-top: 16px; }
+    .kv {
+      display: grid;
+      grid-template-columns: 92px minmax(0, 1fr);
+      gap: 4px 10px;
+      font-size: 14px;
+      line-height: 1.32;
+      margin: 0 0 10px;
+    }
+    .kv div:nth-child(odd) { color: var(--muted); }
+    .kv div:nth-child(even) { min-width: 0; overflow-wrap: anywhere; }
+    .cap-list { margin: 0; padding-left: 0; list-style: none; display: grid; gap: 5px; }
+    .cap-list li {
+      font-family: var(--font-mono);
+      font-size: 13px;
+      border: 1px solid var(--line);
+      background: var(--soft);
+      border-radius: 5px;
+      padding: 6px 7px;
+      overflow-wrap: anywhere;
+      margin: 0;
+    }
+    .cap-list li span {
+      color: var(--muted);
+      display: inline-block;
+      min-width: 64px;
+    }
+    .detail-hero { padding: 20px 0 4px; }
+    .detail-hero h1 { font-family: var(--font-mono); }
+    .back { display: inline-block; margin: 0 0 12px; color: var(--brand); }
+    .generated { color: var(--muted); margin-top: 12px; font-size: 13px; }
+    .site-footer {
+      width: 100%;
+      max-width: none;
+      margin: 0;
+      padding: 0;
+      flex: 0 0 auto;
+      color: var(--muted);
+      border-top: 1px solid var(--line);
+      background: var(--paper);
+      font-size: 12px;
+    }
+    .site-footer .shell { padding-block: 18px 28px; }
+    .readme {
+      line-height: 1.58;
+      color: #1f2937;
+      overflow-wrap: anywhere;
+    }
+    .readme h1 { font-size: 24px; margin-bottom: 10px; }
+    .readme h2 { font-size: 19px; border-bottom: 1px solid var(--line); padding-bottom: 6px; margin: 22px 0 10px; }
+    .readme h3 { font-size: 16px; margin: 18px 0 8px; }
+    .readme p, .readme ul, .readme ol { margin-bottom: 10px; }
+    .readme pre {
+      overflow: auto;
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      background: #f8fafc;
+      padding: 10px;
+      max-width: 100%;
+    }
+    .readme code {
+      background: #f1f5f9;
+      border-radius: 4px;
+      padding: 1px 4px;
+      font-size: 0.92em;
+    }
+    .readme pre code { background: transparent; padding: 0; }
+    .readme .highlight { margin: 10px 0; }
+    .readme .highlight pre { margin: 0; }
+    .readme img { display: block; max-width: 100%; height: auto; border-radius: 7px; }
+    .readme table { border-collapse: collapse; width: 100%; display: block; overflow-x: auto; }
+    .readme th, .readme td { border: 1px solid var(--line); padding: 6px 8px; }
+    code { font-family: var(--font-mono); }
+    .catalog-hero {
+      padding: clamp(38px, 8vw, 82px) 0 24px;
+    }
+    .catalog-hero h1 {
+      max-width: none;
+      margin-top: 10px;
+      font-size: clamp(32px, 4.2vw, 50px);
+      line-height: 1.05;
+      letter-spacing: -0.045em;
+    }
+    .catalog-hero .lede { max-width: 690px; font-size: 17px; }
+    .hero-search { width: min(720px, 100%); margin-top: 24px; }
+    .hero-search input {
+      width: 100%;
+      height: 52px;
+      margin: 0;
+      padding: 0 18px;
+      border: 1px solid #b9c3df;
+      border-radius: 9px;
+      background: rgba(255, 255, 255, 0.96);
+      box-shadow: 0 14px 34px rgba(31, 43, 105, 0.1);
+      font-size: 16px;
+    }
+    .entry-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
+    .entry-card { position: relative; padding: 20px; }
+    .entry-card:hover { border-color: #bcc6ec; box-shadow: var(--shadow); transform: translateY(-2px); }
+    .entry-card h2 { margin: 0 0 7px; font-size: 19px; }
+    .entry-card strong { display: block; margin-top: 16px; color: var(--brand); font-size: 30px; line-height: 1; }
+    .entry-links { display: flex; flex-wrap: wrap; gap: 7px; margin-top: 14px; }
+    .entry-links a {
+      padding: 5px 8px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: var(--soft);
+      font-size: 12px;
+      font-weight: 600;
+    }
+    .home-results { padding: 14px; }
+    .home-results[hidden], .home-empty[hidden], .entry-grid[hidden] { display: none; }
+    .home-results-head { display: flex; justify-content: space-between; gap: 12px; margin-bottom: 10px; }
+    .home-result-list { display: grid; gap: 8px; }
+    .home-result {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 12px;
+      padding: 11px 12px;
+      border: 1px solid var(--line);
+      border-radius: 7px;
+      color: var(--ink);
+      background: #fff;
+    }
+    .home-result:hover { border-color: #bcc6ec; background: #fbfcff; text-decoration: none; }
+    .home-result-name { color: var(--brand-deep); font-family: var(--font-mono); font-weight: 700; overflow-wrap: anywhere; }
+    .home-result span { color: var(--muted); font-size: 13px; text-align: right; }
+    .home-empty { margin: 10px 0 0; color: var(--muted); }
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        scroll-behavior: auto !important;
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+      }
+    }
+    @media (max-width: 860px) {
+      .shell { width: min(100% - 28px, 1180px); }
+      main.shell { width: min(100% - 28px, 1180px); }
+      .topline { align-items: stretch; flex-direction: column; }
+      .api-links {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        justify-content: stretch;
+        width: 100%;
+      }
+      .api-links a { min-width: 0; text-align: center; overflow-wrap: anywhere; }
+      .catalog-frame, .detail-layout { grid-template-columns: 1fr; }
+      .detail-side { order: -1; }
+      .entry-grid { grid-template-columns: 1fr; }
+      .filters {
+        padding: 0;
+        position: static;
+        max-height: none;
+        overflow: visible;
+        scrollbar-gutter: auto;
+      }
+      .filters > summary {
+        display: block;
+        padding: 12px 14px;
+        color: var(--ink);
+        cursor: pointer;
+        font-weight: 700;
+        list-style-position: inside;
+      }
+      .filters[open] > summary { border-bottom: 1px solid var(--line); }
+      .filter-content { padding: 14px; }
+      .toolbar { align-items: stretch; flex-direction: column; }
+      .package-card { grid-template-columns: 1fr; }
+      .card-side { justify-items: start; }
+      .card-actions { justify-content: flex-start; }
+      .card-preview { width: min(100%, 360px); }
+      .api-reference-body { padding: 14px; }
+    }
+    @media (min-width: 861px) {
+      .catalog-hero h1 { white-space: nowrap; }
+    }
+    @media (max-width: 520px) {
+      body { font-size: 14px; }
+      .shell { width: min(100% - 20px, 1180px); }
+      main.shell { width: min(100% - 20px, 1180px); }
+      .site-header .shell { padding-block: 10px; }
+      .brand { font-size: 17px; overflow-wrap: anywhere; }
+      .brand small { display: none; }
+      .api-links { gap: 6px; }
+      .api-links a { padding: 7px 5px; font-size: 11px; }
+      .search-strip { padding: 12px 0; }
+      .content, .detail-main, .detail-side { padding: 12px; min-width: 0; }
+      .package-card { gap: 10px; padding: 11px; }
+      .package-title a { font-size: 14px; }
+      .card-actions { width: 100%; }
+      .card-actions a { flex: 1; text-align: center; }
+      .page-intro { padding-top: 20px; }
+      .catalog-hero { padding-top: 32px; }
+      .catalog-hero h1 { font-size: 34px; }
+      .catalog-hero .lede { font-size: 15px; }
+      .home-result { grid-template-columns: 1fr; gap: 3px; }
+      .home-result span { text-align: left; }
+      .kv { grid-template-columns: 1fr; gap: 2px; }
+      .kv div:nth-child(odd) { margin-top: 7px; font-size: 12px; font-weight: 700; }
+      .api-reference table,
+      .api-reference tbody,
+      .api-reference tr,
+      .api-reference td { display: block; width: 100%; }
+      .api-reference thead { display: none; }
+      .api-reference tr {
+        border: 1px solid var(--line);
+        border-radius: 6px;
+        margin-bottom: 8px;
+        overflow: hidden;
+      }
+      .api-reference td {
+        display: grid;
+        grid-template-columns: 76px minmax(0, 1fr);
+        gap: 8px;
+        border: 0;
+        border-bottom: 1px solid var(--line);
+        overflow-wrap: anywhere;
+      }
+      .api-reference td:last-child { border-bottom: 0; }
+      .api-reference td::before {
+        content: attr(data-label);
+        color: var(--muted);
+        font-size: 11px;
+        font-weight: 700;
+        letter-spacing: 0.03em;
+        text-transform: uppercase;
+      }
+    }
+pre { line-height: 125%; }
+td.linenos .normal { color: #666666; background-color: transparent; padding-left: 5px; padding-right: 5px; }
+span.linenos { color: #666666; background-color: transparent; padding-left: 5px; padding-right: 5px; }
+td.linenos .special { color: #000000; background-color: #ffffc0; padding-left: 5px; padding-right: 5px; }
+span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 5px; padding-right: 5px; }
+.highlight .hll { background-color: #ffffcc }
+.highlight { background: #f0f0f0; }
+.highlight .c { color: #60A0B0; font-style: italic } /* Comment */
+.highlight .err { border: 1px solid #F00 } /* Error */
+.highlight .k { color: #007020; font-weight: bold } /* Keyword */
+.highlight .o { color: #666 } /* Operator */
+.highlight .ch { color: #60A0B0; font-style: italic } /* Comment.Hashbang */
+.highlight .cm { color: #60A0B0; font-style: italic } /* Comment.Multiline */
+.highlight .cp { color: #007020 } /* Comment.Preproc */
+.highlight .cpf { color: #60A0B0; font-style: italic } /* Comment.PreprocFile */
+.highlight .c1 { color: #60A0B0; font-style: italic } /* Comment.Single */
+.highlight .cs { color: #60A0B0; background-color: #FFF0F0 } /* Comment.Special */
+.highlight .gd { color: #A00000 } /* Generic.Deleted */
+.highlight .ge { font-style: italic } /* Generic.Emph */
+.highlight .ges { font-weight: bold; font-style: italic } /* Generic.EmphStrong */
+.highlight .gr { color: #F00 } /* Generic.Error */
+.highlight .gh { color: #000080; font-weight: bold } /* Generic.Heading */
+.highlight .gi { color: #00A000 } /* Generic.Inserted */
+.highlight .go { color: #888 } /* Generic.Output */
+.highlight .gp { color: #C65D09; font-weight: bold } /* Generic.Prompt */
+.highlight .gs { font-weight: bold } /* Generic.Strong */
+.highlight .gu { color: #800080; font-weight: bold } /* Generic.Subheading */
+.highlight .gt { color: #04D } /* Generic.Traceback */
+.highlight .kc { color: #007020; font-weight: bold } /* Keyword.Constant */
+.highlight .kd { color: #007020; font-weight: bold } /* Keyword.Declaration */
+.highlight .kn { color: #007020; font-weight: bold } /* Keyword.Namespace */
+.highlight .kp { color: #007020 } /* Keyword.Pseudo */
+.highlight .kr { color: #007020; font-weight: bold } /* Keyword.Reserved */
+.highlight .kt { color: #902000 } /* Keyword.Type */
+.highlight .m { color: #40A070 } /* Literal.Number */
+.highlight .s { color: #4070A0 } /* Literal.String */
+.highlight .na { color: #4070A0 } /* Name.Attribute */
+.highlight .nb { color: #007020 } /* Name.Builtin */
+.highlight .nc { color: #0E84B5; font-weight: bold } /* Name.Class */
+.highlight .no { color: #60ADD5 } /* Name.Constant */
+.highlight .nd { color: #555; font-weight: bold } /* Name.Decorator */
+.highlight .ni { color: #D55537; font-weight: bold } /* Name.Entity */
+.highlight .ne { color: #007020 } /* Name.Exception */
+.highlight .nf { color: #06287E } /* Name.Function */
+.highlight .nl { color: #002070; font-weight: bold } /* Name.Label */
+.highlight .nn { color: #0E84B5; font-weight: bold } /* Name.Namespace */
+.highlight .nt { color: #062873; font-weight: bold } /* Name.Tag */
+.highlight .nv { color: #BB60D5 } /* Name.Variable */
+.highlight .ow { color: #007020; font-weight: bold } /* Operator.Word */
+.highlight .w { color: #BBB } /* Text.Whitespace */
+.highlight .mb { color: #40A070 } /* Literal.Number.Bin */
+.highlight .mf { color: #40A070 } /* Literal.Number.Float */
+.highlight .mh { color: #40A070 } /* Literal.Number.Hex */
+.highlight .mi { color: #40A070 } /* Literal.Number.Integer */
+.highlight .mo { color: #40A070 } /* Literal.Number.Oct */
+.highlight .sa { color: #4070A0 } /* Literal.String.Affix */
+.highlight .sb { color: #4070A0 } /* Literal.String.Backtick */
+.highlight .sc { color: #4070A0 } /* Literal.String.Char */
+.highlight .dl { color: #4070A0 } /* Literal.String.Delimiter */
+.highlight .sd { color: #4070A0; font-style: italic } /* Literal.String.Doc */
+.highlight .s2 { color: #4070A0 } /* Literal.String.Double */
+.highlight .se { color: #4070A0; font-weight: bold } /* Literal.String.Escape */
+.highlight .sh { color: #4070A0 } /* Literal.String.Heredoc */
+.highlight .si { color: #70A0D0; font-style: italic } /* Literal.String.Interpol */
+.highlight .sx { color: #C65D09 } /* Literal.String.Other */
+.highlight .sr { color: #235388 } /* Literal.String.Regex */
+.highlight .s1 { color: #4070A0 } /* Literal.String.Single */
+.highlight .ss { color: #517918 } /* Literal.String.Symbol */
+.highlight .bp { color: #007020 } /* Name.Builtin.Pseudo */
+.highlight .fm { color: #06287E } /* Name.Function.Magic */
+.highlight .vc { color: #BB60D5 } /* Name.Variable.Class */
+.highlight .vg { color: #BB60D5 } /* Name.Variable.Global */
+.highlight .vi { color: #BB60D5 } /* Name.Variable.Instance */
+.highlight .vm { color: #BB60D5 } /* Name.Variable.Magic */
+.highlight .il { color: #40A070 } /* Literal.Number.Integer.Long */
+  </style>
+</head>
+<body>
+  <header class="site-header">
+    <div class="shell topline">
+      <a class="brand" href="../../">
+        <img class="brand-mark" src="../../assets/robonix-mark.svg" alt="" aria-hidden="true" width="34" height="30">
+        <span>Robonix <small>Package Catalog</small></span>
+      </a>
+      <nav class="api-links" aria-label="Catalog navigation">
+        <a href="../../packages/" aria-current="page">Packages</a>
+        <a href="../../robots/">Robots</a>
+        <a href="../../api/view/">API</a>
+      </nav>
+    </div>
+  </header>
+  <script>
+    (() => {
+      const header = document.currentScript.previousElementSibling;
+      const updateHeaderHeight = () => {
+        const height = Math.ceil(header.getBoundingClientRect().height);
+        document.documentElement.style.setProperty('--site-header-height', `${height}px`);
+      };
+      updateHeaderHeight();
+      if ('ResizeObserver' in window) {
+        new ResizeObserver(updateHeaderHeight).observe(header);
+      } else {
+        window.addEventListener('resize', updateHeaderHeight, { passive: true });
+      }
+    })();
+  </script>
+  <header class="shell detail-hero">
+    <a class="back" href="../">Back to packages</a>
+    <h1>robonix.primitive.syswonder.minecraft_bot</h1>
+    <p class="lede">Minecraft Forge client primitive providing camera, chassis, perception, and Minecraft capabilities.</p>
+  </header>
+  <main class="shell">
+    <div class="detail-layout">
+      <section class="panel detail-main">
+        <h2>README</h2>
+        <article class="readme">
+          <h1>Robonix Minecraft primitive</h1>
+<p>This package connects a real Minecraft Java client to Robonix. A client-only
+Forge Mod captures the rendered framebuffer, applies bounded player controls,
+and serves a loopback JSON-lines interface. The Python package exposes that
+client through existing camera, chassis, perception, and Minecraft primitive
+contracts.</p>
+<h2>Versions</h2>
+<ul>
+<li>Minecraft Java 1.20.4</li>
+<li>Forge 49.2.0</li>
+<li>Eclipse Temurin OpenJDK 17.0.19+10</li>
+<li>ROS 2 Jazzy</li>
+<li>Robonix development baseline
+  <code>74b4ca0f7c0db3c237730321753501e12646c626</code></li>
+</ul>
+<p>The package tracks the latest Robonix development version. Compatibility is
+verified again for every package release; the commit above is the reproducible
+baseline for <code>v0.1.0</code>.</p>
+<p>The installed Java 21 can remain the system default. The build script uses
+<code>JAVA17_HOME</code>, defaulting to
+<code>$HOME/.local/share/jdks/jdk-17.0.19+10</code>.</p>
+<h2>Build</h2>
+<div class="highlight"><pre><span></span><code><span class="nv">JAVA_HOME</span><span class="o">=</span><span class="s2">&quot;</span><span class="nv">$HOME</span><span class="s2">/.local/share/jdks/jdk-17.0.19+10&quot;</span><span class="w"> </span>./gradlew<span class="w"> </span>build
+</code></pre></div>
+<p>Copy <code>build/libs/robonix_minecraft-0.1.0.jar</code> into the Forge 1.20.4 client's
+<code>mods/</code> directory, then launch the client and join the target world or server.
+The server does not need to install this Mod.
+Set the Forge launcher profile's Java executable to
+<code>$HOME/.local/share/jdks/jdk-17.0.19+10/bin/java</code>.</p>
+<p>With <code>rbnx</code> installed and configured against a compatible Robonix source tree,
+validate and build the complete package:</p>
+<div class="highlight"><pre><span></span><code>rbnx<span class="w"> </span>validate<span class="w"> </span>.
+rbnx<span class="w"> </span>build<span class="w"> </span>-p<span class="w"> </span>.
+</code></pre></div>
+<h2>Start</h2>
+<p>The package start entry launches the Forge development client, local viewer,
+and Python providers. Atlas must already be running:</p>
+<div class="highlight"><pre><span></span><code><span class="nv">RBNX_MINECRAFT_USE_NVIDIA</span><span class="o">=</span><span class="m">1</span><span class="w"> </span>rbnx<span class="w"> </span>start<span class="w"> </span>-p<span class="w"> </span>.<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--endpoint<span class="w"> </span><span class="m">127</span>.0.0.1:50051<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--set<span class="w"> </span><span class="nv">ready_timeout_ms</span><span class="o">=</span><span class="m">120000</span>
+</code></pre></div>
+<p>The Mod listens only on <code>127.0.0.1:25576</code>. The package reuses a client already
+listening there instead of launching another one. For a complete deployment,
+use <code>syswonder/robot-syswonder-minecraft_bot</code>, which owns the player URDF,
+Soma description, service selection, skill selection, and runtime parameters.</p>
+<p>Set <code>RBNX_MINECRAFT_USE_NVIDIA=1</code> to let boot start the client with NVIDIA
+Xorg. If NVIDIA rendering cannot be prepared, startup falls back to the
+inherited <code>DISPLAY</code>. Use <code>0</code> (the default) to use that display directly. Since
+boot is non-interactive, creating a new NVIDIA Xorg requires cached <code>sudo</code>
+authorization; otherwise startup falls back. For unattended startup, run a
+persistent NVIDIA Xorg service instead. An existing NVIDIA display requires no
+authorization. Boot also reuses a client already listening on the Mod command
+port.</p>
+<p>The package starts a local framebuffer viewer at <code>http://127.0.0.1:8765/</code>. The page
+shows the latest Mod JPEG beside a fixed-scale depth visualization without
+controlling the player. Depth colors cover 0 through 32 blocks, with invalid
+sky pixels shown as black. Set
+<code>RBNX_MINECRAFT_VIEWER_HOST=0.0.0.0</code> to listen on other interfaces only on a
+trusted network; the viewer has no authentication. A non-loopback bind also
+requires <code>RBNX_MINECRAFT_VIEWER_ALLOWED_HOST</code> to match the hostname or IP used
+in the browser URL. The port defaults to <code>8765</code> and can be changed with
+<code>RBNX_MINECRAFT_VIEWER_PORT</code>.</p>
+<p>Use <code>rbnx chat</code> from another terminal. The model can call the existing camera
+snapshot, depth snapshot, and chassis move capabilities; movement is applied
+to the same player whose framebuffer and GPU depth are captured. Depth uses
+little-endian <code>32FC1</code> metres with sky pixels set to <code>NaN</code>. When that player
+dies, the Mod automatically requests a respawn and releases any active
+movement key.</p>
+<p>Chassis move has three exclusive modes. <code>forward_m</code> is a signed relative
+distance in blocks (positive forward, negative backward, absolute value at
+most <code>32</code>). <code>rotate_deg</code> is a signed relative total yaw angle in degrees
+(positive left/counterclockwise, negative right/clockwise); it is not a speed.
+In velocity mode, <code>linear_x</code> and <code>linear_y</code> are player-relative speeds in
+blocks per second, with positive/negative values meaning forward/backward and
+left/right. Their combined magnitude cannot exceed <code>4.317</code>. <code>angular_z</code> and
+<code>angular_y</code> are yaw and pitch rates in radians per second, with
+positive/negative values meaning left/right and down/up. Their resulting
+relative angles equal the rate multiplied by <code>duration_sec</code>.</p>
+<p>Velocity fields can run together for <code>duration_sec</code>; zero selects one second,
+while an explicit duration must be from <code>0.05</code> through <code>30</code> seconds.
+<code>linear_z</code> and <code>angular_x</code> are unsupported and must remain zero. Keep fields
+from the other modes zero, and change one axis at a time for visual
+micro-adjustments before inspecting a new snapshot.</p>
+<p>The provider also publishes continuous ROS 2 RGB, depth in the RGB optical
+frame, camera intrinsics and extrinsics, and chassis odometry through their
+existing capability contracts. RGB is <code>rgb8</code>; depth is little-endian <code>32FC1</code>
+metres. The latched <code>CameraInfo</code> uses the active Minecraft vertical FOV and the
+actual scaled depth dimensions, so Scene receives calibration that matches
+each capture size.
+Depth and odometry headers retain their client-side capture timestamps so map
+services can associate each frame with the corresponding player pose.
+RGB and depth are acquired sequentially, not as an atomic pair, and either
+stream continues if the other capture fails. The odometry frame uses ROS ENU
+coordinates (<code>x</code> east, <code>y</code> north), treats one block as one metre, and places
+<code>minecraft_view_base</code> at the configurable nominal eye height so view pitch
+remains part of the published pose while camera extrinsics stay fixed.</p>
+<p>The provider also publishes exact semantic observations for visible chests,
+trapped chests, crafting tables, and furnaces. Discovery is local and occurs
+during exploration rather than preloading the world. Discovered blocks remain
+in the snapshot after the player leaves, while revisiting a changed location
+updates or removes its entry. Scene consumes this stream alongside visual
+perception, so exact Minecraft blocks do not depend on YOLO vocabulary.</p>
+<p>Pilot can also compose three Minecraft item-action capabilities directly:</p>
+<ul>
+<li><code>robonix/primitive/minecraft/inventory</code> reports main inventory slots 0-35
+  (hotbar 0-8) and offhand slot 40 with exact item registry names.</li>
+<li><code>robonix/primitive/minecraft/break_block</code> targets the block currently under
+  the crosshair, requires survival mode and either <code>minecraft:dirt</code> or
+  <code>minecraft:crafting_table</code>, and can wait for matching synchronized pickup
+  verification. It stops attacking and walks toward the former block centre
+  when collection is requested. Aim at the intended block before calling it.</li>
+<li><code>robonix/primitive/minecraft/deposit_item</code> accepts explicit chest coordinates
+  and transfers exactly one main-inventory <code>minecraft:dirt</code> or
+  <code>minecraft:crafting_table</code>, reporting synchronized player and container
+  counts.</li>
+</ul>
+<p>These capabilities use ordinary client interactions rather than changing the
+world directly. Targets must be loaded, visible, and within interaction reach.
+Only one break or deposit operation runs at a time; disconnect, death, menu
+replacement, timeout, or a failed server synchronization returns an error.
+A typical Pilot composition is inventory inspection, explicit dirt breaking,
+another inventory inspection, Scene chest discovery and navigation, deposit,
+and final inventory verification.</p>
+<h2>Command-line client</h2>
+<p>With the Minecraft server running and an X display available, start the Forge
+client and connect without using the Minecraft menus:</p>
+<div class="highlight"><pre><span></span><code><span class="nv">DISPLAY</span><span class="o">=</span>:10.0<span class="w"> </span>scripts/run-client.sh
+</code></pre></div>
+<p>The script waits up to 30 seconds for the server, then launches Minecraft with
+<code>--quickPlayMultiplayer</code>. It also disables the first-run accessibility prompt
+in the development client's <code>options.txt</code>, allowing Quick Play to proceed
+without a click. It uses these optional settings:</p>
+<ul>
+<li><code>MC_HOST</code>: Minecraft server host, default <code>127.0.0.1</code>.</li>
+<li><code>MC_PORT</code>: Minecraft server port, default <code>25565</code>.</li>
+<li><code>MC_USERNAME</code>: offline-mode username, default <code>robonix_agent</code>.</li>
+<li><code>MC_CLIENT_WIDTH</code>, <code>MC_CLIENT_HEIGHT</code>: client window size, default
+  <code>1280x720</code>.</li>
+<li><code>JAVA17_HOME</code>: JDK 17 location.</li>
+</ul>
+<p>This removes all in-game clicks but still needs a functioning X display and
+OpenGL renderer. A persistent NVIDIA Xorg display can replace the interactive
+desktop display for fully unattended operation.</p>
+<p>For an unattended NVIDIA-rendered client, use the wrapper script:</p>
+<div class="highlight"><pre><span></span><code>scripts/run-nvidia-client.sh
+</code></pre></div>
+<p>The script selects the NVIDIA GPU with the most free memory, starts a headless
+Xorg on <code>:48</code> through <code>sudo</code>, waits for it to initialize, and then runs the
+client. It reuses an existing <code>:48</code> display and only stops Xorg when it started
+that process itself. Only one wrapper may use a display at a time. Set
+<code>MC_NVIDIA_DISPLAY</code> to use another display number. Minecraft's
+<code>run/logs/latest.log</code> reports the active OpenGL renderer.</p>
+<h2>Configuration</h2>
+<ul>
+<li><code>RBNX_MINECRAFT_MOD_PORT</code>: loopback command port, default <code>25576</code>.</li>
+<li><code>RBNX_MINECRAFT_ROS_SETUP</code>: ROS 2 <code>setup.bash</code>; defaults to an installed
+  Jazzy or Humble setup.</li>
+<li><code>RBNX_MINECRAFT_CAMERA_STREAM_HZ</code>: RGB/depth publication rate, default <code>5</code>;
+  valid range <code>0.1</code> through <code>60</code>.</li>
+<li><code>RBNX_MINECRAFT_ODOM_HZ</code>: odometry publication rate, default <code>10</code>; valid
+  range <code>0.1</code> through <code>60</code>.</li>
+<li><code>RBNX_MINECRAFT_RGB_TOPIC</code>, <code>RBNX_MINECRAFT_DEPTH_TOPIC</code>,
+  <code>RBNX_MINECRAFT_EXTRINSICS_TOPIC</code>, <code>RBNX_MINECRAFT_INTRINSICS_TOPIC</code>,
+  <code>RBNX_MINECRAFT_ODOM_TOPIC</code>,
+  <code>RBNX_MINECRAFT_OBJECTS_TOPIC</code>: ROS 2 topic overrides.</li>
+<li><code>RBNX_MINECRAFT_CAMERA_FRAME_ID</code>, <code>RBNX_MINECRAFT_BASE_FRAME_ID</code>,
+  <code>RBNX_MINECRAFT_ODOM_FRAME_ID</code>: ROS frame overrides.</li>
+<li><code>RBNX_MINECRAFT_EYE_HEIGHT</code>: nominal player eye height in blocks, default
+  <code>1.62</code>; valid range <code>0</code> through <code>3</code>.</li>
+<li><code>RBNX_MINECRAFT_CAPTURE_INTERVAL_MS</code>: minimum capture interval, default <code>200</code>.</li>
+<li><code>RBNX_MINECRAFT_CAPTURE_WIDTH</code>: maximum RGB and depth capture width, default
+  <code>960</code>.</li>
+<li><code>RBNX_MINECRAFT_CAPTURE_HEIGHT</code>: maximum RGB and depth capture height,
+  default <code>540</code>. Capture scaling preserves the client framebuffer aspect ratio.</li>
+<li><code>RBNX_MINECRAFT_JPEG_QUALITY</code>: JPEG quality from <code>0.1</code> to <code>1.0</code>, default <code>0.8</code>.</li>
+<li><code>RBNX_MINECRAFT_BLOCK_RADIUS</code>: structured block scan radius, default <code>5</code>.</li>
+<li><code>RBNX_MINECRAFT_MOD_HOST</code>: provider connection host, default <code>127.0.0.1</code>.</li>
+<li><code>RBNX_MINECRAFT_MOD_TIMEOUT_SEC</code>: provider command timeout, default <code>35</code>;
+  valid range <code>0.1</code> through <code>300</code>.</li>
+<li><code>RBNX_MINECRAFT_VIEWER_HOST</code>: web viewer bind host, default <code>127.0.0.1</code>.</li>
+<li><code>RBNX_MINECRAFT_VIEWER_ALLOWED_HOST</code>: accepted browser <code>Host</code> when using a
+  non-loopback bind; unset for the default localhost-only viewer.</li>
+<li><code>RBNX_MINECRAFT_VIEWER_PORT</code>: web viewer port, default <code>8765</code>.</li>
+<li><code>RBNX_MINECRAFT_VIEWER_INTERVAL_MS</code>: framebuffer refresh interval, default
+  <code>200</code> with a minimum of <code>50</code>.</li>
+<li><code>RBNX_MINECRAFT_MOD_READY_TIMEOUT_MS</code>: provider initialization timeout,
+  default <code>30000</code>. A deployment can supply a larger <code>ready_timeout_ms</code> through
+  provider configuration so the Forge client has time to start.</li>
+</ul>
+<p>The capture contains the final rendered client image, including HUD and open
+screens. Keep the client visible and rendering; minimized clients may stop or
+throttle framebuffer updates depending on the desktop environment.</p>
+<h2>Provenance</h2>
+<p>This package was extracted from <code>examples/minecraft-mod</code> in
+<code>syswonder/robonix</code> at commit
+<code>e30b99b4ca606d5a3463e9c42d7df2de81d680c4</code>. It is distributed under the
+MulanPSL-2.0 license included in this repository.</p>
+        </article>
+      </section>
+      <aside class="panel detail-side">
+        <h2>Package</h2>
+        <div class="kv">
+          <div>Version</div><div><code>0.1.0</code></div>
+          <div>License</div><div><code>MulanPSL-2.0</code></div>
+          <div>Kind</div><div>primitive</div>
+          <div>Type</div><div>package</div>
+          <div>Maintainers</div><div>ZZJJWarth &lt;jzeng25@stu.pku.edu.cn&gt;</div>
+          <div>Repository</div><div><a href="https://github.com/syswonder/primitive-syswonder-minecraft_bot-rbnx">primitive-syswonder-minecraft_bot-rbnx</a></div>
+          <div>Branch</div><div><code>main</code></div>
+          <div>Manifest</div><div><code>package_manifest.yaml</code></div>
+          <div>API</div><div><a href="../../api/view/?package=robonix.primitive.syswonder.minecraft_bot">package metadata</a></div>
+        </div>
+        <div class="tags"><button class="tag tag-blue" data-tag="primitive">primitive</button> <button class="tag tag-gray" data-tag="minecraft">minecraft</button> <button class="tag tag-gray" data-tag="simulation">simulation</button> <button class="tag tag-cyan" data-tag="camera">camera</button> <button class="tag tag-red" data-tag="chassis">chassis</button> <button class="tag tag-gray" data-tag="perception">perception</button></div>
+        <h2>Capabilities</h2>
+        <ul class="cap-list">
+          <li>robonix/primitive/camera/snapshot</li>
+<li>robonix/primitive/camera/depth_snapshot</li>
+<li>robonix/primitive/camera/rgb</li>
+<li>robonix/primitive/camera/depth</li>
+<li>robonix/primitive/camera/extrinsics</li>
+<li>robonix/primitive/camera/intrinsics</li>
+<li>robonix/primitive/camera/driver</li>
+<li>robonix/primitive/chassis/move</li>
+<li>robonix/primitive/chassis/odom</li>
+<li>robonix/primitive/chassis/driver</li>
+<li>robonix/primitive/perception/objects</li>
+<li>robonix/primitive/minecraft/inventory</li>
+<li>robonix/primitive/minecraft/break_block</li>
+<li>robonix/primitive/minecraft/deposit_item</li>
+        </ul>
+      </aside>
+    </div>
+  </main>
+  <footer class="site-footer"><div class="shell">Generated on 2026-07-22T09:12:48+00:00.</div></footer>
+</body>
+</html>

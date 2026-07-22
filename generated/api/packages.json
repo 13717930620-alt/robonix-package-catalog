@@ -1,6 +1,6 @@
 {
   "api_version": "1",
-  "generated_at": "2026-07-21T19:52:27+00:00",
+  "generated_at": "2026-07-22T09:12:48+00:00",
   "packages": [
     {
       "name": "robonix.primitive.agilex.piper.arm",
@@ -405,6 +405,48 @@
       "preview_image_url": ""
     },
     {
+      "name": "robonix.primitive.syswonder.minecraft_bot",
+      "version": "0.1.0",
+      "description": "Minecraft Forge client primitive providing camera, chassis, perception, and Minecraft capabilities.",
+      "license": "MulanPSL-2.0",
+      "tags": [
+        "primitive",
+        "minecraft",
+        "simulation",
+        "camera",
+        "chassis",
+        "perception"
+      ],
+      "repo": "https://github.com/syswonder/primitive-syswonder-minecraft_bot-rbnx",
+      "maintainers": [
+        "ZZJJWarth <jzeng25@stu.pku.edu.cn>"
+      ],
+      "repo_name": "primitive-syswonder-minecraft_bot-rbnx",
+      "default_branch": "main",
+      "kind": "primitive",
+      "catalog_type": "package",
+      "manifest": "package_manifest.yaml",
+      "capabilities": [
+        "robonix/primitive/camera/snapshot",
+        "robonix/primitive/camera/depth_snapshot",
+        "robonix/primitive/camera/rgb",
+        "robonix/primitive/camera/depth",
+        "robonix/primitive/camera/extrinsics",
+        "robonix/primitive/camera/intrinsics",
+        "robonix/primitive/camera/driver",
+        "robonix/primitive/chassis/move",
+        "robonix/primitive/chassis/odom",
+        "robonix/primitive/chassis/driver",
+        "robonix/primitive/perception/objects",
+        "robonix/primitive/minecraft/inventory",
+        "robonix/primitive/minecraft/break_block",
+        "robonix/primitive/minecraft/deposit_item"
+      ],
+      "deploy_dependencies": [],
+      "readme_url": "https://github.com/syswonder/primitive-syswonder-minecraft_bot-rbnx/blob/main/README.md",
+      "preview_image_url": ""
+    },
+    {
       "name": "robonix.service.grasp_pose",
       "version": "0.1.0",
       "description": "Geometric grasp-pose estimator (gRPC).",
@@ -468,6 +510,67 @@
       ],
       "deploy_dependencies": [],
       "readme_url": "https://github.com/syswonder/service-map-rbnx/blob/main/README.md",
+      "preview_image_url": ""
+    },
+    {
+      "name": "robonix.service.minecraft_costmap",
+      "version": "0.1.0",
+      "description": "Minecraft depth and exact-odometry 2D mapping service.",
+      "license": "MulanPSL-2.0",
+      "tags": [
+        "service",
+        "minecraft",
+        "mapping",
+        "costmap",
+        "navigation"
+      ],
+      "repo": "https://github.com/syswonder/service-minecraft-costmap-rbnx",
+      "maintainers": [
+        "ZZJJWarth <jzeng25@stu.pku.edu.cn>"
+      ],
+      "repo_name": "service-minecraft-costmap-rbnx",
+      "default_branch": "main",
+      "kind": "service",
+      "catalog_type": "package",
+      "manifest": "package_manifest.yaml",
+      "capabilities": [
+        "robonix/service/map/driver",
+        "robonix/service/map/pose",
+        "robonix/service/map/occupancy_grid"
+      ],
+      "deploy_dependencies": [],
+      "readme_url": "https://github.com/syswonder/service-minecraft-costmap-rbnx/blob/main/README.md",
+      "preview_image_url": ""
+    },
+    {
+      "name": "robonix.service.minecraft_navigation",
+      "version": "0.1.0",
+      "description": "Minecraft occupancy-grid navigation service.",
+      "license": "MulanPSL-2.0",
+      "tags": [
+        "service",
+        "minecraft",
+        "navigation",
+        "path-planning",
+        "costmap"
+      ],
+      "repo": "https://github.com/syswonder/service-minecraft-navigation-rbnx",
+      "maintainers": [
+        "ZZJJWarth <jzeng25@stu.pku.edu.cn>"
+      ],
+      "repo_name": "service-minecraft-navigation-rbnx",
+      "default_branch": "main",
+      "kind": "service",
+      "catalog_type": "package",
+      "manifest": "package_manifest.yaml",
+      "capabilities": [
+        "robonix/service/navigation/driver",
+        "robonix/service/navigation/navigate",
+        "robonix/service/navigation/navigate/status",
+        "robonix/service/navigation/navigate/cancel"
+      ],
+      "deploy_dependencies": [],
+      "readme_url": "https://github.com/syswonder/service-minecraft-navigation-rbnx/blob/main/README.md",
       "preview_image_url": ""
     },
     {
@@ -652,6 +755,37 @@
       ],
       "deploy_dependencies": [],
       "readme_url": "https://github.com/syswonder/skill-explore-rbnx/blob/main/README.md",
+      "preview_image_url": ""
+    },
+    {
+      "name": "robonix.skill.minecraft_explore",
+      "version": "0.1.0",
+      "description": "Frontier-based exploration skill for the Minecraft example.",
+      "license": "MulanPSL-2.0",
+      "tags": [
+        "skill",
+        "minecraft",
+        "exploration",
+        "frontier",
+        "navigation"
+      ],
+      "repo": "https://github.com/syswonder/skill-minecraft-explore-rbnx",
+      "maintainers": [
+        "ZZJJWarth <jzeng25@stu.pku.edu.cn>"
+      ],
+      "repo_name": "skill-minecraft-explore-rbnx",
+      "default_branch": "main",
+      "kind": "skill",
+      "catalog_type": "package",
+      "manifest": "package_manifest.yaml",
+      "capabilities": [
+        "robonix/skill/explore/driver",
+        "robonix/skill/explore/explore",
+        "robonix/skill/explore/explore/status",
+        "robonix/skill/explore/explore/cancel"
+      ],
+      "deploy_dependencies": [],
+      "readme_url": "https://github.com/syswonder/skill-minecraft-explore-rbnx/blob/main/README.md",
       "preview_image_url": ""
     },
     {
