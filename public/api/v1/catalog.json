@@ -1,6 +1,6 @@
 {
   "api_version": "1",
-  "generated_at": "2026-07-22T09:12:48+00:00",
+  "generated_at": "2026-07-22T14:40:16+00:00",
   "packages": [
     {
       "name": "robonix.primitive.agilex.piper.arm",
@@ -864,7 +864,7 @@
         }
       ],
       "readme_url": "https://github.com/syswonder/robot-syswonder-minecraft_bot/blob/main/README.md",
-      "preview_image_url": ""
+      "preview_image_url": "https://raw.githubusercontent.com/syswonder/robot-syswonder-minecraft_bot/main/assets/robot.jpg"
     },
     {
       "name": "robonix.robot.unitree.go2",
