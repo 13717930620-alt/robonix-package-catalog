@@ -805,6 +805,40 @@ only a starting template. Copy it into the robot deployment repository and set
 <code>rtabmap_params</code> applies after the deploy-owned file.</p>
 <p>With external odometry, <code>deskew_lidar</code> compensates each PointCloud2 point in
 the odom frame before SLAM. Bind only the sensor roles Mapping should consume.</p>
+<h3>Separate localization and navigation odometry</h3>
+<p>Some robots need accurate ICP/RGB-D odometry for RTAB-Map localization but a
+lower-latency chassis odometry stream for navigation. Enable the optional
+split-odometry bridge for this setup:</p>
+<div class="highlight"><pre><span></span><code><span class="nt">service</span><span class="p">:</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">mapping</span>
+<span class="w">    </span><span class="nt">url</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">https://github.com/syswonder/service-map-rbnx</span>
+<span class="w">    </span><span class="nt">config</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">algo</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">rtabmap</span>
+<span class="w">      </span><span class="nt">base_frame</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">base_link</span>
+
+<span class="w">      </span><span class="c1"># Private RTAB-Map odometry frame.</span>
+<span class="w">      </span><span class="nt">odom_frame</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">odom_icp</span>
+
+<span class="w">      </span><span class="c1"># Public chassis odometry used by navigation.</span>
+<span class="w">      </span><span class="nt">navigation_odom_bridge</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
+<span class="w">      </span><span class="nt">navigation_odom_topic</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/odom</span>
+<span class="w">      </span><span class="nt">navigation_odom_frame</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">odom</span>
+
+<span class="w">      </span><span class="nt">sensor_providers</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">lidar3d</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">roof_lidar</span>
+<span class="w">        </span><span class="c1"># Do not bind odom in split-odometry mode.</span>
+</code></pre></div>
+<p>In this mode, RTAB-Map uses an internal message-only odometry trajectory in
+<code>odom_icp</code>, the chassis owns <code>odom -&gt; base_link</code>, and Mapping publishes the
+correction required by navigation:</p>
+<div class="highlight"><pre><span></span><code>map -&gt; odom -&gt; base_link
+</code></pre></div>
+<p>The bridge computes <code>map -&gt; odom</code> from RTAB-Map localization and the two
+timestamp-aligned odometry poses. <code>odom_frame</code> and <code>navigation_odom_frame</code>
+must be different, and <code>sensor_providers.odom</code> must not be configured.</p>
+<p>The feature defaults to <code>false</code>; existing external- and internal-odometry
+deployments are unchanged. See <a href="https://github.com/syswonder/service-map-rbnx/blob/main/config.spec">config.spec</a> for the complete
+field definitions.</p>
 <h2>Deployment targets</h2>
 <p>One package, three targets (selected by the deploy <code>manifest:</code> field — see
 <a href="https://github.com/syswonder/service-map-rbnx/blob/main/CAPABILITY.md#deployment-targets">CAPABILITY.md</a>):</p>
@@ -905,6 +939,8 @@ untrusted network.</p>
 ├── package_manifest.jetson-native.yaml   arm64 Jetson + host ROS2
 ├── CAPABILITY.md                         capability surface + config spec
 ├── src/mapping_rbnx/atlas_bridge.py      cap registration, sensor discovery, persistence
+├── src/mapping_rbnx/map_to_odom_bridge.py optional split-odometry TF bridge
+├── src/mapping_rbnx/odom_bridge_math.py   planar transform and interpolation helpers
 ├── launch/rtabmap_2d.launch.py           sensor-agnostic rtabmap launch
 ├── scripts/
 │   ├── build.sh                          per-target build
@@ -958,6 +994,6 @@ untrusted network.</p>
       </aside>
     </div>
   </main>
-  <footer class="site-footer"><div class="shell">Generated on 2026-07-22T19:44:55+00:00.</div></footer>
+  <footer class="site-footer"><div class="shell">Generated on 2026-07-23T19:46:49+00:00.</div></footer>
 </body>
 </html>

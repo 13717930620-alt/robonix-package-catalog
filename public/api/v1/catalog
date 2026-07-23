@@ -1,6 +1,6 @@
 {
   "api_version": "1",
-  "generated_at": "2026-07-22T19:44:55+00:00",
+  "generated_at": "2026-07-23T19:46:49+00:00",
   "packages": [
     {
       "name": "robonix.primitive.agilex.piper.arm",
@@ -789,12 +789,12 @@
         {
           "section": "service",
           "name": "nav2",
-          "repo": "https://github.com/syswonder/service-navigation-rbnx.git",
+          "repo": "https://github.com/syswonder/service-navigation-rbnx",
           "path": "",
           "branch": "main",
           "manifest": "package_manifest.jetson-native.yaml",
-          "package_name": "",
-          "package_url": ""
+          "package_name": "robonix.service.navigation",
+          "package_url": "../robonix.service.navigation/"
         }
       ],
       "readme_url": "https://github.com/syswonder/robot-deep_robotics-lite3/blob/main/README.md",
