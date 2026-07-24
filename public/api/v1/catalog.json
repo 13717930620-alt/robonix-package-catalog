@@ -1,6 +1,6 @@
 {
   "api_version": "1",
-  "generated_at": "2026-07-23T19:46:49+00:00",
+  "generated_at": "2026-07-24T19:47:53+00:00",
   "packages": [
     {
       "name": "robonix.primitive.agilex.piper.arm",
@@ -1092,9 +1092,29 @@
         },
         {
           "section": "service",
+          "name": "memory",
+          "repo": "",
+          "path": "${ROBONIX_SOURCE_PATH}/services/memsearch",
+          "branch": "",
+          "manifest": "",
+          "package_name": "",
+          "package_url": ""
+        },
+        {
+          "section": "service",
           "name": "speech",
           "repo": "",
           "path": "${ROBONIX_SOURCE_PATH}/services/speech",
+          "branch": "",
+          "manifest": "",
+          "package_name": "",
+          "package_url": ""
+        },
+        {
+          "section": "service",
+          "name": "voiceprint",
+          "repo": "",
+          "path": "${ROBONIX_SOURCE_PATH}/services/voiceprint",
           "branch": "",
           "manifest": "",
           "package_name": "",

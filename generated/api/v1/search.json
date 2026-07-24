@@ -1089,9 +1089,29 @@
       },
       {
         "section": "service",
+        "name": "memory",
+        "repo": "",
+        "path": "${ROBONIX_SOURCE_PATH}/services/memsearch",
+        "branch": "",
+        "manifest": "",
+        "package_name": "",
+        "package_url": ""
+      },
+      {
+        "section": "service",
         "name": "speech",
         "repo": "",
         "path": "${ROBONIX_SOURCE_PATH}/services/speech",
+        "branch": "",
+        "manifest": "",
+        "package_name": "",
+        "package_url": ""
+      },
+      {
+        "section": "service",
+        "name": "voiceprint",
+        "repo": "",
+        "path": "${ROBONIX_SOURCE_PATH}/services/voiceprint",
         "branch": "",
         "manifest": "",
         "package_name": "",
