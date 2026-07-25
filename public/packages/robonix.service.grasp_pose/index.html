@@ -752,12 +752,64 @@ robonix/service/perception/grasp_pose/grasp_request
 <li>Project <code>[u, v, 1]</code> through the required 3x3 homography to get
    arm-plane <code>(x, y)</code>.</li>
 <li>Apply optional global <code>bias_x</code> / <code>bias_y</code>.</li>
-<li>Estimate gripper yaw from the bbox long edge.</li>
+<li>Pick the gripper yaw: if the request carries a usable
+   <code>orientation</code> label (<code>vertical</code> / <code>horizontal</code> / <code>diag_tlbr</code> /
+   <code>diag_trbl</code>), the yaw is looked up directly from
+   <code>_ORIENTATION_YAW_RAD</code>; otherwise (<code>unknown</code> / empty / unrecognized)
+   fall back to the bbox-long-edge estimator
+   <code>_gripper_angle_by_longer</code>.</li>
 <li>Apply <code>catch_offset</code> along the yaw direction.</li>
 <li>Use <code>default_desktop_height</code> as the final grasp z.</li>
 <li>Return a vertical-down <code>PoseStamped</code> in <code>output_frame</code>, default
    <code>arm/base_link</code>.</li>
 </ol>
+<h3>Orientation → yaw mapping</h3>
+<p>The convention is that yaw is the angle of the gripper's <em>closing line</em>
+(between the two fingertips) w.r.t. the image x-axis, in <code>(-π/2, π/2]</code>.
+The gripper closing line is placed <strong>perpendicular</strong> to the object's
+principal axis, so:</p>
+<table>
+<thead>
+<tr>
+<th>detector label</th>
+<th>object long axis</th>
+<th>gripper yaw</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>horizontal</code></td>
+<td><code>—</code></td>
+<td><code>+π/2</code></td>
+</tr>
+<tr>
+<td><code>vertical</code></td>
+<td>|</td>
+<td><code>0</code></td>
+</tr>
+<tr>
+<td><code>diag_tlbr</code></td>
+<td><code>\</code></td>
+<td><code>-π/4</code></td>
+</tr>
+<tr>
+<td><code>diag_trbl</code></td>
+<td><code>/</code></td>
+<td><code>+π/4</code></td>
+</tr>
+<tr>
+<td><code>unknown</code> / "" / other</td>
+<td>—</td>
+<td>fallback: bbox long edge</td>
+</tr>
+</tbody>
+</table>
+<p>The server logs which branch fired: look for
+<code>yaw=&lt;value&gt; (via orientation=…)</code> vs <code>yaw=&lt;value&gt; (via bbox_long_edge)</code>.
+The success <code>message</code> field also echoes <code>yaw_via=…</code> for quick
+inspection from the pick_skill side. The detector's own 180°
+camera-to-arm remap is already applied upstream (in <code>llm_detect</code>), so
+<code>grasp_pose</code> does not flip the label a second time.</p>
 <p>Depth, camera intrinsics, and TF are intentionally not used.</p>
 <h2>Required Config</h2>
 <p>Runtime config comes from <code>robonix_manifest.yaml</code>:</p>
@@ -839,6 +891,6 @@ rbnx<span class="w"> </span>boot
       </aside>
     </div>
   </main>
-  <footer class="site-footer"><div class="shell">Generated on 2026-07-24T19:47:53+00:00.</div></footer>
+  <footer class="site-footer"><div class="shell">Generated on 2026-07-25T19:35:29+00:00.</div></footer>
 </body>
 </html>

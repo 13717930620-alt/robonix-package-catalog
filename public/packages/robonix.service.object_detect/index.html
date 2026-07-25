@@ -816,6 +816,82 @@ rbnx<span class="w"> </span>ask<span class="w"> </span><span class="s2">&quot;wh
 
 <span class="c1"># The package intentionally has no direct ROS service surface.</span>
 </code></pre></div>
+<h2>Orientation output (branch <code>feature/orientation-detection</code>)</h2>
+<p>In addition to the tight bounding box, the LLM is now asked to also
+return a <strong>coarse 4-way orientation</strong> for the primary target, using the
+object's principal / long axis:</p>
+<table>
+<thead>
+<tr>
+<th>label</th>
+<th>meaning</th>
+<th>stroke</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>vertical</code></td>
+<td>long axis is roughly up-down</td>
+<td><code>|</code></td>
+</tr>
+<tr>
+<td><code>horizontal</code></td>
+<td>long axis is roughly left-right</td>
+<td><code>--</code></td>
+</tr>
+<tr>
+<td><code>diag_tlbr</code></td>
+<td>top-left → bottom-right</td>
+<td><code>\</code></td>
+</tr>
+<tr>
+<td><code>diag_trbl</code></td>
+<td>top-right → bottom-left</td>
+<td><code>/</code></td>
+</tr>
+<tr>
+<td><code>unknown</code></td>
+<td>round / symmetric / no clear axis, or low confidence</td>
+<td>(none)</td>
+</tr>
+</tbody>
+</table>
+<p>The orientation is:</p>
+<ul>
+<li>constrained via the strict JSON schema in
+  <code>llm_detect/main.py</code> (<code>ORIENTATION_LABELS</code>);</li>
+<li>normalized (<code>_normalize_orientation</code>) so common LLM aliases like
+  <code>up-down</code>, <code>landscape</code>, <code>slash</code>, <code>\</code> all fold onto the 4 canonical
+  labels;</li>
+<li>rendered on the debug image (<code>~/.cache/robonix/object_detect/latest_ok.jpg</code>)
+  as a <strong>magenta stroke inside the bbox</strong> — a different color from the
+  green/yellow target box and the orange other-object boxes;</li>
+<li>returned to the caller inside the <code>detect_object</code> result as
+  <code>orientation</code>.</li>
+</ul>
+<p>When <code>rotation_cam2arm</code> is enabled the image is flipped 180°; since
+these labels describe an unsigned axis, they are invariant under 180°
+rotation and passed through unchanged.</p>
+<h2>Standalone local test</h2>
+<p><code>scripts/test_local.py</code> lets you run the exact same prompt + schema on
+a <strong>single local image</strong>, without ROS or robonix_api, and drops an
+annotated JPEG with the bbox + orientation stroke. Useful for
+prompt-tuning and CI smoke tests.</p>
+<div class="highlight"><pre><span></span><code>pip<span class="w"> </span>install<span class="w"> </span>opencv-python<span class="w"> </span>openai<span class="w"> </span>toml
+python<span class="w"> </span>scripts/test_local.py<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--image<span class="w">  </span>/path/to/frame.jpg<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--object<span class="w"> </span>banana<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--base-url<span class="w"> </span>https://api.openai.com/v1<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--model<span class="w">    </span>gpt-4o<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--api-key<span class="w">  </span>sk-...<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--output<span class="w">   </span>/tmp/detect_out.jpg<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--dump-json<span class="w"> </span>/tmp/detect_out.json
+</code></pre></div>
+<p>Env fallbacks (used when the matching flag is omitted):
+<code>LLM_BASE_URL</code>, <code>LLM_MODEL</code>, <code>LLM_API_KEY</code>, <code>LLM_TEMPERATURE</code>.</p>
+<p>Exit codes: <code>0</code> = target found + annotated, <code>1</code> = LLM said not found,
+<code>2/3/4/5/64/66/70</code> = various IO / API / dependency errors (see script
+source).</p>
 <h2>License</h2>
 <p>This package: MulanPSL-2.0.</p>
         </article>
@@ -842,6 +918,6 @@ rbnx<span class="w"> </span>ask<span class="w"> </span><span class="s2">&quot;wh
       </aside>
     </div>
   </main>
-  <footer class="site-footer"><div class="shell">Generated on 2026-07-24T19:47:53+00:00.</div></footer>
+  <footer class="site-footer"><div class="shell">Generated on 2026-07-25T19:35:29+00:00.</div></footer>
 </body>
 </html>

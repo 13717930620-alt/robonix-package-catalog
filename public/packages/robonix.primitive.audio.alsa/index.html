@@ -760,9 +760,12 @@ such as <code>hw:1,0</code>. The complete configuration surface and defaults are
 <div class="highlight"><pre><span></span><code>rbnx<span class="w"> </span>build
 rbnx<span class="w"> </span>boot
 </code></pre></div>
-<p><code>rbnx build</code> generates the contract bindings and creates a package-owned Python
-environment. During <code>Driver(CMD_INIT)</code>, the primitive scans ALSA and initializes
-the selected capture and playback devices.</p>
+<p><code>rbnx build</code> first creates an isolated package-owned Python environment, installs
+the pinned protobuf/gRPC compiler and runtime into it, and then generates the
+contract bindings with that same interpreter. The build imports every generated
+<code>*_pb2.py</code> and <code>*_pb2_grpc.py</code> module before accepting the package. At runtime,
+the primitive reuses this environment. During <code>Driver(CMD_INIT)</code>, it scans ALSA
+and initializes the selected capture and playback devices.</p>
 <h2>Capabilities</h2>
 <table>
 <thead>
@@ -799,6 +802,7 @@ rate, preferring 16 kHz. The speaker path defaults to mono, 16-bit PCM at
 24 kHz. Consumers must send PCM matching the configured format.</p>
 <h2>Development checks</h2>
 <div class="highlight"><pre><span></span><code>python3<span class="w"> </span>-m<span class="w"> </span>unittest<span class="w"> </span>-v<span class="w"> </span>test_speaker_driver.py
+python3<span class="w"> </span>-m<span class="w"> </span>unittest<span class="w"> </span>discover<span class="w"> </span>-s<span class="w"> </span>tests<span class="w"> </span>-v
 rbnx<span class="w"> </span>build
 </code></pre></div>
 <p>The package uses <code>arecord</code> and <code>aplay</code> only at runtime; the unit test does not
@@ -830,6 +834,6 @@ access an audio device.</p>
       </aside>
     </div>
   </main>
-  <footer class="site-footer"><div class="shell">Generated on 2026-07-24T19:47:53+00:00.</div></footer>
+  <footer class="site-footer"><div class="shell">Generated on 2026-07-25T19:35:29+00:00.</div></footer>
 </body>
 </html>
