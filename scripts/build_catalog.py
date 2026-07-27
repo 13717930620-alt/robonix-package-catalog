@@ -1372,7 +1372,7 @@ def render_site(public_dir: Path, generated_at: str, packages: list[dict]) -> No
       <div class="home-result-list">{''.join(home_results)}</div>
       <p class="home-empty" id="homeEmpty" hidden>No catalog entries match that search.</p>
     </section>
-    <details class="panel api-reference">
+    <details class="panel api-reference" open>
       <summary>Catalog API</summary>
       <div class="api-reference-body">
       <h2>API Reference</h2>
