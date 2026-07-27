@@ -1,5 +1,6 @@
 import importlib.util
 import io
+import json
 import tempfile
 import unittest
 from pathlib import Path
@@ -238,6 +239,52 @@ class RobotListingTests(unittest.TestCase):
         self.assertIn("python scripts/build_catalog.py", workflow)
         self.assertGreaterEqual(workflow.count("- assets/**"), 2)
 
+    def test_theme_switcher_defaults_to_auto_and_is_present_on_every_page_type(self):
+        package = {
+            "name": "robonix.service.example",
+            "version": "0.1.0",
+            "kind": "service",
+            "description": "Example service",
+            "license": "Apache-2.0",
+            "repo": "https://github.com/syswonder/example-service",
+            "repo_name": "example-service",
+            "default_branch": "main",
+            "catalog_type": "package",
+            "manifest": "package_manifest.yaml",
+            "tags": ["service"],
+            "maintainers": ["Example <example@example.com>"],
+            "capabilities": ["robonix/service/example"],
+            "deploy_dependencies": [],
+            "_readme_markdown": "",
+        }
+
+        with tempfile.TemporaryDirectory() as tmp:
+            public = Path(tmp)
+            BUILD_CATALOG.render_site(public, "2026-07-27T00:00:00+00:00", [package])
+            BUILD_CATALOG.render_package_pages(
+                public, "2026-07-27T00:00:00+00:00", [package]
+            )
+            pages = [
+                public / "index.html",
+                public / "packages" / "index.html",
+                public / "api" / "view" / "index.html",
+                public / "packages" / "robonix.service.example" / "index.html",
+            ]
+
+            for page in pages:
+                rendered = page.read_text()
+                self.assertIn("robonix-catalog-theme", rendered)
+                self.assertIn('data-theme-choice="auto"', rendered)
+                self.assertIn('data-theme-choice="light"', rendered)
+                self.assertIn('data-theme-choice="dark"', rendered)
+                self.assertIn("let preference = 'auto'", rendered)
+                self.assertIn("prefers-color-scheme: dark", rendered)
+                self.assertIn(
+                    "localStorage.setItem(storageKey, safePreference)", rendered
+                )
+                self.assertIn("media.addEventListener?.('change'", rendered)
+                self.assertIn('html[data-theme="dark"]', rendered)
+
     def test_api_writer_keeps_extensionless_resource_and_json_preview(self):
         with tempfile.TemporaryDirectory() as tmp:
             target = Path(tmp) / "api" / "v1" / "catalog"
@@ -316,6 +363,60 @@ class CatalogMetadataTests(unittest.TestCase):
 
 
 class DeploymentDependencyWarningTests(unittest.TestCase):
+    def test_invalid_robot_manifest_uses_cached_metadata_and_becomes_warning(self):
+        cached = {
+            "name": "robonix.robot.example",
+            "version": "0.1.0",
+            "description": "Example robot",
+            "license": "Apache-2.0",
+            "tags": ["robot"],
+            "maintainers": ["Example <example@example.com>"],
+        }
+        entry = {
+            "name": "robonix.robot.example",
+            "repo": "https://github.com/syswonder/example-robot",
+            "_catalog_type": "robot",
+            "manifest": "robonix_manifest.yaml",
+        }
+
+        with tempfile.TemporaryDirectory() as tmp, mock.patch.object(
+            BUILD_CATALOG, "read_catalog", return_value=[entry]
+        ), mock.patch.object(
+            BUILD_CATALOG,
+            "load_remote_manifest",
+            side_effect=BUILD_CATALOG.InvalidRemoteManifestError(
+                "Invalid robonix_manifest.yaml at line 7, column 5: expected ':'.",
+                branch="main",
+                readme="# Example",
+            ),
+        ), mock.patch.object(
+            BUILD_CATALOG,
+            "github_optional_json",
+            return_value=None,
+        ):
+            cached_path = (
+                Path(tmp)
+                / "generated"
+                / "api"
+                / "packages"
+                / "robonix.robot.example.json"
+            )
+            cached_path.parent.mkdir(parents=True)
+            cached_path.write_text(json.dumps(cached))
+            old_cwd = BUILD_CATALOG.os.getcwd()
+            BUILD_CATALOG.os.chdir(tmp)
+            try:
+                packages = BUILD_CATALOG.collect(Path("catalog.yaml"))
+            finally:
+                BUILD_CATALOG.os.chdir(old_cwd)
+
+        robot = packages[0]
+        self.assertEqual(robot["version"], "0.1.0")
+        self.assertEqual(robot["deploy_dependencies"], [])
+        self.assertEqual(robot["deployment_status"], "warning")
+        self.assertEqual(robot["deployment_warnings"][0]["section"], "manifest")
+        self.assertIn("last-known-good", robot["deployment_warnings"][0]["reason"])
+
     def test_dependency_resolution_is_strict_and_catalog_aware(self):
         packages = [
             {
@@ -469,7 +570,7 @@ class DeploymentDependencyWarningTests(unittest.TestCase):
             ).read_text()
 
         self.assertIn('class="package-card has-warning"', listing)
-        self.assertIn("Warning · 1 unresolved", listing)
+        self.assertIn("Warning · 1 issue", listing)
         self.assertIn("host-specific absolute path", listing)
         self.assertIn('class="detail-warning" role="note"', detail)
         self.assertIn('class="dependency-warning"', detail)
@@ -508,8 +609,8 @@ class DeploymentDependencyWarningTests(unittest.TestCase):
         self.assertEqual(count, 1)
         self.assertIn("::warning title=Unresolved deployment dependency", stderr.getvalue())
         self.assertIn("robonix.robot.example", stderr.getvalue())
-        self.assertIn("## Deployment dependency report", report)
-        self.assertIn("Found **1 unresolved deployment dependency**", report)
+        self.assertIn("## Robot deployment warning report", report)
+        self.assertIn("Found **1 robot deployment warning**", report)
         self.assertIn("/home/robot/description", report)
 
 
