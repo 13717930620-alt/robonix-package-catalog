@@ -202,6 +202,7 @@ class RobotListingTests(unittest.TestCase):
         self.assertIn('href="packages/?kind=primitive"', rendered)
         self.assertIn("searchCatalog()", rendered)
         self.assertIn("<summary>Catalog API</summary>", rendered)
+        self.assertIn('<details class="panel api-reference" open>', rendered)
         self.assertIn('href="api/view/"', rendered)
         self.assertIn('class="home-result-name"', rendered)
         self.assertNotIn('class="brand-bus"', rendered)
