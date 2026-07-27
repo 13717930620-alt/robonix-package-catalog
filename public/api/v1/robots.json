@@ -1,6 +1,6 @@
 {
   "api_version": "1",
-  "generated_at": "2026-07-27T04:49:20+00:00",
+  "generated_at": "2026-07-27T04:57:38+00:00",
   "robots": [
     {
       "name": "robonix.robot.agilex.ranger_mini_v3",
@@ -37,8 +37,8 @@
           "path": "",
           "branch": "main",
           "manifest": "package_manifest.native.yaml",
-          "package_name": "",
-          "package_url": ""
+          "package_name": "robonix.primitive.robot_description",
+          "package_url": "../robonix.primitive.robot_description/"
         },
         {
           "section": "primitive",
@@ -299,8 +299,8 @@
           "path": "",
           "branch": "main",
           "manifest": "package_manifest.native.yaml",
-          "package_name": "",
-          "package_url": ""
+          "package_name": "robonix.primitive.robot_description",
+          "package_url": "../robonix.primitive.robot_description/"
         },
         {
           "section": "primitive",

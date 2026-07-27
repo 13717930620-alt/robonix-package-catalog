@@ -1,6 +1,6 @@
 {
   "api_version": "1",
-  "generated_at": "2026-07-27T04:49:20+00:00",
+  "generated_at": "2026-07-27T04:57:38+00:00",
   "packages": [
     {
       "name": "robonix.primitive.agilex.piper.arm",
@@ -402,6 +402,35 @@
       ],
       "deploy_dependencies": [],
       "readme_url": "https://github.com/syswonder/primitive-orbbec-camera/blob/main/README.md",
+      "preview_image_url": ""
+    },
+    {
+      "name": "robonix.primitive.robot_description",
+      "version": "0.1.0",
+      "description": "Publishes the Soma-owned URDF as the standard ROS 2 robot TF tree.",
+      "license": "MulanPSL-2.0",
+      "tags": [
+        "primitive",
+        "robot-description",
+        "urdf",
+        "tf",
+        "ros2",
+        "zenoh"
+      ],
+      "repo": "https://github.com/syswonder/primitive-robot-description-rbnx",
+      "maintainers": [
+        "wheatfox <wheatfox17@icloud.com>"
+      ],
+      "repo_name": "primitive-robot-description-rbnx",
+      "default_branch": "main",
+      "kind": "primitive",
+      "catalog_type": "package",
+      "manifest": "package_manifest.yaml",
+      "capabilities": [
+        "robonix/primitive/robot_description/driver"
+      ],
+      "deploy_dependencies": [],
+      "readme_url": "https://github.com/syswonder/primitive-robot-description-rbnx/blob/main/README.md",
       "preview_image_url": ""
     },
     {

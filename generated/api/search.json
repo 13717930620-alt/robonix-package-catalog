@@ -402,6 +402,35 @@
     "preview_image_url": ""
   },
   {
+    "name": "robonix.primitive.robot_description",
+    "version": "0.1.0",
+    "description": "Publishes the Soma-owned URDF as the standard ROS 2 robot TF tree.",
+    "license": "MulanPSL-2.0",
+    "tags": [
+      "primitive",
+      "robot-description",
+      "urdf",
+      "tf",
+      "ros2",
+      "zenoh"
+    ],
+    "repo": "https://github.com/syswonder/primitive-robot-description-rbnx",
+    "maintainers": [
+      "wheatfox <wheatfox17@icloud.com>"
+    ],
+    "repo_name": "primitive-robot-description-rbnx",
+    "default_branch": "main",
+    "kind": "primitive",
+    "catalog_type": "package",
+    "manifest": "package_manifest.yaml",
+    "capabilities": [
+      "robonix/primitive/robot_description/driver"
+    ],
+    "deploy_dependencies": [],
+    "readme_url": "https://github.com/syswonder/primitive-robot-description-rbnx/blob/main/README.md",
+    "preview_image_url": ""
+  },
+  {
     "name": "robonix.primitive.syswonder.minecraft_bot",
     "version": "0.1.0",
     "description": "Minecraft Forge client primitive providing camera, chassis, perception, and Minecraft capabilities.",
@@ -478,8 +507,8 @@
         "path": "",
         "branch": "main",
         "manifest": "package_manifest.native.yaml",
-        "package_name": "",
-        "package_url": ""
+        "package_name": "robonix.primitive.robot_description",
+        "package_url": "../robonix.primitive.robot_description/"
       },
       {
         "section": "primitive",
@@ -740,8 +769,8 @@
         "path": "",
         "branch": "main",
         "manifest": "package_manifest.native.yaml",
-        "package_name": "",
-        "package_url": ""
+        "package_name": "robonix.primitive.robot_description",
+        "package_url": "../robonix.primitive.robot_description/"
       },
       {
         "section": "primitive",

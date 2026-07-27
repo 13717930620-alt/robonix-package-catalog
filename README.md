@@ -206,7 +206,7 @@ but browser-facing links and new integrations should use the `.json` paths above
 The generated commit uses `[skip ci]`; normal CI only triggers from
 `catalog.yaml`, the builder script, the workflow, or manual dispatch.
 
-Generated on `2026-07-27T04:49:20+00:00`.
+Generated on `2026-07-27T04:57:38+00:00`.
 
 ## Packages
 
@@ -225,6 +225,7 @@ Generated on `2026-07-27T04:49:20+00:00`.
 | [`robonix.primitive.livox.mid360.lidar`](https://syswonder.github.io/robonix-package-catalog/packages/robonix.primitive.livox.mid360.lidar/) | `0.1.0` | `primitive` | wheatfox <wheatfox17@icloud.com> | primitive, lidar, livox, mid360, pointcloud | [repo](https://github.com/syswonder/primitive-livox-mid360-lidar-rbnx) |
 | [`robonix.primitive.orbbec.dabai_dcw.camera`](https://syswonder.github.io/robonix-package-catalog/packages/robonix.primitive.orbbec.dabai_dcw.camera/) | `0.1.0` | `primitive` | lhw2002426 <lhw2002426@users.noreply.github.com> | primitive, camera, orbbec, dabai_dcw, rgbd, ros2 | [repo](https://github.com/syswonder/primitive-orbbec-dabai_dcw-camera-rbnx) |
 | [`robonix.primitive.orbbec.gemini330.camera`](https://syswonder.github.io/robonix-package-catalog/packages/robonix.primitive.orbbec.gemini330.camera/) | `0.1.1` | `primitive` | Bunnycxk <2501213313@stu.pku.edu.cn> | primitive, camera, orbbec, gemini330, rgbd, ros2 | [repo](https://github.com/syswonder/primitive-orbbec-camera) |
+| [`robonix.primitive.robot_description`](https://syswonder.github.io/robonix-package-catalog/packages/robonix.primitive.robot_description/) | `0.1.0` | `primitive` | wheatfox <wheatfox17@icloud.com> | primitive, robot-description, urdf, tf, ros2, zenoh | [repo](https://github.com/syswonder/primitive-robot-description-rbnx) |
 | [`robonix.primitive.syswonder.minecraft_bot`](https://syswonder.github.io/robonix-package-catalog/packages/robonix.primitive.syswonder.minecraft_bot/) | `0.1.0` | `primitive` | ZZJJWarth <jzeng25@stu.pku.edu.cn> | primitive, minecraft, simulation, camera, chassis, perception | [repo](https://github.com/syswonder/primitive-syswonder-minecraft_bot-rbnx) |
 | [`robonix.robot.agilex.ranger_mini_v3`](https://syswonder.github.io/robonix-package-catalog/robots/robonix.robot.agilex.ranger_mini_v3/) | `0.2.0` | `robot` | wheatfox <wheatfox17@icloud.com> | robot, deploy, agilex, ranger_mini_v3, jetson, lidar, rgbd, scene, mapping, navigation | [repo](https://github.com/syswonder/robot-agilex-ranger_mini_v3) |
 | [`robonix.robot.deep_robotics.lite3`](https://syswonder.github.io/robonix-package-catalog/robots/robonix.robot.deep_robotics.lite3/) | `0.2.0` | `robot` | Bunnycxk <2501213313@stu.pku.edu.cn> | robot, deploy, deep_robotics, lite3, quadruped, jetson, lidar, rgbd, mapping, navigation | [repo](https://github.com/syswonder/robot-deep_robotics-lite3) |

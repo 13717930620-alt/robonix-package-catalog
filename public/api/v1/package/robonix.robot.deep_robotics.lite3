@@ -63,8 +63,8 @@
       "path": "",
       "branch": "main",
       "manifest": "package_manifest.native.yaml",
-      "package_name": "",
-      "package_url": ""
+      "package_name": "robonix.primitive.robot_description",
+      "package_url": "../robonix.primitive.robot_description/"
     },
     {
       "section": "primitive",
