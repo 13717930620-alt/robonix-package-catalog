@@ -35,6 +35,13 @@ PREVIEW_SIZES = ((380, 285), (720, 540))
 PREVIEW_WEBP_QUALITY = 76
 
 
+class InvalidRemoteManifestError(RuntimeError):
+    def __init__(self, message: str, *, branch: str, readme: str) -> None:
+        super().__init__(message)
+        self.branch = branch
+        self.readme = readme
+
+
 def fail(msg: str) -> None:
     print(f"error: {msg}", file=sys.stderr)
     raise SystemExit(1)
@@ -162,7 +169,17 @@ def load_remote_manifest(repo_url: str, manifest_path: str) -> tuple[str, dict, 
     try:
         manifest = yaml.safe_load(raw) or {}
     except yaml.YAMLError as e:
-        fail(f"{repo_url}: invalid {manifest_path}: {e}")
+        readme = load_remote_text(owner, repo, "README.md", branch, required=False)
+        mark = getattr(e, "problem_mark", None)
+        location = (
+            f" at line {mark.line + 1}, column {mark.column + 1}" if mark else ""
+        )
+        problem = getattr(e, "problem", None) or str(e).splitlines()[0]
+        raise InvalidRemoteManifestError(
+            f"Invalid {manifest_path}{location}: {problem}.",
+            branch=branch,
+            readme=readme,
+        ) from e
     readme = load_remote_text(owner, repo, "README.md", branch, required=False)
     return branch, manifest, readme
 
@@ -363,7 +380,7 @@ def annotate_deploy_dependencies(packages: list[dict]) -> None:
     for package in packages:
         if package.get("catalog_type") != "robot":
             continue
-        warnings = []
+        warnings = list(package.get("_source_warnings", []))
         for dep in package.get("deploy_dependencies", []):
             resolution, dep_name, warning = classify_deploy_dependency(dep, catalog_repos)
             dep["resolution"] = resolution
@@ -417,15 +434,15 @@ def report_deployment_warnings(packages: list[dict]) -> int:
 
     summary_path = os.environ.get("GITHUB_STEP_SUMMARY")
     if summary_path:
-        lines = ["## Deployment dependency report", ""]
+        lines = ["## Robot deployment warning report", ""]
         if not warnings:
             lines.append("All robot deployment dependencies have portable, catalog-resolvable sources.")
         else:
-            dependency_label = "dependency" if len(warnings) == 1 else "dependencies"
+            warning_label = "warning" if len(warnings) == 1 else "warnings"
             lines.extend(
                 [
-                    f"Found **{len(warnings)} unresolved deployment {dependency_label}**. "
-                    "Catalog generation continues, but the robot maintainers should replace these sources.",
+                    f"Found **{len(warnings)} robot deployment {warning_label}**. "
+                    "Catalog generation continues, but the robot maintainers should fix the reported manifest or source.",
                     "",
                     "| Robot | Section | Deployment package | Source | Reason |",
                     "| --- | --- | --- | --- | --- |",
@@ -478,8 +495,42 @@ def collect(catalog_path: Path) -> list[dict]:
             manifest_path = "robonix_manifest.yaml" if name.startswith("robonix.robot.") else "package_manifest.yaml"
         if not isinstance(manifest_path, str) or not manifest_path.strip():
             fail(f"{name}: manifest must be a non-empty string")
-        branch, manifest, readme = load_remote_manifest(repo, manifest_path)
         catalog_type = entry.get("_catalog_type") or ("robot" if manifest_path == "robonix_manifest.yaml" or name.startswith("robonix.robot.") else "package")
+        source_warnings = []
+        cached = None
+        try:
+            branch, manifest, readme = load_remote_manifest(repo, manifest_path)
+        except InvalidRemoteManifestError as error:
+            if catalog_type != "robot":
+                fail(f"{repo}: {error}")
+            cached_path = (
+                Path("generated")
+                / "api"
+                / "packages"
+                / f"{package_slug(name)}.json"
+            )
+            try:
+                cached = json.loads(cached_path.read_text(encoding="utf-8"))
+            except (OSError, json.JSONDecodeError) as cache_error:
+                fail(
+                    f"{repo}: {error} No last-known-good catalog metadata is "
+                    f"available at {cached_path}: {cache_error}"
+                )
+            branch = error.branch
+            manifest = {}
+            readme = error.readme
+            source_warnings.append(
+                {
+                    "section": "manifest",
+                    "name": manifest_path,
+                    "source": f"{repo}/blob/{branch}/{manifest_path}",
+                    "reason": (
+                        f"{error} Showing last-known-good catalog metadata; "
+                        "deployment dependencies cannot be inspected until the "
+                        "robot manifest is fixed."
+                    ),
+                }
+            )
         preview_image_url = ""
         if catalog_type == "robot":
             owner, parsed_repo = parse_repo(repo)
@@ -489,10 +540,30 @@ def collect(catalog_path: Path) -> list[dict]:
             if preview and preview.get("type") == "file":
                 preview_image_url = preview.get("download_url") or ""
         if catalog_type == "robot":
-            meta = manifest.get("catalog")
-            version, description, license_name, tags, maintainers = validate_catalog_metadata(name, meta, name)
             cap_names = []
-            deploy_dependencies = collect_deploy_dependencies(name, manifest)
+            if cached is None:
+                meta = manifest.get("catalog")
+                version, description, license_name, tags, maintainers = validate_catalog_metadata(name, meta, name)
+                deploy_dependencies = collect_deploy_dependencies(name, manifest)
+            else:
+                version = cached.get("version", "")
+                description = cached.get("description", "")
+                license_name = cached.get("license", "")
+                tags = cached.get("tags", [])
+                maintainers = cached.get("maintainers", [])
+                validate_catalog_metadata(
+                    name,
+                    {
+                        "name": name,
+                        "version": version,
+                        "description": description,
+                        "license": license_name,
+                        "tags": tags,
+                        "maintainers": maintainers,
+                    },
+                    name,
+                )
+                deploy_dependencies = []
         else:
             package = manifest.get("package")
             if not isinstance(package, dict):
@@ -520,6 +591,7 @@ def collect(catalog_path: Path) -> list[dict]:
                 "readme_url": f"{repo}/blob/{branch}/README.md",
                 "preview_image_url": preview_image_url,
                 "_readme_markdown": readme,
+                "_source_warnings": source_warnings,
             }
         )
     annotate_deploy_dependencies(out)
@@ -599,8 +671,48 @@ def render_css() -> str:
       --warning-line: #e2ad58;
       --warning-soft: #fff7e8;
       --shadow: 0 8px 28px rgba(28, 38, 88, 0.06);
+      --header-bg: rgba(255, 255, 255, 0.9);
+      --field-bg: #ffffff;
+      --code-bg: #f8fafc;
+      --code-ink: #1d2939;
+      --body-copy: #343941;
+      --readme-ink: #1f2937;
+      --action-ink: #29303a;
+      --nav-ink: #344054;
+      --warning-copy: #5f3a12;
+      --hover-line: #bcc6ec;
+      --brand-contrast: #ffffff;
       --site-header-height: 64px;
       --sticky-gap: 14px;
+    }
+    html[data-theme="dark"] {
+      color-scheme: dark;
+      --bg: #0d1220;
+      --paper: #151c2d;
+      --soft: #1d263a;
+      --ink: #eef2ff;
+      --muted: #a9b3c9;
+      --line: #303b54;
+      --line-strong: #475574;
+      --brand: #9dacff;
+      --brand-deep: #c4ccff;
+      --signal: #7da2ff;
+      --signal-soft: #252f58;
+      --warning: #ffc46b;
+      --warning-line: #9c6927;
+      --warning-soft: #322514;
+      --shadow: 0 12px 32px rgba(0, 0, 0, 0.28);
+      --header-bg: rgba(16, 22, 36, 0.9);
+      --field-bg: #111827;
+      --code-bg: #101725;
+      --code-ink: #e5eaf6;
+      --body-copy: #d2d9e8;
+      --readme-ink: #dce3f1;
+      --action-ink: #d7deed;
+      --nav-ink: #c5cede;
+      --warning-copy: #f2cf96;
+      --hover-line: #6376ad;
+      --brand-contrast: #101426;
     }
     * { box-sizing: border-box; }
     html { min-height: 100%; background: var(--bg); }
@@ -652,8 +764,8 @@ def render_css() -> str:
       top: 0;
       z-index: 20;
       color: var(--ink);
-      border-bottom: 1px solid rgba(221, 225, 236, 0.88);
-      background: rgba(255, 255, 255, 0.9);
+      border-bottom: 1px solid var(--line);
+      background: var(--header-bg);
       -webkit-backdrop-filter: blur(16px);
       backdrop-filter: blur(16px);
     }
@@ -677,9 +789,10 @@ def render_css() -> str:
     }
     .brand:hover { color: var(--brand); text-decoration: none; }
     .brand small { color: var(--muted); font-size: 12px; font-weight: 500; }
-    .api-links { display: flex; gap: 8px; flex-wrap: wrap; justify-content: flex-end; }
+    .header-actions { display: flex; gap: 10px; align-items: center; justify-content: flex-end; }
+    .api-links { display: flex; gap: 8px; flex-wrap: nowrap; justify-content: flex-end; }
     .api-links a {
-      color: #344054;
+      color: var(--nav-ink);
       border: 1px solid transparent;
       background: transparent;
       border-radius: 6px;
@@ -690,9 +803,37 @@ def render_css() -> str:
     }
     .api-links a:hover, .api-links a[aria-current="page"] {
       color: var(--brand);
-      border-color: #d9def4;
+      border-color: var(--line-strong);
       background: var(--signal-soft);
       text-decoration: none;
+    }
+    .theme-switcher {
+      display: inline-flex;
+      align-items: center;
+      gap: 2px;
+      padding: 3px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--soft);
+      white-space: nowrap;
+    }
+    .theme-switcher button {
+      min-width: 0;
+      margin: 0;
+      padding: 4px 7px;
+      border: 0;
+      border-radius: 5px;
+      background: transparent;
+      color: var(--muted);
+      font-size: 11px;
+      font-weight: 700;
+      line-height: 1.4;
+      box-shadow: none;
+    }
+    .theme-switcher button:hover { color: var(--ink); }
+    .theme-switcher button[aria-pressed="true"] {
+      color: var(--brand-contrast);
+      background: var(--brand);
     }
     h1 {
       margin: 0;
@@ -754,7 +895,7 @@ def render_css() -> str:
     .filter-buttons { display: flex; gap: 6px; flex-wrap: wrap; }
     .filter-button {
       border: 1px solid var(--line);
-      background: #fff;
+      background: var(--field-bg);
       color: var(--ink);
       border-radius: 999px;
       padding: 5px 9px;
@@ -764,7 +905,7 @@ def render_css() -> str:
     }
     .filter-button { transition: color 150ms ease, border-color 150ms ease, background 150ms ease; }
     .filter-button:hover { border-color: var(--brand); }
-    .filter-button.active { background: var(--brand); color: #fff; border-color: var(--brand); }
+    .filter-button.active { background: var(--brand); color: var(--brand-contrast); border-color: var(--brand); }
     .content { padding: 14px; min-width: 0; }
     .api-reference {
       margin-top: 14px;
@@ -796,7 +937,7 @@ def render_css() -> str:
       margin: 0;
       overflow-x: auto;
       border: 1px solid var(--line);
-      background: #f8fafc;
+      background: var(--code-bg);
       border-radius: 6px;
       padding: 10px;
       font-size: 12px;
@@ -815,8 +956,8 @@ def render_css() -> str:
       margin: 0;
       overflow: auto;
       border: 0;
-      background: #f8fafc;
-      color: #1d2939;
+      background: var(--code-bg);
+      color: var(--code-ink);
       font-family: var(--font-mono);
       font-size: 12px;
       line-height: 1.5;
@@ -828,7 +969,7 @@ def render_css() -> str:
     .search {
       width: min(620px, 100%);
       border: 1px solid var(--line-strong);
-      background: #fff;
+      background: var(--field-bg);
       border-radius: 6px;
       padding: 9px 11px;
       font-size: 15px;
@@ -849,7 +990,7 @@ def render_css() -> str:
     .package-list { display: grid; gap: 9px; }
     .package-card {
       border: 1px solid var(--line);
-      background: #fff;
+      background: var(--paper);
       border-radius: 7px;
       padding: 12px;
       display: grid;
@@ -861,10 +1002,10 @@ def render_css() -> str:
     .package-card:nth-child(2) { animation-delay: 35ms; }
     .package-card:nth-child(3) { animation-delay: 70ms; }
     .package-card:nth-child(4) { animation-delay: 105ms; }
-    .package-card:hover { border-color: #bcc6ec; box-shadow: var(--shadow); transform: translateY(-2px); }
+    .package-card:hover { border-color: var(--hover-line); box-shadow: var(--shadow); transform: translateY(-2px); }
     .package-card.has-warning {
       border-color: var(--warning-line);
-      background: linear-gradient(90deg, var(--warning-soft), #fff 26%);
+      background: linear-gradient(90deg, var(--warning-soft), var(--paper) 26%);
     }
     .package-card.has-warning:hover { border-color: #c9892f; }
     @keyframes rise-in {
@@ -901,7 +1042,7 @@ def render_css() -> str:
       margin: 9px 0;
       border-left: 3px solid var(--warning-line);
       padding: 7px 9px;
-      color: #5f3a12;
+      color: var(--warning-copy);
       background: var(--warning-soft);
       font-size: 12px;
       line-height: 1.4;
@@ -909,7 +1050,7 @@ def render_css() -> str:
     .warning-summary strong { display: block; margin-bottom: 3px; color: var(--warning); }
     .warning-summary ul { margin: 0; padding-left: 17px; }
     .warning-summary li { margin: 2px 0; }
-    .warning-summary code { color: #5f3a12; background: transparent; padding: 0; }
+    .warning-summary code { color: var(--warning-copy); background: transparent; padding: 0; }
     .package-title { display: flex; gap: 8px; align-items: baseline; flex-wrap: wrap; margin-bottom: 5px; }
     .package-title a {
       font-family: var(--font-mono);
@@ -927,7 +1068,7 @@ def render_css() -> str:
       padding: 2px 5px;
       background: var(--soft);
     }
-    .description { color: #343941; margin: 0 0 8px; line-height: 1.38; }
+    .description { color: var(--body-copy); margin: 0 0 8px; line-height: 1.38; }
     .meta-line { color: var(--muted); font-size: 13px; display: flex; gap: 14px; flex-wrap: wrap; }
     .meta-line strong, .meta-line code { overflow-wrap: anywhere; }
     .meta-line code { font-size: 12px; }
@@ -937,13 +1078,13 @@ def render_css() -> str:
       border-radius: 6px;
       padding: 6px 8px;
       background: var(--soft);
-      color: #29303a;
+      color: var(--action-ink);
       font-size: 13px;
       margin: 0;
       font-weight: 600;
       transition: background 160ms ease, border-color 160ms ease, color 160ms ease;
     }
-    .card-actions a:first-child { color: #fff; border-color: var(--brand); background: var(--brand); }
+    .card-actions a:first-child { color: var(--brand-contrast); border-color: var(--brand); background: var(--brand); }
     .card-actions a:hover { border-color: var(--brand); text-decoration: none; }
     .card-side {
       display: grid;
@@ -1022,7 +1163,7 @@ def render_css() -> str:
     .dependency-warning-reason {
       display: block;
       margin-top: 5px;
-      color: #5f3a12;
+      color: var(--warning-copy);
       font-family: var(--font-sans);
       font-size: 12px;
       line-height: 1.4;
@@ -1033,7 +1174,7 @@ def render_css() -> str:
       border: 1px solid var(--warning-line);
       border-radius: 7px;
       padding: 10px 12px;
-      color: #5f3a12;
+      color: var(--warning-copy);
       background: var(--warning-soft);
       font-size: 13px;
     }
@@ -1058,7 +1199,7 @@ def render_css() -> str:
     .site-footer .shell { padding-block: 18px 28px; }
     .readme {
       line-height: 1.58;
-      color: #1f2937;
+      color: var(--readme-ink);
       overflow-wrap: anywhere;
     }
     .readme h1 { font-size: 24px; margin-bottom: 10px; }
@@ -1069,12 +1210,12 @@ def render_css() -> str:
       overflow: auto;
       border: 1px solid var(--line);
       border-radius: 6px;
-      background: #f8fafc;
+      background: var(--code-bg);
       padding: 10px;
       max-width: 100%;
     }
     .readme code {
-      background: #f1f5f9;
+      background: var(--soft);
       border-radius: 4px;
       padding: 1px 4px;
       font-size: 0.92em;
@@ -1105,13 +1246,13 @@ def render_css() -> str:
       padding: 0 18px;
       border: 1px solid #b9c3df;
       border-radius: 9px;
-      background: rgba(255, 255, 255, 0.96);
+      background: var(--field-bg);
       box-shadow: 0 14px 34px rgba(31, 43, 105, 0.1);
       font-size: 16px;
     }
     .entry-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
     .entry-card { position: relative; padding: 20px; }
-    .entry-card:hover { border-color: #bcc6ec; box-shadow: var(--shadow); transform: translateY(-2px); }
+    .entry-card:hover { border-color: var(--hover-line); box-shadow: var(--shadow); transform: translateY(-2px); }
     .entry-card h2 { margin: 0 0 7px; font-size: 19px; }
     .entry-card strong { display: block; margin-top: 16px; color: var(--brand); font-size: 30px; line-height: 1; }
     .entry-links { display: flex; flex-wrap: wrap; gap: 7px; margin-top: 14px; }
@@ -1135,9 +1276,9 @@ def render_css() -> str:
       border: 1px solid var(--line);
       border-radius: 7px;
       color: var(--ink);
-      background: #fff;
+      background: var(--paper);
     }
-    .home-result:hover { border-color: #bcc6ec; background: #fbfcff; text-decoration: none; }
+    .home-result:hover { border-color: var(--hover-line); background: var(--soft); text-decoration: none; }
     .home-result-name { color: var(--brand-deep); font-family: var(--font-mono); font-weight: 700; overflow-wrap: anywhere; }
     .home-result span { color: var(--muted); font-size: 13px; text-align: right; }
     .home-empty { margin: 10px 0 0; color: var(--muted); }
@@ -1153,6 +1294,7 @@ def render_css() -> str:
       .shell { width: min(100% - 28px, 1180px); }
       main.shell { width: min(100% - 28px, 1180px); }
       .topline { align-items: stretch; flex-direction: column; }
+      .header-actions { justify-content: space-between; }
       .api-links {
         display: grid;
         grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -1197,7 +1339,9 @@ def render_css() -> str:
       .site-header .shell { padding-block: 10px; }
       .brand { font-size: 17px; overflow-wrap: anywhere; }
       .brand small { display: none; }
+      .header-actions { align-items: stretch; flex-direction: column; gap: 7px; }
       .api-links { gap: 6px; }
+      .theme-switcher { align-self: flex-end; }
       .api-links a { padding: 7px 5px; font-size: 11px; }
       .search-strip { padding: 12px 0; }
       .content, .detail-main, .detail-side { padding: 12px; min-width: 0; }
@@ -1243,11 +1387,34 @@ def render_css() -> str:
       }
     }
     """.strip()
-    return base_css + "\n" + HtmlFormatter(style="friendly").get_style_defs(".highlight")
+    light_highlight = HtmlFormatter(style="friendly").get_style_defs(".highlight")
+    dark_highlight = HtmlFormatter(style="monokai").get_style_defs(
+        'html[data-theme="dark"] .highlight'
+    )
+    return base_css + "\n" + light_highlight + "\n" + dark_highlight
 
 
 def render_favicon(root: str) -> str:
     return f'<link rel="icon" type="image/svg+xml" href="{root}assets/robonix-mark.svg">'
+
+
+def render_theme_bootstrap() -> str:
+    return """<script>
+    (() => {
+      const storageKey = 'robonix-catalog-theme';
+      let preference = 'auto';
+      try {
+        const stored = localStorage.getItem(storageKey);
+        if (stored === 'light' || stored === 'dark' || stored === 'auto') preference = stored;
+      } catch (_) {}
+      const resolved = preference === 'auto'
+        ? (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light')
+        : preference;
+      document.documentElement.dataset.theme = resolved;
+      document.documentElement.dataset.themePreference = preference;
+      document.documentElement.style.colorScheme = resolved;
+    })();
+  </script>"""
 
 
 def render_navigation(root: str, current: str = "") -> str:
@@ -1261,16 +1428,56 @@ def render_navigation(root: str, current: str = "") -> str:
         <img class="brand-mark" src="{root}assets/robonix-mark.svg" alt="" aria-hidden="true" width="34" height="30">
         <span>Robonix <small>Package Catalog</small></span>
       </a>
-      <nav class="api-links" aria-label="Catalog navigation">
-        {page_link('packages/', 'Packages', 'packages')}
-        {page_link('robots/', 'Robots', 'robots')}
-        {page_link('api/view/', 'API', 'api')}
-      </nav>
+      <div class="header-actions">
+        <nav class="api-links" aria-label="Catalog navigation">
+          {page_link('packages/', 'Packages', 'packages')}
+          {page_link('robots/', 'Robots', 'robots')}
+          {page_link('api/view/', 'API', 'api')}
+        </nav>
+        <div class="theme-switcher" role="group" aria-label="Color theme">
+          <button type="button" data-theme-choice="auto" aria-pressed="false">Auto</button>
+          <button type="button" data-theme-choice="light" aria-pressed="false">Light</button>
+          <button type="button" data-theme-choice="dark" aria-pressed="false">Dark</button>
+        </div>
+      </div>
     </div>
   </header>
   <script>
     (() => {{
       const header = document.currentScript.previousElementSibling;
+      const storageKey = 'robonix-catalog-theme';
+      const media = matchMedia('(prefers-color-scheme: dark)');
+      const choices = Array.from(header.querySelectorAll('[data-theme-choice]'));
+      const validPreference = (value) => ['auto', 'light', 'dark'].includes(value);
+      const readPreference = () => {{
+        const current = document.documentElement.dataset.themePreference;
+        return validPreference(current) ? current : 'auto';
+      }};
+      const applyTheme = (preference, persist = false) => {{
+        const safePreference = validPreference(preference) ? preference : 'auto';
+        const resolved = safePreference === 'auto'
+          ? (media.matches ? 'dark' : 'light')
+          : safePreference;
+        document.documentElement.dataset.theme = resolved;
+        document.documentElement.dataset.themePreference = safePreference;
+        document.documentElement.style.colorScheme = resolved;
+        choices.forEach((button) => {{
+          button.setAttribute('aria-pressed', String(button.dataset.themeChoice === safePreference));
+        }});
+        if (persist) {{
+          try {{ localStorage.setItem(storageKey, safePreference); }} catch (_) {{}}
+        }}
+      }};
+      choices.forEach((button) => {{
+        button.addEventListener('click', () => applyTheme(button.dataset.themeChoice, true));
+      }});
+      media.addEventListener?.('change', () => {{
+        if (readPreference() === 'auto') applyTheme('auto');
+      }});
+      window.addEventListener('storage', (event) => {{
+        if (event.key === storageKey) applyTheme(validPreference(event.newValue) ? event.newValue : 'auto');
+      }});
+      applyTheme(readPreference());
       const updateHeaderHeight = () => {{
         const height = Math.ceil(header.getBoundingClientRect().height);
         document.documentElement.style.setProperty('--site-header-height', `${{height}}px`);
@@ -1341,8 +1548,10 @@ def render_listing_page(public_dir: Path, generated_at: str, packages: list[dict
         preview_line = f"\n          {preview_html}" if preview_html else ""
         deployment_warnings = p.get("deployment_warnings", [])
         card_class = "package-card has-warning" if deployment_warnings else "package-card"
+        warning_count = len(deployment_warnings)
         warning_badge = (
-            f'<span class="warning-badge">Warning · {len(deployment_warnings)} unresolved</span>'
+            f'<span class="warning-badge">Warning · {warning_count} '
+            f'{"issue" if warning_count == 1 else "issues"}</span>'
             if deployment_warnings
             else ""
         )
@@ -1398,10 +1607,11 @@ def render_listing_page(public_dir: Path, generated_at: str, packages: list[dict
     page_dir.mkdir(parents=True, exist_ok=True)
     page_dir.joinpath("index.html").write_text(
         f"""<!doctype html>
-<html lang="en" data-theme="light">
+<html lang="en">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  {render_theme_bootstrap()}
   <title>{html.escape(title)} - Robonix Package Catalog</title>
   {render_favicon('../')}
   <link rel="stylesheet" href="../assets/vendor/pico/pico.classless.min.css">
@@ -1585,10 +1795,11 @@ def render_site(public_dir: Path, generated_at: str, packages: list[dict]) -> No
         )
     (public_dir / "index.html").write_text(
         f"""<!doctype html>
-<html lang="en" data-theme="light">
+<html lang="en">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  {render_theme_bootstrap()}
   <title>Robonix Package Catalog</title>
   {render_favicon('')}
   <link rel="stylesheet" href="assets/vendor/pico/pico.classless.min.css">
@@ -1694,10 +1905,11 @@ def render_api_viewer(public_dir: Path, generated_at: str) -> None:
     viewer_dir.mkdir(parents=True, exist_ok=True)
     viewer_dir.joinpath("index.html").write_text(
         f"""<!doctype html>
-<html lang="en" data-theme="light">
+<html lang="en">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  {render_theme_bootstrap()}
   <title>Catalog API - Robonix Package Catalog</title>
   {render_favicon('../../')}
   <link rel="stylesheet" href="../../assets/vendor/pico/pico.classless.min.css">
@@ -1883,7 +2095,8 @@ def render_package_pages(public_dir: Path, generated_at: str, packages: list[dic
                 )
                 detail_warning = (
                     '\n    <div class="detail-warning" role="note" aria-label="Deployment warning">'
-                    f"<strong>Deployment warning · {len(deployment_warnings)} unresolved dependencies</strong>"
+                    f"<strong>Deployment warning · {len(deployment_warnings)} "
+                    f'{"issue" if len(deployment_warnings) == 1 else "issues"}</strong>'
                     f"<ul>{warning_items}</ul></div>"
                 )
         else:
@@ -1894,10 +2107,11 @@ def render_package_pages(public_dir: Path, generated_at: str, packages: list[dic
         )
         package_dir.joinpath("index.html").write_text(
             f"""<!doctype html>
-<html lang="en" data-theme="light">
+<html lang="en">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  {render_theme_bootstrap()}
   <title>{html.escape(p['name'])} - Robonix Package Catalog</title>
   {render_favicon('../../')}
   <link rel="stylesheet" href="../../assets/vendor/pico/pico.classless.min.css">
@@ -2026,7 +2240,7 @@ def render_readme(path: Path, generated_at: str, packages: list[dict]) -> None:
         "| `capabilities` | string[] | declared Robonix contract IDs |",
         "| `deploy_dependencies` | object[] | robot deployment dependencies parsed from `robonix_manifest.yaml` |",
         "| `deployment_status` | string | robot dependency health: `ok` or `warning` |",
-        "| `deployment_warnings` | object[] | unresolved robot dependencies with section, name, source, and reason |",
+        "| `deployment_warnings` | object[] | robot manifest or dependency warnings with section, name, source, and reason |",
         "| `readme_url` | string | GitHub README URL for the indexed branch |",
         "| `preview_image_url` | string | optional robot preview discovered at `assets/robot.jpg`; empty when absent |",
         "",
