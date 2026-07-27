@@ -33,8 +33,10 @@
       "path": "",
       "branch": "main",
       "manifest": "",
-      "package_name": "",
-      "package_url": ""
+      "resolution": "catalog",
+      "package_name": "robonix.primitive.deep_robotics.lite3.quadruped",
+      "package_url": "../robonix.primitive.deep_robotics.lite3.quadruped/",
+      "resolution_warning": ""
     },
     {
       "section": "primitive",
@@ -43,8 +45,10 @@
       "path": "",
       "branch": "main",
       "manifest": "",
+      "resolution": "catalog",
       "package_name": "robonix.primitive.livox.mid360.lidar",
-      "package_url": "../robonix.primitive.livox.mid360.lidar/"
+      "package_url": "../robonix.primitive.livox.mid360.lidar/",
+      "resolution_warning": ""
     },
     {
       "section": "primitive",
@@ -53,8 +57,10 @@
       "path": "",
       "branch": "main",
       "manifest": "",
+      "resolution": "catalog",
       "package_name": "robonix.primitive.livox.mid360.imu",
-      "package_url": "../robonix.primitive.livox.mid360.imu/"
+      "package_url": "../robonix.primitive.livox.mid360.imu/",
+      "resolution_warning": ""
     },
     {
       "section": "primitive",
@@ -63,8 +69,10 @@
       "path": "",
       "branch": "main",
       "manifest": "package_manifest.native.yaml",
+      "resolution": "catalog",
       "package_name": "robonix.primitive.robot_description",
-      "package_url": "../robonix.primitive.robot_description/"
+      "package_url": "../robonix.primitive.robot_description/",
+      "resolution_warning": ""
     },
     {
       "section": "primitive",
@@ -73,8 +81,10 @@
       "path": "",
       "branch": "main",
       "manifest": "",
-      "package_name": "",
-      "package_url": ""
+      "resolution": "catalog",
+      "package_name": "robonix.primitive.orbbec.gemini330.camera",
+      "package_url": "../robonix.primitive.orbbec.gemini330.camera/",
+      "resolution_warning": ""
     },
     {
       "section": "primitive",
@@ -83,8 +93,10 @@
       "path": "${ROBONIX_SOURCE_PATH}/examples/webots/primitives/audio_client_bridge",
       "branch": "",
       "manifest": "",
+      "resolution": "robonix_source",
       "package_name": "",
-      "package_url": ""
+      "package_url": "",
+      "resolution_warning": ""
     },
     {
       "section": "service",
@@ -93,8 +105,10 @@
       "path": "",
       "branch": "main",
       "manifest": "package_manifest.jetson-native.yaml",
+      "resolution": "catalog",
       "package_name": "robonix.service.mapping",
-      "package_url": "../robonix.service.mapping/"
+      "package_url": "../robonix.service.mapping/",
+      "resolution_warning": ""
     },
     {
       "section": "service",
@@ -103,8 +117,10 @@
       "path": "${ROBONIX_SOURCE_PATH}/services/speech",
       "branch": "",
       "manifest": "",
+      "resolution": "robonix_source",
       "package_name": "",
-      "package_url": ""
+      "package_url": "",
+      "resolution_warning": ""
     },
     {
       "section": "service",
@@ -113,10 +129,14 @@
       "path": "",
       "branch": "main",
       "manifest": "package_manifest.jetson-native.yaml",
+      "resolution": "catalog",
       "package_name": "robonix.service.navigation",
-      "package_url": "../robonix.service.navigation/"
+      "package_url": "../robonix.service.navigation/",
+      "resolution_warning": ""
     }
   ],
   "readme_url": "https://github.com/syswonder/robot-deep_robotics-lite3/blob/main/README.md",
-  "preview_image_url": ""
+  "preview_image_url": "",
+  "deployment_status": "ok",
+  "deployment_warnings": []
 }

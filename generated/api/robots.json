@@ -1,6 +1,6 @@
 {
   "api_version": "1",
-  "generated_at": "2026-07-27T05:16:29+00:00",
+  "generated_at": "2026-07-27T05:22:46+00:00",
   "robots": [
     {
       "name": "robonix.robot.agilex.ranger_mini_v3",
@@ -37,8 +37,10 @@
           "path": "",
           "branch": "main",
           "manifest": "package_manifest.native.yaml",
+          "resolution": "catalog",
           "package_name": "robonix.primitive.robot_description",
-          "package_url": "../robonix.primitive.robot_description/"
+          "package_url": "../robonix.primitive.robot_description/",
+          "resolution_warning": ""
         },
         {
           "section": "primitive",
@@ -47,8 +49,10 @@
           "path": "",
           "branch": "main",
           "manifest": "",
+          "resolution": "catalog",
           "package_name": "robonix.primitive.livox.mid360.lidar",
-          "package_url": "../robonix.primitive.livox.mid360.lidar/"
+          "package_url": "../robonix.primitive.livox.mid360.lidar/",
+          "resolution_warning": ""
         },
         {
           "section": "primitive",
@@ -57,8 +61,10 @@
           "path": "",
           "branch": "main",
           "manifest": "",
+          "resolution": "catalog",
           "package_name": "robonix.primitive.livox.mid360.imu",
-          "package_url": "../robonix.primitive.livox.mid360.imu/"
+          "package_url": "../robonix.primitive.livox.mid360.imu/",
+          "resolution_warning": ""
         },
         {
           "section": "primitive",
@@ -67,8 +73,10 @@
           "path": "",
           "branch": "main",
           "manifest": "",
+          "resolution": "catalog",
           "package_name": "robonix.primitive.orbbec.gemini330.camera",
-          "package_url": "../robonix.primitive.orbbec.gemini330.camera/"
+          "package_url": "../robonix.primitive.orbbec.gemini330.camera/",
+          "resolution_warning": ""
         },
         {
           "section": "primitive",
@@ -77,8 +85,10 @@
           "path": "",
           "branch": "main",
           "manifest": "",
+          "resolution": "catalog",
           "package_name": "robonix.primitive.orbbec.dabai_dcw.camera",
-          "package_url": "../robonix.primitive.orbbec.dabai_dcw.camera/"
+          "package_url": "../robonix.primitive.orbbec.dabai_dcw.camera/",
+          "resolution_warning": ""
         },
         {
           "section": "primitive",
@@ -87,8 +97,10 @@
           "path": "",
           "branch": "main",
           "manifest": "",
+          "resolution": "catalog",
           "package_name": "robonix.primitive.agilex.ranger_mini_v3.chassis",
-          "package_url": "../robonix.primitive.agilex.ranger_mini_v3.chassis/"
+          "package_url": "../robonix.primitive.agilex.ranger_mini_v3.chassis/",
+          "resolution_warning": ""
         },
         {
           "section": "primitive",
@@ -97,8 +109,10 @@
           "path": "",
           "branch": "main",
           "manifest": "",
+          "resolution": "catalog",
           "package_name": "robonix.primitive.agilex.piper.arm",
-          "package_url": "../robonix.primitive.agilex.piper.arm/"
+          "package_url": "../robonix.primitive.agilex.piper.arm/",
+          "resolution_warning": ""
         },
         {
           "section": "primitive",
@@ -107,8 +121,10 @@
           "path": "",
           "branch": "main",
           "manifest": "",
+          "resolution": "catalog",
           "package_name": "robonix.primitive.audio.alsa",
-          "package_url": "../robonix.primitive.audio.alsa/"
+          "package_url": "../robonix.primitive.audio.alsa/",
+          "resolution_warning": ""
         },
         {
           "section": "primitive",
@@ -117,8 +133,10 @@
           "path": "",
           "branch": "main",
           "manifest": "",
+          "resolution": "catalog",
           "package_name": "robonix.primitive.audio.client_bridge",
-          "package_url": "../robonix.primitive.audio.client_bridge/"
+          "package_url": "../robonix.primitive.audio.client_bridge/",
+          "resolution_warning": ""
         },
         {
           "section": "service",
@@ -127,8 +145,10 @@
           "path": "${ROBONIX_SOURCE_PATH}/services/memsearch",
           "branch": "",
           "manifest": "",
+          "resolution": "robonix_source",
           "package_name": "",
-          "package_url": ""
+          "package_url": "",
+          "resolution_warning": ""
         },
         {
           "section": "service",
@@ -137,8 +157,10 @@
           "path": "${ROBONIX_SOURCE_PATH}/services/speech",
           "branch": "",
           "manifest": "",
+          "resolution": "robonix_source",
           "package_name": "",
-          "package_url": ""
+          "package_url": "",
+          "resolution_warning": ""
         },
         {
           "section": "service",
@@ -147,8 +169,10 @@
           "path": "${ROBONIX_SOURCE_PATH}/services/voiceprint",
           "branch": "",
           "manifest": "",
+          "resolution": "robonix_source",
           "package_name": "",
-          "package_url": ""
+          "package_url": "",
+          "resolution_warning": ""
         },
         {
           "section": "service",
@@ -157,8 +181,10 @@
           "path": "",
           "branch": "main",
           "manifest": "",
+          "resolution": "catalog",
           "package_name": "robonix.service.object_detect",
-          "package_url": "../robonix.service.object_detect/"
+          "package_url": "../robonix.service.object_detect/",
+          "resolution_warning": ""
         },
         {
           "section": "service",
@@ -167,8 +193,10 @@
           "path": "",
           "branch": "main",
           "manifest": "",
+          "resolution": "catalog",
           "package_name": "robonix.service.grasp_pose",
-          "package_url": "../robonix.service.grasp_pose/"
+          "package_url": "../robonix.service.grasp_pose/",
+          "resolution_warning": ""
         },
         {
           "section": "service",
@@ -177,8 +205,10 @@
           "path": "",
           "branch": "main",
           "manifest": "",
+          "resolution": "catalog",
           "package_name": "robonix.service.roboarm.ik",
-          "package_url": "../robonix.service.roboarm.ik/"
+          "package_url": "../robonix.service.roboarm.ik/",
+          "resolution_warning": ""
         },
         {
           "section": "service",
@@ -187,8 +217,10 @@
           "path": "",
           "branch": "main",
           "manifest": "package_manifest.jetson-native.yaml",
+          "resolution": "catalog",
           "package_name": "robonix.service.mapping",
-          "package_url": "../robonix.service.mapping/"
+          "package_url": "../robonix.service.mapping/",
+          "resolution_warning": ""
         },
         {
           "section": "service",
@@ -197,8 +229,10 @@
           "path": "",
           "branch": "main",
           "manifest": "package_manifest.jetson-native.yaml",
+          "resolution": "catalog",
           "package_name": "robonix.service.navigation",
-          "package_url": "../robonix.service.navigation/"
+          "package_url": "../robonix.service.navigation/",
+          "resolution_warning": ""
         },
         {
           "section": "skill",
@@ -207,8 +241,10 @@
           "path": "",
           "branch": "main",
           "manifest": "",
+          "resolution": "catalog",
           "package_name": "robonix.skill.explore",
-          "package_url": "../robonix.skill.explore/"
+          "package_url": "../robonix.skill.explore/",
+          "resolution_warning": ""
         },
         {
           "section": "skill",
@@ -217,8 +253,10 @@
           "path": "./skills/greet",
           "branch": "",
           "manifest": "",
+          "resolution": "robot_repository",
           "package_name": "",
-          "package_url": ""
+          "package_url": "",
+          "resolution_warning": ""
         },
         {
           "section": "skill",
@@ -227,12 +265,16 @@
           "path": "",
           "branch": "main",
           "manifest": "",
+          "resolution": "catalog",
           "package_name": "robonix.skill.pick.vertical_grasp",
-          "package_url": "../robonix.skill.pick.vertical_grasp/"
+          "package_url": "../robonix.skill.pick.vertical_grasp/",
+          "resolution_warning": ""
         }
       ],
       "readme_url": "https://github.com/syswonder/robot-agilex-ranger_mini_v3/blob/main/README.md",
-      "preview_image_url": "https://raw.githubusercontent.com/syswonder/robot-agilex-ranger_mini_v3/main/assets/robot.jpg"
+      "preview_image_url": "https://raw.githubusercontent.com/syswonder/robot-agilex-ranger_mini_v3/main/assets/robot.jpg",
+      "deployment_status": "ok",
+      "deployment_warnings": []
     },
     {
       "name": "robonix.robot.deep_robotics.lite3",
@@ -269,8 +311,10 @@
           "path": "",
           "branch": "main",
           "manifest": "",
-          "package_name": "",
-          "package_url": ""
+          "resolution": "catalog",
+          "package_name": "robonix.primitive.deep_robotics.lite3.quadruped",
+          "package_url": "../robonix.primitive.deep_robotics.lite3.quadruped/",
+          "resolution_warning": ""
         },
         {
           "section": "primitive",
@@ -279,8 +323,10 @@
           "path": "",
           "branch": "main",
           "manifest": "",
+          "resolution": "catalog",
           "package_name": "robonix.primitive.livox.mid360.lidar",
-          "package_url": "../robonix.primitive.livox.mid360.lidar/"
+          "package_url": "../robonix.primitive.livox.mid360.lidar/",
+          "resolution_warning": ""
         },
         {
           "section": "primitive",
@@ -289,8 +335,10 @@
           "path": "",
           "branch": "main",
           "manifest": "",
+          "resolution": "catalog",
           "package_name": "robonix.primitive.livox.mid360.imu",
-          "package_url": "../robonix.primitive.livox.mid360.imu/"
+          "package_url": "../robonix.primitive.livox.mid360.imu/",
+          "resolution_warning": ""
         },
         {
           "section": "primitive",
@@ -299,8 +347,10 @@
           "path": "",
           "branch": "main",
           "manifest": "package_manifest.native.yaml",
+          "resolution": "catalog",
           "package_name": "robonix.primitive.robot_description",
-          "package_url": "../robonix.primitive.robot_description/"
+          "package_url": "../robonix.primitive.robot_description/",
+          "resolution_warning": ""
         },
         {
           "section": "primitive",
@@ -309,8 +359,10 @@
           "path": "",
           "branch": "main",
           "manifest": "",
-          "package_name": "",
-          "package_url": ""
+          "resolution": "catalog",
+          "package_name": "robonix.primitive.orbbec.gemini330.camera",
+          "package_url": "../robonix.primitive.orbbec.gemini330.camera/",
+          "resolution_warning": ""
         },
         {
           "section": "primitive",
@@ -319,8 +371,10 @@
           "path": "${ROBONIX_SOURCE_PATH}/examples/webots/primitives/audio_client_bridge",
           "branch": "",
           "manifest": "",
+          "resolution": "robonix_source",
           "package_name": "",
-          "package_url": ""
+          "package_url": "",
+          "resolution_warning": ""
         },
         {
           "section": "service",
@@ -329,8 +383,10 @@
           "path": "",
           "branch": "main",
           "manifest": "package_manifest.jetson-native.yaml",
+          "resolution": "catalog",
           "package_name": "robonix.service.mapping",
-          "package_url": "../robonix.service.mapping/"
+          "package_url": "../robonix.service.mapping/",
+          "resolution_warning": ""
         },
         {
           "section": "service",
@@ -339,8 +395,10 @@
           "path": "${ROBONIX_SOURCE_PATH}/services/speech",
           "branch": "",
           "manifest": "",
+          "resolution": "robonix_source",
           "package_name": "",
-          "package_url": ""
+          "package_url": "",
+          "resolution_warning": ""
         },
         {
           "section": "service",
@@ -349,12 +407,16 @@
           "path": "",
           "branch": "main",
           "manifest": "package_manifest.jetson-native.yaml",
+          "resolution": "catalog",
           "package_name": "robonix.service.navigation",
-          "package_url": "../robonix.service.navigation/"
+          "package_url": "../robonix.service.navigation/",
+          "resolution_warning": ""
         }
       ],
       "readme_url": "https://github.com/syswonder/robot-deep_robotics-lite3/blob/main/README.md",
-      "preview_image_url": ""
+      "preview_image_url": "",
+      "deployment_status": "ok",
+      "deployment_warnings": []
     },
     {
       "name": "robonix.robot.syswonder.minecraft_bot",
@@ -385,8 +447,10 @@
           "path": "",
           "branch": "v0.1.0",
           "manifest": "",
+          "resolution": "catalog",
           "package_name": "robonix.primitive.syswonder.minecraft_bot",
-          "package_url": "../robonix.primitive.syswonder.minecraft_bot/"
+          "package_url": "../robonix.primitive.syswonder.minecraft_bot/",
+          "resolution_warning": ""
         },
         {
           "section": "service",
@@ -395,8 +459,10 @@
           "path": "",
           "branch": "v0.1.0",
           "manifest": "",
+          "resolution": "catalog",
           "package_name": "robonix.service.minecraft_costmap",
-          "package_url": "../robonix.service.minecraft_costmap/"
+          "package_url": "../robonix.service.minecraft_costmap/",
+          "resolution_warning": ""
         },
         {
           "section": "service",
@@ -405,8 +471,10 @@
           "path": "",
           "branch": "v0.1.0",
           "manifest": "",
+          "resolution": "catalog",
           "package_name": "robonix.service.minecraft_navigation",
-          "package_url": "../robonix.service.minecraft_navigation/"
+          "package_url": "../robonix.service.minecraft_navigation/",
+          "resolution_warning": ""
         },
         {
           "section": "skill",
@@ -415,12 +483,16 @@
           "path": "",
           "branch": "v0.1.0",
           "manifest": "",
+          "resolution": "catalog",
           "package_name": "robonix.skill.minecraft_explore",
-          "package_url": "../robonix.skill.minecraft_explore/"
+          "package_url": "../robonix.skill.minecraft_explore/",
+          "resolution_warning": ""
         }
       ],
       "readme_url": "https://github.com/syswonder/robot-syswonder-minecraft_bot/blob/main/README.md",
-      "preview_image_url": "https://raw.githubusercontent.com/syswonder/robot-syswonder-minecraft_bot/main/assets/robot.jpg"
+      "preview_image_url": "https://raw.githubusercontent.com/syswonder/robot-syswonder-minecraft_bot/main/assets/robot.jpg",
+      "deployment_status": "ok",
+      "deployment_warnings": []
     },
     {
       "name": "robonix.robot.unitree.go2",
@@ -458,8 +530,10 @@
           "path": "${ROBONIX_DEPLOY_DIR}/packages/go2_chassis",
           "branch": "",
           "manifest": "",
+          "resolution": "robonix_deploy",
           "package_name": "",
-          "package_url": ""
+          "package_url": "",
+          "resolution_warning": ""
         },
         {
           "section": "primitive",
@@ -468,8 +542,10 @@
           "path": "${ROBONIX_DEPLOY_DIR}/packages/go2_sensors",
           "branch": "",
           "manifest": "",
+          "resolution": "robonix_deploy",
           "package_name": "",
-          "package_url": ""
+          "package_url": "",
+          "resolution_warning": ""
         },
         {
           "section": "primitive",
@@ -478,8 +554,10 @@
           "path": "${ROBONIX_DEPLOY_DIR}/packages/go2_description",
           "branch": "",
           "manifest": "",
+          "resolution": "robonix_deploy",
           "package_name": "",
-          "package_url": ""
+          "package_url": "",
+          "resolution_warning": ""
         },
         {
           "section": "primitive",
@@ -488,8 +566,10 @@
           "path": "${ROBONIX_SOURCE_PATH}/examples/webots/primitives/audio_client_bridge",
           "branch": "",
           "manifest": "",
+          "resolution": "robonix_source",
           "package_name": "",
-          "package_url": ""
+          "package_url": "",
+          "resolution_warning": ""
         },
         {
           "section": "service",
@@ -498,8 +578,10 @@
           "path": "",
           "branch": "main",
           "manifest": "",
+          "resolution": "catalog",
           "package_name": "robonix.service.mapping",
-          "package_url": "../robonix.service.mapping/"
+          "package_url": "../robonix.service.mapping/",
+          "resolution_warning": ""
         },
         {
           "section": "service",
@@ -508,8 +590,10 @@
           "path": "${ROBONIX_SOURCE_PATH}/services/speech",
           "branch": "",
           "manifest": "",
+          "resolution": "robonix_source",
           "package_name": "",
-          "package_url": ""
+          "package_url": "",
+          "resolution_warning": ""
         },
         {
           "section": "service",
@@ -518,8 +602,10 @@
           "path": "",
           "branch": "main",
           "manifest": "",
+          "resolution": "catalog",
           "package_name": "robonix.service.navigation",
-          "package_url": "../robonix.service.navigation/"
+          "package_url": "../robonix.service.navigation/",
+          "resolution_warning": ""
         },
         {
           "section": "service",
@@ -528,8 +614,10 @@
           "path": "${ROBONIX_DEPLOY_DIR}/packages/go2_dashboard",
           "branch": "",
           "manifest": "",
+          "resolution": "robonix_deploy",
           "package_name": "",
-          "package_url": ""
+          "package_url": "",
+          "resolution_warning": ""
         },
         {
           "section": "skill",
@@ -538,12 +626,16 @@
           "path": "${ROBONIX_DEPLOY_DIR}/packages/semantic_navigation",
           "branch": "",
           "manifest": "",
+          "resolution": "robonix_deploy",
           "package_name": "",
-          "package_url": ""
+          "package_url": "",
+          "resolution_warning": ""
         }
       ],
       "readme_url": "https://github.com/syswonder/robot-unitree-go2/blob/main/README.md",
-      "preview_image_url": ""
+      "preview_image_url": "",
+      "deployment_status": "ok",
+      "deployment_warnings": []
     },
     {
       "name": "robonix.robot.wheeltec.r550",
@@ -573,8 +665,10 @@
           "path": "/home/wheeltec/Desktop/rbnx_deploy/wheeltec_robot/primitives/robot_description",
           "branch": "",
           "manifest": "",
+          "resolution": "unresolved",
           "package_name": "",
-          "package_url": ""
+          "package_url": "",
+          "resolution_warning": "Uses host-specific absolute path '/home/wheeltec/Desktop/rbnx_deploy/wheeltec_robot/primitives/robot_description'; use a cataloged repository URL, ${ROBONIX_SOURCE_PATH}/... for a Robonix built-in, ${ROBONIX_DEPLOY_DIR}/... for the boot deployment, or a repository-relative path such as ./primitives/robot_description."
         },
         {
           "section": "primitive",
@@ -583,8 +677,10 @@
           "path": "/home/wheeltec/Desktop/rbnx_deploy/wheeltec_robot/primitives/r550_chassis",
           "branch": "",
           "manifest": "",
+          "resolution": "unresolved",
           "package_name": "",
-          "package_url": ""
+          "package_url": "",
+          "resolution_warning": "Uses host-specific absolute path '/home/wheeltec/Desktop/rbnx_deploy/wheeltec_robot/primitives/r550_chassis'; use a cataloged repository URL, ${ROBONIX_SOURCE_PATH}/... for a Robonix built-in, ${ROBONIX_DEPLOY_DIR}/... for the boot deployment, or a repository-relative path such as ./primitives/robot_description."
         },
         {
           "section": "primitive",
@@ -593,8 +689,10 @@
           "path": "/home/wheeltec/Desktop/rbnx_deploy/wheeltec_robot/primitives/n10p_lslidar",
           "branch": "",
           "manifest": "",
+          "resolution": "unresolved",
           "package_name": "",
-          "package_url": ""
+          "package_url": "",
+          "resolution_warning": "Uses host-specific absolute path '/home/wheeltec/Desktop/rbnx_deploy/wheeltec_robot/primitives/n10p_lslidar'; use a cataloged repository URL, ${ROBONIX_SOURCE_PATH}/... for a Robonix built-in, ${ROBONIX_DEPLOY_DIR}/... for the boot deployment, or a repository-relative path such as ./primitives/robot_description."
         },
         {
           "section": "primitive",
@@ -603,8 +701,10 @@
           "path": "./primitives/astra_s_camera",
           "branch": "",
           "manifest": "",
+          "resolution": "robot_repository",
           "package_name": "",
-          "package_url": ""
+          "package_url": "",
+          "resolution_warning": ""
         },
         {
           "section": "primitive",
@@ -613,8 +713,10 @@
           "path": "",
           "branch": "main",
           "manifest": "",
+          "resolution": "catalog",
           "package_name": "robonix.primitive.audio.alsa",
-          "package_url": "../robonix.primitive.audio.alsa/"
+          "package_url": "../robonix.primitive.audio.alsa/",
+          "resolution_warning": ""
         },
         {
           "section": "primitive",
@@ -623,8 +725,10 @@
           "path": "",
           "branch": "main",
           "manifest": "",
+          "resolution": "catalog",
           "package_name": "robonix.primitive.audio.client_bridge",
-          "package_url": "../robonix.primitive.audio.client_bridge/"
+          "package_url": "../robonix.primitive.audio.client_bridge/",
+          "resolution_warning": ""
         },
         {
           "section": "service",
@@ -633,8 +737,10 @@
           "path": "/home/wheeltec/Desktop/rbnx_deploy/wheeltec_robot/services/service-map-rbnx",
           "branch": "",
           "manifest": "package_manifest.jetson-native.yaml",
+          "resolution": "unresolved",
           "package_name": "",
-          "package_url": ""
+          "package_url": "",
+          "resolution_warning": "Uses host-specific absolute path '/home/wheeltec/Desktop/rbnx_deploy/wheeltec_robot/services/service-map-rbnx'; use a cataloged repository URL, ${ROBONIX_SOURCE_PATH}/... for a Robonix built-in, ${ROBONIX_DEPLOY_DIR}/... for the boot deployment, or a repository-relative path such as ./primitives/robot_description."
         },
         {
           "section": "service",
@@ -643,8 +749,10 @@
           "path": "./services/service-navigation-rbnx",
           "branch": "",
           "manifest": "package_manifest.jetson-docker.yaml",
+          "resolution": "robot_repository",
           "package_name": "",
-          "package_url": ""
+          "package_url": "",
+          "resolution_warning": ""
         },
         {
           "section": "service",
@@ -653,8 +761,10 @@
           "path": "${ROBONIX_SOURCE_PATH}/services/memsearch",
           "branch": "",
           "manifest": "",
+          "resolution": "robonix_source",
           "package_name": "",
-          "package_url": ""
+          "package_url": "",
+          "resolution_warning": ""
         },
         {
           "section": "service",
@@ -663,8 +773,10 @@
           "path": "${ROBONIX_SOURCE_PATH}/services/speech",
           "branch": "",
           "manifest": "",
+          "resolution": "robonix_source",
           "package_name": "",
-          "package_url": ""
+          "package_url": "",
+          "resolution_warning": ""
         },
         {
           "section": "service",
@@ -673,8 +785,10 @@
           "path": "${ROBONIX_SOURCE_PATH}/services/voiceprint",
           "branch": "",
           "manifest": "",
+          "resolution": "robonix_source",
           "package_name": "",
-          "package_url": ""
+          "package_url": "",
+          "resolution_warning": ""
         },
         {
           "section": "skill",
@@ -683,12 +797,41 @@
           "path": "./skills/skill-explore-rbnx",
           "branch": "",
           "manifest": "",
+          "resolution": "robot_repository",
           "package_name": "",
-          "package_url": ""
+          "package_url": "",
+          "resolution_warning": ""
         }
       ],
       "readme_url": "https://github.com/syswonder/robot-wheeltec-r550/blob/main/README.md",
-      "preview_image_url": ""
+      "preview_image_url": "",
+      "deployment_status": "warning",
+      "deployment_warnings": [
+        {
+          "section": "primitive",
+          "name": "robot_description",
+          "source": "/home/wheeltec/Desktop/rbnx_deploy/wheeltec_robot/primitives/robot_description",
+          "reason": "Uses host-specific absolute path '/home/wheeltec/Desktop/rbnx_deploy/wheeltec_robot/primitives/robot_description'; use a cataloged repository URL, ${ROBONIX_SOURCE_PATH}/... for a Robonix built-in, ${ROBONIX_DEPLOY_DIR}/... for the boot deployment, or a repository-relative path such as ./primitives/robot_description."
+        },
+        {
+          "section": "primitive",
+          "name": "r550_chassis",
+          "source": "/home/wheeltec/Desktop/rbnx_deploy/wheeltec_robot/primitives/r550_chassis",
+          "reason": "Uses host-specific absolute path '/home/wheeltec/Desktop/rbnx_deploy/wheeltec_robot/primitives/r550_chassis'; use a cataloged repository URL, ${ROBONIX_SOURCE_PATH}/... for a Robonix built-in, ${ROBONIX_DEPLOY_DIR}/... for the boot deployment, or a repository-relative path such as ./primitives/robot_description."
+        },
+        {
+          "section": "primitive",
+          "name": "n10p_lslidar",
+          "source": "/home/wheeltec/Desktop/rbnx_deploy/wheeltec_robot/primitives/n10p_lslidar",
+          "reason": "Uses host-specific absolute path '/home/wheeltec/Desktop/rbnx_deploy/wheeltec_robot/primitives/n10p_lslidar'; use a cataloged repository URL, ${ROBONIX_SOURCE_PATH}/... for a Robonix built-in, ${ROBONIX_DEPLOY_DIR}/... for the boot deployment, or a repository-relative path such as ./primitives/robot_description."
+        },
+        {
+          "section": "service",
+          "name": "mapping",
+          "source": "/home/wheeltec/Desktop/rbnx_deploy/wheeltec_robot/services/service-map-rbnx",
+          "reason": "Uses host-specific absolute path '/home/wheeltec/Desktop/rbnx_deploy/wheeltec_robot/services/service-map-rbnx'; use a cataloged repository URL, ${ROBONIX_SOURCE_PATH}/... for a Robonix built-in, ${ROBONIX_DEPLOY_DIR}/... for the boot deployment, or a repository-relative path such as ./primitives/robot_description."
+        }
+      ]
     },
     {
       "name": "robonix.robot.wowrobo.roboarm",
@@ -720,8 +863,10 @@
           "path": "primitives/roboarm_arm",
           "branch": "",
           "manifest": "",
+          "resolution": "robot_repository",
           "package_name": "",
-          "package_url": ""
+          "package_url": "",
+          "resolution_warning": ""
         },
         {
           "section": "primitive",
@@ -730,8 +875,10 @@
           "path": "primitives/orbbec_camera_roboarm",
           "branch": "",
           "manifest": "",
+          "resolution": "robot_repository",
           "package_name": "",
-          "package_url": ""
+          "package_url": "",
+          "resolution_warning": ""
         },
         {
           "section": "primitive",
@@ -740,8 +887,10 @@
           "path": "",
           "branch": "main",
           "manifest": "",
+          "resolution": "catalog",
           "package_name": "robonix.primitive.audio.alsa",
-          "package_url": "../robonix.primitive.audio.alsa/"
+          "package_url": "../robonix.primitive.audio.alsa/",
+          "resolution_warning": ""
         },
         {
           "section": "service",
@@ -750,8 +899,10 @@
           "path": "${ROBONIX_SOURCE_PATH}/services/speech",
           "branch": "",
           "manifest": "",
+          "resolution": "robonix_source",
           "package_name": "",
-          "package_url": ""
+          "package_url": "",
+          "resolution_warning": ""
         },
         {
           "section": "skill",
@@ -760,12 +911,16 @@
           "path": "skills/roboarm_grasp",
           "branch": "",
           "manifest": "",
+          "resolution": "robot_repository",
           "package_name": "",
-          "package_url": ""
+          "package_url": "",
+          "resolution_warning": ""
         }
       ],
       "readme_url": "https://github.com/syswonder/robot-wowrobo-roboarm/blob/main/README.md",
-      "preview_image_url": ""
+      "preview_image_url": "",
+      "deployment_status": "ok",
+      "deployment_warnings": []
     }
   ]
 }

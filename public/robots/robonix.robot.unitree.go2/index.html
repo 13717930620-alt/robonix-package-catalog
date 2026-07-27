@@ -27,6 +27,9 @@
       --brand-deep: #17205f;
       --signal: #3674ff;
       --signal-soft: #e9edff;
+      --warning: #8a4b08;
+      --warning-line: #e2ad58;
+      --warning-soft: #fff7e8;
       --shadow: 0 8px 28px rgba(28, 38, 88, 0.06);
       --site-header-height: 64px;
       --sticky-gap: 14px;
@@ -291,6 +294,11 @@
     .package-card:nth-child(3) { animation-delay: 70ms; }
     .package-card:nth-child(4) { animation-delay: 105ms; }
     .package-card:hover { border-color: #bcc6ec; box-shadow: var(--shadow); transform: translateY(-2px); }
+    .package-card.has-warning {
+      border-color: var(--warning-line);
+      background: linear-gradient(90deg, var(--warning-soft), #fff 26%);
+    }
+    .package-card.has-warning:hover { border-color: #c9892f; }
     @keyframes rise-in {
       from { opacity: 0; transform: translateY(7px); }
       to { opacity: 1; transform: translateY(0); }
@@ -305,6 +313,35 @@
       letter-spacing: 0.08em;
       text-transform: uppercase;
     }
+    .card-status-line { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+    .warning-badge {
+      display: inline-flex;
+      align-items: center;
+      width: fit-content;
+      min-width: 0;
+      border: 1px solid var(--warning-line);
+      border-radius: 999px;
+      padding: 2px 7px;
+      color: var(--warning);
+      background: var(--warning-soft);
+      font-family: var(--font-sans);
+      font-size: 11px;
+      font-weight: 700;
+      line-height: 1.35;
+    }
+    .warning-summary {
+      margin: 9px 0;
+      border-left: 3px solid var(--warning-line);
+      padding: 7px 9px;
+      color: #5f3a12;
+      background: var(--warning-soft);
+      font-size: 12px;
+      line-height: 1.4;
+    }
+    .warning-summary strong { display: block; margin-bottom: 3px; color: var(--warning); }
+    .warning-summary ul { margin: 0; padding-left: 17px; }
+    .warning-summary li { margin: 2px 0; }
+    .warning-summary code { color: #5f3a12; background: transparent; padding: 0; }
     .package-title { display: flex; gap: 8px; align-items: baseline; flex-wrap: wrap; margin-bottom: 5px; }
     .package-title a {
       font-family: var(--font-mono);
@@ -409,6 +446,32 @@
       display: inline-block;
       min-width: 64px;
     }
+    .cap-list li.dependency-warning {
+      border-color: var(--warning-line);
+      background: var(--warning-soft);
+    }
+    .dependency-warning .warning-badge { margin-left: 5px; }
+    .dependency-warning-reason {
+      display: block;
+      margin-top: 5px;
+      color: #5f3a12;
+      font-family: var(--font-sans);
+      font-size: 12px;
+      line-height: 1.4;
+    }
+    .detail-warning {
+      max-width: 920px;
+      margin-top: 12px;
+      border: 1px solid var(--warning-line);
+      border-radius: 7px;
+      padding: 10px 12px;
+      color: #5f3a12;
+      background: var(--warning-soft);
+      font-size: 13px;
+    }
+    .detail-warning strong { display: block; margin-bottom: 4px; color: var(--warning); }
+    .detail-warning ul { margin: 0; padding-left: 18px; }
+    .detail-warning li { margin: 3px 0; }
     .detail-hero { padding: 20px 0 4px; }
     .detail-hero h1 { font-family: var(--font-mono); }
     .back { display: inline-block; margin: 0 0 12px; color: var(--brand); }
@@ -820,6 +883,6 @@ in the pinned submodules.</p>
       </aside>
     </div>
   </main>
-  <footer class="site-footer"><div class="shell">Generated on 2026-07-27T05:16:29+00:00.</div></footer>
+  <footer class="site-footer"><div class="shell">Generated on 2026-07-27T05:22:46+00:00.</div></footer>
 </body>
 </html>

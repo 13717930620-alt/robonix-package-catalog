@@ -28,8 +28,10 @@
       "path": "primitives/roboarm_arm",
       "branch": "",
       "manifest": "",
+      "resolution": "robot_repository",
       "package_name": "",
-      "package_url": ""
+      "package_url": "",
+      "resolution_warning": ""
     },
     {
       "section": "primitive",
@@ -38,8 +40,10 @@
       "path": "primitives/orbbec_camera_roboarm",
       "branch": "",
       "manifest": "",
+      "resolution": "robot_repository",
       "package_name": "",
-      "package_url": ""
+      "package_url": "",
+      "resolution_warning": ""
     },
     {
       "section": "primitive",
@@ -48,8 +52,10 @@
       "path": "",
       "branch": "main",
       "manifest": "",
+      "resolution": "catalog",
       "package_name": "robonix.primitive.audio.alsa",
-      "package_url": "../robonix.primitive.audio.alsa/"
+      "package_url": "../robonix.primitive.audio.alsa/",
+      "resolution_warning": ""
     },
     {
       "section": "service",
@@ -58,8 +64,10 @@
       "path": "${ROBONIX_SOURCE_PATH}/services/speech",
       "branch": "",
       "manifest": "",
+      "resolution": "robonix_source",
       "package_name": "",
-      "package_url": ""
+      "package_url": "",
+      "resolution_warning": ""
     },
     {
       "section": "skill",
@@ -68,10 +76,14 @@
       "path": "skills/roboarm_grasp",
       "branch": "",
       "manifest": "",
+      "resolution": "robot_repository",
       "package_name": "",
-      "package_url": ""
+      "package_url": "",
+      "resolution_warning": ""
     }
   ],
   "readme_url": "https://github.com/syswonder/robot-wowrobo-roboarm/blob/main/README.md",
-  "preview_image_url": ""
+  "preview_image_url": "",
+  "deployment_status": "ok",
+  "deployment_warnings": []
 }

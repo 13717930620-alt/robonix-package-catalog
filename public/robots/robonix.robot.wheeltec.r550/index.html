@@ -27,6 +27,9 @@
       --brand-deep: #17205f;
       --signal: #3674ff;
       --signal-soft: #e9edff;
+      --warning: #8a4b08;
+      --warning-line: #e2ad58;
+      --warning-soft: #fff7e8;
       --shadow: 0 8px 28px rgba(28, 38, 88, 0.06);
       --site-header-height: 64px;
       --sticky-gap: 14px;
@@ -291,6 +294,11 @@
     .package-card:nth-child(3) { animation-delay: 70ms; }
     .package-card:nth-child(4) { animation-delay: 105ms; }
     .package-card:hover { border-color: #bcc6ec; box-shadow: var(--shadow); transform: translateY(-2px); }
+    .package-card.has-warning {
+      border-color: var(--warning-line);
+      background: linear-gradient(90deg, var(--warning-soft), #fff 26%);
+    }
+    .package-card.has-warning:hover { border-color: #c9892f; }
     @keyframes rise-in {
       from { opacity: 0; transform: translateY(7px); }
       to { opacity: 1; transform: translateY(0); }
@@ -305,6 +313,35 @@
       letter-spacing: 0.08em;
       text-transform: uppercase;
     }
+    .card-status-line { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+    .warning-badge {
+      display: inline-flex;
+      align-items: center;
+      width: fit-content;
+      min-width: 0;
+      border: 1px solid var(--warning-line);
+      border-radius: 999px;
+      padding: 2px 7px;
+      color: var(--warning);
+      background: var(--warning-soft);
+      font-family: var(--font-sans);
+      font-size: 11px;
+      font-weight: 700;
+      line-height: 1.35;
+    }
+    .warning-summary {
+      margin: 9px 0;
+      border-left: 3px solid var(--warning-line);
+      padding: 7px 9px;
+      color: #5f3a12;
+      background: var(--warning-soft);
+      font-size: 12px;
+      line-height: 1.4;
+    }
+    .warning-summary strong { display: block; margin-bottom: 3px; color: var(--warning); }
+    .warning-summary ul { margin: 0; padding-left: 17px; }
+    .warning-summary li { margin: 2px 0; }
+    .warning-summary code { color: #5f3a12; background: transparent; padding: 0; }
     .package-title { display: flex; gap: 8px; align-items: baseline; flex-wrap: wrap; margin-bottom: 5px; }
     .package-title a {
       font-family: var(--font-mono);
@@ -409,6 +446,32 @@
       display: inline-block;
       min-width: 64px;
     }
+    .cap-list li.dependency-warning {
+      border-color: var(--warning-line);
+      background: var(--warning-soft);
+    }
+    .dependency-warning .warning-badge { margin-left: 5px; }
+    .dependency-warning-reason {
+      display: block;
+      margin-top: 5px;
+      color: #5f3a12;
+      font-family: var(--font-sans);
+      font-size: 12px;
+      line-height: 1.4;
+    }
+    .detail-warning {
+      max-width: 920px;
+      margin-top: 12px;
+      border: 1px solid var(--warning-line);
+      border-radius: 7px;
+      padding: 10px 12px;
+      color: #5f3a12;
+      background: var(--warning-soft);
+      font-size: 13px;
+    }
+    .detail-warning strong { display: block; margin-bottom: 4px; color: var(--warning); }
+    .detail-warning ul { margin: 0; padding-left: 18px; }
+    .detail-warning li { margin: 3px 0; }
     .detail-hero { padding: 20px 0 4px; }
     .detail-hero h1 { font-family: var(--font-mono); }
     .back { display: inline-block; margin: 0 0 12px; color: var(--brand); }
@@ -721,6 +784,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
     <a class="back" href="../">Back to robots</a>
     <h1>robonix.robot.wheeltec.r550</h1>
     <p class="lede">Wheeltec R550 mini_tank — 2D SLAM mapping deploy (N10P lidar + rtabmap).</p>
+    <div class="detail-warning" role="note" aria-label="Deployment warning"><strong>Deployment warning · 4 unresolved dependencies</strong><ul><li><code>primitive robot_description</code>: Uses host-specific absolute path &#x27;/home/wheeltec/Desktop/rbnx_deploy/wheeltec_robot/primitives/robot_description&#x27;; use a cataloged repository URL, ${ROBONIX_SOURCE_PATH}/... for a Robonix built-in, ${ROBONIX_DEPLOY_DIR}/... for the boot deployment, or a repository-relative path such as ./primitives/robot_description.</li><li><code>primitive r550_chassis</code>: Uses host-specific absolute path &#x27;/home/wheeltec/Desktop/rbnx_deploy/wheeltec_robot/primitives/r550_chassis&#x27;; use a cataloged repository URL, ${ROBONIX_SOURCE_PATH}/... for a Robonix built-in, ${ROBONIX_DEPLOY_DIR}/... for the boot deployment, or a repository-relative path such as ./primitives/robot_description.</li><li><code>primitive n10p_lslidar</code>: Uses host-specific absolute path &#x27;/home/wheeltec/Desktop/rbnx_deploy/wheeltec_robot/primitives/n10p_lslidar&#x27;; use a cataloged repository URL, ${ROBONIX_SOURCE_PATH}/... for a Robonix built-in, ${ROBONIX_DEPLOY_DIR}/... for the boot deployment, or a repository-relative path such as ./primitives/robot_description.</li><li><code>service mapping</code>: Uses host-specific absolute path &#x27;/home/wheeltec/Desktop/rbnx_deploy/wheeltec_robot/services/service-map-rbnx&#x27;; use a cataloged repository URL, ${ROBONIX_SOURCE_PATH}/... for a Robonix built-in, ${ROBONIX_DEPLOY_DIR}/... for the boot deployment, or a repository-relative path such as ./primitives/robot_description.</li></ul></div>
   </header>
   <main class="shell">
     <div class="detail-layout">
@@ -1045,13 +1109,13 @@ rbnx<span class="w"> </span>chat
         <div class="tags"><button class="tag tag-red" data-tag="robot">robot</button> <button class="tag tag-slate" data-tag="deploy">deploy</button> <button class="tag tag-gray" data-tag="robonix">robonix</button></div>
         <h2>Deployment Packages</h2>
         <ul class="cap-list">
-          <li><span>primitive</span> <code>robot_description</code><br>/home/wheeltec/Desktop/rbnx_deploy/wheeltec_robot/primitives/robot_description</li>
-<li><span>primitive</span> <code>r550_chassis</code><br>/home/wheeltec/Desktop/rbnx_deploy/wheeltec_robot/primitives/r550_chassis</li>
-<li><span>primitive</span> <code>n10p_lslidar</code><br>/home/wheeltec/Desktop/rbnx_deploy/wheeltec_robot/primitives/n10p_lslidar</li>
+          <li class="dependency-warning"><span>primitive</span> <code>robot_description</code><strong class="warning-badge">Warning</strong><br>/home/wheeltec/Desktop/rbnx_deploy/wheeltec_robot/primitives/robot_description<small class="dependency-warning-reason">Uses host-specific absolute path &#x27;/home/wheeltec/Desktop/rbnx_deploy/wheeltec_robot/primitives/robot_description&#x27;; use a cataloged repository URL, ${ROBONIX_SOURCE_PATH}/... for a Robonix built-in, ${ROBONIX_DEPLOY_DIR}/... for the boot deployment, or a repository-relative path such as ./primitives/robot_description.</small></li>
+<li class="dependency-warning"><span>primitive</span> <code>r550_chassis</code><strong class="warning-badge">Warning</strong><br>/home/wheeltec/Desktop/rbnx_deploy/wheeltec_robot/primitives/r550_chassis<small class="dependency-warning-reason">Uses host-specific absolute path &#x27;/home/wheeltec/Desktop/rbnx_deploy/wheeltec_robot/primitives/r550_chassis&#x27;; use a cataloged repository URL, ${ROBONIX_SOURCE_PATH}/... for a Robonix built-in, ${ROBONIX_DEPLOY_DIR}/... for the boot deployment, or a repository-relative path such as ./primitives/robot_description.</small></li>
+<li class="dependency-warning"><span>primitive</span> <code>n10p_lslidar</code><strong class="warning-badge">Warning</strong><br>/home/wheeltec/Desktop/rbnx_deploy/wheeltec_robot/primitives/n10p_lslidar<small class="dependency-warning-reason">Uses host-specific absolute path &#x27;/home/wheeltec/Desktop/rbnx_deploy/wheeltec_robot/primitives/n10p_lslidar&#x27;; use a cataloged repository URL, ${ROBONIX_SOURCE_PATH}/... for a Robonix built-in, ${ROBONIX_DEPLOY_DIR}/... for the boot deployment, or a repository-relative path such as ./primitives/robot_description.</small></li>
 <li><span>primitive</span> <code>astra_s_camera</code><br>./primitives/astra_s_camera</li>
 <li><span>primitive</span> <code>audio_driver</code><br><a href="../../packages/robonix.primitive.audio.alsa/">robonix.primitive.audio.alsa</a></li>
 <li><span>primitive</span> <code>audio_client_bridge</code><br><a href="../../packages/robonix.primitive.audio.client_bridge/">robonix.primitive.audio.client_bridge</a></li>
-<li><span>service</span> <code>mapping</code><br>/home/wheeltec/Desktop/rbnx_deploy/wheeltec_robot/services/service-map-rbnx</li>
+<li class="dependency-warning"><span>service</span> <code>mapping</code><strong class="warning-badge">Warning</strong><br>/home/wheeltec/Desktop/rbnx_deploy/wheeltec_robot/services/service-map-rbnx<small class="dependency-warning-reason">Uses host-specific absolute path &#x27;/home/wheeltec/Desktop/rbnx_deploy/wheeltec_robot/services/service-map-rbnx&#x27;; use a cataloged repository URL, ${ROBONIX_SOURCE_PATH}/... for a Robonix built-in, ${ROBONIX_DEPLOY_DIR}/... for the boot deployment, or a repository-relative path such as ./primitives/robot_description.</small></li>
 <li><span>service</span> <code>nav2</code><br>./services/service-navigation-rbnx</li>
 <li><span>service</span> <code>memory</code><br>${ROBONIX_SOURCE_PATH}/services/memsearch</li>
 <li><span>service</span> <code>speech</code><br>${ROBONIX_SOURCE_PATH}/services/speech</li>
@@ -1061,6 +1125,6 @@ rbnx<span class="w"> </span>chat
       </aside>
     </div>
   </main>
-  <footer class="site-footer"><div class="shell">Generated on 2026-07-27T05:16:29+00:00.</div></footer>
+  <footer class="site-footer"><div class="shell">Generated on 2026-07-27T05:22:46+00:00.</div></footer>
 </body>
 </html>

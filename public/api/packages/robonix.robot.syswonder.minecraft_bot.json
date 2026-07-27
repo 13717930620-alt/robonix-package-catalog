@@ -27,8 +27,10 @@
       "path": "",
       "branch": "v0.1.0",
       "manifest": "",
+      "resolution": "catalog",
       "package_name": "robonix.primitive.syswonder.minecraft_bot",
-      "package_url": "../robonix.primitive.syswonder.minecraft_bot/"
+      "package_url": "../robonix.primitive.syswonder.minecraft_bot/",
+      "resolution_warning": ""
     },
     {
       "section": "service",
@@ -37,8 +39,10 @@
       "path": "",
       "branch": "v0.1.0",
       "manifest": "",
+      "resolution": "catalog",
       "package_name": "robonix.service.minecraft_costmap",
-      "package_url": "../robonix.service.minecraft_costmap/"
+      "package_url": "../robonix.service.minecraft_costmap/",
+      "resolution_warning": ""
     },
     {
       "section": "service",
@@ -47,8 +51,10 @@
       "path": "",
       "branch": "v0.1.0",
       "manifest": "",
+      "resolution": "catalog",
       "package_name": "robonix.service.minecraft_navigation",
-      "package_url": "../robonix.service.minecraft_navigation/"
+      "package_url": "../robonix.service.minecraft_navigation/",
+      "resolution_warning": ""
     },
     {
       "section": "skill",
@@ -57,10 +63,14 @@
       "path": "",
       "branch": "v0.1.0",
       "manifest": "",
+      "resolution": "catalog",
       "package_name": "robonix.skill.minecraft_explore",
-      "package_url": "../robonix.skill.minecraft_explore/"
+      "package_url": "../robonix.skill.minecraft_explore/",
+      "resolution_warning": ""
     }
   ],
   "readme_url": "https://github.com/syswonder/robot-syswonder-minecraft_bot/blob/main/README.md",
-  "preview_image_url": "https://raw.githubusercontent.com/syswonder/robot-syswonder-minecraft_bot/main/assets/robot.jpg"
+  "preview_image_url": "https://raw.githubusercontent.com/syswonder/robot-syswonder-minecraft_bot/main/assets/robot.jpg",
+  "deployment_status": "ok",
+  "deployment_warnings": []
 }

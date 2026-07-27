@@ -34,8 +34,10 @@
       "path": "${ROBONIX_DEPLOY_DIR}/packages/go2_chassis",
       "branch": "",
       "manifest": "",
+      "resolution": "robonix_deploy",
       "package_name": "",
-      "package_url": ""
+      "package_url": "",
+      "resolution_warning": ""
     },
     {
       "section": "primitive",
@@ -44,8 +46,10 @@
       "path": "${ROBONIX_DEPLOY_DIR}/packages/go2_sensors",
       "branch": "",
       "manifest": "",
+      "resolution": "robonix_deploy",
       "package_name": "",
-      "package_url": ""
+      "package_url": "",
+      "resolution_warning": ""
     },
     {
       "section": "primitive",
@@ -54,8 +58,10 @@
       "path": "${ROBONIX_DEPLOY_DIR}/packages/go2_description",
       "branch": "",
       "manifest": "",
+      "resolution": "robonix_deploy",
       "package_name": "",
-      "package_url": ""
+      "package_url": "",
+      "resolution_warning": ""
     },
     {
       "section": "primitive",
@@ -64,8 +70,10 @@
       "path": "${ROBONIX_SOURCE_PATH}/examples/webots/primitives/audio_client_bridge",
       "branch": "",
       "manifest": "",
+      "resolution": "robonix_source",
       "package_name": "",
-      "package_url": ""
+      "package_url": "",
+      "resolution_warning": ""
     },
     {
       "section": "service",
@@ -74,8 +82,10 @@
       "path": "",
       "branch": "main",
       "manifest": "",
+      "resolution": "catalog",
       "package_name": "robonix.service.mapping",
-      "package_url": "../robonix.service.mapping/"
+      "package_url": "../robonix.service.mapping/",
+      "resolution_warning": ""
     },
     {
       "section": "service",
@@ -84,8 +94,10 @@
       "path": "${ROBONIX_SOURCE_PATH}/services/speech",
       "branch": "",
       "manifest": "",
+      "resolution": "robonix_source",
       "package_name": "",
-      "package_url": ""
+      "package_url": "",
+      "resolution_warning": ""
     },
     {
       "section": "service",
@@ -94,8 +106,10 @@
       "path": "",
       "branch": "main",
       "manifest": "",
+      "resolution": "catalog",
       "package_name": "robonix.service.navigation",
-      "package_url": "../robonix.service.navigation/"
+      "package_url": "../robonix.service.navigation/",
+      "resolution_warning": ""
     },
     {
       "section": "service",
@@ -104,8 +118,10 @@
       "path": "${ROBONIX_DEPLOY_DIR}/packages/go2_dashboard",
       "branch": "",
       "manifest": "",
+      "resolution": "robonix_deploy",
       "package_name": "",
-      "package_url": ""
+      "package_url": "",
+      "resolution_warning": ""
     },
     {
       "section": "skill",
@@ -114,10 +130,14 @@
       "path": "${ROBONIX_DEPLOY_DIR}/packages/semantic_navigation",
       "branch": "",
       "manifest": "",
+      "resolution": "robonix_deploy",
       "package_name": "",
-      "package_url": ""
+      "package_url": "",
+      "resolution_warning": ""
     }
   ],
   "readme_url": "https://github.com/syswonder/robot-unitree-go2/blob/main/README.md",
-  "preview_image_url": ""
+  "preview_image_url": "",
+  "deployment_status": "ok",
+  "deployment_warnings": []
 }

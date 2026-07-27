@@ -72,6 +72,8 @@ Package object fields:
 | `manifest` | string | source manifest path, usually `package_manifest.yaml` or `robonix_manifest.yaml` |
 | `capabilities` | string[] | declared Robonix contract IDs |
 | `deploy_dependencies` | object[] | robot deployment dependencies parsed from `robonix_manifest.yaml` |
+| `deployment_status` | string | robot dependency health: `ok` or `warning` |
+| `deployment_warnings` | object[] | unresolved robot dependencies with section, name, source, and reason |
 | `readme_url` | string | GitHub README URL for the indexed branch |
 | `preview_image_url` | string | optional robot preview discovered at `assets/robot.jpg`; empty when absent |
 
@@ -181,7 +183,15 @@ the same metadata and layout without an image placeholder.
 
 The builder also parses `primitive:`, `service:`, and `skill:` entries from
 `robonix_manifest.yaml` into `deploy_dependencies[]`, linking dependencies
-back to cataloged ordinary packages when their repository is known.
+back to cataloged ordinary packages when their repository is known. Each
+dependency includes `resolution` (`catalog`, `robonix_source`,
+`robonix_deploy`, `robot_repository`, or `unresolved`) and
+`resolution_warning`. A source is
+portable when it resolves to a cataloged repository, uses the exact
+`${ROBONIX_SOURCE_PATH}/...` source-tree root, uses the exact
+`${ROBONIX_DEPLOY_DIR}/...` boot-deployment root, or stays inside the
+robot repository through a relative path. Unresolved sources produce CI
+warnings and a report without failing catalog generation.
 
 ## Generated Outputs
 
@@ -206,7 +216,7 @@ but browser-facing links and new integrations should use the `.json` paths above
 The generated commit uses `[skip ci]`; normal CI only triggers from
 `catalog.yaml`, the builder script, the workflow, or manual dispatch.
 
-Generated on `2026-07-27T05:16:29+00:00`.
+Generated on `2026-07-27T05:22:46+00:00`.
 
 ## Packages
 

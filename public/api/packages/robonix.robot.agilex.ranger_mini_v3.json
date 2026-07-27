@@ -33,8 +33,10 @@
       "path": "",
       "branch": "main",
       "manifest": "package_manifest.native.yaml",
+      "resolution": "catalog",
       "package_name": "robonix.primitive.robot_description",
-      "package_url": "../robonix.primitive.robot_description/"
+      "package_url": "../robonix.primitive.robot_description/",
+      "resolution_warning": ""
     },
     {
       "section": "primitive",
@@ -43,8 +45,10 @@
       "path": "",
       "branch": "main",
       "manifest": "",
+      "resolution": "catalog",
       "package_name": "robonix.primitive.livox.mid360.lidar",
-      "package_url": "../robonix.primitive.livox.mid360.lidar/"
+      "package_url": "../robonix.primitive.livox.mid360.lidar/",
+      "resolution_warning": ""
     },
     {
       "section": "primitive",
@@ -53,8 +57,10 @@
       "path": "",
       "branch": "main",
       "manifest": "",
+      "resolution": "catalog",
       "package_name": "robonix.primitive.livox.mid360.imu",
-      "package_url": "../robonix.primitive.livox.mid360.imu/"
+      "package_url": "../robonix.primitive.livox.mid360.imu/",
+      "resolution_warning": ""
     },
     {
       "section": "primitive",
@@ -63,8 +69,10 @@
       "path": "",
       "branch": "main",
       "manifest": "",
+      "resolution": "catalog",
       "package_name": "robonix.primitive.orbbec.gemini330.camera",
-      "package_url": "../robonix.primitive.orbbec.gemini330.camera/"
+      "package_url": "../robonix.primitive.orbbec.gemini330.camera/",
+      "resolution_warning": ""
     },
     {
       "section": "primitive",
@@ -73,8 +81,10 @@
       "path": "",
       "branch": "main",
       "manifest": "",
+      "resolution": "catalog",
       "package_name": "robonix.primitive.orbbec.dabai_dcw.camera",
-      "package_url": "../robonix.primitive.orbbec.dabai_dcw.camera/"
+      "package_url": "../robonix.primitive.orbbec.dabai_dcw.camera/",
+      "resolution_warning": ""
     },
     {
       "section": "primitive",
@@ -83,8 +93,10 @@
       "path": "",
       "branch": "main",
       "manifest": "",
+      "resolution": "catalog",
       "package_name": "robonix.primitive.agilex.ranger_mini_v3.chassis",
-      "package_url": "../robonix.primitive.agilex.ranger_mini_v3.chassis/"
+      "package_url": "../robonix.primitive.agilex.ranger_mini_v3.chassis/",
+      "resolution_warning": ""
     },
     {
       "section": "primitive",
@@ -93,8 +105,10 @@
       "path": "",
       "branch": "main",
       "manifest": "",
+      "resolution": "catalog",
       "package_name": "robonix.primitive.agilex.piper.arm",
-      "package_url": "../robonix.primitive.agilex.piper.arm/"
+      "package_url": "../robonix.primitive.agilex.piper.arm/",
+      "resolution_warning": ""
     },
     {
       "section": "primitive",
@@ -103,8 +117,10 @@
       "path": "",
       "branch": "main",
       "manifest": "",
+      "resolution": "catalog",
       "package_name": "robonix.primitive.audio.alsa",
-      "package_url": "../robonix.primitive.audio.alsa/"
+      "package_url": "../robonix.primitive.audio.alsa/",
+      "resolution_warning": ""
     },
     {
       "section": "primitive",
@@ -113,8 +129,10 @@
       "path": "",
       "branch": "main",
       "manifest": "",
+      "resolution": "catalog",
       "package_name": "robonix.primitive.audio.client_bridge",
-      "package_url": "../robonix.primitive.audio.client_bridge/"
+      "package_url": "../robonix.primitive.audio.client_bridge/",
+      "resolution_warning": ""
     },
     {
       "section": "service",
@@ -123,8 +141,10 @@
       "path": "${ROBONIX_SOURCE_PATH}/services/memsearch",
       "branch": "",
       "manifest": "",
+      "resolution": "robonix_source",
       "package_name": "",
-      "package_url": ""
+      "package_url": "",
+      "resolution_warning": ""
     },
     {
       "section": "service",
@@ -133,8 +153,10 @@
       "path": "${ROBONIX_SOURCE_PATH}/services/speech",
       "branch": "",
       "manifest": "",
+      "resolution": "robonix_source",
       "package_name": "",
-      "package_url": ""
+      "package_url": "",
+      "resolution_warning": ""
     },
     {
       "section": "service",
@@ -143,8 +165,10 @@
       "path": "${ROBONIX_SOURCE_PATH}/services/voiceprint",
       "branch": "",
       "manifest": "",
+      "resolution": "robonix_source",
       "package_name": "",
-      "package_url": ""
+      "package_url": "",
+      "resolution_warning": ""
     },
     {
       "section": "service",
@@ -153,8 +177,10 @@
       "path": "",
       "branch": "main",
       "manifest": "",
+      "resolution": "catalog",
       "package_name": "robonix.service.object_detect",
-      "package_url": "../robonix.service.object_detect/"
+      "package_url": "../robonix.service.object_detect/",
+      "resolution_warning": ""
     },
     {
       "section": "service",
@@ -163,8 +189,10 @@
       "path": "",
       "branch": "main",
       "manifest": "",
+      "resolution": "catalog",
       "package_name": "robonix.service.grasp_pose",
-      "package_url": "../robonix.service.grasp_pose/"
+      "package_url": "../robonix.service.grasp_pose/",
+      "resolution_warning": ""
     },
     {
       "section": "service",
@@ -173,8 +201,10 @@
       "path": "",
       "branch": "main",
       "manifest": "",
+      "resolution": "catalog",
       "package_name": "robonix.service.roboarm.ik",
-      "package_url": "../robonix.service.roboarm.ik/"
+      "package_url": "../robonix.service.roboarm.ik/",
+      "resolution_warning": ""
     },
     {
       "section": "service",
@@ -183,8 +213,10 @@
       "path": "",
       "branch": "main",
       "manifest": "package_manifest.jetson-native.yaml",
+      "resolution": "catalog",
       "package_name": "robonix.service.mapping",
-      "package_url": "../robonix.service.mapping/"
+      "package_url": "../robonix.service.mapping/",
+      "resolution_warning": ""
     },
     {
       "section": "service",
@@ -193,8 +225,10 @@
       "path": "",
       "branch": "main",
       "manifest": "package_manifest.jetson-native.yaml",
+      "resolution": "catalog",
       "package_name": "robonix.service.navigation",
-      "package_url": "../robonix.service.navigation/"
+      "package_url": "../robonix.service.navigation/",
+      "resolution_warning": ""
     },
     {
       "section": "skill",
@@ -203,8 +237,10 @@
       "path": "",
       "branch": "main",
       "manifest": "",
+      "resolution": "catalog",
       "package_name": "robonix.skill.explore",
-      "package_url": "../robonix.skill.explore/"
+      "package_url": "../robonix.skill.explore/",
+      "resolution_warning": ""
     },
     {
       "section": "skill",
@@ -213,8 +249,10 @@
       "path": "./skills/greet",
       "branch": "",
       "manifest": "",
+      "resolution": "robot_repository",
       "package_name": "",
-      "package_url": ""
+      "package_url": "",
+      "resolution_warning": ""
     },
     {
       "section": "skill",
@@ -223,10 +261,14 @@
       "path": "",
       "branch": "main",
       "manifest": "",
+      "resolution": "catalog",
       "package_name": "robonix.skill.pick.vertical_grasp",
-      "package_url": "../robonix.skill.pick.vertical_grasp/"
+      "package_url": "../robonix.skill.pick.vertical_grasp/",
+      "resolution_warning": ""
     }
   ],
   "readme_url": "https://github.com/syswonder/robot-agilex-ranger_mini_v3/blob/main/README.md",
-  "preview_image_url": "https://raw.githubusercontent.com/syswonder/robot-agilex-ranger_mini_v3/main/assets/robot.jpg"
+  "preview_image_url": "https://raw.githubusercontent.com/syswonder/robot-agilex-ranger_mini_v3/main/assets/robot.jpg",
+  "deployment_status": "ok",
+  "deployment_warnings": []
 }

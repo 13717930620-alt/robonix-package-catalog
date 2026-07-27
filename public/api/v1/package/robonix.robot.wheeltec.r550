@@ -26,8 +26,10 @@
       "path": "/home/wheeltec/Desktop/rbnx_deploy/wheeltec_robot/primitives/robot_description",
       "branch": "",
       "manifest": "",
+      "resolution": "unresolved",
       "package_name": "",
-      "package_url": ""
+      "package_url": "",
+      "resolution_warning": "Uses host-specific absolute path '/home/wheeltec/Desktop/rbnx_deploy/wheeltec_robot/primitives/robot_description'; use a cataloged repository URL, ${ROBONIX_SOURCE_PATH}/... for a Robonix built-in, ${ROBONIX_DEPLOY_DIR}/... for the boot deployment, or a repository-relative path such as ./primitives/robot_description."
     },
     {
       "section": "primitive",
@@ -36,8 +38,10 @@
       "path": "/home/wheeltec/Desktop/rbnx_deploy/wheeltec_robot/primitives/r550_chassis",
       "branch": "",
       "manifest": "",
+      "resolution": "unresolved",
       "package_name": "",
-      "package_url": ""
+      "package_url": "",
+      "resolution_warning": "Uses host-specific absolute path '/home/wheeltec/Desktop/rbnx_deploy/wheeltec_robot/primitives/r550_chassis'; use a cataloged repository URL, ${ROBONIX_SOURCE_PATH}/... for a Robonix built-in, ${ROBONIX_DEPLOY_DIR}/... for the boot deployment, or a repository-relative path such as ./primitives/robot_description."
     },
     {
       "section": "primitive",
@@ -46,8 +50,10 @@
       "path": "/home/wheeltec/Desktop/rbnx_deploy/wheeltec_robot/primitives/n10p_lslidar",
       "branch": "",
       "manifest": "",
+      "resolution": "unresolved",
       "package_name": "",
-      "package_url": ""
+      "package_url": "",
+      "resolution_warning": "Uses host-specific absolute path '/home/wheeltec/Desktop/rbnx_deploy/wheeltec_robot/primitives/n10p_lslidar'; use a cataloged repository URL, ${ROBONIX_SOURCE_PATH}/... for a Robonix built-in, ${ROBONIX_DEPLOY_DIR}/... for the boot deployment, or a repository-relative path such as ./primitives/robot_description."
     },
     {
       "section": "primitive",
@@ -56,8 +62,10 @@
       "path": "./primitives/astra_s_camera",
       "branch": "",
       "manifest": "",
+      "resolution": "robot_repository",
       "package_name": "",
-      "package_url": ""
+      "package_url": "",
+      "resolution_warning": ""
     },
     {
       "section": "primitive",
@@ -66,8 +74,10 @@
       "path": "",
       "branch": "main",
       "manifest": "",
+      "resolution": "catalog",
       "package_name": "robonix.primitive.audio.alsa",
-      "package_url": "../robonix.primitive.audio.alsa/"
+      "package_url": "../robonix.primitive.audio.alsa/",
+      "resolution_warning": ""
     },
     {
       "section": "primitive",
@@ -76,8 +86,10 @@
       "path": "",
       "branch": "main",
       "manifest": "",
+      "resolution": "catalog",
       "package_name": "robonix.primitive.audio.client_bridge",
-      "package_url": "../robonix.primitive.audio.client_bridge/"
+      "package_url": "../robonix.primitive.audio.client_bridge/",
+      "resolution_warning": ""
     },
     {
       "section": "service",
@@ -86,8 +98,10 @@
       "path": "/home/wheeltec/Desktop/rbnx_deploy/wheeltec_robot/services/service-map-rbnx",
       "branch": "",
       "manifest": "package_manifest.jetson-native.yaml",
+      "resolution": "unresolved",
       "package_name": "",
-      "package_url": ""
+      "package_url": "",
+      "resolution_warning": "Uses host-specific absolute path '/home/wheeltec/Desktop/rbnx_deploy/wheeltec_robot/services/service-map-rbnx'; use a cataloged repository URL, ${ROBONIX_SOURCE_PATH}/... for a Robonix built-in, ${ROBONIX_DEPLOY_DIR}/... for the boot deployment, or a repository-relative path such as ./primitives/robot_description."
     },
     {
       "section": "service",
@@ -96,8 +110,10 @@
       "path": "./services/service-navigation-rbnx",
       "branch": "",
       "manifest": "package_manifest.jetson-docker.yaml",
+      "resolution": "robot_repository",
       "package_name": "",
-      "package_url": ""
+      "package_url": "",
+      "resolution_warning": ""
     },
     {
       "section": "service",
@@ -106,8 +122,10 @@
       "path": "${ROBONIX_SOURCE_PATH}/services/memsearch",
       "branch": "",
       "manifest": "",
+      "resolution": "robonix_source",
       "package_name": "",
-      "package_url": ""
+      "package_url": "",
+      "resolution_warning": ""
     },
     {
       "section": "service",
@@ -116,8 +134,10 @@
       "path": "${ROBONIX_SOURCE_PATH}/services/speech",
       "branch": "",
       "manifest": "",
+      "resolution": "robonix_source",
       "package_name": "",
-      "package_url": ""
+      "package_url": "",
+      "resolution_warning": ""
     },
     {
       "section": "service",
@@ -126,8 +146,10 @@
       "path": "${ROBONIX_SOURCE_PATH}/services/voiceprint",
       "branch": "",
       "manifest": "",
+      "resolution": "robonix_source",
       "package_name": "",
-      "package_url": ""
+      "package_url": "",
+      "resolution_warning": ""
     },
     {
       "section": "skill",
@@ -136,10 +158,39 @@
       "path": "./skills/skill-explore-rbnx",
       "branch": "",
       "manifest": "",
+      "resolution": "robot_repository",
       "package_name": "",
-      "package_url": ""
+      "package_url": "",
+      "resolution_warning": ""
     }
   ],
   "readme_url": "https://github.com/syswonder/robot-wheeltec-r550/blob/main/README.md",
-  "preview_image_url": ""
+  "preview_image_url": "",
+  "deployment_status": "warning",
+  "deployment_warnings": [
+    {
+      "section": "primitive",
+      "name": "robot_description",
+      "source": "/home/wheeltec/Desktop/rbnx_deploy/wheeltec_robot/primitives/robot_description",
+      "reason": "Uses host-specific absolute path '/home/wheeltec/Desktop/rbnx_deploy/wheeltec_robot/primitives/robot_description'; use a cataloged repository URL, ${ROBONIX_SOURCE_PATH}/... for a Robonix built-in, ${ROBONIX_DEPLOY_DIR}/... for the boot deployment, or a repository-relative path such as ./primitives/robot_description."
+    },
+    {
+      "section": "primitive",
+      "name": "r550_chassis",
+      "source": "/home/wheeltec/Desktop/rbnx_deploy/wheeltec_robot/primitives/r550_chassis",
+      "reason": "Uses host-specific absolute path '/home/wheeltec/Desktop/rbnx_deploy/wheeltec_robot/primitives/r550_chassis'; use a cataloged repository URL, ${ROBONIX_SOURCE_PATH}/... for a Robonix built-in, ${ROBONIX_DEPLOY_DIR}/... for the boot deployment, or a repository-relative path such as ./primitives/robot_description."
+    },
+    {
+      "section": "primitive",
+      "name": "n10p_lslidar",
+      "source": "/home/wheeltec/Desktop/rbnx_deploy/wheeltec_robot/primitives/n10p_lslidar",
+      "reason": "Uses host-specific absolute path '/home/wheeltec/Desktop/rbnx_deploy/wheeltec_robot/primitives/n10p_lslidar'; use a cataloged repository URL, ${ROBONIX_SOURCE_PATH}/... for a Robonix built-in, ${ROBONIX_DEPLOY_DIR}/... for the boot deployment, or a repository-relative path such as ./primitives/robot_description."
+    },
+    {
+      "section": "service",
+      "name": "mapping",
+      "source": "/home/wheeltec/Desktop/rbnx_deploy/wheeltec_robot/services/service-map-rbnx",
+      "reason": "Uses host-specific absolute path '/home/wheeltec/Desktop/rbnx_deploy/wheeltec_robot/services/service-map-rbnx'; use a cataloged repository URL, ${ROBONIX_SOURCE_PATH}/... for a Robonix built-in, ${ROBONIX_DEPLOY_DIR}/... for the boot deployment, or a repository-relative path such as ./primitives/robot_description."
+    }
+  ]
 }

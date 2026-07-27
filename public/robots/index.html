@@ -27,6 +27,9 @@
       --brand-deep: #17205f;
       --signal: #3674ff;
       --signal-soft: #e9edff;
+      --warning: #8a4b08;
+      --warning-line: #e2ad58;
+      --warning-soft: #fff7e8;
       --shadow: 0 8px 28px rgba(28, 38, 88, 0.06);
       --site-header-height: 64px;
       --sticky-gap: 14px;
@@ -291,6 +294,11 @@
     .package-card:nth-child(3) { animation-delay: 70ms; }
     .package-card:nth-child(4) { animation-delay: 105ms; }
     .package-card:hover { border-color: #bcc6ec; box-shadow: var(--shadow); transform: translateY(-2px); }
+    .package-card.has-warning {
+      border-color: var(--warning-line);
+      background: linear-gradient(90deg, var(--warning-soft), #fff 26%);
+    }
+    .package-card.has-warning:hover { border-color: #c9892f; }
     @keyframes rise-in {
       from { opacity: 0; transform: translateY(7px); }
       to { opacity: 1; transform: translateY(0); }
@@ -305,6 +313,35 @@
       letter-spacing: 0.08em;
       text-transform: uppercase;
     }
+    .card-status-line { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+    .warning-badge {
+      display: inline-flex;
+      align-items: center;
+      width: fit-content;
+      min-width: 0;
+      border: 1px solid var(--warning-line);
+      border-radius: 999px;
+      padding: 2px 7px;
+      color: var(--warning);
+      background: var(--warning-soft);
+      font-family: var(--font-sans);
+      font-size: 11px;
+      font-weight: 700;
+      line-height: 1.35;
+    }
+    .warning-summary {
+      margin: 9px 0;
+      border-left: 3px solid var(--warning-line);
+      padding: 7px 9px;
+      color: #5f3a12;
+      background: var(--warning-soft);
+      font-size: 12px;
+      line-height: 1.4;
+    }
+    .warning-summary strong { display: block; margin-bottom: 3px; color: var(--warning); }
+    .warning-summary ul { margin: 0; padding-left: 17px; }
+    .warning-summary li { margin: 2px 0; }
+    .warning-summary code { color: #5f3a12; background: transparent; padding: 0; }
     .package-title { display: flex; gap: 8px; align-items: baseline; flex-wrap: wrap; margin-bottom: 5px; }
     .package-title a {
       font-family: var(--font-mono);
@@ -409,6 +446,32 @@
       display: inline-block;
       min-width: 64px;
     }
+    .cap-list li.dependency-warning {
+      border-color: var(--warning-line);
+      background: var(--warning-soft);
+    }
+    .dependency-warning .warning-badge { margin-left: 5px; }
+    .dependency-warning-reason {
+      display: block;
+      margin-top: 5px;
+      color: #5f3a12;
+      font-family: var(--font-sans);
+      font-size: 12px;
+      line-height: 1.4;
+    }
+    .detail-warning {
+      max-width: 920px;
+      margin-top: 12px;
+      border: 1px solid var(--warning-line);
+      border-radius: 7px;
+      padding: 10px 12px;
+      color: #5f3a12;
+      background: var(--warning-soft);
+      font-size: 13px;
+    }
+    .detail-warning strong { display: block; margin-bottom: 4px; color: var(--warning); }
+    .detail-warning ul { margin: 0; padding-left: 18px; }
+    .detail-warning li { margin: 3px 0; }
     .detail-hero { padding: 20px 0 4px; }
     .detail-hero h1 { font-family: var(--font-mono); }
     .back { display: inline-block; margin: 0 0 12px; color: var(--brand); }
@@ -757,9 +820,9 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
           <button class="clear-filters" id="clearFilters" type="button">Clear filters</button>
         </div>
         <div class="package-list" id="packages">
-          <article class="package-card" data-kind="robot" data-tags="robot deploy agilex ranger_mini_v3 jetson lidar rgbd scene mapping navigation" data-search="robonix.robot.agilex.ranger_mini_v3 0.2.0 robot robonix deployment for the agilex ranger mini v3 robot. apache-2.0 https://github.com/syswonder/robot-agilex-ranger_mini_v3 wheatfox &lt;wheatfox17@icloud.com&gt; robot deploy agilex ranger_mini_v3 jetson lidar rgbd scene mapping navigation robot_description mid360_lidar mid360_imu orbbec_camera orbbec_wrist_camera ranger_chassis piper_ctl audio_driver audio_client_bridge memory speech voiceprint llm_detect grasp_pose roboarm_ik mapping nav2 explore greet pick">
+          <article class="package-card" data-kind="robot" data-tags="robot deploy agilex ranger_mini_v3 jetson lidar rgbd scene mapping navigation" data-search="robonix.robot.agilex.ranger_mini_v3 0.2.0 robot robonix deployment for the agilex ranger mini v3 robot. apache-2.0 https://github.com/syswonder/robot-agilex-ranger_mini_v3 wheatfox &lt;wheatfox17@icloud.com&gt; robot deploy agilex ranger_mini_v3 jetson lidar rgbd scene mapping navigation robot_description https://github.com/syswonder/primitive-robot-description-rbnx   mid360_lidar https://github.com/syswonder/primitive-livox-mid360-lidar-rbnx   mid360_imu https://github.com/syswonder/primitive-livox-mid360-imu-rbnx   orbbec_camera https://github.com/syswonder/primitive-orbbec-camera   orbbec_wrist_camera https://github.com/syswonder/primitive-orbbec-dabai_dcw-camera-rbnx   ranger_chassis https://github.com/syswonder/primitive-agilex-ranger_mini_v3-chassis-rbnx   piper_ctl https://github.com/syswonder/primitive-agilex-piper-arm-rbnx   audio_driver https://github.com/syswonder/primitive-audio-driver-rbnx   audio_client_bridge https://github.com/syswonder/primitive-audio-client-bridge-rbnx   memory  ${robonix_source_path}/services/memsearch  speech  ${robonix_source_path}/services/speech  voiceprint  ${robonix_source_path}/services/voiceprint  llm_detect https://github.com/syswonder/service-object-detect-rbnx   grasp_pose https://github.com/syswonder/service-grasp-pose-rbnx   roboarm_ik https://github.com/syswonder/service-roboarm-ik-rbnx   mapping https://github.com/syswonder/service-map-rbnx   nav2 https://github.com/syswonder/service-navigation-rbnx   explore https://github.com/syswonder/skill-explore-rbnx   greet  ./skills/greet  pick https://github.com/syswonder/skill-pick-vertical-grasp-rbnx  ">
         <div>
-          <span class="kind-label">robot</span>
+          <div class="card-status-line"><span class="kind-label">robot</span></div>
           <div class="package-title">
             <a href="robonix.robot.agilex.ranger_mini_v3/">robonix.robot.agilex.ranger_mini_v3</a>
             <span class="version">v0.2.0</span>
@@ -778,9 +841,9 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
           </div>
           <img class="card-preview" src="../assets/previews/robonix.robot.agilex.ranger_mini_v3-380.webp" srcset="../assets/previews/robonix.robot.agilex.ranger_mini_v3-380.webp 380w, ../assets/previews/robonix.robot.agilex.ranger_mini_v3-720.webp 720w" sizes="(max-width: 520px) calc(100vw - 48px), 190px" width="380" height="285" alt="robonix.robot.agilex.ranger_mini_v3 preview" loading="lazy" decoding="async" fetchpriority="low">
         </div>
-      </article><article class="package-card" data-kind="robot" data-tags="robot deploy deep_robotics lite3 quadruped jetson lidar rgbd mapping navigation" data-search="robonix.robot.deep_robotics.lite3 0.2.0 robot minimal robonix deployment for the deep robotics lite3. apache-2.0 https://github.com/syswonder/robot-deep_robotics-lite3 bunnycxk &lt;2501213313@stu.pku.edu.cn&gt; robot deploy deep_robotics lite3 quadruped jetson lidar rgbd mapping navigation lite3_quadruped mid360_lidar mid360_imu robot_description orbbec_camera audio_client_bridge mapping speech nav2">
+      </article><article class="package-card" data-kind="robot" data-tags="robot deploy deep_robotics lite3 quadruped jetson lidar rgbd mapping navigation" data-search="robonix.robot.deep_robotics.lite3 0.2.0 robot minimal robonix deployment for the deep robotics lite3. apache-2.0 https://github.com/syswonder/robot-deep_robotics-lite3 bunnycxk &lt;2501213313@stu.pku.edu.cn&gt; robot deploy deep_robotics lite3 quadruped jetson lidar rgbd mapping navigation lite3_quadruped https://github.com/syswonder/primitive-deep_robotics-lite3_quadruped.git   mid360_lidar https://github.com/syswonder/primitive-livox-mid360-lidar-rbnx   mid360_imu https://github.com/syswonder/primitive-livox-mid360-imu-rbnx   robot_description https://github.com/syswonder/primitive-robot-description-rbnx   orbbec_camera https://github.com/syswonder/primitive-orbbec-camera.git   audio_client_bridge  ${robonix_source_path}/examples/webots/primitives/audio_client_bridge  mapping https://github.com/syswonder/service-map-rbnx   speech  ${robonix_source_path}/services/speech  nav2 https://github.com/syswonder/service-navigation-rbnx  ">
         <div>
-          <span class="kind-label">robot</span>
+          <div class="card-status-line"><span class="kind-label">robot</span></div>
           <div class="package-title">
             <a href="robonix.robot.deep_robotics.lite3/">robonix.robot.deep_robotics.lite3</a>
             <span class="version">v0.2.0</span>
@@ -798,9 +861,9 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
             <a href="https://github.com/syswonder/robot-deep_robotics-lite3">GitHub</a>
           </div>
         </div>
-      </article><article class="package-card" data-kind="robot" data-tags="robot deploy minecraft simulation" data-search="robonix.robot.syswonder.minecraft_bot 0.1.0 robot robonix deployment for an autonomous minecraft player. mulanpsl-2.0 https://github.com/syswonder/robot-syswonder-minecraft_bot zzjjwarth &lt;jzeng25@stu.pku.edu.cn&gt; robot deploy minecraft simulation minecraft_mod minecraft_costmap minecraft_navigation minecraft_explore">
+      </article><article class="package-card" data-kind="robot" data-tags="robot deploy minecraft simulation" data-search="robonix.robot.syswonder.minecraft_bot 0.1.0 robot robonix deployment for an autonomous minecraft player. mulanpsl-2.0 https://github.com/syswonder/robot-syswonder-minecraft_bot zzjjwarth &lt;jzeng25@stu.pku.edu.cn&gt; robot deploy minecraft simulation minecraft_mod https://github.com/syswonder/primitive-syswonder-minecraft_bot-rbnx   minecraft_costmap https://github.com/syswonder/service-minecraft-costmap-rbnx   minecraft_navigation https://github.com/syswonder/service-minecraft-navigation-rbnx   minecraft_explore https://github.com/syswonder/skill-minecraft-explore-rbnx  ">
         <div>
-          <span class="kind-label">robot</span>
+          <div class="card-status-line"><span class="kind-label">robot</span></div>
           <div class="package-title">
             <a href="robonix.robot.syswonder.minecraft_bot/">robonix.robot.syswonder.minecraft_bot</a>
             <span class="version">v0.1.0</span>
@@ -819,9 +882,9 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
           </div>
           <img class="card-preview" src="../assets/previews/robonix.robot.syswonder.minecraft_bot-380.webp" srcset="../assets/previews/robonix.robot.syswonder.minecraft_bot-380.webp 380w, ../assets/previews/robonix.robot.syswonder.minecraft_bot-720.webp 720w" sizes="(max-width: 520px) calc(100vw - 48px), 190px" width="380" height="285" alt="robonix.robot.syswonder.minecraft_bot preview" loading="lazy" decoding="async" fetchpriority="low">
         </div>
-      </article><article class="package-card" data-kind="robot" data-tags="robot deploy unitree go2 quadruped lidar camera imu mapping navigation speech" data-search="robonix.robot.unitree.go2 0.1.0 robot safe robonix deployment for unitree go2 with mapping, semantic navigation and read-only ui. apache-2.0 and bsd-3-clause and mit and (epl-2.0 or edl-1.0) https://github.com/syswonder/robot-unitree-go2 origamii520 &lt;origamii520@users.noreply.github.com&gt; robot deploy unitree go2 quadruped lidar camera imu mapping navigation speech go2_chassis go2_sensors robot_description audio_client_bridge mapping speech nav2 go2_dashboard semantic_navigation">
+      </article><article class="package-card" data-kind="robot" data-tags="robot deploy unitree go2 quadruped lidar camera imu mapping navigation speech" data-search="robonix.robot.unitree.go2 0.1.0 robot safe robonix deployment for unitree go2 with mapping, semantic navigation and read-only ui. apache-2.0 and bsd-3-clause and mit and (epl-2.0 or edl-1.0) https://github.com/syswonder/robot-unitree-go2 origamii520 &lt;origamii520@users.noreply.github.com&gt; robot deploy unitree go2 quadruped lidar camera imu mapping navigation speech go2_chassis  ${robonix_deploy_dir}/packages/go2_chassis  go2_sensors  ${robonix_deploy_dir}/packages/go2_sensors  robot_description  ${robonix_deploy_dir}/packages/go2_description  audio_client_bridge  ${robonix_source_path}/examples/webots/primitives/audio_client_bridge  mapping https://github.com/syswonder/service-map-rbnx   speech  ${robonix_source_path}/services/speech  nav2 https://github.com/syswonder/service-navigation-rbnx   go2_dashboard  ${robonix_deploy_dir}/packages/go2_dashboard  semantic_navigation  ${robonix_deploy_dir}/packages/semantic_navigation ">
         <div>
-          <span class="kind-label">robot</span>
+          <div class="card-status-line"><span class="kind-label">robot</span></div>
           <div class="package-title">
             <a href="robonix.robot.unitree.go2/">robonix.robot.unitree.go2</a>
             <span class="version">v0.1.0</span>
@@ -839,14 +902,15 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
             <a href="https://github.com/syswonder/robot-unitree-go2">GitHub</a>
           </div>
         </div>
-      </article><article class="package-card" data-kind="robot" data-tags="robot deploy robonix" data-search="robonix.robot.wheeltec.r550 0.1.0 robot wheeltec r550 mini_tank — 2d slam mapping deploy (n10p lidar + rtabmap). noassertion https://github.com/syswonder/robot-wheeltec-r550 xiangrui cheng &lt;ccc_7020@qq.com&gt; robot deploy robonix robot_description r550_chassis n10p_lslidar astra_s_camera audio_driver audio_client_bridge mapping nav2 memory speech voiceprint explore">
+      </article><article class="package-card has-warning" data-kind="robot" data-tags="robot deploy robonix" data-search="robonix.robot.wheeltec.r550 0.1.0 robot wheeltec r550 mini_tank — 2d slam mapping deploy (n10p lidar + rtabmap). noassertion https://github.com/syswonder/robot-wheeltec-r550 xiangrui cheng &lt;ccc_7020@qq.com&gt; robot deploy robonix robot_description  /home/wheeltec/desktop/rbnx_deploy/wheeltec_robot/primitives/robot_description uses host-specific absolute path &#x27;/home/wheeltec/desktop/rbnx_deploy/wheeltec_robot/primitives/robot_description&#x27;; use a cataloged repository url, ${robonix_source_path}/... for a robonix built-in, ${robonix_deploy_dir}/... for the boot deployment, or a repository-relative path such as ./primitives/robot_description. r550_chassis  /home/wheeltec/desktop/rbnx_deploy/wheeltec_robot/primitives/r550_chassis uses host-specific absolute path &#x27;/home/wheeltec/desktop/rbnx_deploy/wheeltec_robot/primitives/r550_chassis&#x27;; use a cataloged repository url, ${robonix_source_path}/... for a robonix built-in, ${robonix_deploy_dir}/... for the boot deployment, or a repository-relative path such as ./primitives/robot_description. n10p_lslidar  /home/wheeltec/desktop/rbnx_deploy/wheeltec_robot/primitives/n10p_lslidar uses host-specific absolute path &#x27;/home/wheeltec/desktop/rbnx_deploy/wheeltec_robot/primitives/n10p_lslidar&#x27;; use a cataloged repository url, ${robonix_source_path}/... for a robonix built-in, ${robonix_deploy_dir}/... for the boot deployment, or a repository-relative path such as ./primitives/robot_description. astra_s_camera  ./primitives/astra_s_camera  audio_driver https://github.com/syswonder/primitive-audio-driver-rbnx   audio_client_bridge https://github.com/syswonder/primitive-audio-client-bridge-rbnx   mapping  /home/wheeltec/desktop/rbnx_deploy/wheeltec_robot/services/service-map-rbnx uses host-specific absolute path &#x27;/home/wheeltec/desktop/rbnx_deploy/wheeltec_robot/services/service-map-rbnx&#x27;; use a cataloged repository url, ${robonix_source_path}/... for a robonix built-in, ${robonix_deploy_dir}/... for the boot deployment, or a repository-relative path such as ./primitives/robot_description. nav2  ./services/service-navigation-rbnx  memory  ${robonix_source_path}/services/memsearch  speech  ${robonix_source_path}/services/speech  voiceprint  ${robonix_source_path}/services/voiceprint  explore  ./skills/skill-explore-rbnx ">
         <div>
-          <span class="kind-label">robot</span>
+          <div class="card-status-line"><span class="kind-label">robot</span><span class="warning-badge">Warning · 4 unresolved</span></div>
           <div class="package-title">
             <a href="robonix.robot.wheeltec.r550/">robonix.robot.wheeltec.r550</a>
             <span class="version">v0.1.0</span>
           </div>
           <p class="description">Wheeltec R550 mini_tank — 2D SLAM mapping deploy (N10P lidar + rtabmap).</p>
+          <div class="warning-summary"><strong>Deployment source warning</strong><ul><li><code>primitive robot_description</code>: Uses host-specific absolute path &#x27;/home/wheeltec/Desktop/rbnx_deploy/wheeltec_robot/primitives/robot_description&#x27;; use a cataloged repository URL, ${ROBONIX_SOURCE_PATH}/... for a Robonix built-in, ${ROBONIX_DEPLOY_DIR}/... for the boot deployment, or a repository-relative path such as ./primitives/robot_description.</li><li><code>primitive r550_chassis</code>: Uses host-specific absolute path &#x27;/home/wheeltec/Desktop/rbnx_deploy/wheeltec_robot/primitives/r550_chassis&#x27;; use a cataloged repository URL, ${ROBONIX_SOURCE_PATH}/... for a Robonix built-in, ${ROBONIX_DEPLOY_DIR}/... for the boot deployment, or a repository-relative path such as ./primitives/robot_description.</li><li><code>primitive n10p_lslidar</code>: Uses host-specific absolute path &#x27;/home/wheeltec/Desktop/rbnx_deploy/wheeltec_robot/primitives/n10p_lslidar&#x27;; use a cataloged repository URL, ${ROBONIX_SOURCE_PATH}/... for a Robonix built-in, ${ROBONIX_DEPLOY_DIR}/... for the boot deployment, or a repository-relative path such as ./primitives/robot_description.</li><li><code>service mapping</code>: Uses host-specific absolute path &#x27;/home/wheeltec/Desktop/rbnx_deploy/wheeltec_robot/services/service-map-rbnx&#x27;; use a cataloged repository URL, ${ROBONIX_SOURCE_PATH}/... for a Robonix built-in, ${ROBONIX_DEPLOY_DIR}/... for the boot deployment, or a repository-relative path such as ./primitives/robot_description.</li></ul></div>
           <div class="meta-line">
             <span>maintainers <strong>Xiangrui Cheng &lt;ccc_7020@qq.com&gt;</strong></span>
             <span>12 dependencies</span>
@@ -859,9 +923,9 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
             <a href="https://github.com/syswonder/robot-wheeltec-r550">GitHub</a>
           </div>
         </div>
-      </article><article class="package-card" data-kind="robot" data-tags="robot deploy robonix manipulator lerobo" data-search="robonix.robot.wowrobo.roboarm 0.1.0 robot roboarm lerobot koch 五自由度机械臂 robonix 部署。 apache-2.0 https://github.com/syswonder/robot-wowrobo-roboarm yuzheng gao &lt;2300013159@stuu.pku.edu.cn&gt; robot deploy robonix manipulator lerobo roboarm_arm orbbec_camera_roboarm audio_driver speech roboarm_grasp">
+      </article><article class="package-card" data-kind="robot" data-tags="robot deploy robonix manipulator lerobo" data-search="robonix.robot.wowrobo.roboarm 0.1.0 robot roboarm lerobot koch 五自由度机械臂 robonix 部署。 apache-2.0 https://github.com/syswonder/robot-wowrobo-roboarm yuzheng gao &lt;2300013159@stuu.pku.edu.cn&gt; robot deploy robonix manipulator lerobo roboarm_arm  primitives/roboarm_arm  orbbec_camera_roboarm  primitives/orbbec_camera_roboarm  audio_driver https://github.com/syswonder/primitive-audio-driver-rbnx   speech  ${robonix_source_path}/services/speech  roboarm_grasp  skills/roboarm_grasp ">
         <div>
-          <span class="kind-label">robot</span>
+          <div class="card-status-line"><span class="kind-label">robot</span></div>
           <div class="package-title">
             <a href="robonix.robot.wowrobo.roboarm/">robonix.robot.wowrobo.roboarm</a>
             <span class="version">v0.1.0</span>
@@ -902,7 +966,7 @@ const detail = await fetch(`${base}/package/${encodeURIComponent('robonix.servic
       </div>
     </details>
   </main>
-  <footer class="site-footer"><div class="shell">Generated on 2026-07-27T05:16:29+00:00.</div></footer>
+  <footer class="site-footer"><div class="shell">Generated on 2026-07-27T05:22:46+00:00.</div></footer>
   <script>
     const input = document.getElementById('q');
     const cards = Array.from(document.querySelectorAll('.package-card'));
