@@ -284,6 +284,20 @@ class RobotListingTests(unittest.TestCase):
                 )
                 self.assertIn("media.addEventListener?.('change'", rendered)
                 self.assertIn('html[data-theme="dark"]', rendered)
+                self.assertIn("--header-control-height: 34px", rendered)
+                self.assertIn(
+                    "min-height: var(--header-control-height)", rendered
+                )
+                self.assertIn("width: auto;", rendered)
+                self.assertIn("margin: 0;", rendered)
+                self.assertIn(
+                    'html[data-theme="dark"] .tag-blue { background: #172d3d;',
+                    rendered,
+                )
+                self.assertIn(
+                    'html[data-theme="dark"] .tag-red { background: #3b221e;',
+                    rendered,
+                )
 
     def test_api_writer_keeps_extensionless_resource_and_json_preview(self):
         with tempfile.TemporaryDirectory() as tmp:

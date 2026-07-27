@@ -683,6 +683,7 @@ def render_css() -> str:
       --hover-line: #bcc6ec;
       --brand-contrast: #ffffff;
       --site-header-height: 64px;
+      --header-control-height: 34px;
       --sticky-gap: 14px;
     }
     html[data-theme="dark"] {
@@ -789,16 +790,28 @@ def render_css() -> str:
     }
     .brand:hover { color: var(--brand); text-decoration: none; }
     .brand small { color: var(--muted); font-size: 12px; font-weight: 500; }
-    .header-actions { display: flex; gap: 10px; align-items: center; justify-content: flex-end; }
-    .api-links { display: flex; gap: 8px; flex-wrap: nowrap; justify-content: flex-end; }
+    .header-actions { display: flex; gap: 10px; align-items: stretch; justify-content: flex-end; }
+    .api-links {
+      display: flex;
+      min-height: var(--header-control-height);
+      gap: 8px;
+      align-items: stretch;
+      flex-wrap: nowrap;
+      justify-content: flex-end;
+    }
     .api-links a {
+      display: inline-flex;
+      min-height: var(--header-control-height);
+      align-items: center;
+      justify-content: center;
       color: var(--nav-ink);
       border: 1px solid transparent;
       background: transparent;
       border-radius: 6px;
-      padding: 7px 9px;
+      padding: 0 9px;
       font-size: 13px;
       font-weight: 600;
+      line-height: 1;
       transition: color 160ms ease, background 160ms ease, border-color 160ms ease;
     }
     .api-links a:hover, .api-links a[aria-current="page"] {
@@ -809,25 +822,32 @@ def render_css() -> str:
     }
     .theme-switcher {
       display: inline-flex;
-      align-items: center;
+      width: auto;
+      min-height: var(--header-control-height);
+      align-items: stretch;
       gap: 2px;
+      margin: 0;
       padding: 3px;
       border: 1px solid var(--line);
       border-radius: 8px;
       background: var(--soft);
+      box-shadow: none;
       white-space: nowrap;
     }
     .theme-switcher button {
+      display: inline-flex;
       min-width: 0;
       margin: 0;
       padding: 4px 7px;
+      align-items: center;
+      justify-content: center;
       border: 0;
       border-radius: 5px;
       background: transparent;
       color: var(--muted);
       font-size: 11px;
       font-weight: 700;
-      line-height: 1.4;
+      line-height: 1;
       box-shadow: none;
     }
     .theme-switcher button:hover { color: var(--ink); }
@@ -1119,6 +1139,14 @@ def render_css() -> str:
     .tag-slate { background: #e4e8ee; color: #344052; }
     .tag-red { background: #f5ded8; color: #7b2c1f; }
     .tag-gray { background: #ece8df; color: #4a4b4d; }
+    html[data-theme="dark"] .tag-blue { background: #172d3d; color: #8bc9ea; }
+    html[data-theme="dark"] .tag-green { background: #183522; color: #91d7a3; }
+    html[data-theme="dark"] .tag-gold { background: #3a2d13; color: #e8c96f; }
+    html[data-theme="dark"] .tag-cyan { background: #123638; color: #87d8da; }
+    html[data-theme="dark"] .tag-purple { background: #302440; color: #c9a7e5; }
+    html[data-theme="dark"] .tag-slate { background: #252e3d; color: #bdc8da; }
+    html[data-theme="dark"] .tag-red { background: #3b221e; color: #eda69a; }
+    html[data-theme="dark"] .tag-gray { background: #2b2a28; color: #cbc7c0; }
     .detail-layout {
       display: grid;
       grid-template-columns: 1fr 340px;
