@@ -1,8 +1,24 @@
 <!doctype html>
-<html lang="en" data-theme="light">
+<html lang="en">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <script>
+    (() => {
+      const storageKey = 'robonix-catalog-theme';
+      let preference = 'auto';
+      try {
+        const stored = localStorage.getItem(storageKey);
+        if (stored === 'light' || stored === 'dark' || stored === 'auto') preference = stored;
+      } catch (_) {}
+      const resolved = preference === 'auto'
+        ? (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light')
+        : preference;
+      document.documentElement.dataset.theme = resolved;
+      document.documentElement.dataset.themePreference = preference;
+      document.documentElement.style.colorScheme = resolved;
+    })();
+  </script>
   <title>robonix.primitive.syswonder.minecraft_bot - Robonix Package Catalog</title>
   <link rel="icon" type="image/svg+xml" href="../../assets/robonix-mark.svg">
   <link rel="stylesheet" href="../../assets/vendor/pico/pico.classless.min.css">
@@ -31,8 +47,48 @@
       --warning-line: #e2ad58;
       --warning-soft: #fff7e8;
       --shadow: 0 8px 28px rgba(28, 38, 88, 0.06);
+      --header-bg: rgba(255, 255, 255, 0.9);
+      --field-bg: #ffffff;
+      --code-bg: #f8fafc;
+      --code-ink: #1d2939;
+      --body-copy: #343941;
+      --readme-ink: #1f2937;
+      --action-ink: #29303a;
+      --nav-ink: #344054;
+      --warning-copy: #5f3a12;
+      --hover-line: #bcc6ec;
+      --brand-contrast: #ffffff;
       --site-header-height: 64px;
       --sticky-gap: 14px;
+    }
+    html[data-theme="dark"] {
+      color-scheme: dark;
+      --bg: #0d1220;
+      --paper: #151c2d;
+      --soft: #1d263a;
+      --ink: #eef2ff;
+      --muted: #a9b3c9;
+      --line: #303b54;
+      --line-strong: #475574;
+      --brand: #9dacff;
+      --brand-deep: #c4ccff;
+      --signal: #7da2ff;
+      --signal-soft: #252f58;
+      --warning: #ffc46b;
+      --warning-line: #9c6927;
+      --warning-soft: #322514;
+      --shadow: 0 12px 32px rgba(0, 0, 0, 0.28);
+      --header-bg: rgba(16, 22, 36, 0.9);
+      --field-bg: #111827;
+      --code-bg: #101725;
+      --code-ink: #e5eaf6;
+      --body-copy: #d2d9e8;
+      --readme-ink: #dce3f1;
+      --action-ink: #d7deed;
+      --nav-ink: #c5cede;
+      --warning-copy: #f2cf96;
+      --hover-line: #6376ad;
+      --brand-contrast: #101426;
     }
     * { box-sizing: border-box; }
     html { min-height: 100%; background: var(--bg); }
@@ -84,8 +140,8 @@
       top: 0;
       z-index: 20;
       color: var(--ink);
-      border-bottom: 1px solid rgba(221, 225, 236, 0.88);
-      background: rgba(255, 255, 255, 0.9);
+      border-bottom: 1px solid var(--line);
+      background: var(--header-bg);
       -webkit-backdrop-filter: blur(16px);
       backdrop-filter: blur(16px);
     }
@@ -109,9 +165,10 @@
     }
     .brand:hover { color: var(--brand); text-decoration: none; }
     .brand small { color: var(--muted); font-size: 12px; font-weight: 500; }
-    .api-links { display: flex; gap: 8px; flex-wrap: wrap; justify-content: flex-end; }
+    .header-actions { display: flex; gap: 10px; align-items: center; justify-content: flex-end; }
+    .api-links { display: flex; gap: 8px; flex-wrap: nowrap; justify-content: flex-end; }
     .api-links a {
-      color: #344054;
+      color: var(--nav-ink);
       border: 1px solid transparent;
       background: transparent;
       border-radius: 6px;
@@ -122,9 +179,37 @@
     }
     .api-links a:hover, .api-links a[aria-current="page"] {
       color: var(--brand);
-      border-color: #d9def4;
+      border-color: var(--line-strong);
       background: var(--signal-soft);
       text-decoration: none;
+    }
+    .theme-switcher {
+      display: inline-flex;
+      align-items: center;
+      gap: 2px;
+      padding: 3px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--soft);
+      white-space: nowrap;
+    }
+    .theme-switcher button {
+      min-width: 0;
+      margin: 0;
+      padding: 4px 7px;
+      border: 0;
+      border-radius: 5px;
+      background: transparent;
+      color: var(--muted);
+      font-size: 11px;
+      font-weight: 700;
+      line-height: 1.4;
+      box-shadow: none;
+    }
+    .theme-switcher button:hover { color: var(--ink); }
+    .theme-switcher button[aria-pressed="true"] {
+      color: var(--brand-contrast);
+      background: var(--brand);
     }
     h1 {
       margin: 0;
@@ -186,7 +271,7 @@
     .filter-buttons { display: flex; gap: 6px; flex-wrap: wrap; }
     .filter-button {
       border: 1px solid var(--line);
-      background: #fff;
+      background: var(--field-bg);
       color: var(--ink);
       border-radius: 999px;
       padding: 5px 9px;
@@ -196,7 +281,7 @@
     }
     .filter-button { transition: color 150ms ease, border-color 150ms ease, background 150ms ease; }
     .filter-button:hover { border-color: var(--brand); }
-    .filter-button.active { background: var(--brand); color: #fff; border-color: var(--brand); }
+    .filter-button.active { background: var(--brand); color: var(--brand-contrast); border-color: var(--brand); }
     .content { padding: 14px; min-width: 0; }
     .api-reference {
       margin-top: 14px;
@@ -228,7 +313,7 @@
       margin: 0;
       overflow-x: auto;
       border: 1px solid var(--line);
-      background: #f8fafc;
+      background: var(--code-bg);
       border-radius: 6px;
       padding: 10px;
       font-size: 12px;
@@ -247,8 +332,8 @@
       margin: 0;
       overflow: auto;
       border: 0;
-      background: #f8fafc;
-      color: #1d2939;
+      background: var(--code-bg);
+      color: var(--code-ink);
       font-family: var(--font-mono);
       font-size: 12px;
       line-height: 1.5;
@@ -260,7 +345,7 @@
     .search {
       width: min(620px, 100%);
       border: 1px solid var(--line-strong);
-      background: #fff;
+      background: var(--field-bg);
       border-radius: 6px;
       padding: 9px 11px;
       font-size: 15px;
@@ -281,7 +366,7 @@
     .package-list { display: grid; gap: 9px; }
     .package-card {
       border: 1px solid var(--line);
-      background: #fff;
+      background: var(--paper);
       border-radius: 7px;
       padding: 12px;
       display: grid;
@@ -293,10 +378,10 @@
     .package-card:nth-child(2) { animation-delay: 35ms; }
     .package-card:nth-child(3) { animation-delay: 70ms; }
     .package-card:nth-child(4) { animation-delay: 105ms; }
-    .package-card:hover { border-color: #bcc6ec; box-shadow: var(--shadow); transform: translateY(-2px); }
+    .package-card:hover { border-color: var(--hover-line); box-shadow: var(--shadow); transform: translateY(-2px); }
     .package-card.has-warning {
       border-color: var(--warning-line);
-      background: linear-gradient(90deg, var(--warning-soft), #fff 26%);
+      background: linear-gradient(90deg, var(--warning-soft), var(--paper) 26%);
     }
     .package-card.has-warning:hover { border-color: #c9892f; }
     @keyframes rise-in {
@@ -333,7 +418,7 @@
       margin: 9px 0;
       border-left: 3px solid var(--warning-line);
       padding: 7px 9px;
-      color: #5f3a12;
+      color: var(--warning-copy);
       background: var(--warning-soft);
       font-size: 12px;
       line-height: 1.4;
@@ -341,7 +426,7 @@
     .warning-summary strong { display: block; margin-bottom: 3px; color: var(--warning); }
     .warning-summary ul { margin: 0; padding-left: 17px; }
     .warning-summary li { margin: 2px 0; }
-    .warning-summary code { color: #5f3a12; background: transparent; padding: 0; }
+    .warning-summary code { color: var(--warning-copy); background: transparent; padding: 0; }
     .package-title { display: flex; gap: 8px; align-items: baseline; flex-wrap: wrap; margin-bottom: 5px; }
     .package-title a {
       font-family: var(--font-mono);
@@ -359,7 +444,7 @@
       padding: 2px 5px;
       background: var(--soft);
     }
-    .description { color: #343941; margin: 0 0 8px; line-height: 1.38; }
+    .description { color: var(--body-copy); margin: 0 0 8px; line-height: 1.38; }
     .meta-line { color: var(--muted); font-size: 13px; display: flex; gap: 14px; flex-wrap: wrap; }
     .meta-line strong, .meta-line code { overflow-wrap: anywhere; }
     .meta-line code { font-size: 12px; }
@@ -369,13 +454,13 @@
       border-radius: 6px;
       padding: 6px 8px;
       background: var(--soft);
-      color: #29303a;
+      color: var(--action-ink);
       font-size: 13px;
       margin: 0;
       font-weight: 600;
       transition: background 160ms ease, border-color 160ms ease, color 160ms ease;
     }
-    .card-actions a:first-child { color: #fff; border-color: var(--brand); background: var(--brand); }
+    .card-actions a:first-child { color: var(--brand-contrast); border-color: var(--brand); background: var(--brand); }
     .card-actions a:hover { border-color: var(--brand); text-decoration: none; }
     .card-side {
       display: grid;
@@ -454,7 +539,7 @@
     .dependency-warning-reason {
       display: block;
       margin-top: 5px;
-      color: #5f3a12;
+      color: var(--warning-copy);
       font-family: var(--font-sans);
       font-size: 12px;
       line-height: 1.4;
@@ -465,7 +550,7 @@
       border: 1px solid var(--warning-line);
       border-radius: 7px;
       padding: 10px 12px;
-      color: #5f3a12;
+      color: var(--warning-copy);
       background: var(--warning-soft);
       font-size: 13px;
     }
@@ -490,7 +575,7 @@
     .site-footer .shell { padding-block: 18px 28px; }
     .readme {
       line-height: 1.58;
-      color: #1f2937;
+      color: var(--readme-ink);
       overflow-wrap: anywhere;
     }
     .readme h1 { font-size: 24px; margin-bottom: 10px; }
@@ -501,12 +586,12 @@
       overflow: auto;
       border: 1px solid var(--line);
       border-radius: 6px;
-      background: #f8fafc;
+      background: var(--code-bg);
       padding: 10px;
       max-width: 100%;
     }
     .readme code {
-      background: #f1f5f9;
+      background: var(--soft);
       border-radius: 4px;
       padding: 1px 4px;
       font-size: 0.92em;
@@ -537,13 +622,13 @@
       padding: 0 18px;
       border: 1px solid #b9c3df;
       border-radius: 9px;
-      background: rgba(255, 255, 255, 0.96);
+      background: var(--field-bg);
       box-shadow: 0 14px 34px rgba(31, 43, 105, 0.1);
       font-size: 16px;
     }
     .entry-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
     .entry-card { position: relative; padding: 20px; }
-    .entry-card:hover { border-color: #bcc6ec; box-shadow: var(--shadow); transform: translateY(-2px); }
+    .entry-card:hover { border-color: var(--hover-line); box-shadow: var(--shadow); transform: translateY(-2px); }
     .entry-card h2 { margin: 0 0 7px; font-size: 19px; }
     .entry-card strong { display: block; margin-top: 16px; color: var(--brand); font-size: 30px; line-height: 1; }
     .entry-links { display: flex; flex-wrap: wrap; gap: 7px; margin-top: 14px; }
@@ -567,9 +652,9 @@
       border: 1px solid var(--line);
       border-radius: 7px;
       color: var(--ink);
-      background: #fff;
+      background: var(--paper);
     }
-    .home-result:hover { border-color: #bcc6ec; background: #fbfcff; text-decoration: none; }
+    .home-result:hover { border-color: var(--hover-line); background: var(--soft); text-decoration: none; }
     .home-result-name { color: var(--brand-deep); font-family: var(--font-mono); font-weight: 700; overflow-wrap: anywhere; }
     .home-result span { color: var(--muted); font-size: 13px; text-align: right; }
     .home-empty { margin: 10px 0 0; color: var(--muted); }
@@ -585,6 +670,7 @@
       .shell { width: min(100% - 28px, 1180px); }
       main.shell { width: min(100% - 28px, 1180px); }
       .topline { align-items: stretch; flex-direction: column; }
+      .header-actions { justify-content: space-between; }
       .api-links {
         display: grid;
         grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -629,7 +715,9 @@
       .site-header .shell { padding-block: 10px; }
       .brand { font-size: 17px; overflow-wrap: anywhere; }
       .brand small { display: none; }
+      .header-actions { align-items: stretch; flex-direction: column; gap: 7px; }
       .api-links { gap: 6px; }
+      .theme-switcher { align-self: flex-end; }
       .api-links a { padding: 7px 5px; font-size: 11px; }
       .search-strip { padding: 12px 0; }
       .content, .detail-main, .detail-side { padding: 12px; min-width: 0; }
@@ -749,6 +837,91 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 .highlight .vi { color: #BB60D5 } /* Name.Variable.Instance */
 .highlight .vm { color: #BB60D5 } /* Name.Variable.Magic */
 .highlight .il { color: #40A070 } /* Literal.Number.Integer.Long */
+pre { line-height: 125%; }
+td.linenos .normal { color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px; }
+span.linenos { color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px; }
+td.linenos .special { color: #000000; background-color: #ffffc0; padding-left: 5px; padding-right: 5px; }
+span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 5px; padding-right: 5px; }
+html[data-theme="dark"] .highlight .hll { background-color: #49483e }
+html[data-theme="dark"] .highlight { background: #272822; color: #F8F8F2 }
+html[data-theme="dark"] .highlight .c { color: #959077 } /* Comment */
+html[data-theme="dark"] .highlight .err { color: #ED007E; background-color: #1E0010 } /* Error */
+html[data-theme="dark"] .highlight .esc { color: #F8F8F2 } /* Escape */
+html[data-theme="dark"] .highlight .g { color: #F8F8F2 } /* Generic */
+html[data-theme="dark"] .highlight .k { color: #66D9EF } /* Keyword */
+html[data-theme="dark"] .highlight .l { color: #AE81FF } /* Literal */
+html[data-theme="dark"] .highlight .n { color: #F8F8F2 } /* Name */
+html[data-theme="dark"] .highlight .o { color: #FF4689 } /* Operator */
+html[data-theme="dark"] .highlight .x { color: #F8F8F2 } /* Other */
+html[data-theme="dark"] .highlight .p { color: #F8F8F2 } /* Punctuation */
+html[data-theme="dark"] .highlight .ch { color: #959077 } /* Comment.Hashbang */
+html[data-theme="dark"] .highlight .cm { color: #959077 } /* Comment.Multiline */
+html[data-theme="dark"] .highlight .cp { color: #959077 } /* Comment.Preproc */
+html[data-theme="dark"] .highlight .cpf { color: #959077 } /* Comment.PreprocFile */
+html[data-theme="dark"] .highlight .c1 { color: #959077 } /* Comment.Single */
+html[data-theme="dark"] .highlight .cs { color: #959077 } /* Comment.Special */
+html[data-theme="dark"] .highlight .gd { color: #FF4689 } /* Generic.Deleted */
+html[data-theme="dark"] .highlight .ge { color: #F8F8F2; font-style: italic } /* Generic.Emph */
+html[data-theme="dark"] .highlight .ges { color: #F8F8F2; font-weight: bold; font-style: italic } /* Generic.EmphStrong */
+html[data-theme="dark"] .highlight .gr { color: #F8F8F2 } /* Generic.Error */
+html[data-theme="dark"] .highlight .gh { color: #F8F8F2 } /* Generic.Heading */
+html[data-theme="dark"] .highlight .gi { color: #A6E22E } /* Generic.Inserted */
+html[data-theme="dark"] .highlight .go { color: #66D9EF } /* Generic.Output */
+html[data-theme="dark"] .highlight .gp { color: #FF4689; font-weight: bold } /* Generic.Prompt */
+html[data-theme="dark"] .highlight .gs { color: #F8F8F2; font-weight: bold } /* Generic.Strong */
+html[data-theme="dark"] .highlight .gu { color: #959077 } /* Generic.Subheading */
+html[data-theme="dark"] .highlight .gt { color: #F8F8F2 } /* Generic.Traceback */
+html[data-theme="dark"] .highlight .kc { color: #66D9EF } /* Keyword.Constant */
+html[data-theme="dark"] .highlight .kd { color: #66D9EF } /* Keyword.Declaration */
+html[data-theme="dark"] .highlight .kn { color: #FF4689 } /* Keyword.Namespace */
+html[data-theme="dark"] .highlight .kp { color: #66D9EF } /* Keyword.Pseudo */
+html[data-theme="dark"] .highlight .kr { color: #66D9EF } /* Keyword.Reserved */
+html[data-theme="dark"] .highlight .kt { color: #66D9EF } /* Keyword.Type */
+html[data-theme="dark"] .highlight .ld { color: #E6DB74 } /* Literal.Date */
+html[data-theme="dark"] .highlight .m { color: #AE81FF } /* Literal.Number */
+html[data-theme="dark"] .highlight .s { color: #E6DB74 } /* Literal.String */
+html[data-theme="dark"] .highlight .na { color: #A6E22E } /* Name.Attribute */
+html[data-theme="dark"] .highlight .nb { color: #F8F8F2 } /* Name.Builtin */
+html[data-theme="dark"] .highlight .nc { color: #A6E22E } /* Name.Class */
+html[data-theme="dark"] .highlight .no { color: #66D9EF } /* Name.Constant */
+html[data-theme="dark"] .highlight .nd { color: #A6E22E } /* Name.Decorator */
+html[data-theme="dark"] .highlight .ni { color: #F8F8F2 } /* Name.Entity */
+html[data-theme="dark"] .highlight .ne { color: #A6E22E } /* Name.Exception */
+html[data-theme="dark"] .highlight .nf { color: #A6E22E } /* Name.Function */
+html[data-theme="dark"] .highlight .nl { color: #F8F8F2 } /* Name.Label */
+html[data-theme="dark"] .highlight .nn { color: #F8F8F2 } /* Name.Namespace */
+html[data-theme="dark"] .highlight .nx { color: #A6E22E } /* Name.Other */
+html[data-theme="dark"] .highlight .py { color: #F8F8F2 } /* Name.Property */
+html[data-theme="dark"] .highlight .nt { color: #FF4689 } /* Name.Tag */
+html[data-theme="dark"] .highlight .nv { color: #F8F8F2 } /* Name.Variable */
+html[data-theme="dark"] .highlight .ow { color: #FF4689 } /* Operator.Word */
+html[data-theme="dark"] .highlight .pm { color: #F8F8F2 } /* Punctuation.Marker */
+html[data-theme="dark"] .highlight .w { color: #F8F8F2 } /* Text.Whitespace */
+html[data-theme="dark"] .highlight .mb { color: #AE81FF } /* Literal.Number.Bin */
+html[data-theme="dark"] .highlight .mf { color: #AE81FF } /* Literal.Number.Float */
+html[data-theme="dark"] .highlight .mh { color: #AE81FF } /* Literal.Number.Hex */
+html[data-theme="dark"] .highlight .mi { color: #AE81FF } /* Literal.Number.Integer */
+html[data-theme="dark"] .highlight .mo { color: #AE81FF } /* Literal.Number.Oct */
+html[data-theme="dark"] .highlight .sa { color: #E6DB74 } /* Literal.String.Affix */
+html[data-theme="dark"] .highlight .sb { color: #E6DB74 } /* Literal.String.Backtick */
+html[data-theme="dark"] .highlight .sc { color: #E6DB74 } /* Literal.String.Char */
+html[data-theme="dark"] .highlight .dl { color: #E6DB74 } /* Literal.String.Delimiter */
+html[data-theme="dark"] .highlight .sd { color: #E6DB74 } /* Literal.String.Doc */
+html[data-theme="dark"] .highlight .s2 { color: #E6DB74 } /* Literal.String.Double */
+html[data-theme="dark"] .highlight .se { color: #AE81FF } /* Literal.String.Escape */
+html[data-theme="dark"] .highlight .sh { color: #E6DB74 } /* Literal.String.Heredoc */
+html[data-theme="dark"] .highlight .si { color: #E6DB74 } /* Literal.String.Interpol */
+html[data-theme="dark"] .highlight .sx { color: #E6DB74 } /* Literal.String.Other */
+html[data-theme="dark"] .highlight .sr { color: #E6DB74 } /* Literal.String.Regex */
+html[data-theme="dark"] .highlight .s1 { color: #E6DB74 } /* Literal.String.Single */
+html[data-theme="dark"] .highlight .ss { color: #E6DB74 } /* Literal.String.Symbol */
+html[data-theme="dark"] .highlight .bp { color: #F8F8F2 } /* Name.Builtin.Pseudo */
+html[data-theme="dark"] .highlight .fm { color: #A6E22E } /* Name.Function.Magic */
+html[data-theme="dark"] .highlight .vc { color: #F8F8F2 } /* Name.Variable.Class */
+html[data-theme="dark"] .highlight .vg { color: #F8F8F2 } /* Name.Variable.Global */
+html[data-theme="dark"] .highlight .vi { color: #F8F8F2 } /* Name.Variable.Instance */
+html[data-theme="dark"] .highlight .vm { color: #F8F8F2 } /* Name.Variable.Magic */
+html[data-theme="dark"] .highlight .il { color: #AE81FF } /* Literal.Number.Integer.Long */
   </style>
 </head>
 <body>
@@ -758,16 +931,56 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
         <img class="brand-mark" src="../../assets/robonix-mark.svg" alt="" aria-hidden="true" width="34" height="30">
         <span>Robonix <small>Package Catalog</small></span>
       </a>
-      <nav class="api-links" aria-label="Catalog navigation">
-        <a href="../../packages/" aria-current="page">Packages</a>
-        <a href="../../robots/">Robots</a>
-        <a href="../../api/view/">API</a>
-      </nav>
+      <div class="header-actions">
+        <nav class="api-links" aria-label="Catalog navigation">
+          <a href="../../packages/" aria-current="page">Packages</a>
+          <a href="../../robots/">Robots</a>
+          <a href="../../api/view/">API</a>
+        </nav>
+        <div class="theme-switcher" role="group" aria-label="Color theme">
+          <button type="button" data-theme-choice="auto" aria-pressed="false">Auto</button>
+          <button type="button" data-theme-choice="light" aria-pressed="false">Light</button>
+          <button type="button" data-theme-choice="dark" aria-pressed="false">Dark</button>
+        </div>
+      </div>
     </div>
   </header>
   <script>
     (() => {
       const header = document.currentScript.previousElementSibling;
+      const storageKey = 'robonix-catalog-theme';
+      const media = matchMedia('(prefers-color-scheme: dark)');
+      const choices = Array.from(header.querySelectorAll('[data-theme-choice]'));
+      const validPreference = (value) => ['auto', 'light', 'dark'].includes(value);
+      const readPreference = () => {
+        const current = document.documentElement.dataset.themePreference;
+        return validPreference(current) ? current : 'auto';
+      };
+      const applyTheme = (preference, persist = false) => {
+        const safePreference = validPreference(preference) ? preference : 'auto';
+        const resolved = safePreference === 'auto'
+          ? (media.matches ? 'dark' : 'light')
+          : safePreference;
+        document.documentElement.dataset.theme = resolved;
+        document.documentElement.dataset.themePreference = safePreference;
+        document.documentElement.style.colorScheme = resolved;
+        choices.forEach((button) => {
+          button.setAttribute('aria-pressed', String(button.dataset.themeChoice === safePreference));
+        });
+        if (persist) {
+          try { localStorage.setItem(storageKey, safePreference); } catch (_) {}
+        }
+      };
+      choices.forEach((button) => {
+        button.addEventListener('click', () => applyTheme(button.dataset.themeChoice, true));
+      });
+      media.addEventListener?.('change', () => {
+        if (readPreference() === 'auto') applyTheme('auto');
+      });
+      window.addEventListener('storage', (event) => {
+        if (event.key === storageKey) applyTheme(validPreference(event.newValue) ? event.newValue : 'auto');
+      });
+      applyTheme(readPreference());
       const updateHeaderHeight = () => {
         const height = Math.ceil(header.getBoundingClientRect().height);
         document.documentElement.style.setProperty('--site-header-height', `${height}px`);
@@ -1023,6 +1236,6 @@ MulanPSL-2.0 license included in this repository.</p>
       </aside>
     </div>
   </main>
-  <footer class="site-footer"><div class="shell">Generated on 2026-07-27T05:22:46+00:00.</div></footer>
+  <footer class="site-footer"><div class="shell">Generated on 2026-07-27T14:19:44+00:00.</div></footer>
 </body>
 </html>

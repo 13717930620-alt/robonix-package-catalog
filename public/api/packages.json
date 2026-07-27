@@ -1,6 +1,6 @@
 {
   "api_version": "1",
-  "generated_at": "2026-07-27T05:22:46+00:00",
+  "generated_at": "2026-07-27T14:19:44+00:00",
   "packages": [
     {
       "name": "robonix.primitive.agilex.piper.arm",
@@ -634,7 +634,7 @@
     },
     {
       "name": "robonix.service.navigation.vln",
-      "version": "0.3.0",
+      "version": "0.4.0",
       "description": "Instruction-following navigation service — cloud S2 semantic latents plus edge S1 action generation with adaptive cloud-edge synchronization.",
       "license": "MulanPSL-2.0",
       "tags": [
@@ -648,7 +648,7 @@
       ],
       "repo": "https://github.com/i6bimua/service-navigation-vln-rbnx",
       "maintainers": [
-        "Hangyu Cao <3087918372@qq.com>"
+        "Seto <202330552461@mail.scut.edu.cn>"
       ],
       "repo_name": "service-navigation-vln-rbnx",
       "default_branch": "main",
