@@ -24,6 +24,10 @@ from pygments.formatters import HtmlFormatter
 
 GITHUB_RE = re.compile(r"^https://github\.com/([^/]+)/([^/#?]+?)(?:\.git)?/?$")
 MAINTAINER_RE = re.compile(r"^[^<>\n]+ <[^<>\s@]+@[^<>\s@]+\.[^<>\s@]+>$")
+ROBONIX_SOURCE_RE = re.compile(r"^\$\{ROBONIX_SOURCE_PATH\}(?:/|$)")
+ROBONIX_DEPLOY_RE = re.compile(r"^\$\{ROBONIX_DEPLOY_DIR\}(?:/|$)")
+ENV_ROOT_RE = re.compile(r"^\$\{([^}]+)\}(?:/|$)")
+WINDOWS_ABSOLUTE_RE = re.compile(r"^[A-Za-z]:[\\/]")
 VENDOR_ASSETS = Path("assets/vendor/pico")
 BRAND_MARK_ASSET = Path("assets/robonix-mark.svg")
 LEGACY_MISSING_LICENSE = {"robonix.robot.wheeltec.r550"}
@@ -275,6 +279,178 @@ def collect_deploy_dependencies(package_name: str, manifest: dict) -> list[dict]
     return deps
 
 
+def canonical_github_repo(url: str) -> str:
+    """Normalize a GitHub repository URL for catalog dependency matching."""
+    match = GITHUB_RE.match(url.strip())
+    if not match:
+        return ""
+    return f"https://github.com/{match.group(1).lower()}/{match.group(2).lower()}"
+
+
+def classify_deploy_dependency(dep: dict, catalog_repos: dict[str, str]) -> tuple[str, str, str]:
+    """Return (resolution, package_name, warning) for one robot dependency."""
+    repo = str(dep.get("repo") or "").strip()
+    path = str(dep.get("path") or "").strip()
+    source = repo or path
+
+    if repo:
+        canonical_repo = canonical_github_repo(repo)
+        package_name = catalog_repos.get(canonical_repo, "") if canonical_repo else ""
+        if package_name:
+            return "catalog", package_name, ""
+        if canonical_repo:
+            return (
+                "unresolved",
+                "",
+                f"Repository {repo!r} is not indexed by catalog.yaml; add the package to the Catalog or use a repository-local dependency.",
+            )
+        return (
+            "unresolved",
+            "",
+            f"URL {repo!r} is not a cataloged GitHub repository; use a cataloged repository URL, "
+            "${ROBONIX_SOURCE_PATH}/... for a Robonix built-in, "
+            "${ROBONIX_DEPLOY_DIR}/... for the boot deployment, or a repository-relative path.",
+        )
+
+    if not path:
+        return (
+            "unresolved",
+            "",
+            "No url or path is declared; use a cataloged repository URL, "
+            "${ROBONIX_SOURCE_PATH}/... for a Robonix built-in, "
+            "${ROBONIX_DEPLOY_DIR}/... for the boot deployment, or a repository-relative path.",
+        )
+    if ROBONIX_SOURCE_RE.match(path):
+        return "robonix_source", "", ""
+    if ROBONIX_DEPLOY_RE.match(path):
+        return "robonix_deploy", "", ""
+    env_root = ENV_ROOT_RE.match(path)
+    if env_root:
+        return (
+            "unresolved",
+            "",
+            f"Uses unsupported environment root ${{{env_root.group(1)}}}; Robonix accepts only "
+            "${ROBONIX_SOURCE_PATH}/... for the source tree and ${ROBONIX_DEPLOY_DIR}/... "
+            "for the boot deployment. Otherwise use a cataloged repository URL or "
+            "repository-relative path.",
+        )
+    if posixpath.isabs(path) or WINDOWS_ABSOLUTE_RE.match(path) or path.startswith("~"):
+        return (
+            "unresolved",
+            "",
+            f"Uses host-specific absolute path {source!r}; use a cataloged repository URL, "
+            "${ROBONIX_SOURCE_PATH}/... for a Robonix built-in, "
+            "${ROBONIX_DEPLOY_DIR}/... for the boot deployment, or a repository-relative "
+            "path such as ./primitives/robot_description.",
+        )
+    normalized_path = posixpath.normpath(path.replace("\\", "/"))
+    if normalized_path == ".." or normalized_path.startswith("../"):
+        return (
+            "unresolved",
+            "",
+            f"Repository-relative path {path!r} escapes the robot repository; keep bundled packages inside the repository.",
+        )
+    return "robot_repository", "", ""
+
+
+def annotate_deploy_dependencies(packages: list[dict]) -> None:
+    catalog_repos = {
+        canonical_github_repo(package["repo"]): package["name"]
+        for package in packages
+        if package.get("catalog_type") != "robot" and canonical_github_repo(package.get("repo", ""))
+    }
+    name_to_slug = {package["name"]: package_slug(package["name"]) for package in packages}
+    for package in packages:
+        if package.get("catalog_type") != "robot":
+            continue
+        warnings = []
+        for dep in package.get("deploy_dependencies", []):
+            resolution, dep_name, warning = classify_deploy_dependency(dep, catalog_repos)
+            dep["resolution"] = resolution
+            dep["package_name"] = dep_name
+            dep["package_url"] = f"../{name_to_slug[dep_name]}/" if dep_name else ""
+            dep["resolution_warning"] = warning
+            if warning:
+                source = dep.get("repo") or dep.get("path") or ""
+                warnings.append(
+                    {
+                        "section": dep.get("section", ""),
+                        "name": dep.get("name", ""),
+                        "source": source,
+                        "reason": warning,
+                    }
+                )
+        package["deployment_status"] = "warning" if warnings else "ok"
+        package["deployment_warnings"] = warnings
+
+
+def github_command_escape(value: str) -> str:
+    return value.replace("%", "%25").replace("\r", "%0D").replace("\n", "%0A")
+
+
+def markdown_cell(value: str) -> str:
+    return value.replace("\\", "\\\\").replace("|", "\\|").replace("\r", " ").replace("\n", "<br>")
+
+
+def report_deployment_warnings(packages: list[dict]) -> int:
+    warnings = [
+        (package["name"], warning)
+        for package in packages
+        for warning in package.get("deployment_warnings", [])
+    ]
+    github_actions = os.environ.get("GITHUB_ACTIONS", "").lower() == "true"
+    for robot_name, warning in warnings:
+        source = warning.get("source") or "(missing source)"
+        message = (
+            f"{robot_name}: {warning.get('section', '')} {warning.get('name', '')} "
+            f"[{source}] — {warning.get('reason', '')}"
+        )
+        print(f"warning: {message}", file=sys.stderr)
+        if github_actions:
+            title = github_command_escape(
+                f"Unresolved deployment dependency: {warning.get('name', '')}"
+            )
+            print(
+                f"::warning title={title}::{github_command_escape(message)}",
+                file=sys.stderr,
+            )
+
+    summary_path = os.environ.get("GITHUB_STEP_SUMMARY")
+    if summary_path:
+        lines = ["## Deployment dependency report", ""]
+        if not warnings:
+            lines.append("All robot deployment dependencies have portable, catalog-resolvable sources.")
+        else:
+            dependency_label = "dependency" if len(warnings) == 1 else "dependencies"
+            lines.extend(
+                [
+                    f"Found **{len(warnings)} unresolved deployment {dependency_label}**. "
+                    "Catalog generation continues, but the robot maintainers should replace these sources.",
+                    "",
+                    "| Robot | Section | Deployment package | Source | Reason |",
+                    "| --- | --- | --- | --- | --- |",
+                ]
+            )
+            for robot_name, warning in warnings:
+                lines.append(
+                    "| "
+                    + " | ".join(
+                        markdown_cell(str(value))
+                        for value in (
+                            robot_name,
+                            warning.get("section", ""),
+                            warning.get("name", ""),
+                            warning.get("source") or "(missing source)",
+                            warning.get("reason", ""),
+                        )
+                    )
+                    + " |"
+                )
+        with open(summary_path, "a", encoding="utf-8") as summary:
+            summary.write("\n".join(lines) + "\n")
+    return len(warnings)
+
+
 def collect(catalog_path: Path) -> list[dict]:
     entries = read_catalog(catalog_path)
     seen_names = set()
@@ -346,13 +522,7 @@ def collect(catalog_path: Path) -> list[dict]:
                 "_readme_markdown": readme,
             }
         )
-    repo_to_package = {p["repo"]: p["name"] for p in out}
-    name_to_slug = {p["name"]: package_slug(p["name"]) for p in out}
-    for package in out:
-        for dep in package.get("deploy_dependencies", []):
-            dep_name = repo_to_package.get(dep.get("repo", ""))
-            dep["package_name"] = dep_name or ""
-            dep["package_url"] = f"../{name_to_slug[dep_name]}/" if dep_name else ""
+    annotate_deploy_dependencies(out)
     out.sort(key=lambda x: x["name"])
     return out
 
@@ -425,6 +595,9 @@ def render_css() -> str:
       --brand-deep: #17205f;
       --signal: #3674ff;
       --signal-soft: #e9edff;
+      --warning: #8a4b08;
+      --warning-line: #e2ad58;
+      --warning-soft: #fff7e8;
       --shadow: 0 8px 28px rgba(28, 38, 88, 0.06);
       --site-header-height: 64px;
       --sticky-gap: 14px;
@@ -689,6 +862,11 @@ def render_css() -> str:
     .package-card:nth-child(3) { animation-delay: 70ms; }
     .package-card:nth-child(4) { animation-delay: 105ms; }
     .package-card:hover { border-color: #bcc6ec; box-shadow: var(--shadow); transform: translateY(-2px); }
+    .package-card.has-warning {
+      border-color: var(--warning-line);
+      background: linear-gradient(90deg, var(--warning-soft), #fff 26%);
+    }
+    .package-card.has-warning:hover { border-color: #c9892f; }
     @keyframes rise-in {
       from { opacity: 0; transform: translateY(7px); }
       to { opacity: 1; transform: translateY(0); }
@@ -703,6 +881,35 @@ def render_css() -> str:
       letter-spacing: 0.08em;
       text-transform: uppercase;
     }
+    .card-status-line { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+    .warning-badge {
+      display: inline-flex;
+      align-items: center;
+      width: fit-content;
+      min-width: 0;
+      border: 1px solid var(--warning-line);
+      border-radius: 999px;
+      padding: 2px 7px;
+      color: var(--warning);
+      background: var(--warning-soft);
+      font-family: var(--font-sans);
+      font-size: 11px;
+      font-weight: 700;
+      line-height: 1.35;
+    }
+    .warning-summary {
+      margin: 9px 0;
+      border-left: 3px solid var(--warning-line);
+      padding: 7px 9px;
+      color: #5f3a12;
+      background: var(--warning-soft);
+      font-size: 12px;
+      line-height: 1.4;
+    }
+    .warning-summary strong { display: block; margin-bottom: 3px; color: var(--warning); }
+    .warning-summary ul { margin: 0; padding-left: 17px; }
+    .warning-summary li { margin: 2px 0; }
+    .warning-summary code { color: #5f3a12; background: transparent; padding: 0; }
     .package-title { display: flex; gap: 8px; align-items: baseline; flex-wrap: wrap; margin-bottom: 5px; }
     .package-title a {
       font-family: var(--font-mono);
@@ -807,6 +1014,32 @@ def render_css() -> str:
       display: inline-block;
       min-width: 64px;
     }
+    .cap-list li.dependency-warning {
+      border-color: var(--warning-line);
+      background: var(--warning-soft);
+    }
+    .dependency-warning .warning-badge { margin-left: 5px; }
+    .dependency-warning-reason {
+      display: block;
+      margin-top: 5px;
+      color: #5f3a12;
+      font-family: var(--font-sans);
+      font-size: 12px;
+      line-height: 1.4;
+    }
+    .detail-warning {
+      max-width: 920px;
+      margin-top: 12px;
+      border: 1px solid var(--warning-line);
+      border-radius: 7px;
+      padding: 10px 12px;
+      color: #5f3a12;
+      background: var(--warning-soft);
+      font-size: 13px;
+    }
+    .detail-warning strong { display: block; margin-bottom: 4px; color: var(--warning); }
+    .detail-warning ul { margin: 0; padding-left: 18px; }
+    .detail-warning li { margin: 3px 0; }
     .detail-hero { padding: 20px 0 4px; }
     .detail-hero h1 { font-family: var(--font-mono); }
     .back { display: inline-block; margin: 0 0 12px; color: var(--brand); }
@@ -1076,7 +1309,17 @@ def render_listing_page(public_dir: Path, generated_at: str, packages: list[dict
             ]
             + p["tags"]
             + p["capabilities"]
-            + [d.get("name", "") for d in p.get("deploy_dependencies", [])]
+            + [
+                " ".join(
+                    [
+                        d.get("name", ""),
+                        d.get("repo", ""),
+                        d.get("path", ""),
+                        d.get("resolution_warning", ""),
+                    ]
+                )
+                for d in p.get("deploy_dependencies", [])
+            ]
         )
         preview_html = ""
         if p.get("_preview_image_380"):
@@ -1096,15 +1339,37 @@ def render_listing_page(public_dir: Path, generated_at: str, packages: list[dict
                 f'loading="lazy" decoding="async" fetchpriority="low">'
             )
         preview_line = f"\n          {preview_html}" if preview_html else ""
+        deployment_warnings = p.get("deployment_warnings", [])
+        card_class = "package-card has-warning" if deployment_warnings else "package-card"
+        warning_badge = (
+            f'<span class="warning-badge">Warning · {len(deployment_warnings)} unresolved</span>'
+            if deployment_warnings
+            else ""
+        )
+        warning_summary = ""
+        if deployment_warnings:
+            warning_items = "".join(
+                "<li><code>"
+                + html.escape(f"{warning.get('section', '')} {warning.get('name', '')}".strip())
+                + "</code>: "
+                + html.escape(warning.get("reason", ""))
+                + "</li>"
+                for warning in deployment_warnings
+            )
+            warning_summary = (
+                '<div class="warning-summary"><strong>Deployment source warning</strong>'
+                f"<ul>{warning_items}</ul></div>"
+            )
+        warning_summary_line = f"\n          {warning_summary}" if warning_summary else ""
         cards.append(
-            f"""<article class="package-card" data-kind="{html.escape(p['kind'])}" data-tags="{html.escape(' '.join(p['tags']))}" data-search="{html.escape(search_text.lower())}">
+            f"""<article class="{card_class}" data-kind="{html.escape(p['kind'])}" data-tags="{html.escape(' '.join(p['tags']))}" data-search="{html.escape(search_text.lower())}">
         <div>
-          <span class="kind-label">{html.escape(p['kind'])}</span>
+          <div class="card-status-line"><span class="kind-label">{html.escape(p['kind'])}</span>{warning_badge}</div>
           <div class="package-title">
             <a href="{detail_href}">{html.escape(p['name'])}</a>
             <span class="version">v{html.escape(p['version'])}</span>
           </div>
-          <p class="description">{html.escape(p['description'])}</p>
+          <p class="description">{html.escape(p['description'])}</p>{warning_summary_line}
           <div class="meta-line">
             <span>maintainers <strong>{html.escape(', '.join(p['maintainers']))}</strong></span>
             <span>{html.escape(str(unit_count))} {html.escape(unit_label)}</span>
@@ -1578,6 +1843,7 @@ def render_package_pages(public_dir: Path, generated_at: str, packages: list[dic
         base = detail_base(p)
         package_dir = public_dir / base / package_slug(p["name"])
         package_dir.mkdir(parents=True, exist_ok=True)
+        detail_warning = ""
         if p.get("catalog_type") == "robot":
             cap_title = "Deployment Packages"
             dep_items = []
@@ -1589,10 +1855,37 @@ def render_package_pages(public_dir: Path, generated_at: str, packages: list[dic
                     dep_label = f"<a href=\"{html.escape(dep['repo'])}\">{html.escape(dep['repo'])}</a>"
                 else:
                     dep_label = html.escape(dep_name)
+                warning = dep.get("resolution_warning", "")
+                warning_badge = '<strong class="warning-badge">Warning</strong>' if warning else ""
+                warning_reason = (
+                    f'<small class="dependency-warning-reason">{html.escape(warning)}</small>'
+                    if warning
+                    else ""
+                )
+                item_class = ' class="dependency-warning"' if warning else ""
                 dep_items.append(
-                    f"<li><span>{html.escape(dep.get('section', ''))}</span> <code>{html.escape(dep.get('name', ''))}</code><br>{dep_label}</li>"
+                    f"<li{item_class}><span>{html.escape(dep.get('section', ''))}</span> "
+                    f"<code>{html.escape(dep.get('name', ''))}</code>{warning_badge}<br>"
+                    f"{dep_label}{warning_reason}</li>"
                 )
             cap_items = "\n".join(dep_items)
+            deployment_warnings = p.get("deployment_warnings", [])
+            if deployment_warnings:
+                warning_items = "".join(
+                    "<li><code>"
+                    + html.escape(
+                        f"{warning.get('section', '')} {warning.get('name', '')}".strip()
+                    )
+                    + "</code>: "
+                    + html.escape(warning.get("reason", ""))
+                    + "</li>"
+                    for warning in deployment_warnings
+                )
+                detail_warning = (
+                    '\n    <div class="detail-warning" role="note" aria-label="Deployment warning">'
+                    f"<strong>Deployment warning · {len(deployment_warnings)} unresolved dependencies</strong>"
+                    f"<ul>{warning_items}</ul></div>"
+                )
         else:
             cap_title = "Capabilities"
             cap_items = "\n".join(f"<li>{html.escape(cap)}</li>" for cap in p["capabilities"])
@@ -1617,7 +1910,7 @@ def render_package_pages(public_dir: Path, generated_at: str, packages: list[dic
   <header class="shell detail-hero">
     <a class="back" href="../">Back to {html.escape(base)}</a>
     <h1>{html.escape(p['name'])}</h1>
-    <p class="lede">{html.escape(p['description'])}</p>
+    <p class="lede">{html.escape(p['description'])}</p>{detail_warning}
   </header>
   <main class="shell">
     <div class="detail-layout">
@@ -1732,6 +2025,8 @@ def render_readme(path: Path, generated_at: str, packages: list[dict]) -> None:
         "| `manifest` | string | source manifest path, usually `package_manifest.yaml` or `robonix_manifest.yaml` |",
         "| `capabilities` | string[] | declared Robonix contract IDs |",
         "| `deploy_dependencies` | object[] | robot deployment dependencies parsed from `robonix_manifest.yaml` |",
+        "| `deployment_status` | string | robot dependency health: `ok` or `warning` |",
+        "| `deployment_warnings` | object[] | unresolved robot dependencies with section, name, source, and reason |",
         "| `readme_url` | string | GitHub README URL for the indexed branch |",
         "| `preview_image_url` | string | optional robot preview discovered at `assets/robot.jpg`; empty when absent |",
         "",
@@ -1841,7 +2136,15 @@ def render_readme(path: Path, generated_at: str, packages: list[dict]) -> None:
         "",
         "The builder also parses `primitive:`, `service:`, and `skill:` entries from",
         "`robonix_manifest.yaml` into `deploy_dependencies[]`, linking dependencies",
-        "back to cataloged ordinary packages when their repository is known.",
+        "back to cataloged ordinary packages when their repository is known. Each",
+        "dependency includes `resolution` (`catalog`, `robonix_source`,",
+        "`robonix_deploy`, `robot_repository`, or `unresolved`) and",
+        "`resolution_warning`. A source is",
+        "portable when it resolves to a cataloged repository, uses the exact",
+        "`${ROBONIX_SOURCE_PATH}/...` source-tree root, uses the exact",
+        "`${ROBONIX_DEPLOY_DIR}/...` boot-deployment root, or stays inside the",
+        "robot repository through a relative path. Unresolved sources produce CI",
+        "warnings and a report without failing catalog generation.",
         "",
         "## Generated Outputs",
         "",
@@ -1892,6 +2195,7 @@ def main() -> None:
 
     generated_at = dt.datetime.now(dt.timezone.utc).replace(microsecond=0).isoformat()
     packages = collect(Path(args.catalog))
+    report_deployment_warnings(packages)
     out = Path(args.out)
     public = Path(args.public)
     if out.exists():

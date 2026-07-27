@@ -315,5 +315,203 @@ class CatalogMetadataTests(unittest.TestCase):
             )
 
 
+class DeploymentDependencyWarningTests(unittest.TestCase):
+    def test_dependency_resolution_is_strict_and_catalog_aware(self):
+        packages = [
+            {
+                "name": "robonix.primitive.example",
+                "repo": "https://github.com/syswonder/primitive-example-rbnx",
+                "catalog_type": "package",
+            },
+            {
+                "name": "robonix.robot.example",
+                "repo": "https://github.com/syswonder/robot-example",
+                "catalog_type": "robot",
+                "deploy_dependencies": [
+                    {
+                        "section": "primitive",
+                        "name": "cataloged",
+                        "repo": "https://github.com/syswonder/primitive-example-rbnx.git",
+                        "path": "",
+                    },
+                    {
+                        "section": "service",
+                        "name": "builtin",
+                        "repo": "",
+                        "path": "${ROBONIX_SOURCE_PATH}/services/speech",
+                    },
+                    {
+                        "section": "service",
+                        "name": "wrong_builtin_variable",
+                        "repo": "",
+                        "path": "${ROBONIX_SOURCE}/services/speech",
+                    },
+                    {
+                        "section": "skill",
+                        "name": "bundled_dot",
+                        "repo": "",
+                        "path": "./skills/greet",
+                    },
+                    {
+                        "section": "primitive",
+                        "name": "bundled_plain",
+                        "repo": "",
+                        "path": "primitives/camera",
+                    },
+                    {
+                        "section": "primitive",
+                        "name": "absolute",
+                        "repo": "",
+                        "path": "/home/robot/primitives/description",
+                    },
+                    {
+                        "section": "primitive",
+                        "name": "deploy_dir",
+                        "repo": "",
+                        "path": "${ROBONIX_DEPLOY_DIR}/packages/chassis",
+                    },
+                    {
+                        "section": "primitive",
+                        "name": "escaping",
+                        "repo": "",
+                        "path": "../shared/chassis",
+                    },
+                    {
+                        "section": "service",
+                        "name": "unindexed",
+                        "repo": "https://github.com/syswonder/service-unindexed-rbnx",
+                        "path": "",
+                    },
+                    {
+                        "section": "service",
+                        "name": "missing",
+                        "repo": "",
+                        "path": "",
+                    },
+                ],
+            },
+        ]
+
+        BUILD_CATALOG.annotate_deploy_dependencies(packages)
+
+        robot = packages[1]
+        dependencies = {dep["name"]: dep for dep in robot["deploy_dependencies"]}
+        self.assertEqual(dependencies["cataloged"]["resolution"], "catalog")
+        self.assertEqual(
+            dependencies["cataloged"]["package_name"], "robonix.primitive.example"
+        )
+        self.assertEqual(dependencies["builtin"]["resolution"], "robonix_source")
+        self.assertEqual(dependencies["bundled_dot"]["resolution"], "robot_repository")
+        self.assertEqual(dependencies["bundled_plain"]["resolution"], "robot_repository")
+        self.assertEqual(dependencies["wrong_builtin_variable"]["resolution"], "unresolved")
+        self.assertIn(
+            "unsupported environment root ${ROBONIX_SOURCE}",
+            dependencies["wrong_builtin_variable"]["resolution_warning"],
+        )
+        self.assertIn(
+            "host-specific absolute path",
+            dependencies["absolute"]["resolution_warning"],
+        )
+        self.assertEqual(dependencies["deploy_dir"]["resolution"], "robonix_deploy")
+        self.assertEqual(dependencies["deploy_dir"]["resolution_warning"], "")
+        self.assertIn("escapes the robot repository", dependencies["escaping"]["resolution_warning"])
+        self.assertIn("not indexed by catalog.yaml", dependencies["unindexed"]["resolution_warning"])
+        self.assertIn("No url or path", dependencies["missing"]["resolution_warning"])
+        self.assertEqual(robot["deployment_status"], "warning")
+        self.assertEqual(len(robot["deployment_warnings"]), 5)
+
+    def test_robot_list_and_detail_render_warning_reasons(self):
+        robot = {
+            "name": "robonix.robot.example",
+            "version": "0.1.0",
+            "kind": "robot",
+            "description": "Example robot",
+            "license": "Apache-2.0",
+            "repo": "https://github.com/syswonder/example-robot",
+            "repo_name": "example-robot",
+            "default_branch": "main",
+            "catalog_type": "robot",
+            "manifest": "robonix_manifest.yaml",
+            "tags": ["robot"],
+            "maintainers": ["Example <example@example.com>"],
+            "capabilities": [],
+            "deploy_dependencies": [
+                {
+                    "section": "primitive",
+                    "name": "robot_description",
+                    "repo": "",
+                    "path": "/home/robot/primitives/robot_description",
+                    "branch": "",
+                    "manifest": "",
+                }
+            ],
+            "preview_image_url": "",
+            "_readme_markdown": "",
+        }
+        BUILD_CATALOG.annotate_deploy_dependencies([robot])
+
+        with tempfile.TemporaryDirectory() as tmp:
+            public = Path(tmp)
+            BUILD_CATALOG.render_listing_page(
+                public,
+                "2026-07-27T00:00:00+00:00",
+                [robot],
+                page="robots",
+                title="Robot deployments",
+                empty_label="robot deployments",
+            )
+            BUILD_CATALOG.render_package_pages(
+                public, "2026-07-27T00:00:00+00:00", [robot]
+            )
+            listing = (public / "robots" / "index.html").read_text()
+            detail = (
+                public / "robots" / "robonix.robot.example" / "index.html"
+            ).read_text()
+
+        self.assertIn('class="package-card has-warning"', listing)
+        self.assertIn("Warning · 1 unresolved", listing)
+        self.assertIn("host-specific absolute path", listing)
+        self.assertIn('class="detail-warning" role="note"', detail)
+        self.assertIn('class="dependency-warning"', detail)
+        self.assertIn("robot_description", detail)
+        self.assertIn("host-specific absolute path", detail)
+
+    def test_ci_warning_annotations_and_summary_do_not_fail(self):
+        packages = [
+            {
+                "name": "robonix.robot.example",
+                "deployment_warnings": [
+                    {
+                        "section": "primitive",
+                        "name": "robot_description",
+                        "source": "/home/robot/description",
+                        "reason": "Uses a host-specific absolute path.",
+                    }
+                ],
+            }
+        ]
+
+        with tempfile.TemporaryDirectory() as tmp:
+            summary = Path(tmp) / "summary.md"
+            stderr = io.StringIO()
+            with mock.patch.dict(
+                BUILD_CATALOG.os.environ,
+                {
+                    "GITHUB_ACTIONS": "true",
+                    "GITHUB_STEP_SUMMARY": str(summary),
+                },
+            ), mock.patch.object(BUILD_CATALOG.sys, "stderr", stderr):
+                count = BUILD_CATALOG.report_deployment_warnings(packages)
+
+            report = summary.read_text()
+
+        self.assertEqual(count, 1)
+        self.assertIn("::warning title=Unresolved deployment dependency", stderr.getvalue())
+        self.assertIn("robonix.robot.example", stderr.getvalue())
+        self.assertIn("## Deployment dependency report", report)
+        self.assertIn("Found **1 unresolved deployment dependency**", report)
+        self.assertIn("/home/robot/description", report)
+
+
 if __name__ == "__main__":
     unittest.main()
