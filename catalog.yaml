@@ -55,8 +55,6 @@ packages:
     repo: https://github.com/syswonder/skill-minecraft-explore-rbnx
   - name: robonix.service.navigation.vln
     repo: https://github.com/i6bimua/service-navigation-vln-rbnx
-  - name: robonix.skill.navigation.vln
-    repo: https://github.com/i6bimua/skill-navigation-vln-rbnx
 
 robots:
   - name: robonix.robot.agilex.ranger_mini_v3
