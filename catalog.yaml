@@ -57,6 +57,8 @@ packages:
     repo: https://github.com/syswonder/skill-minecraft-explore-rbnx
   - name: robonix.service.navigation.vln
     repo: https://github.com/i6bimua/service-navigation-vln-rbnx
+  - name: robonix.skill.sim2real
+  - repo: https://github.com/QingFeng34048/Robonix-Skill-Sim2Real-Completed
 
 robots:
   - name: robonix.robot.agilex.ranger_mini_v3
