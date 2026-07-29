@@ -1052,10 +1052,12 @@ html[data-theme="dark"] .highlight .il { color: #AE81FF } /* Literal.Number.Inte
 
 <p><a></a></p>
 <h2>🎯 What this adds to RoboNix</h2>
-<p>RoboNix already has metric navigation (<code>robonix.service.navigation</code> / Nav2:
-go to a <code>PoseStamped</code>). It did <strong>not</strong> have a packaged, Pilot-callable service
-that follows a <strong>natural-language route</strong> while keeping the heavy dual-system
-VLN stack deployable on an edge robot. That is what this package is.</p>
+<p>This repository turns a dual-system VLN S1/S2 inference path into a
+<strong>deployable, callable, and observable RoboNix cloud–edge navigation service</strong>.
+S1 keeps the edge action loop moving while S2 refreshes high-level semantic
+context in the cloud; this repository owns when they communicate, how model
+history advances correctly, how timeouts and late results are handled, and how
+the runtime binds to RoboNix lifecycle and robot I/O.</p>
 <table>
 <thead>
 <tr>
@@ -1065,39 +1067,46 @@ VLN stack deployable on an edge robot. That is what this package is.</p>
 </thead>
 <tbody>
 <tr>
-<td>An instruction-following navigation <strong>service</strong></td>
-<td><code>robonix.service.navigation.vln</code> — sibling of Nav2. A coordinate goes to Nav2; a sentence such as <em>"walk down the hallway and stop at the kitchen door"</em> comes here.</td>
+<td>A genuinely split cloud–edge runtime</td>
+<td>Heavy S2 runs on a cloud GPU and lightweight S1 runs at the edge; the edge never has to materialize the complete dual-system model.</td>
 </tr>
 <tr>
-<td>Direct Pilot / Executor use</td>
-<td>Four MCP tools: <code>navigate</code>, <code>navigate/status</code>, <code>navigate/cancel</code>, <code>telemetry</code>. Pilot discovers them on the service; the executor owns the async poll lifecycle. Nothing else has to be deployed alongside.</td>
+<td>Adaptive collaboration without blocking control</td>
+<td>Key-latent synchronization, active/pending buffers, adaptive timeouts, and late-response absorption let S1 keep moving without consuming stale context indefinitely.</td>
 </tr>
 <tr>
-<td>Standard robot I/O only</td>
-<td>Consumes <code>camera/{rgb,depth,intrinsics}</code>, chassis <code>odom</code> / map <code>pose</code>, and drives <code>chassis/move</code>. No RoboNix-core patch, no vendor SDK.</td>
+<td>Preserved closed-loop model semantics</td>
+<td>One action is executed per observation while short-trajectory tails are retained; edge-only frames are replayed into S2 history, and S2 LOOK_DOWN / STOP actions are handled correctly.</td>
 </tr>
 <tr>
-<td>A cloud–edge compute plan that fits real robots</td>
-<td>Slow S2 semantic latents on a GPU host; fast S1 actions on the edge (~<strong>0.60 GB</strong> vs <strong>16.63 GB</strong> Edge Only). On Orin+A100 the control loop is <strong>2.22×</strong> faster than Edge Only at nearly the same SR, and recovers <strong>+6.1 SR / +12.7 SPL</strong> over Naive ECC.</td>
+<td>A complete RoboNix Service surface</td>
+<td>Four MCP tools — <code>navigate</code>, <code>navigate/status</code>, <code>navigate/cancel</code>, <code>telemetry</code> — plus standard camera, pose, and chassis contracts, with no RoboNix-core patch.</td>
+</tr>
+<tr>
+<td>Measured system gains</td>
+<td>Edge model memory is about <strong>0.60 GB</strong> versus <strong>16.63 GB</strong> for Edge Only. On Orin+A100 the control loop is <strong>2.22×</strong> faster at nearly the same SR, while recovering <strong>+6.1 SR / +12.7 SPL</strong> over Naive ECC.</td>
 </tr>
 </tbody>
 </table>
-<p><strong>Identity.</strong> The catalog capability is <em>instruction-following VLN navigation</em>.
-Cloud–edge scheduling, key-latent sync, and telemetry are how that capability
-stays accurate under edge memory and network limits — they are not a separate
-package users deploy.</p>
-<p><strong>Project boundary.</strong> Publishable RoboNix Service (<code>package_manifest.yaml</code>,
-Atlas provider, five contracts). Cloud S2 is part of this same runtime on a
-GPU host outside the robot deployment. An HTTP lifecycle API remains for
+<p>The concrete S1/S2 model and weights are InternVLA-N1; the rest of this document
+focuses on this repository's cloud–edge deployment, runtime correctness,
+scheduling, and RoboNix integration.</p>
+<p>The catalog identity is <code>robonix.service.navigation.vln</code> because the external
+RoboNix boundary is a long-running navigation service; cloud–edge compute
+optimization is its core implementation. Cloud S2 belongs to the same runtime
+on a GPU host outside the robot deployment. An HTTP lifecycle API remains for
 non-RoboNix orchestrators. See
 <a href="#robonix-integration-boundary">RoboNix Integration Boundary</a>.</p>
 <p><a></a></p>
 <h2>🎬 Demo Video</h2>
-<p>Each reel is one R2R-CE episode with <strong>left = Naive ECC</strong> and <strong>right = Ours</strong>;
-the HUD carries steps, per-step latency, wall clock, and the terminal verdict.</p>
+<p>These recordings run the trained InternVLA-N1 policy through the RoboNix
+Service control path in Habitat / R2R-CE. They are <strong>real-policy simulation
+demos, not physical-robot validation</strong>. The two representative reels cover
+robustness and actual task completion time without a redundant grid or
+single-lane clip.</p>
 <div>
 
-**1 · We succeed · they hang**
+**1 · Robustness: Naive ECC times out, Ours succeeds**
 
 <a href="https://github.com/i6bimua/service-navigation-vln-rbnx/blob/main/docs/assets/demo/habitat_comparison_fail.mp4">
   <img width="100%" src="https://raw.githubusercontent.com/i6bimua/service-navigation-vln-rbnx/main/docs/assets/demo/habitat_comparison_fail.gif" alt="Fail reel: Naive ECC TIMEOUT vs Ours SUCCEEDED">
@@ -1105,24 +1114,20 @@ the HUD carries steps, per-step latency, wall clock, and the terminal verdict.</
 
 <a href="https://github.com/i6bimua/service-navigation-vln-rbnx/blob/main/docs/assets/demo/habitat_comparison_fail.mp4">habitat_comparison_fail.mp4</a>
 
-**2 · Both succeed · we finish first**
+**2 · Completion time: Edge Only and Ours succeed, Ours is about 2× faster**
 
 <a href="https://github.com/i6bimua/service-navigation-vln-rbnx/blob/main/docs/assets/demo/habitat_comparison_speed.mp4">
-  <img width="100%" src="https://raw.githubusercontent.com/i6bimua/service-navigation-vln-rbnx/main/docs/assets/demo/habitat_comparison_speed.gif" alt="Speed reel: both SUCCEEDED, Ours faster">
+  <img width="100%" src="https://raw.githubusercontent.com/i6bimua/service-navigation-vln-rbnx/main/docs/assets/demo/habitat_comparison_speed.gif" alt="Speed reel: Edge Only and Ours both succeed, Ours finishes first">
 </a>
 
 <a href="https://github.com/i6bimua/service-navigation-vln-rbnx/blob/main/docs/assets/demo/habitat_comparison_speed.mp4">habitat_comparison_speed.mp4</a>
 
-**3 · 8×2 episode grid** — left Naive ECC · right Ours
-
-<img width="62%" src="https://raw.githubusercontent.com/i6bimua/service-navigation-vln-rbnx/main/docs/assets/demo/habitat_comparison_grid.gif" alt="8×2 Habitat comparison grid GIF">
-
 </div>
 
-<p>Secondary single-lane clip (no comparison HUD):
-<a href="https://github.com/i6bimua/service-navigation-vln-rbnx/blob/main/docs/assets/demo/habitat_demo.mp4">habitat_demo.mp4</a>.
-Rebuild the reels with <code>scripts/demo/make_demo_reels.py</code> (fail / speed / grid),
-or see <a href="#demo-filming">Demo filming in Habitat</a>.</p>
+<p>The complete RoboNix TUI sequence — startup, instruction entry, tool invocation,
+and terminal state — appears under
+<a href="#robonix-integration-boundary">RoboNix Integration Boundary</a> instead of being
+duplicated here.</p>
 <p><a></a></p>
 <h2>⚡ Results</h2>
 <table>
@@ -1250,6 +1255,13 @@ in <a href="#benchmark-results">Benchmark Results</a>.</p>
 <p><a></a></p>
 <h2>📰 News</h2>
 <ul>
+<li><strong>2026-07-29 — v0.4.1:</strong> Corrected the trained InternVLA-N1 service loop:
+  one action per observed frame, S2 history replay across edge-only steps,
+  action-only STOP / LOOK_DOWN handling, forced refresh after an exhausted
+  action chunk, valid RGB/depth packaging, and reproducible Habitat episode
+  pinning. The public demos are now limited to two representative Habitat
+  comparisons plus the complete RoboNix TUI path. See
+  <a href="https://github.com/i6bimua/service-navigation-vln-rbnx/blob/main/CHANGELOG.md">CHANGELOG.md</a>.</li>
 <li><strong>2026-07-27 — v0.4.0:</strong> Two safety and liveness fixes, both breaking.
   <code>config.mode</code> is now required — it used to default to <code>mock</code>, so an
   unconfigured deployment silently got a stub policy that reported runs as
@@ -1279,88 +1291,38 @@ in <a href="#benchmark-results">Benchmark Results</a>.</p>
 </ul>
 <p><a></a></p>
 <h2>🎥 Demo filming in Habitat</h2>
-<p>Demos are shot in <strong>Habitat / R2R-CE</strong>, not on a physical robot. The point of
-the comparison reel is that viewers can <em>see</em> two things at once: <strong>we finish</strong>
-when a weak cloud–edge baseline does not, and <strong>we are faster</strong> when both
-finish. Numbers in the HUD must come from that run's telemetry; the Orin+A100
-tables above stay the project-wide summary.</p>
-<h3>What to compare</h3>
-<table>
-<thead>
-<tr>
-<th>Lane</th>
-<th>Strategy</th>
-<th>What the audience should notice</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><strong>A · Naive ECC</strong></td>
-<td><code>naive_ecc</code> — reuse a stale latent, no key-latent switching</td>
-<td>Slow or stuck under delay; often <code>FAILED</code> / timeout</td>
-</tr>
-<tr>
-<td><strong>B · Ours</strong></td>
-<td><code>ours</code> — this service's online switcher</td>
-<td>Same instruction &amp; scene; shorter wall clock; <code>SUCCEEDED</code></td>
-</tr>
-<tr>
-<td><strong>C · Edge Only</strong> <em>(optional)</em></td>
-<td>Full dual-system on the edge (no cloud split)</td>
-<td>Succeeds but step latency / edge memory stay high</td>
-</tr>
-</tbody>
-</table>
-<p>Keep instruction, episode id, and camera view identical across lanes. Change
-only the strategy (and, when stressing A, the injected RTT).</p>
-<h3>Shot list (simple version for the filming team)</h3>
-<ol>
-<li>Pick <strong>8 episodes</strong> from <code>benchmarks/r2r_ce/demo_episodes.yaml</code> (or run the
-   scout mode of <code>scripts/demo/run_comparison.sh</code> to fill success/fail pairs).</li>
-<li>For each episode, record <strong>A then B</strong> (and C if you have time) with
-   <code>ANALYSIS_SAVE_VIDEO=1</code>. Do <strong>not</strong> speed up the decision/motion segment;
-   only idle tails may be 2× in the edit.</li>
-<li>Burn in a fixed HUD, e.g.
-   <code>[A] Naive ECC · step 12 · 498 ms · 41.2 s · FAIL</code> vs
-   <code>[B] Ours · step 12 · 224 ms · 18.7 s · SUCCEEDED</code>.</li>
-<li>Prefer ≥4 episodes where both succeed but B is clearly faster, and ≥2 where
-   <strong>B succeeds and A fails</strong>.</li>
-<li>Compose the public reel with
-   <code>python scripts/demo/compose_side_by_side.py …</code> (left A / right B, endpoint
-   freeze with green/red badge).</li>
-</ol>
-<h3>One-command record + compose</h3>
-<div class="highlight"><pre><span></span><code><span class="c1"># Paths below match a typical dual-A100 workstation; override as needed.</span>
-<span class="nb">export</span><span class="w"> </span><span class="nv">INTERNNAV_ROOT</span><span class="o">=</span>/path/to/InternNav
+<p>The public repository keeps only three representative assets: Naive ECC/Ours
+robustness, Edge Only/Ours completion time, and the complete RoboNix TUI path.
+The first two run the real model policy in <strong>Habitat / R2R-CE</strong>, which is not a
+physical-robot test. The TUI recording validates invocation through Pilot and
+Executor.</p>
+<p>Comparison recordings must lock the same instruction, episode, and camera
+start. The Naive ECC reel changes only synchronization strategy; the Edge Only
+reel changes only placement. HUD state and wall clock come from that run rather
+than from the aggregate benchmark table.</p>
+<div class="highlight"><pre><span></span><code><span class="nb">export</span><span class="w"> </span><span class="nv">INTERNNAV_ROOT</span><span class="o">=</span>/path/to/InternNav
 <span class="nb">export</span><span class="w"> </span><span class="nv">ROBONIX_COMPUTE_DATA_ROOT</span><span class="o">=</span>/path/to/vln_data<span class="w">   </span><span class="c1"># contains vln_ce/, scene_data/</span>
 <span class="nb">export</span><span class="w"> </span><span class="nv">ROBONIX_COMPUTE_MODEL_DIR</span><span class="o">=</span>/path/to/InternVLA-N1
 <span class="nb">export</span><span class="w"> </span><span class="nv">ROBONIX_COMPUTE_S1_MODEL_DIR</span><span class="o">=</span>/path/to/InternVLA-N1-S1
 <span class="nb">export</span><span class="w"> </span><span class="nv">PYTHON_BIN</span><span class="o">=</span>/path/to/conda/envs/habitat/bin/python
 
-<span class="c1"># Record Naive ECC vs Ours for the curated episode list (writes mp4 + telemetry).</span>
 bash<span class="w"> </span>scripts/demo/run_comparison.sh<span class="w"> </span><span class="se">\</span>
 <span class="w">  </span>--episodes-file<span class="w"> </span>benchmarks/r2r_ce/demo_episodes.yaml<span class="w"> </span><span class="se">\</span>
 <span class="w">  </span>--strategies<span class="w"> </span>naive_ecc,ours<span class="w"> </span><span class="se">\</span>
 <span class="w">  </span>--rtt-delay-ms<span class="w"> </span><span class="m">200</span><span class="w"> </span><span class="se">\</span>
 <span class="w">  </span>--output-dir<span class="w"> </span>outputs/demo_comparison
 
-<span class="c1"># Hero reels from recorded lane mp4s (fail = they hang / we succeed;</span>
-<span class="c1"># speed = both succeed, we finish first). Optional RTT remapping / setpts</span>
-<span class="c1"># is fine for the public “result” clips — see make_demo_reels.py.</span>
+<span class="c1"># Robustness reel: Naive ECC vs Ours.</span>
 python<span class="w"> </span>scripts/demo/make_demo_reels.py<span class="w"> </span>--mode<span class="w"> </span>fail<span class="w"> </span><span class="se">\</span>
 <span class="w">  </span>--left<span class="w">  </span>outputs/.../naive_ecc/.../0206.mp4<span class="w"> </span><span class="se">\</span>
 <span class="w">  </span>--right<span class="w"> </span>outputs/.../ours/.../0206.mp4<span class="w"> </span><span class="se">\</span>
 <span class="w">  </span>--out<span class="w"> </span>docs/assets/demo/habitat_comparison_fail.mp4
 
+<span class="c1"># Completion-time reel: Edge Only vs Ours.</span>
 python<span class="w"> </span>scripts/demo/make_demo_reels.py<span class="w"> </span>--mode<span class="w"> </span>speed<span class="w"> </span><span class="se">\</span>
-<span class="w">  </span>--left<span class="w">  </span>outputs/.../naive_ecc/.../0206.mp4<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--left<span class="w">  </span>outputs/.../edge_only/.../0206.mp4<span class="w"> </span><span class="se">\</span>
 <span class="w">  </span>--right<span class="w"> </span>outputs/.../ours/.../0206.mp4<span class="w"> </span><span class="se">\</span>
 <span class="w">  </span>--out<span class="w"> </span>docs/assets/demo/habitat_comparison_speed.mp4
-
-<span class="c1"># 8×2 contact-sheet GIF (TSV: left_mp4\\tright_mp4\\tlabel per line)</span>
-python<span class="w"> </span>scripts/demo/make_demo_reels.py<span class="w"> </span>--mode<span class="w"> </span>grid<span class="w"> </span><span class="se">\</span>
-<span class="w">  </span>--grid-pairs<span class="w"> </span>outputs/demo_grid_clips/pairs.tsv<span class="w"> </span><span class="se">\</span>
-<span class="w">  </span>--out<span class="w"> </span>docs/assets/demo/habitat_comparison_grid.gif
 </code></pre></div>
 <p>Full field list, episode selection criteria, and editing rules:
 <a href="https://github.com/i6bimua/service-navigation-vln-rbnx/blob/main/benchmarks/r2r_ce/DEMO_FILMING.md">benchmarks/r2r_ce/DEMO_FILMING.md</a>.</p>
@@ -1430,11 +1392,11 @@ memory, and optional diffusion latents remain behind adapters.</p>
 contracts, so <code>rbnx boot</code> starts the provider and Atlas registers it. See
 <a href="https://github.com/i6bimua/service-navigation-vln-rbnx/blob/main/CAPABILITY.md">CAPABILITY.md</a> for the capability manual and
 <a href="https://github.com/i6bimua/service-navigation-vln-rbnx/blob/main/config.spec">config.spec</a> for every config field.</p>
-<p>It is the <strong>instruction-following sibling of <code>robonix.service.navigation</code></strong>
-(Nav2): both own a long-running navigation runtime and expose the same
-navigate / status / cancel triple, but Nav2's goal is a metric <code>PoseStamped</code>
-while this one's is a sentence. A coordinate goes to Nav2; a route description
-comes here.</p>
+<p><code>navigation.vln</code> names the external RoboNix capability boundary: it accepts an
+instruction and manages a long-running navigation task. Our contribution is the
+cloud–edge execution behind that boundary — split S1/S2 deployment, adaptive
+synchronization, consistent model history, failure handling, and step-level
+telemetry — rather than redefining the VLN model itself.</p>
 <table>
 <thead>
 <tr>
@@ -1471,6 +1433,21 @@ comes here.</p>
 </tr>
 </tbody>
 </table>
+<h3>Complete RoboNix TUI path</h3>
+<p>The recording keeps the full <code>rbnx chat</code> sequence: startup, instruction entry,
+Pilot selecting the <code>navigate</code> tool, Executor polling, and terminal output.
+Naive ECC is on top and Ours is below; both complete the same kind of task, while
+Ours reaches a terminal result first. This validates the <strong>RoboNix integration
+path and wall-clock completion behavior</strong>; it does not replace the full R2R-CE
+benchmark.</p>
+<div>
+<a href="https://github.com/i6bimua/service-navigation-vln-rbnx/blob/main/docs/assets/demo/robonix_tui_demo.mp4">
+  <img width="100%" src="https://raw.githubusercontent.com/i6bimua/service-navigation-vln-rbnx/main/docs/assets/demo/robonix_tui_demo.jpg" alt="RoboNix TUI: Naive ECC on top, Ours below">
+</a>
+<br>
+<a href="https://github.com/i6bimua/service-navigation-vln-rbnx/blob/main/docs/assets/demo/robonix_tui_demo.mp4">robonix_tui_demo.mp4</a> — click the image to play the full video
+</div>
+
 <p>Natural-language invocation needs nothing else deployed alongside: pilot
 discovers these MCP contracts on the service directly, and because
 <code>navigate</code>, <code>navigate/status</code> and <code>navigate/cancel</code> form an async contract
@@ -2746,7 +2723,7 @@ and citing it:</p>
 <span class="w">  </span><span class="na">author</span><span class="w">  </span><span class="p">=</span><span class="w"> </span><span class="s">{Cao, Hangyu and Zheng, Zihao}</span><span class="p">,</span>
 <span class="w">  </span><span class="na">title</span><span class="w">   </span><span class="p">=</span><span class="w"> </span><span class="s">{RoboNix Compute Optimization}</span><span class="p">,</span>
 <span class="w">  </span><span class="na">year</span><span class="w">    </span><span class="p">=</span><span class="w"> </span><span class="s">{2026}</span><span class="p">,</span>
-<span class="w">  </span><span class="na">version</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="s">{0.4.0}</span><span class="p">,</span>
+<span class="w">  </span><span class="na">version</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="s">{0.4.1}</span><span class="p">,</span>
 <span class="w">  </span><span class="na">url</span><span class="w">     </span><span class="p">=</span><span class="w"> </span><span class="s">{https://github.com/i6bimua/service-navigation-vln-rbnx}</span>
 <span class="p">}</span>
 </code></pre></div>
@@ -2763,7 +2740,7 @@ see <code>THIRD_PARTY_LICENSES.md</code>.</p>
       <aside class="panel detail-side">
         <h2>Package</h2>
         <div class="kv">
-          <div>Version</div><div><code>0.4.0</code></div>
+          <div>Version</div><div><code>0.4.1</code></div>
           <div>License</div><div><code>MulanPSL-2.0</code></div>
           <div>Kind</div><div>service</div>
           <div>Type</div><div>package</div>
@@ -2785,6 +2762,6 @@ see <code>THIRD_PARTY_LICENSES.md</code>.</p>
       </aside>
     </div>
   </main>
-  <footer class="site-footer"><div class="shell">Generated on 2026-07-28T19:53:47+00:00.</div></footer>
+  <footer class="site-footer"><div class="shell">Generated on 2026-07-29T19:44:40+00:00.</div></footer>
 </body>
 </html>

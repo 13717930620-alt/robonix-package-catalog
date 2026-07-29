@@ -216,7 +216,7 @@ but browser-facing links and new integrations should use the `.json` paths above
 The generated commit uses `[skip ci]`; normal CI only triggers from
 `catalog.yaml`, the builder script, the workflow, or manual dispatch.
 
-Generated on `2026-07-28T19:53:47+00:00`.
+Generated on `2026-07-29T19:44:40+00:00`.
 
 ## Packages
 
@@ -248,7 +248,7 @@ Generated on `2026-07-28T19:53:47+00:00`.
 | [`robonix.service.minecraft_costmap`](https://syswonder.github.io/robonix-package-catalog/packages/robonix.service.minecraft_costmap/) | `0.1.0` | `service` | ZZJJWarth <jzeng25@stu.pku.edu.cn> | service, minecraft, mapping, costmap, navigation | [repo](https://github.com/syswonder/service-minecraft-costmap-rbnx) |
 | [`robonix.service.minecraft_navigation`](https://syswonder.github.io/robonix-package-catalog/packages/robonix.service.minecraft_navigation/) | `0.1.0` | `service` | ZZJJWarth <jzeng25@stu.pku.edu.cn> | service, minecraft, navigation, path-planning, costmap | [repo](https://github.com/syswonder/service-minecraft-navigation-rbnx) |
 | [`robonix.service.navigation`](https://syswonder.github.io/robonix-package-catalog/packages/robonix.service.navigation/) | `0.1.0` | `service` | wheatfox <wheatfox17@icloud.com> | service, navigation, nav2, ros2 | [repo](https://github.com/syswonder/service-navigation-rbnx) |
-| [`robonix.service.navigation.vln`](https://syswonder.github.io/robonix-package-catalog/packages/robonix.service.navigation.vln/) | `0.4.0` | `service` | Seto <202330552461@mail.scut.edu.cn> | service, navigation, vln, compute-optimization, cloud-edge, dual-system, embodied-ai | [repo](https://github.com/i6bimua/service-navigation-vln-rbnx) |
+| [`robonix.service.navigation.vln`](https://syswonder.github.io/robonix-package-catalog/packages/robonix.service.navigation.vln/) | `0.4.1` | `service` | Seto <202330552461@mail.scut.edu.cn> | service, navigation, vln, compute-optimization, cloud-edge, dual-system, embodied-ai | [repo](https://github.com/i6bimua/service-navigation-vln-rbnx) |
 | [`robonix.service.object_detect`](https://syswonder.github.io/robonix-package-catalog/packages/robonix.service.object_detect/) | `0.1.0` | `service` | lhw2002426 <lhw2002426@users.noreply.github.com> | service, perception, object_detect, llm, vlm, ros2 | [repo](https://github.com/syswonder/service-object-detect-rbnx) |
 | [`robonix.service.pcld2lscan`](https://syswonder.github.io/robonix-package-catalog/packages/robonix.service.pcld2lscan/) | `0.1.0` | `service` | Bunnycxk <2501213313@stu.pku.edu.cn> | service, lidar, pointcloud, laserscan, ros2 | [repo](https://github.com/syswonder/service-pcld2lscan-rbnx) |
 | [`robonix.service.piper_moveit`](https://syswonder.github.io/robonix-package-catalog/packages/robonix.service.piper_moveit/) | `0.1.0` | `service` | lhw2002426 <lhw2002426@users.noreply.github.com> | service, manipulation, moveit, agilex, piper, ros2 | [repo](https://github.com/syswonder/service-piper-moveit-rbnx) |
