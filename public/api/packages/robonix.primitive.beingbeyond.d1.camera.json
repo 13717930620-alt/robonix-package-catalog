@@ -1,0 +1,31 @@
+{
+  "name": "robonix.primitive.beingbeyond.d1.camera",
+  "version": "0.1.0",
+  "description": "D1 head RealSense D435i camera primitive — on-demand RGB + depth snapshots.",
+  "license": "MulanPSL-2.0",
+  "tags": [
+    "primitive",
+    "camera",
+    "rgbd",
+    "realsense",
+    "beingbeyond",
+    "d1"
+  ],
+  "repo": "https://github.com/syswonder/primitive-beingbeyond-d1-camera-rbnx",
+  "maintainers": [
+    "Felix <xi.lifeng@qq.com>"
+  ],
+  "repo_name": "primitive-beingbeyond-d1-camera-rbnx",
+  "default_branch": "main",
+  "kind": "primitive",
+  "catalog_type": "package",
+  "manifest": "package_manifest.yaml",
+  "capabilities": [
+    "robonix/primitive/camera/snapshot",
+    "robonix/primitive/camera/depth_snapshot",
+    "robonix/primitive/camera/driver"
+  ],
+  "deploy_dependencies": [],
+  "readme_url": "https://github.com/syswonder/primitive-beingbeyond-d1-camera-rbnx/blob/main/README.md",
+  "preview_image_url": ""
+}

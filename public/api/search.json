@@ -184,6 +184,104 @@
     "preview_image_url": ""
   },
   {
+    "name": "robonix.primitive.beingbeyond.d1.arm",
+    "version": "0.1.0",
+    "description": "D1 6-DOF arm primitive — absolute joint control (rad) + Cartesian move_pose via the SDK's arm-only IK.",
+    "license": "MulanPSL-2.0",
+    "tags": [
+      "primitive",
+      "arm",
+      "manipulator",
+      "beingbeyond",
+      "d1"
+    ],
+    "repo": "https://github.com/syswonder/primitive-beingbeyond-d1-arm-rbnx",
+    "maintainers": [
+      "Felix <xi.lifeng@qq.com>"
+    ],
+    "repo_name": "primitive-beingbeyond-d1-arm-rbnx",
+    "default_branch": "main",
+    "kind": "primitive",
+    "catalog_type": "package",
+    "manifest": "package_manifest.yaml",
+    "capabilities": [
+      "robonix/primitive/arm/driver",
+      "robonix/primitive/arm/info",
+      "robonix/primitive/arm/move_joint",
+      "robonix/primitive/arm/get_state",
+      "robonix/primitive/arm/move_pose",
+      "robonix/primitive/arm/set_head"
+    ],
+    "deploy_dependencies": [],
+    "readme_url": "https://github.com/syswonder/primitive-beingbeyond-d1-arm-rbnx/blob/main/README.md",
+    "preview_image_url": ""
+  },
+  {
+    "name": "robonix.primitive.beingbeyond.d1.camera",
+    "version": "0.1.0",
+    "description": "D1 head RealSense D435i camera primitive — on-demand RGB + depth snapshots.",
+    "license": "MulanPSL-2.0",
+    "tags": [
+      "primitive",
+      "camera",
+      "rgbd",
+      "realsense",
+      "beingbeyond",
+      "d1"
+    ],
+    "repo": "https://github.com/syswonder/primitive-beingbeyond-d1-camera-rbnx",
+    "maintainers": [
+      "Felix <xi.lifeng@qq.com>"
+    ],
+    "repo_name": "primitive-beingbeyond-d1-camera-rbnx",
+    "default_branch": "main",
+    "kind": "primitive",
+    "catalog_type": "package",
+    "manifest": "package_manifest.yaml",
+    "capabilities": [
+      "robonix/primitive/camera/snapshot",
+      "robonix/primitive/camera/depth_snapshot",
+      "robonix/primitive/camera/driver"
+    ],
+    "deploy_dependencies": [],
+    "readme_url": "https://github.com/syswonder/primitive-beingbeyond-d1-camera-rbnx/blob/main/README.md",
+    "preview_image_url": ""
+  },
+  {
+    "name": "robonix.primitive.beingbeyond.d1.hand",
+    "version": "0.1.0",
+    "description": "D1 dexterous-hand primitive — axis-level position control + speed/torque limits over CAN.",
+    "license": "MulanPSL-2.0",
+    "tags": [
+      "primitive",
+      "hand",
+      "gripper",
+      "dexterous",
+      "beingbeyond",
+      "d1"
+    ],
+    "repo": "https://github.com/syswonder/primitive-beingbeyond-d1-hand-rbnx",
+    "maintainers": [
+      "Felix <xi.lifeng@qq.com>"
+    ],
+    "repo_name": "primitive-beingbeyond-d1-hand-rbnx",
+    "default_branch": "main",
+    "kind": "primitive",
+    "catalog_type": "package",
+    "manifest": "package_manifest.yaml",
+    "capabilities": [
+      "robonix/primitive/hand/driver",
+      "robonix/primitive/hand/info",
+      "robonix/primitive/hand/move_joint",
+      "robonix/primitive/hand/set_joint_speed_limits",
+      "robonix/primitive/hand/set_joint_torque_limits",
+      "robonix/primitive/hand/get_state"
+    ],
+    "deploy_dependencies": [],
+    "readme_url": "https://github.com/syswonder/primitive-beingbeyond-d1-hand-rbnx/blob/main/README.md",
+    "preview_image_url": ""
+  },
+  {
     "name": "robonix.primitive.deep_robotics.lite3.description",
     "version": "0.1.0",
     "description": "Deep Robotics Lite3 URDF and fixed sensor transform publisher.",
@@ -743,6 +841,120 @@
     ],
     "readme_url": "https://github.com/syswonder/robot-agilex-ranger_mini_v3/blob/main/README.md",
     "preview_image_url": "https://raw.githubusercontent.com/syswonder/robot-agilex-ranger_mini_v3/main/assets/robot.jpg",
+    "deployment_status": "ok",
+    "deployment_warnings": []
+  },
+  {
+    "name": "robonix.robot.beingbeyond.d1",
+    "version": "0.1.0",
+    "description": "BeingBeyond D1 desktop robot deployment — dexterous-hand object pick/place skill.",
+    "license": "MulanPSL-2.0",
+    "tags": [
+      "robot",
+      "deploy",
+      "beingbeyond",
+      "d1",
+      "manipulation",
+      "dexterous-hand"
+    ],
+    "repo": "https://github.com/syswonder/robot-beingbeyond-d1",
+    "maintainers": [
+      "Felix <xi.lifeng@qq.com>"
+    ],
+    "repo_name": "robot-beingbeyond-d1",
+    "default_branch": "main",
+    "kind": "robot",
+    "catalog_type": "robot",
+    "manifest": "robonix_manifest.yaml",
+    "capabilities": [],
+    "deploy_dependencies": [
+      {
+        "section": "primitive",
+        "name": "d1_arm",
+        "repo": "https://github.com/syswonder/primitive-beingbeyond-d1-arm-rbnx",
+        "path": "",
+        "branch": "main",
+        "manifest": "",
+        "resolution": "catalog",
+        "package_name": "robonix.primitive.beingbeyond.d1.arm",
+        "package_url": "../robonix.primitive.beingbeyond.d1.arm/",
+        "resolution_warning": ""
+      },
+      {
+        "section": "primitive",
+        "name": "d1_hand",
+        "repo": "https://github.com/syswonder/primitive-beingbeyond-d1-hand-rbnx",
+        "path": "",
+        "branch": "main",
+        "manifest": "",
+        "resolution": "catalog",
+        "package_name": "robonix.primitive.beingbeyond.d1.hand",
+        "package_url": "../robonix.primitive.beingbeyond.d1.hand/",
+        "resolution_warning": ""
+      },
+      {
+        "section": "primitive",
+        "name": "d1_camera",
+        "repo": "https://github.com/syswonder/primitive-beingbeyond-d1-camera-rbnx",
+        "path": "",
+        "branch": "main",
+        "manifest": "",
+        "resolution": "catalog",
+        "package_name": "robonix.primitive.beingbeyond.d1.camera",
+        "package_url": "../robonix.primitive.beingbeyond.d1.camera/",
+        "resolution_warning": ""
+      },
+      {
+        "section": "primitive",
+        "name": "audio_driver",
+        "repo": "https://github.com/syswonder/primitive-audio-driver-rbnx",
+        "path": "",
+        "branch": "main",
+        "manifest": "",
+        "resolution": "catalog",
+        "package_name": "robonix.primitive.audio.alsa",
+        "package_url": "../robonix.primitive.audio.alsa/",
+        "resolution_warning": ""
+      },
+      {
+        "section": "service",
+        "name": "speech",
+        "repo": "",
+        "path": "${ROBONIX_SOURCE_PATH}/services/speech",
+        "branch": "",
+        "manifest": "",
+        "resolution": "robonix_source",
+        "package_name": "",
+        "package_url": "",
+        "resolution_warning": ""
+      },
+      {
+        "section": "skill",
+        "name": "vertical_grasp_object",
+        "repo": "https://github.com/syswonder/skill-vertical-grasp-object-rbnx",
+        "path": "",
+        "branch": "main",
+        "manifest": "",
+        "resolution": "catalog",
+        "package_name": "robonix.skill.vertical_grasp_object",
+        "package_url": "../robonix.skill.vertical_grasp_object/",
+        "resolution_warning": ""
+      },
+      {
+        "section": "skill",
+        "name": "hand_gesture",
+        "repo": "https://github.com/syswonder/skill-hand-gesture-rbnx",
+        "path": "",
+        "branch": "main",
+        "manifest": "",
+        "resolution": "catalog",
+        "package_name": "robonix.skill.hand_gesture",
+        "package_url": "../robonix.skill.hand_gesture/",
+        "resolution_warning": ""
+      }
+    ],
+    "readme_url": "https://github.com/syswonder/robot-beingbeyond-d1/blob/main/README.md",
+    "preview_image_url": "https://raw.githubusercontent.com/syswonder/robot-beingbeyond-d1/main/assets/robot.jpg",
     "deployment_status": "ok",
     "deployment_warnings": []
   },
@@ -1575,6 +1787,36 @@
     "preview_image_url": ""
   },
   {
+    "name": "robonix.skill.hand_gesture",
+    "version": "0.1.0",
+    "description": "Make the D1 dexterous hand perform a finger \"dance\" — a rhythmic open/close wiggle across all fingers for a given duration. A single MCP tool for the D1 hand.",
+    "license": "MulanPSL-2.0",
+    "tags": [
+      "skill",
+      "gesture",
+      "dance",
+      "hand",
+      "beingbeyond",
+      "d1"
+    ],
+    "repo": "https://github.com/syswonder/skill-hand-gesture-rbnx",
+    "maintainers": [
+      "Felix <xi.lifeng@qq.com>"
+    ],
+    "repo_name": "skill-hand-gesture-rbnx",
+    "default_branch": "main",
+    "kind": "skill",
+    "catalog_type": "package",
+    "manifest": "package_manifest.yaml",
+    "capabilities": [
+      "robonix/skill/hand_gesture/driver",
+      "robonix/skill/hand_gesture/gesture_dance"
+    ],
+    "deploy_dependencies": [],
+    "readme_url": "https://github.com/syswonder/skill-hand-gesture-rbnx/blob/main/README.md",
+    "preview_image_url": ""
+  },
+  {
     "name": "robonix.skill.minecraft_explore",
     "version": "0.1.0",
     "description": "Frontier-based exploration skill for the Minecraft example.",
@@ -1632,6 +1874,44 @@
     ],
     "deploy_dependencies": [],
     "readme_url": "https://github.com/syswonder/skill-pick-vertical-grasp-rbnx/blob/main/README.md",
+    "preview_image_url": ""
+  },
+  {
+    "name": "robonix.skill.vertical_grasp_object",
+    "version": "0.1.0",
+    "description": "Detect objects on the table (YOLO cubes, or open-vocabulary via a VLM), then grasp and place them (with optional grasp angle and gripper aperture) — MCP tools for the D1 dexterous hand.",
+    "license": "MulanPSL-2.0",
+    "tags": [
+      "skill",
+      "grasp",
+      "pick",
+      "place",
+      "manipulation",
+      "beingbeyond",
+      "d1"
+    ],
+    "repo": "https://github.com/syswonder/skill-vertical-grasp-object-rbnx",
+    "maintainers": [
+      "Felix <xi.lifeng@qq.com>"
+    ],
+    "repo_name": "skill-vertical-grasp-object-rbnx",
+    "default_branch": "main",
+    "kind": "skill",
+    "catalog_type": "package",
+    "manifest": "package_manifest.yaml",
+    "capabilities": [
+      "robonix/skill/vertical_grasp_object/driver",
+      "robonix/skill/vertical_grasp_object/pick_cube",
+      "robonix/skill/vertical_grasp_object/place_cube",
+      "robonix/skill/vertical_grasp_object/detect_cubes",
+      "robonix/skill/vertical_grasp_object/detect_objects",
+      "robonix/skill/vertical_grasp_object/verify_grasp",
+      "robonix/skill/vertical_grasp_object/stack_cubes",
+      "robonix/skill/vertical_grasp_object/put_cube_in_container",
+      "robonix/skill/vertical_grasp_object/sort_cubes"
+    ],
+    "deploy_dependencies": [],
+    "readme_url": "https://github.com/syswonder/skill-vertical-grasp-object-rbnx/blob/main/README.md",
     "preview_image_url": ""
   },
   {
