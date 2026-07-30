@@ -216,7 +216,7 @@ but browser-facing links and new integrations should use the `.json` paths above
 The generated commit uses `[skip ci]`; normal CI only triggers from
 `catalog.yaml`, the builder script, the workflow, or manual dispatch.
 
-Generated on `2026-07-30T02:01:33+00:00`.
+Generated on `2026-07-30T12:35:12+00:00`.
 
 ## Packages
 
@@ -257,6 +257,8 @@ Generated on `2026-07-30T02:01:33+00:00`.
 | [`robonix.service.pcld2lscan`](https://syswonder.github.io/robonix-package-catalog/packages/robonix.service.pcld2lscan/) | `0.1.0` | `service` | Bunnycxk <2501213313@stu.pku.edu.cn> | service, lidar, pointcloud, laserscan, ros2 | [repo](https://github.com/syswonder/service-pcld2lscan-rbnx) |
 | [`robonix.service.piper_moveit`](https://syswonder.github.io/robonix-package-catalog/packages/robonix.service.piper_moveit/) | `0.1.0` | `service` | lhw2002426 <lhw2002426@users.noreply.github.com> | service, manipulation, moveit, agilex, piper, ros2 | [repo](https://github.com/syswonder/service-piper-moveit-rbnx) |
 | [`robonix.service.roboarm.ik`](https://syswonder.github.io/robonix-package-catalog/packages/robonix.service.roboarm.ik/) | `0.1.0` | `service` | lhw2002426 <lhw2002426@users.noreply.github.com> | service, manipulation, ik, agilex, piper, ros2 | [repo](https://github.com/syswonder/service-roboarm-ik-rbnx) |
+| [`robonix.skill.dual_piper_initialize`](https://syswonder.github.io/robonix-package-catalog/packages/robonix.skill.dual_piper_initialize/) | `0.1.0` | `skill` | Zhenyu Zhang <768726812@qq.com> | skill, dual-arm, piper, initialization | [repo](https://github.com/syswonder/skill-dual-piper-initialize-rbnx) |
+| [`robonix.skill.dual_piper_transfer`](https://syswonder.github.io/robonix-package-catalog/packages/robonix.skill.dual_piper_transfer/) | `0.1.0` | `skill` | Zhenyu Zhang <768726812@qq.com> | skill, dual-arm, piper, transfer | [repo](https://github.com/syswonder/skill-dual-piper-transfer-rbnx) |
 | [`robonix.skill.explore`](https://syswonder.github.io/robonix-package-catalog/packages/robonix.skill.explore/) | `0.1.0` | `skill` | wheatfox <wheatfox17@icloud.com> | skill, explore, frontier, navigation, mapping | [repo](https://github.com/syswonder/skill-explore-rbnx) |
 | [`robonix.skill.hand_gesture`](https://syswonder.github.io/robonix-package-catalog/packages/robonix.skill.hand_gesture/) | `0.1.0` | `skill` | Felix <xi.lifeng@qq.com> | skill, gesture, dance, hand, beingbeyond, d1 | [repo](https://github.com/syswonder/skill-hand-gesture-rbnx) |
 | [`robonix.skill.minecraft_explore`](https://syswonder.github.io/robonix-package-catalog/packages/robonix.skill.minecraft_explore/) | `0.1.0` | `skill` | ZZJJWarth <jzeng25@stu.pku.edu.cn> | skill, minecraft, exploration, frontier, navigation | [repo](https://github.com/syswonder/skill-minecraft-explore-rbnx) |

@@ -1,6 +1,6 @@
 {
   "api_version": "1",
-  "generated_at": "2026-07-30T02:01:33+00:00",
+  "generated_at": "2026-07-30T12:35:12+00:00",
   "robots": [
     {
       "name": "robonix.robot.agilex.ranger_mini_v3",
@@ -827,30 +827,6 @@
           "branch": "",
           "manifest": "",
           "resolution": "robot_repository",
-          "package_name": "",
-          "package_url": "",
-          "resolution_warning": ""
-        },
-        {
-          "section": "primitive",
-          "name": "audio_driver",
-          "repo": "https://github.com/syswonder/primitive-audio-driver-rbnx",
-          "path": "",
-          "branch": "main",
-          "manifest": "",
-          "resolution": "catalog",
-          "package_name": "robonix.primitive.audio.alsa",
-          "package_url": "../robonix.primitive.audio.alsa/",
-          "resolution_warning": ""
-        },
-        {
-          "section": "service",
-          "name": "speech",
-          "repo": "",
-          "path": "${ROBONIX_SOURCE_PATH}/services/speech",
-          "branch": "",
-          "manifest": "",
-          "resolution": "robonix_source",
           "package_name": "",
           "package_url": "",
           "resolution_warning": ""

@@ -1,0 +1,28 @@
+{
+  "name": "robonix.skill.dual_piper_initialize",
+  "version": "0.1.0",
+  "description": "Safely home and enable two AgileX Piper arms and grippers.",
+  "license": "MIT",
+  "tags": [
+    "skill",
+    "dual-arm",
+    "piper",
+    "initialization"
+  ],
+  "repo": "https://github.com/syswonder/skill-dual-piper-initialize-rbnx",
+  "maintainers": [
+    "Zhenyu Zhang <768726812@qq.com>"
+  ],
+  "repo_name": "skill-dual-piper-initialize-rbnx",
+  "default_branch": "main",
+  "kind": "skill",
+  "catalog_type": "package",
+  "manifest": "package_manifest.yaml",
+  "capabilities": [
+    "robonix/skill/dual_piper_initialize/driver",
+    "robonix/skill/dual_piper_initialize/run"
+  ],
+  "deploy_dependencies": [],
+  "readme_url": "https://github.com/syswonder/skill-dual-piper-initialize-rbnx/blob/main/README.md",
+  "preview_image_url": ""
+}
