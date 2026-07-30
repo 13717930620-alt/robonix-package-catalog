@@ -69,6 +69,12 @@ packages:
   - name: robonix.skill.hand_gesture
     repo: https://github.com/syswonder/skill-hand-gesture-rbnx
 
+  - name: robonix.skill.dual_piper_initialize
+    repo: https://github.com/syswonder/skill-dual-piper-initialize-rbnx
+
+  - name: robonix.skill.dual_piper_transfer
+    repo: https://github.com/syswonder/skill-dual-piper-transfer-rbnx
+
 robots:
   - name: robonix.robot.agilex.ranger_mini_v3
     repo: https://github.com/syswonder/robot-agilex-ranger_mini_v3
