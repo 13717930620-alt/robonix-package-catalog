@@ -1,6 +1,6 @@
 {
   "api_version": "1",
-  "generated_at": "2026-07-30T02:01:33+00:00",
+  "generated_at": "2026-07-30T12:35:12+00:00",
   "packages": [
     {
       "name": "robonix.primitive.agilex.piper.arm",
@@ -1403,30 +1403,6 @@
           "resolution_warning": ""
         },
         {
-          "section": "primitive",
-          "name": "audio_driver",
-          "repo": "https://github.com/syswonder/primitive-audio-driver-rbnx",
-          "path": "",
-          "branch": "main",
-          "manifest": "",
-          "resolution": "catalog",
-          "package_name": "robonix.primitive.audio.alsa",
-          "package_url": "../robonix.primitive.audio.alsa/",
-          "resolution_warning": ""
-        },
-        {
-          "section": "service",
-          "name": "speech",
-          "repo": "",
-          "path": "${ROBONIX_SOURCE_PATH}/services/speech",
-          "branch": "",
-          "manifest": "",
-          "resolution": "robonix_source",
-          "package_name": "",
-          "package_url": "",
-          "resolution_warning": ""
-        },
-        {
           "section": "skill",
           "name": "roboarm_grasp",
           "repo": "",
@@ -1756,6 +1732,62 @@
       ],
       "deploy_dependencies": [],
       "readme_url": "https://github.com/syswonder/service-roboarm-ik-rbnx/blob/main/README.md",
+      "preview_image_url": ""
+    },
+    {
+      "name": "robonix.skill.dual_piper_initialize",
+      "version": "0.1.0",
+      "description": "Safely home and enable two AgileX Piper arms and grippers.",
+      "license": "MIT",
+      "tags": [
+        "skill",
+        "dual-arm",
+        "piper",
+        "initialization"
+      ],
+      "repo": "https://github.com/syswonder/skill-dual-piper-initialize-rbnx",
+      "maintainers": [
+        "Zhenyu Zhang <768726812@qq.com>"
+      ],
+      "repo_name": "skill-dual-piper-initialize-rbnx",
+      "default_branch": "main",
+      "kind": "skill",
+      "catalog_type": "package",
+      "manifest": "package_manifest.yaml",
+      "capabilities": [
+        "robonix/skill/dual_piper_initialize/driver",
+        "robonix/skill/dual_piper_initialize/run"
+      ],
+      "deploy_dependencies": [],
+      "readme_url": "https://github.com/syswonder/skill-dual-piper-initialize-rbnx/blob/main/README.md",
+      "preview_image_url": ""
+    },
+    {
+      "name": "robonix.skill.dual_piper_transfer",
+      "version": "0.1.0",
+      "description": "Execute a validated dual-Piper left-to-center-to-right transfer plan.",
+      "license": "MIT",
+      "tags": [
+        "skill",
+        "dual-arm",
+        "piper",
+        "transfer"
+      ],
+      "repo": "https://github.com/syswonder/skill-dual-piper-transfer-rbnx",
+      "maintainers": [
+        "Zhenyu Zhang <768726812@qq.com>"
+      ],
+      "repo_name": "skill-dual-piper-transfer-rbnx",
+      "default_branch": "main",
+      "kind": "skill",
+      "catalog_type": "package",
+      "manifest": "package_manifest.yaml",
+      "capabilities": [
+        "robonix/skill/dual_piper_transfer/driver",
+        "robonix/skill/dual_piper_transfer/run"
+      ],
+      "deploy_dependencies": [],
+      "readme_url": "https://github.com/syswonder/skill-dual-piper-transfer-rbnx/blob/main/README.md",
       "preview_image_url": ""
     },
     {

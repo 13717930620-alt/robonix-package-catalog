@@ -46,30 +46,6 @@
       "resolution_warning": ""
     },
     {
-      "section": "primitive",
-      "name": "audio_driver",
-      "repo": "https://github.com/syswonder/primitive-audio-driver-rbnx",
-      "path": "",
-      "branch": "main",
-      "manifest": "",
-      "resolution": "catalog",
-      "package_name": "robonix.primitive.audio.alsa",
-      "package_url": "../robonix.primitive.audio.alsa/",
-      "resolution_warning": ""
-    },
-    {
-      "section": "service",
-      "name": "speech",
-      "repo": "",
-      "path": "${ROBONIX_SOURCE_PATH}/services/speech",
-      "branch": "",
-      "manifest": "",
-      "resolution": "robonix_source",
-      "package_name": "",
-      "package_url": "",
-      "resolution_warning": ""
-    },
-    {
       "section": "skill",
       "name": "roboarm_grasp",
       "repo": "",
