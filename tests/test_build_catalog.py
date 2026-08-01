@@ -18,6 +18,38 @@ SPEC.loader.exec_module(BUILD_CATALOG)
 
 
 class MarkdownRenderingTests(unittest.TestCase):
+    def test_markdown_inside_centered_html_div_is_rendered(self):
+        rendered = BUILD_CATALOG.render_markdown(
+            '<div align="center">\n\n'
+            "# Example Service\n\n"
+            "[中文文档](README-CN.md)\n\n"
+            "![Python](docs/python-badge.svg)\n\n"
+            "</div>",
+            "https://github.com/syswonder/example-service",
+            "main",
+        )
+
+        self.assertIn('<div align="center">', rendered)
+        self.assertIn("<h1>Example Service</h1>", rendered)
+        self.assertIn(
+            'href="https://github.com/syswonder/example-service/blob/main/README-CN.md"',
+            rendered,
+        )
+        self.assertIn(
+            'src="https://raw.githubusercontent.com/syswonder/example-service/main/docs/python-badge.svg"',
+            rendered,
+        )
+        self.assertNotIn("# Example Service", rendered)
+
+    def test_html_like_text_inside_fenced_code_is_not_modified(self):
+        rendered = BUILD_CATALOG.render_markdown(
+            "```html\n<div>\n```",
+            "https://github.com/syswonder/example-service",
+            "main",
+        )
+
+        self.assertNotIn('markdown="1"', rendered)
+
     def test_yaml_fence_is_highlighted_and_relative_image_is_preserved(self):
         rendered = BUILD_CATALOG.render_markdown(
             "1. Configure the deployment:\n\n"
