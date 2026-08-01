@@ -1,0 +1,1815 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <script>
+    (() => {
+      const storageKey = 'robonix-catalog-theme';
+      let preference = 'auto';
+      try {
+        const stored = localStorage.getItem(storageKey);
+        if (stored === 'light' || stored === 'dark' || stored === 'auto') preference = stored;
+      } catch (_) {}
+      const resolved = preference === 'auto'
+        ? (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light')
+        : preference;
+      document.documentElement.dataset.theme = resolved;
+      document.documentElement.dataset.themePreference = preference;
+      document.documentElement.style.colorScheme = resolved;
+    })();
+  </script>
+  <title>robonix.service.memory.action_retrieval - Robonix Package Catalog</title>
+  <link rel="icon" type="image/svg+xml" href="../../assets/robonix-mark.svg">
+  <link rel="stylesheet" href="../../assets/vendor/pico/pico.classless.min.css">
+  <style>
+@import url("https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Noto+Sans+SC:wght@400;500;700&display=swap");
+
+    :root {
+      color-scheme: light;
+      --font-sans: "Noto Sans CJK SC", "Noto Sans SC", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      --font-mono: "JetBrains Mono", "Noto Sans CJK SC", "Noto Sans SC", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      --pico-font-family: var(--font-sans);
+      --pico-border-radius: 6px;
+      --pico-spacing: 0.75rem;
+      --bg: #f7f8fc;
+      --paper: #ffffff;
+      --soft: #f1f3f9;
+      --ink: #11172a;
+      --muted: #5f677a;
+      --line: #dde1ec;
+      --line-strong: #bdc5d8;
+      --brand: #283689;
+      --brand-deep: #17205f;
+      --signal: #3674ff;
+      --signal-soft: #e9edff;
+      --warning: #8a4b08;
+      --warning-line: #e2ad58;
+      --warning-soft: #fff7e8;
+      --shadow: 0 8px 28px rgba(28, 38, 88, 0.06);
+      --header-bg: rgba(255, 255, 255, 0.9);
+      --field-bg: #ffffff;
+      --code-bg: #f8fafc;
+      --code-ink: #1d2939;
+      --body-copy: #343941;
+      --readme-ink: #1f2937;
+      --action-ink: #29303a;
+      --nav-ink: #344054;
+      --warning-copy: #5f3a12;
+      --hover-line: #bcc6ec;
+      --brand-contrast: #ffffff;
+      --site-header-height: 64px;
+      --header-control-height: 34px;
+      --sticky-gap: 14px;
+    }
+    html[data-theme="dark"] {
+      color-scheme: dark;
+      --bg: #0d1220;
+      --paper: #151c2d;
+      --soft: #1d263a;
+      --ink: #eef2ff;
+      --muted: #a9b3c9;
+      --line: #303b54;
+      --line-strong: #475574;
+      --brand: #9dacff;
+      --brand-deep: #c4ccff;
+      --signal: #7da2ff;
+      --signal-soft: #252f58;
+      --warning: #ffc46b;
+      --warning-line: #9c6927;
+      --warning-soft: #322514;
+      --shadow: 0 12px 32px rgba(0, 0, 0, 0.28);
+      --header-bg: rgba(16, 22, 36, 0.9);
+      --field-bg: #111827;
+      --code-bg: #101725;
+      --code-ink: #e5eaf6;
+      --body-copy: #d2d9e8;
+      --readme-ink: #dce3f1;
+      --action-ink: #d7deed;
+      --nav-ink: #c5cede;
+      --warning-copy: #f2cf96;
+      --hover-line: #6376ad;
+      --brand-contrast: #101426;
+    }
+    * { box-sizing: border-box; }
+    html { min-height: 100%; background: var(--bg); }
+    .visually-hidden {
+      position: absolute !important;
+      width: 1px !important;
+      height: 1px !important;
+      padding: 0 !important;
+      margin: -1px !important;
+      overflow: hidden !important;
+      clip: rect(0, 0, 0, 0) !important;
+      white-space: nowrap !important;
+      border: 0 !important;
+    }
+    body {
+      width: 100%;
+      max-width: none;
+      min-height: 100vh;
+      min-height: 100dvh;
+      padding: 0;
+      margin: 0;
+      display: flex;
+      flex-direction: column;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at 18% -8%, rgba(54, 116, 255, 0.09), transparent 30rem),
+        var(--bg);
+      font-family: var(--font-sans);
+      font-size: 15px;
+      letter-spacing: 0;
+    }
+    a { color: var(--brand); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    :focus-visible {
+      outline: 3px solid rgba(54, 116, 255, 0.42);
+      outline-offset: 3px;
+    }
+    .shell {
+      width: min(100% - 48px, 1180px);
+      max-width: 1180px;
+      margin: 0 auto;
+    }
+    .site-header {
+      width: 100%;
+      max-width: none;
+      margin: 0;
+      padding: 0;
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      color: var(--ink);
+      border-bottom: 1px solid var(--line);
+      background: var(--header-bg);
+      -webkit-backdrop-filter: blur(16px);
+      backdrop-filter: blur(16px);
+    }
+    .site-header .shell { padding-block: 12px; }
+    .topline { display: flex; justify-content: space-between; gap: 16px; align-items: center; }
+    .brand {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      color: var(--ink);
+      font-weight: 700;
+      font-size: 17px;
+      letter-spacing: -0.01em;
+    }
+    .brand-mark {
+      display: block;
+      width: 34px;
+      height: 30px;
+      flex: 0 0 auto;
+      object-fit: contain;
+    }
+    .brand:hover { color: var(--brand); text-decoration: none; }
+    .brand small { color: var(--muted); font-size: 12px; font-weight: 500; }
+    .header-actions { display: flex; gap: 10px; align-items: stretch; justify-content: flex-end; }
+    .api-links {
+      display: flex;
+      min-height: var(--header-control-height);
+      gap: 8px;
+      align-items: stretch;
+      flex-wrap: nowrap;
+      justify-content: flex-end;
+    }
+    .api-links a {
+      display: inline-flex;
+      min-height: var(--header-control-height);
+      align-items: center;
+      justify-content: center;
+      color: var(--nav-ink);
+      border: 1px solid transparent;
+      background: transparent;
+      border-radius: 6px;
+      padding: 0 9px;
+      font-size: 13px;
+      font-weight: 600;
+      line-height: 1;
+      transition: color 160ms ease, background 160ms ease, border-color 160ms ease;
+    }
+    .api-links a:hover, .api-links a[aria-current="page"] {
+      color: var(--brand);
+      border-color: var(--line-strong);
+      background: var(--signal-soft);
+      text-decoration: none;
+    }
+    .theme-switcher {
+      display: inline-flex;
+      width: auto;
+      min-height: var(--header-control-height);
+      align-items: stretch;
+      gap: 2px;
+      margin: 0;
+      padding: 3px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--soft);
+      box-shadow: none;
+      white-space: nowrap;
+    }
+    .theme-switcher button {
+      display: inline-flex;
+      min-width: 0;
+      margin: 0;
+      padding: 4px 7px;
+      align-items: center;
+      justify-content: center;
+      border: 0;
+      border-radius: 5px;
+      background: transparent;
+      color: var(--muted);
+      font-size: 11px;
+      font-weight: 700;
+      line-height: 1;
+      box-shadow: none;
+    }
+    .theme-switcher button:hover { color: var(--ink); }
+    .theme-switcher button[aria-pressed="true"] {
+      color: var(--brand-contrast);
+      background: var(--brand);
+    }
+    h1 {
+      margin: 0;
+      font-family: var(--font-sans);
+      font-size: 22px;
+      line-height: 1.35;
+      letter-spacing: 0;
+      overflow-wrap: anywhere;
+      word-break: break-word;
+    }
+    .lede { color: var(--muted); max-width: 720px; margin: 8px 0 0; line-height: 1.55; font-size: 15px; }
+    .page-intro { padding: 28px 0 16px; }
+    .page-intro .eyebrow, .catalog-hero .eyebrow, .api-viewer .eyebrow {
+      color: var(--brand);
+      font-family: var(--font-mono);
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.09em;
+      text-transform: uppercase;
+    }
+    main.shell {
+      width: min(100% - 48px, 1180px);
+      flex: 1 0 auto;
+      padding-block: 0 34px;
+    }
+    .search-strip { padding: 16px 0 14px; }
+    .catalog-frame {
+      display: grid;
+      grid-template-columns: 265px 1fr;
+      gap: 14px;
+      align-items: start;
+    }
+    .panel {
+      background: var(--paper);
+      border: 1px solid var(--line);
+      box-shadow: var(--shadow);
+      border-radius: 8px;
+      overflow: hidden;
+      margin-bottom: 0;
+      transition: border-color 180ms ease, box-shadow 180ms ease, transform 180ms ease;
+    }
+    .filters {
+      padding: 14px;
+      position: sticky;
+      top: calc(var(--site-header-height) + var(--sticky-gap));
+      max-height: calc(100dvh - var(--site-header-height) - 28px);
+      overflow-y: auto;
+      overscroll-behavior: contain;
+      scrollbar-gutter: stable;
+    }
+    .filters > summary { display: none; }
+    .filter-content { min-width: 0; }
+    .filters h2, .content h2 { margin: 0 0 9px; font-size: 15px; }
+    .stat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 7px; margin-bottom: 14px; }
+    .stat { border: 1px solid var(--line); border-radius: 6px; padding: 8px; background: var(--soft); }
+    .stat strong { display: block; font-size: 20px; line-height: 1.15; }
+    .stat span { color: var(--muted); font-size: 12px; }
+    .filter-group { border-top: 1px solid var(--line); padding-top: 11px; margin-top: 11px; }
+    .filter-buttons { display: flex; gap: 6px; flex-wrap: wrap; }
+    .filter-button {
+      border: 1px solid var(--line);
+      background: var(--field-bg);
+      color: var(--ink);
+      border-radius: 999px;
+      padding: 5px 9px;
+      cursor: pointer;
+      font-size: 13px;
+      margin: 0;
+    }
+    .filter-button { transition: color 150ms ease, border-color 150ms ease, background 150ms ease; }
+    .filter-button:hover { border-color: var(--brand); }
+    .filter-button.active { background: var(--brand); color: var(--brand-contrast); border-color: var(--brand); }
+    .content { padding: 14px; min-width: 0; }
+    .api-reference {
+      margin-top: 14px;
+      padding: 0;
+      font-size: 14px;
+      line-height: 1.45;
+    }
+    .api-reference > summary {
+      cursor: pointer;
+      padding: 14px 18px;
+      color: var(--ink);
+      font-weight: 700;
+    }
+    .api-reference[open] > summary { border-bottom: 1px solid var(--line); }
+    .api-reference-body { padding: 16px 18px 18px; }
+    .api-reference h2 { margin: 0 0 8px; font-size: 16px; line-height: 1.3; }
+    .api-reference p { margin: 0 0 10px; font-size: 14px; line-height: 1.45; }
+    .api-reference table {
+      margin: 10px 0 12px;
+      width: 100%;
+      font-size: 13px;
+    }
+    .api-reference td,
+    .api-reference th {
+      vertical-align: top;
+      padding: 7px 8px;
+    }
+    .api-reference pre {
+      margin: 0;
+      overflow-x: auto;
+      border: 1px solid var(--line);
+      background: var(--code-bg);
+      border-radius: 6px;
+      padding: 10px;
+      font-size: 12px;
+      line-height: 1.45;
+    }
+    .api-reference code { font-size: 0.92em; }
+    .api-viewer { padding-block: 30px 40px; }
+    .api-viewer-head { margin-bottom: 16px; }
+    .api-viewer-head h1 { margin-top: 7px; }
+    .api-viewer-endpoint { margin: 10px 0 0; color: var(--muted); }
+    .api-json-panel { padding: 14px; }
+    .api-json {
+      width: 100%;
+      min-height: 420px;
+      max-height: calc(100vh - 260px);
+      margin: 0;
+      overflow: auto;
+      border: 0;
+      background: var(--code-bg);
+      color: var(--code-ink);
+      font-family: var(--font-mono);
+      font-size: 12px;
+      line-height: 1.5;
+      white-space: pre;
+    }
+    .api-json code { padding: 0; background: transparent; }
+    .muted { color: var(--muted); }
+    .toolbar { display: flex; justify-content: space-between; gap: 12px; align-items: center; margin-bottom: 10px; }
+    .search {
+      width: min(620px, 100%);
+      border: 1px solid var(--line-strong);
+      background: var(--field-bg);
+      border-radius: 6px;
+      padding: 9px 11px;
+      font-size: 15px;
+      margin: 0;
+    }
+    .count { color: var(--muted); white-space: nowrap; }
+    .clear-filters {
+      display: none;
+      width: auto;
+      margin: 0;
+      padding: 5px 8px;
+      border: 0;
+      background: transparent;
+      color: var(--brand);
+      font-size: 13px;
+    }
+    .clear-filters.visible { display: inline-block; }
+    .package-list { display: grid; gap: 9px; }
+    .package-card {
+      border: 1px solid var(--line);
+      background: var(--paper);
+      border-radius: 7px;
+      padding: 12px;
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 12px;
+      margin: 0;
+      animation: rise-in 360ms cubic-bezier(.2, .7, .2, 1) both;
+    }
+    .package-card:nth-child(2) { animation-delay: 35ms; }
+    .package-card:nth-child(3) { animation-delay: 70ms; }
+    .package-card:nth-child(4) { animation-delay: 105ms; }
+    .package-card:hover { border-color: var(--hover-line); box-shadow: var(--shadow); transform: translateY(-2px); }
+    .package-card.has-warning {
+      border-color: var(--warning-line);
+      background: linear-gradient(90deg, var(--warning-soft), var(--paper) 26%);
+    }
+    .package-card.has-warning:hover { border-color: #c9892f; }
+    @keyframes rise-in {
+      from { opacity: 0; transform: translateY(7px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .kind-label {
+      display: inline-block;
+      margin-bottom: 5px;
+      color: var(--brand);
+      font-family: var(--font-mono);
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+    .card-status-line { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+    .warning-badge {
+      display: inline-flex;
+      align-items: center;
+      width: fit-content;
+      min-width: 0;
+      border: 1px solid var(--warning-line);
+      border-radius: 999px;
+      padding: 2px 7px;
+      color: var(--warning);
+      background: var(--warning-soft);
+      font-family: var(--font-sans);
+      font-size: 11px;
+      font-weight: 700;
+      line-height: 1.35;
+    }
+    .warning-summary {
+      margin: 9px 0;
+      border-left: 3px solid var(--warning-line);
+      padding: 7px 9px;
+      color: var(--warning-copy);
+      background: var(--warning-soft);
+      font-size: 12px;
+      line-height: 1.4;
+    }
+    .warning-summary strong { display: block; margin-bottom: 3px; color: var(--warning); }
+    .warning-summary ul { margin: 0; padding-left: 17px; }
+    .warning-summary li { margin: 2px 0; }
+    .warning-summary code { color: var(--warning-copy); background: transparent; padding: 0; }
+    .package-title { display: flex; gap: 8px; align-items: baseline; flex-wrap: wrap; margin-bottom: 5px; }
+    .package-title a {
+      font-family: var(--font-mono);
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--ink);
+      overflow-wrap: anywhere;
+    }
+    .version {
+      font-family: var(--font-mono);
+      color: var(--muted);
+      font-size: 12px;
+      border: 1px solid var(--line);
+      border-radius: 4px;
+      padding: 2px 5px;
+      background: var(--soft);
+    }
+    .description { color: var(--body-copy); margin: 0 0 8px; line-height: 1.38; }
+    .meta-line { color: var(--muted); font-size: 13px; display: flex; gap: 14px; flex-wrap: wrap; }
+    .meta-line strong, .meta-line code { overflow-wrap: anywhere; }
+    .meta-line code { font-size: 12px; }
+    .card-actions { display: flex; gap: 8px; align-items: start; }
+    .card-actions a {
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      padding: 6px 8px;
+      background: var(--soft);
+      color: var(--action-ink);
+      font-size: 13px;
+      margin: 0;
+      font-weight: 600;
+      transition: background 160ms ease, border-color 160ms ease, color 160ms ease;
+    }
+    .card-actions a:first-child { color: var(--brand-contrast); border-color: var(--brand); background: var(--brand); }
+    .card-actions a:hover { border-color: var(--brand); text-decoration: none; }
+    .card-side {
+      display: grid;
+      gap: 10px;
+      justify-items: end;
+      align-content: start;
+    }
+    .card-preview {
+      display: block;
+      width: 190px;
+      aspect-ratio: 4 / 3;
+      object-fit: cover;
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      background: var(--soft);
+    }
+    .tags { display: flex; gap: 5px; flex-wrap: wrap; margin-top: 8px; }
+    .tag {
+      border: 0;
+      border-radius: 999px;
+      padding: 3px 7px;
+      font-size: 12px;
+      cursor: pointer;
+      color: #1c2732;
+      margin: 0;
+    }
+    .tag-blue { background: #dcecf7; color: #164965; }
+    .tag-green { background: #dff0df; color: #23562a; }
+    .tag-gold { background: #f3e6bd; color: #6b4b10; }
+    .tag-cyan { background: #d8f0f0; color: #165456; }
+    .tag-purple { background: #eadff4; color: #4d2d68; }
+    .tag-slate { background: #e4e8ee; color: #344052; }
+    .tag-red { background: #f5ded8; color: #7b2c1f; }
+    .tag-gray { background: #ece8df; color: #4a4b4d; }
+    html[data-theme="dark"] .tag-blue { background: #172d3d; color: #8bc9ea; }
+    html[data-theme="dark"] .tag-green { background: #183522; color: #91d7a3; }
+    html[data-theme="dark"] .tag-gold { background: #3a2d13; color: #e8c96f; }
+    html[data-theme="dark"] .tag-cyan { background: #123638; color: #87d8da; }
+    html[data-theme="dark"] .tag-purple { background: #302440; color: #c9a7e5; }
+    html[data-theme="dark"] .tag-slate { background: #252e3d; color: #bdc8da; }
+    html[data-theme="dark"] .tag-red { background: #3b221e; color: #eda69a; }
+    html[data-theme="dark"] .tag-gray { background: #2b2a28; color: #cbc7c0; }
+    .detail-layout {
+      display: grid;
+      grid-template-columns: 1fr 340px;
+      gap: 14px;
+      align-items: start;
+      margin-top: 16px;
+    }
+    .detail-main, .detail-side { padding: 14px; }
+    .detail-main h2, .detail-side h2 { margin: 0 0 10px; font-size: 18px; }
+    .detail-side h2:not(:first-child) { margin-top: 16px; }
+    .kv {
+      display: grid;
+      grid-template-columns: 92px minmax(0, 1fr);
+      gap: 4px 10px;
+      font-size: 14px;
+      line-height: 1.32;
+      margin: 0 0 10px;
+    }
+    .kv div:nth-child(odd) { color: var(--muted); }
+    .kv div:nth-child(even) { min-width: 0; overflow-wrap: anywhere; }
+    .cap-list { margin: 0; padding-left: 0; list-style: none; display: grid; gap: 5px; }
+    .cap-list li {
+      font-family: var(--font-mono);
+      font-size: 13px;
+      border: 1px solid var(--line);
+      background: var(--soft);
+      border-radius: 5px;
+      padding: 6px 7px;
+      overflow-wrap: anywhere;
+      margin: 0;
+    }
+    .cap-list li span {
+      color: var(--muted);
+      display: inline-block;
+      min-width: 64px;
+    }
+    .cap-list li.dependency-warning {
+      border-color: var(--warning-line);
+      background: var(--warning-soft);
+    }
+    .dependency-warning .warning-badge { margin-left: 5px; }
+    .dependency-warning-reason {
+      display: block;
+      margin-top: 5px;
+      color: var(--warning-copy);
+      font-family: var(--font-sans);
+      font-size: 12px;
+      line-height: 1.4;
+    }
+    .detail-warning {
+      max-width: 920px;
+      margin-top: 12px;
+      border: 1px solid var(--warning-line);
+      border-radius: 7px;
+      padding: 10px 12px;
+      color: var(--warning-copy);
+      background: var(--warning-soft);
+      font-size: 13px;
+    }
+    .detail-warning strong { display: block; margin-bottom: 4px; color: var(--warning); }
+    .detail-warning ul { margin: 0; padding-left: 18px; }
+    .detail-warning li { margin: 3px 0; }
+    .detail-hero { padding: 20px 0 4px; }
+    .detail-hero h1 { font-family: var(--font-mono); }
+    .back { display: inline-block; margin: 0 0 12px; color: var(--brand); }
+    .generated { color: var(--muted); margin-top: 12px; font-size: 13px; }
+    .site-footer {
+      width: 100%;
+      max-width: none;
+      margin: 0;
+      padding: 0;
+      flex: 0 0 auto;
+      color: var(--muted);
+      border-top: 1px solid var(--line);
+      background: var(--paper);
+      font-size: 12px;
+    }
+    .site-footer .shell { padding-block: 18px 28px; }
+    .readme {
+      line-height: 1.58;
+      color: var(--readme-ink);
+      overflow-wrap: anywhere;
+    }
+    .readme h1 { font-size: 24px; margin-bottom: 10px; }
+    .readme h2 { font-size: 19px; border-bottom: 1px solid var(--line); padding-bottom: 6px; margin: 22px 0 10px; }
+    .readme h3 { font-size: 16px; margin: 18px 0 8px; }
+    .readme p, .readme ul, .readme ol { margin-bottom: 10px; }
+    .readme pre {
+      overflow: auto;
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      background: var(--code-bg);
+      padding: 10px;
+      max-width: 100%;
+    }
+    .readme code {
+      background: var(--soft);
+      border-radius: 4px;
+      padding: 1px 4px;
+      font-size: 0.92em;
+    }
+    .readme pre code { background: transparent; padding: 0; }
+    .readme .highlight { margin: 10px 0; }
+    .readme .highlight pre { margin: 0; }
+    .readme img { display: block; max-width: 100%; height: auto; border-radius: 7px; }
+    .readme table { border-collapse: collapse; width: 100%; display: block; overflow-x: auto; }
+    .readme th, .readme td { border: 1px solid var(--line); padding: 6px 8px; }
+    code { font-family: var(--font-mono); }
+    .catalog-hero {
+      padding: clamp(38px, 8vw, 82px) 0 24px;
+    }
+    .catalog-hero h1 {
+      max-width: none;
+      margin-top: 10px;
+      font-size: clamp(32px, 4.2vw, 50px);
+      line-height: 1.05;
+      letter-spacing: -0.045em;
+    }
+    .catalog-hero .lede { max-width: 690px; font-size: 17px; }
+    .hero-search { width: min(720px, 100%); margin-top: 24px; }
+    .hero-search input {
+      width: 100%;
+      height: 52px;
+      margin: 0;
+      padding: 0 18px;
+      border: 1px solid #b9c3df;
+      border-radius: 9px;
+      background: var(--field-bg);
+      box-shadow: 0 14px 34px rgba(31, 43, 105, 0.1);
+      font-size: 16px;
+    }
+    .entry-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
+    .entry-card { position: relative; padding: 20px; }
+    .entry-card:hover { border-color: var(--hover-line); box-shadow: var(--shadow); transform: translateY(-2px); }
+    .entry-card h2 { margin: 0 0 7px; font-size: 19px; }
+    .entry-card strong { display: block; margin-top: 16px; color: var(--brand); font-size: 30px; line-height: 1; }
+    .entry-links { display: flex; flex-wrap: wrap; gap: 7px; margin-top: 14px; }
+    .entry-links a {
+      padding: 5px 8px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: var(--soft);
+      font-size: 12px;
+      font-weight: 600;
+    }
+    .home-results { padding: 14px; }
+    .home-results[hidden], .home-empty[hidden], .entry-grid[hidden] { display: none; }
+    .home-results-head { display: flex; justify-content: space-between; gap: 12px; margin-bottom: 10px; }
+    .home-result-list { display: grid; gap: 8px; }
+    .home-result {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 12px;
+      padding: 11px 12px;
+      border: 1px solid var(--line);
+      border-radius: 7px;
+      color: var(--ink);
+      background: var(--paper);
+    }
+    .home-result:hover { border-color: var(--hover-line); background: var(--soft); text-decoration: none; }
+    .home-result-name { color: var(--brand-deep); font-family: var(--font-mono); font-weight: 700; overflow-wrap: anywhere; }
+    .home-result span { color: var(--muted); font-size: 13px; text-align: right; }
+    .home-empty { margin: 10px 0 0; color: var(--muted); }
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        scroll-behavior: auto !important;
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+      }
+    }
+    @media (max-width: 860px) {
+      .shell { width: min(100% - 28px, 1180px); }
+      main.shell { width: min(100% - 28px, 1180px); }
+      .topline { align-items: stretch; flex-direction: column; }
+      .header-actions { justify-content: space-between; }
+      .api-links {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        justify-content: stretch;
+        width: 100%;
+      }
+      .api-links a { min-width: 0; text-align: center; overflow-wrap: anywhere; }
+      .catalog-frame, .detail-layout { grid-template-columns: 1fr; }
+      .detail-side { order: -1; }
+      .entry-grid { grid-template-columns: 1fr; }
+      .filters {
+        padding: 0;
+        position: static;
+        max-height: none;
+        overflow: visible;
+        scrollbar-gutter: auto;
+      }
+      .filters > summary {
+        display: block;
+        padding: 12px 14px;
+        color: var(--ink);
+        cursor: pointer;
+        font-weight: 700;
+        list-style-position: inside;
+      }
+      .filters[open] > summary { border-bottom: 1px solid var(--line); }
+      .filter-content { padding: 14px; }
+      .toolbar { align-items: stretch; flex-direction: column; }
+      .package-card { grid-template-columns: 1fr; }
+      .card-side { justify-items: start; }
+      .card-actions { justify-content: flex-start; }
+      .card-preview { width: min(100%, 360px); }
+      .api-reference-body { padding: 14px; }
+    }
+    @media (min-width: 861px) {
+      .catalog-hero h1 { white-space: nowrap; }
+    }
+    @media (max-width: 520px) {
+      body { font-size: 14px; }
+      .shell { width: min(100% - 20px, 1180px); }
+      main.shell { width: min(100% - 20px, 1180px); }
+      .site-header .shell { padding-block: 10px; }
+      .brand { font-size: 17px; overflow-wrap: anywhere; }
+      .brand small { display: none; }
+      .header-actions { align-items: stretch; flex-direction: column; gap: 7px; }
+      .api-links { gap: 6px; }
+      .theme-switcher { align-self: flex-end; }
+      .api-links a { padding: 7px 5px; font-size: 11px; }
+      .search-strip { padding: 12px 0; }
+      .content, .detail-main, .detail-side { padding: 12px; min-width: 0; }
+      .package-card { gap: 10px; padding: 11px; }
+      .package-title a { font-size: 14px; }
+      .card-actions { width: 100%; }
+      .card-actions a { flex: 1; text-align: center; }
+      .page-intro { padding-top: 20px; }
+      .catalog-hero { padding-top: 32px; }
+      .catalog-hero h1 { font-size: 34px; }
+      .catalog-hero .lede { font-size: 15px; }
+      .home-result { grid-template-columns: 1fr; gap: 3px; }
+      .home-result span { text-align: left; }
+      .kv { grid-template-columns: 1fr; gap: 2px; }
+      .kv div:nth-child(odd) { margin-top: 7px; font-size: 12px; font-weight: 700; }
+      .api-reference table,
+      .api-reference tbody,
+      .api-reference tr,
+      .api-reference td { display: block; width: 100%; }
+      .api-reference thead { display: none; }
+      .api-reference tr {
+        border: 1px solid var(--line);
+        border-radius: 6px;
+        margin-bottom: 8px;
+        overflow: hidden;
+      }
+      .api-reference td {
+        display: grid;
+        grid-template-columns: 76px minmax(0, 1fr);
+        gap: 8px;
+        border: 0;
+        border-bottom: 1px solid var(--line);
+        overflow-wrap: anywhere;
+      }
+      .api-reference td:last-child { border-bottom: 0; }
+      .api-reference td::before {
+        content: attr(data-label);
+        color: var(--muted);
+        font-size: 11px;
+        font-weight: 700;
+        letter-spacing: 0.03em;
+        text-transform: uppercase;
+      }
+    }
+pre { line-height: 125%; }
+td.linenos .normal { color: #666666; background-color: transparent; padding-left: 5px; padding-right: 5px; }
+span.linenos { color: #666666; background-color: transparent; padding-left: 5px; padding-right: 5px; }
+td.linenos .special { color: #000000; background-color: #ffffc0; padding-left: 5px; padding-right: 5px; }
+span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 5px; padding-right: 5px; }
+.highlight .hll { background-color: #ffffcc }
+.highlight { background: #f0f0f0; }
+.highlight .c { color: #60A0B0; font-style: italic } /* Comment */
+.highlight .err { border: 1px solid #F00 } /* Error */
+.highlight .k { color: #007020; font-weight: bold } /* Keyword */
+.highlight .o { color: #666 } /* Operator */
+.highlight .ch { color: #60A0B0; font-style: italic } /* Comment.Hashbang */
+.highlight .cm { color: #60A0B0; font-style: italic } /* Comment.Multiline */
+.highlight .cp { color: #007020 } /* Comment.Preproc */
+.highlight .cpf { color: #60A0B0; font-style: italic } /* Comment.PreprocFile */
+.highlight .c1 { color: #60A0B0; font-style: italic } /* Comment.Single */
+.highlight .cs { color: #60A0B0; background-color: #FFF0F0 } /* Comment.Special */
+.highlight .gd { color: #A00000 } /* Generic.Deleted */
+.highlight .ge { font-style: italic } /* Generic.Emph */
+.highlight .ges { font-weight: bold; font-style: italic } /* Generic.EmphStrong */
+.highlight .gr { color: #F00 } /* Generic.Error */
+.highlight .gh { color: #000080; font-weight: bold } /* Generic.Heading */
+.highlight .gi { color: #00A000 } /* Generic.Inserted */
+.highlight .go { color: #888 } /* Generic.Output */
+.highlight .gp { color: #C65D09; font-weight: bold } /* Generic.Prompt */
+.highlight .gs { font-weight: bold } /* Generic.Strong */
+.highlight .gu { color: #800080; font-weight: bold } /* Generic.Subheading */
+.highlight .gt { color: #04D } /* Generic.Traceback */
+.highlight .kc { color: #007020; font-weight: bold } /* Keyword.Constant */
+.highlight .kd { color: #007020; font-weight: bold } /* Keyword.Declaration */
+.highlight .kn { color: #007020; font-weight: bold } /* Keyword.Namespace */
+.highlight .kp { color: #007020 } /* Keyword.Pseudo */
+.highlight .kr { color: #007020; font-weight: bold } /* Keyword.Reserved */
+.highlight .kt { color: #902000 } /* Keyword.Type */
+.highlight .m { color: #40A070 } /* Literal.Number */
+.highlight .s { color: #4070A0 } /* Literal.String */
+.highlight .na { color: #4070A0 } /* Name.Attribute */
+.highlight .nb { color: #007020 } /* Name.Builtin */
+.highlight .nc { color: #0E84B5; font-weight: bold } /* Name.Class */
+.highlight .no { color: #60ADD5 } /* Name.Constant */
+.highlight .nd { color: #555; font-weight: bold } /* Name.Decorator */
+.highlight .ni { color: #D55537; font-weight: bold } /* Name.Entity */
+.highlight .ne { color: #007020 } /* Name.Exception */
+.highlight .nf { color: #06287E } /* Name.Function */
+.highlight .nl { color: #002070; font-weight: bold } /* Name.Label */
+.highlight .nn { color: #0E84B5; font-weight: bold } /* Name.Namespace */
+.highlight .nt { color: #062873; font-weight: bold } /* Name.Tag */
+.highlight .nv { color: #BB60D5 } /* Name.Variable */
+.highlight .ow { color: #007020; font-weight: bold } /* Operator.Word */
+.highlight .w { color: #BBB } /* Text.Whitespace */
+.highlight .mb { color: #40A070 } /* Literal.Number.Bin */
+.highlight .mf { color: #40A070 } /* Literal.Number.Float */
+.highlight .mh { color: #40A070 } /* Literal.Number.Hex */
+.highlight .mi { color: #40A070 } /* Literal.Number.Integer */
+.highlight .mo { color: #40A070 } /* Literal.Number.Oct */
+.highlight .sa { color: #4070A0 } /* Literal.String.Affix */
+.highlight .sb { color: #4070A0 } /* Literal.String.Backtick */
+.highlight .sc { color: #4070A0 } /* Literal.String.Char */
+.highlight .dl { color: #4070A0 } /* Literal.String.Delimiter */
+.highlight .sd { color: #4070A0; font-style: italic } /* Literal.String.Doc */
+.highlight .s2 { color: #4070A0 } /* Literal.String.Double */
+.highlight .se { color: #4070A0; font-weight: bold } /* Literal.String.Escape */
+.highlight .sh { color: #4070A0 } /* Literal.String.Heredoc */
+.highlight .si { color: #70A0D0; font-style: italic } /* Literal.String.Interpol */
+.highlight .sx { color: #C65D09 } /* Literal.String.Other */
+.highlight .sr { color: #235388 } /* Literal.String.Regex */
+.highlight .s1 { color: #4070A0 } /* Literal.String.Single */
+.highlight .ss { color: #517918 } /* Literal.String.Symbol */
+.highlight .bp { color: #007020 } /* Name.Builtin.Pseudo */
+.highlight .fm { color: #06287E } /* Name.Function.Magic */
+.highlight .vc { color: #BB60D5 } /* Name.Variable.Class */
+.highlight .vg { color: #BB60D5 } /* Name.Variable.Global */
+.highlight .vi { color: #BB60D5 } /* Name.Variable.Instance */
+.highlight .vm { color: #BB60D5 } /* Name.Variable.Magic */
+.highlight .il { color: #40A070 } /* Literal.Number.Integer.Long */
+pre { line-height: 125%; }
+td.linenos .normal { color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px; }
+span.linenos { color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px; }
+td.linenos .special { color: #000000; background-color: #ffffc0; padding-left: 5px; padding-right: 5px; }
+span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 5px; padding-right: 5px; }
+html[data-theme="dark"] .highlight .hll { background-color: #49483e }
+html[data-theme="dark"] .highlight { background: #272822; color: #F8F8F2 }
+html[data-theme="dark"] .highlight .c { color: #959077 } /* Comment */
+html[data-theme="dark"] .highlight .err { color: #ED007E; background-color: #1E0010 } /* Error */
+html[data-theme="dark"] .highlight .esc { color: #F8F8F2 } /* Escape */
+html[data-theme="dark"] .highlight .g { color: #F8F8F2 } /* Generic */
+html[data-theme="dark"] .highlight .k { color: #66D9EF } /* Keyword */
+html[data-theme="dark"] .highlight .l { color: #AE81FF } /* Literal */
+html[data-theme="dark"] .highlight .n { color: #F8F8F2 } /* Name */
+html[data-theme="dark"] .highlight .o { color: #FF4689 } /* Operator */
+html[data-theme="dark"] .highlight .x { color: #F8F8F2 } /* Other */
+html[data-theme="dark"] .highlight .p { color: #F8F8F2 } /* Punctuation */
+html[data-theme="dark"] .highlight .ch { color: #959077 } /* Comment.Hashbang */
+html[data-theme="dark"] .highlight .cm { color: #959077 } /* Comment.Multiline */
+html[data-theme="dark"] .highlight .cp { color: #959077 } /* Comment.Preproc */
+html[data-theme="dark"] .highlight .cpf { color: #959077 } /* Comment.PreprocFile */
+html[data-theme="dark"] .highlight .c1 { color: #959077 } /* Comment.Single */
+html[data-theme="dark"] .highlight .cs { color: #959077 } /* Comment.Special */
+html[data-theme="dark"] .highlight .gd { color: #FF4689 } /* Generic.Deleted */
+html[data-theme="dark"] .highlight .ge { color: #F8F8F2; font-style: italic } /* Generic.Emph */
+html[data-theme="dark"] .highlight .ges { color: #F8F8F2; font-weight: bold; font-style: italic } /* Generic.EmphStrong */
+html[data-theme="dark"] .highlight .gr { color: #F8F8F2 } /* Generic.Error */
+html[data-theme="dark"] .highlight .gh { color: #F8F8F2 } /* Generic.Heading */
+html[data-theme="dark"] .highlight .gi { color: #A6E22E } /* Generic.Inserted */
+html[data-theme="dark"] .highlight .go { color: #66D9EF } /* Generic.Output */
+html[data-theme="dark"] .highlight .gp { color: #FF4689; font-weight: bold } /* Generic.Prompt */
+html[data-theme="dark"] .highlight .gs { color: #F8F8F2; font-weight: bold } /* Generic.Strong */
+html[data-theme="dark"] .highlight .gu { color: #959077 } /* Generic.Subheading */
+html[data-theme="dark"] .highlight .gt { color: #F8F8F2 } /* Generic.Traceback */
+html[data-theme="dark"] .highlight .kc { color: #66D9EF } /* Keyword.Constant */
+html[data-theme="dark"] .highlight .kd { color: #66D9EF } /* Keyword.Declaration */
+html[data-theme="dark"] .highlight .kn { color: #FF4689 } /* Keyword.Namespace */
+html[data-theme="dark"] .highlight .kp { color: #66D9EF } /* Keyword.Pseudo */
+html[data-theme="dark"] .highlight .kr { color: #66D9EF } /* Keyword.Reserved */
+html[data-theme="dark"] .highlight .kt { color: #66D9EF } /* Keyword.Type */
+html[data-theme="dark"] .highlight .ld { color: #E6DB74 } /* Literal.Date */
+html[data-theme="dark"] .highlight .m { color: #AE81FF } /* Literal.Number */
+html[data-theme="dark"] .highlight .s { color: #E6DB74 } /* Literal.String */
+html[data-theme="dark"] .highlight .na { color: #A6E22E } /* Name.Attribute */
+html[data-theme="dark"] .highlight .nb { color: #F8F8F2 } /* Name.Builtin */
+html[data-theme="dark"] .highlight .nc { color: #A6E22E } /* Name.Class */
+html[data-theme="dark"] .highlight .no { color: #66D9EF } /* Name.Constant */
+html[data-theme="dark"] .highlight .nd { color: #A6E22E } /* Name.Decorator */
+html[data-theme="dark"] .highlight .ni { color: #F8F8F2 } /* Name.Entity */
+html[data-theme="dark"] .highlight .ne { color: #A6E22E } /* Name.Exception */
+html[data-theme="dark"] .highlight .nf { color: #A6E22E } /* Name.Function */
+html[data-theme="dark"] .highlight .nl { color: #F8F8F2 } /* Name.Label */
+html[data-theme="dark"] .highlight .nn { color: #F8F8F2 } /* Name.Namespace */
+html[data-theme="dark"] .highlight .nx { color: #A6E22E } /* Name.Other */
+html[data-theme="dark"] .highlight .py { color: #F8F8F2 } /* Name.Property */
+html[data-theme="dark"] .highlight .nt { color: #FF4689 } /* Name.Tag */
+html[data-theme="dark"] .highlight .nv { color: #F8F8F2 } /* Name.Variable */
+html[data-theme="dark"] .highlight .ow { color: #FF4689 } /* Operator.Word */
+html[data-theme="dark"] .highlight .pm { color: #F8F8F2 } /* Punctuation.Marker */
+html[data-theme="dark"] .highlight .w { color: #F8F8F2 } /* Text.Whitespace */
+html[data-theme="dark"] .highlight .mb { color: #AE81FF } /* Literal.Number.Bin */
+html[data-theme="dark"] .highlight .mf { color: #AE81FF } /* Literal.Number.Float */
+html[data-theme="dark"] .highlight .mh { color: #AE81FF } /* Literal.Number.Hex */
+html[data-theme="dark"] .highlight .mi { color: #AE81FF } /* Literal.Number.Integer */
+html[data-theme="dark"] .highlight .mo { color: #AE81FF } /* Literal.Number.Oct */
+html[data-theme="dark"] .highlight .sa { color: #E6DB74 } /* Literal.String.Affix */
+html[data-theme="dark"] .highlight .sb { color: #E6DB74 } /* Literal.String.Backtick */
+html[data-theme="dark"] .highlight .sc { color: #E6DB74 } /* Literal.String.Char */
+html[data-theme="dark"] .highlight .dl { color: #E6DB74 } /* Literal.String.Delimiter */
+html[data-theme="dark"] .highlight .sd { color: #E6DB74 } /* Literal.String.Doc */
+html[data-theme="dark"] .highlight .s2 { color: #E6DB74 } /* Literal.String.Double */
+html[data-theme="dark"] .highlight .se { color: #AE81FF } /* Literal.String.Escape */
+html[data-theme="dark"] .highlight .sh { color: #E6DB74 } /* Literal.String.Heredoc */
+html[data-theme="dark"] .highlight .si { color: #E6DB74 } /* Literal.String.Interpol */
+html[data-theme="dark"] .highlight .sx { color: #E6DB74 } /* Literal.String.Other */
+html[data-theme="dark"] .highlight .sr { color: #E6DB74 } /* Literal.String.Regex */
+html[data-theme="dark"] .highlight .s1 { color: #E6DB74 } /* Literal.String.Single */
+html[data-theme="dark"] .highlight .ss { color: #E6DB74 } /* Literal.String.Symbol */
+html[data-theme="dark"] .highlight .bp { color: #F8F8F2 } /* Name.Builtin.Pseudo */
+html[data-theme="dark"] .highlight .fm { color: #A6E22E } /* Name.Function.Magic */
+html[data-theme="dark"] .highlight .vc { color: #F8F8F2 } /* Name.Variable.Class */
+html[data-theme="dark"] .highlight .vg { color: #F8F8F2 } /* Name.Variable.Global */
+html[data-theme="dark"] .highlight .vi { color: #F8F8F2 } /* Name.Variable.Instance */
+html[data-theme="dark"] .highlight .vm { color: #F8F8F2 } /* Name.Variable.Magic */
+html[data-theme="dark"] .highlight .il { color: #AE81FF } /* Literal.Number.Integer.Long */
+  </style>
+</head>
+<body>
+  <header class="site-header">
+    <div class="shell topline">
+      <a class="brand" href="../../">
+        <img class="brand-mark" src="../../assets/robonix-mark.svg" alt="" aria-hidden="true" width="34" height="30">
+        <span>Robonix <small>Package Catalog</small></span>
+      </a>
+      <div class="header-actions">
+        <nav class="api-links" aria-label="Catalog navigation">
+          <a href="../../packages/" aria-current="page">Packages</a>
+          <a href="../../robots/">Robots</a>
+          <a href="../../api/view/">API</a>
+        </nav>
+        <div class="theme-switcher" role="group" aria-label="Color theme">
+          <button type="button" data-theme-choice="auto" aria-pressed="false">Auto</button>
+          <button type="button" data-theme-choice="light" aria-pressed="false">Light</button>
+          <button type="button" data-theme-choice="dark" aria-pressed="false">Dark</button>
+        </div>
+      </div>
+    </div>
+  </header>
+  <script>
+    (() => {
+      const header = document.currentScript.previousElementSibling;
+      const storageKey = 'robonix-catalog-theme';
+      const media = matchMedia('(prefers-color-scheme: dark)');
+      const choices = Array.from(header.querySelectorAll('[data-theme-choice]'));
+      const validPreference = (value) => ['auto', 'light', 'dark'].includes(value);
+      const readPreference = () => {
+        const current = document.documentElement.dataset.themePreference;
+        return validPreference(current) ? current : 'auto';
+      };
+      const applyTheme = (preference, persist = false) => {
+        const safePreference = validPreference(preference) ? preference : 'auto';
+        const resolved = safePreference === 'auto'
+          ? (media.matches ? 'dark' : 'light')
+          : safePreference;
+        document.documentElement.dataset.theme = resolved;
+        document.documentElement.dataset.themePreference = safePreference;
+        document.documentElement.style.colorScheme = resolved;
+        choices.forEach((button) => {
+          button.setAttribute('aria-pressed', String(button.dataset.themeChoice === safePreference));
+        });
+        if (persist) {
+          try { localStorage.setItem(storageKey, safePreference); } catch (_) {}
+        }
+      };
+      choices.forEach((button) => {
+        button.addEventListener('click', () => applyTheme(button.dataset.themeChoice, true));
+      });
+      media.addEventListener?.('change', () => {
+        if (readPreference() === 'auto') applyTheme('auto');
+      });
+      window.addEventListener('storage', (event) => {
+        if (event.key === storageKey) applyTheme(validPreference(event.newValue) ? event.newValue : 'auto');
+      });
+      applyTheme(readPreference());
+      const updateHeaderHeight = () => {
+        const height = Math.ceil(header.getBoundingClientRect().height);
+        document.documentElement.style.setProperty('--site-header-height', `${height}px`);
+      };
+      updateHeaderHeight();
+      if ('ResizeObserver' in window) {
+        new ResizeObserver(updateHeaderHeight).observe(header);
+      } else {
+        window.addEventListener('resize', updateHeaderHeight, { passive: true });
+      }
+    })();
+  </script>
+  <header class="shell detail-hero">
+    <a class="back" href="../">Back to packages</a>
+    <h1>robonix.service.memory.action_retrieval</h1>
+    <p class="lede">Experience-backed candidate action retrieval service for embodied models.</p>
+  </header>
+  <main class="shell">
+    <div class="detail-layout">
+      <section class="panel detail-main">
+        <h2>README</h2>
+        <article class="readme">
+          <div>
+
+# RoboNix Memory Action Retrieval Service
+
+**A system-level experience memory and candidate-action retrieval Service for embodied models**
+
+[中文文档](README-CN.md) · [🚀 Quick Start](#quick-start) · [📦 Dataset](#datasets) · [🗄️ Build Database](#build-index) · [📝 Citation](#citation)
+
+![Python](https://img.shields.io/badge/Python-3.10+-3776AB?logo=python&amp;logoColor=white)
+![PyTorch](https://img.shields.io/badge/PyTorch-2.2-EE4C2C?logo=pytorch&amp;logoColor=white)
+![Qdrant](https://img.shields.io/badge/Qdrant-1.16-DC244C)
+![Status](https://img.shields.io/badge/two--view_pipeline-verified-1f9d72)
+[![License](https://img.shields.io/badge/license-MulanPSL--2.0-red)](LICENSE)
+[![GitHub Stars](https://img.shields.io/github/stars/lusunn111/service-memory-action-retrieval-rbnx?style=flat&amp;logo=github)](https://github.com/lusunn111/service-memory-action-retrieval-rbnx/stargazers)
+
+</div>
+
+<p>The <strong>RoboNix Memory Action Retrieval Service</strong> lets existing embodied models
+use historical execution experience during online decision-making instead of
+leaving it as offline data. It retrieves candidate actions that match the
+current scene and instruction, then uses verification and policy fallback to
+contain retrieval errors, reducing repeated inference without replacing the
+original policy. The research implementation currently supports OpenVLA and π0, single-view and
+two-view Mix retrieval, and chunk-level hybrid verification.</p>
+<h2>RoboNix Service package</h2>
+<p>The repository root is directly publishable as
+<code>robonix.service.memory.action_retrieval</code>. It exposes
+<code>robonix/service/memory/action_retrieval/retrieve</code>, returns candidate
+trajectories only, and never commands robot hardware. Backend health is checked
+on the first request rather than during RoboNix boot.</p>
+<div class="highlight"><pre><span></span><code>python<span class="w"> </span>-m<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span>-e<span class="w"> </span><span class="s1">&#39;.[dev]&#39;</span>
+python<span class="w"> </span>-m<span class="w"> </span>pytest<span class="w"> </span>-q
+python<span class="w"> </span>scripts/release_audit.py
+python<span class="w"> </span>-m<span class="w"> </span>build
+python<span class="w"> </span>scripts/verify_distribution.py
+rbnx<span class="w"> </span>validate<span class="w"> </span>.
+rbnx<span class="w"> </span>build<span class="w"> </span>-p<span class="w"> </span>.
+</code></pre></div>
+<p>The deployment contract and safety boundary are documented in
+<a href="https://github.com/lusunn111/service-memory-action-retrieval-rbnx/blob/main/CAPABILITY.md">CAPABILITY.md</a>. A mock deployment and a real HTTP backend
+configuration are in
+<a href="https://github.com/lusunn111/service-memory-action-retrieval-rbnx/blob/main/examples/minimal-deployment/README.md">examples/minimal-deployment/README.md</a>;
+the exact validation boundary is recorded in <a href="https://github.com/lusunn111/service-memory-action-retrieval-rbnx/blob/main/VALIDATION.md">VALIDATION.md</a>.
+Mock mode and a normal no-match both return <code>success=false</code>, no actions, and
+<code>fallback_required=true</code>. Network failures, malformed responses, and invalid
+trajectories fail the capability call. The complete research implementation
+and benchmarks below remain part of this repository.</p>
+<p><a></a></p>
+<h2>Real RoboNix deployment</h2>
+<p>The release deployment is intentionally Service-only:</p>
+<div class="highlight"><pre><span></span><code>Executor -&gt; Atlas -&gt; MCP -&gt; action_retrieval -&gt; configured retrieval HTTP API
+</code></pre></div>
+<p>It does not start a robot driver or execute the returned trajectory. Prepare a
+dedicated environment and a large-volume data root; link existing datasets or
+models only after resolving and checking their targets. The validation host's
+concrete storage layout and safe-link procedure are recorded in
+<a href="https://github.com/lusunn111/service-memory-action-retrieval-rbnx/blob/main/benchmarks/target_server/README.md">benchmarks/target_server/README.md</a>, while
+the public manifest remains portable.</p>
+<div class="highlight"><pre><span></span><code>python3.11<span class="w"> </span>-m<span class="w"> </span>venv<span class="w"> </span>/path/to/environments/retrieval-service
+<span class="nb">source</span><span class="w"> </span>/path/to/environments/retrieval-service/bin/activate
+python<span class="w"> </span>-m<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span>--upgrade<span class="w"> </span>pip
+python<span class="w"> </span>-m<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span>-e<span class="w"> </span><span class="s1">&#39;.[dev]&#39;</span>
+
+rbnx<span class="w"> </span>validate<span class="w"> </span>.
+rbnx<span class="w"> </span>build<span class="w"> </span>-p<span class="w"> </span>.
+
+<span class="nb">cd</span><span class="w"> </span>examples/real-deployment
+cp<span class="w"> </span>.env.example<span class="w"> </span>.env
+<span class="c1"># Edit the untracked .env with this deployment&#39;s environment, runtime,</span>
+<span class="c1"># input-root, and loopback backend paths.</span>
+<span class="nb">set</span><span class="w"> </span>-a
+<span class="nb">source</span><span class="w"> </span>.env
+<span class="nb">set</span><span class="w"> </span>+a
+
+rbnx<span class="w"> </span>build<span class="w"> </span>-f<span class="w"> </span>robonix_manifest.yaml
+rbnx<span class="w"> </span>boot<span class="w"> </span>-v<span class="w"> </span>--no-update-check<span class="w"> </span>-f<span class="w"> </span>robonix_manifest.yaml
+rbnx<span class="w"> </span>caps<span class="w"> </span>-v<span class="w"> </span>--server<span class="w"> </span><span class="m">127</span>.0.0.1:50251
+rbnx<span class="w"> </span>tools<span class="w"> </span>--server<span class="w"> </span><span class="m">127</span>.0.0.1:50251
+rbnx<span class="w"> </span>describe<span class="w"> </span>--server<span class="w"> </span><span class="m">127</span>.0.0.1:50251<span class="w"> </span>--provider<span class="w"> </span>action_retrieval
+rbnx<span class="w"> </span>inspect<span class="w"> </span>--server<span class="w"> </span><span class="m">127</span>.0.0.1:50251
+</code></pre></div>
+<p>Invoke the capability through Executor rather than importing the Python class:</p>
+<div class="highlight"><pre><span></span><code>python<span class="w"> </span>../../benchmarks/target_server/invoke_executor.py<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--atlas<span class="w"> </span><span class="m">127</span>.0.0.1:50251<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--provider<span class="w"> </span>action_retrieval<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--contract<span class="w"> </span>robonix/service/memory/action_retrieval/retrieve<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--args-json<span class="w"> </span><span class="s1">&#39;{&quot;instruction&quot;:&quot;pick up the cup&quot;,&quot;third_person_image_path&quot;:&quot;/absolute/input/third.jpg&quot;,&quot;wrist_image_path&quot;:&quot;/absolute/input/wrist.jpg&quot;,&quot;dataset_type&quot;:&quot;goal&quot;,&quot;timeout_s&quot;:30}&#39;</span>
+
+rbnx<span class="w"> </span>shutdown<span class="w"> </span>-f<span class="w"> </span>robonix_manifest.yaml
+</code></pre></div>
+<p>Boot does not contact the backend. The first <code>retrieve</code> performs the health
+check and request. Both input images must be JPEG, PNG, or WebP files below
+<code>allowed_image_root</code>. A genuine no-match is a normal fallback; an unavailable
+collection, network failure, malformed response, invalid trajectory shape, or
+non-finite action fails the MCP call. Configuration fields and defaults are
+defined in <a href="https://github.com/lusunn111/service-memory-action-retrieval-rbnx/blob/main/config.spec">config.spec</a>. The existing backend uses wire value
+<code>dataset_type="10"</code> for the LIBERO-Long suite.</p>
+<p><a></a></p>
+<h2>📊 Performance Snapshot</h2>
+<p>The experience-memory path has been evaluated as part of verified hybrid
+execution on both token-based and diffusion-based VLA models. Results report
+task success rate (SR) and end-to-end speedup over the original model.</p>
+<table>
+<thead>
+<tr>
+<th>Model</th>
+<th>LIBERO suite</th>
+<th>SR</th>
+<th>Speedup</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>OpenVLA</td>
+<td>Goal</td>
+<td>73.0%</td>
+<td>2.38×</td>
+</tr>
+<tr>
+<td>OpenVLA</td>
+<td>Object</td>
+<td>71.0%</td>
+<td><strong>2.45×</strong></td>
+</tr>
+<tr>
+<td>OpenVLA</td>
+<td>Spatial</td>
+<td>78.0%</td>
+<td>1.90×</td>
+</tr>
+<tr>
+<td>OpenVLA</td>
+<td>Long</td>
+<td>47.0%</td>
+<td>1.79×</td>
+</tr>
+<tr>
+<td>π0</td>
+<td>Goal</td>
+<td>93.33%</td>
+<td>2.97×</td>
+</tr>
+<tr>
+<td>π0</td>
+<td>Object</td>
+<td><strong>98.33%</strong></td>
+<td>2.21×</td>
+</tr>
+<tr>
+<td>π0</td>
+<td>Spatial</td>
+<td>94.67%</td>
+<td>2.47×</td>
+</tr>
+<tr>
+<td>π0</td>
+<td>Long</td>
+<td>78.33%</td>
+<td><strong>3.01×</strong></td>
+</tr>
+</tbody>
+</table>
+<h2>📚 Table of Contents</h2>
+<ul>
+<li><a href="#real-robonix-deployment">Real RoboNix deployment</a></li>
+<li><a href="#performance-snapshot">📊 Performance Snapshot</a></li>
+<li><a href="#news">📰 News</a></li>
+<li><a href="#system-results">⚡ System Capability and Results</a></li>
+<li><a href="#architecture">🧠 Architecture Overview</a></li>
+<li><a href="#robonix-integration">🔌 RoboNix Integration and Outlook</a></li>
+<li><a href="#validated-release">🧪 Validated Release</a></li>
+<li><a href="#requirements">⚙️ Requirements</a></li>
+<li><a href="#quick-start">🚀 Quick Start</a></li>
+<li><a href="#datasets">📦 Dataset and Checkpoint Sources</a></li>
+<li><a href="#build-index">🗄️ Build the Retrieval Index</a></li>
+<li><a href="#retrieval-service">🌐 Start the Retrieval Service</a></li>
+<li><a href="#roadmap">🗺️ Roadmap</a></li>
+<li><a href="#citation">📝 Citation</a></li>
+<li><a href="#contributors">🤝 Contributors</a></li>
+<li><a href="#license">📄 License</a></li>
+</ul>
+<p><a></a></p>
+<h2>📰 News</h2>
+<ul>
+<li><strong>2026-07-19</strong>: 🆕 Released the system-level experience-backed action retrieval Service
+  with capability results, model support, and bilingual documentation.</li>
+<li><strong>2026-07-18</strong>: 🔥 Validated the complete two-view image → embedding → Qdrant
+  → 4×7 action-trajectory request path from the independent repository root.</li>
+<li><strong>2026-07-18</strong>: 🗄️ Strictly checked 39 Mix collections containing 273,465
+  experience points with 4,352-dimensional cosine vectors and action payloads.</li>
+</ul>
+<p><a></a></p>
+<h2>⚡ System Capability and Results</h2>
+<p>From the RoboNix runtime perspective, this Service is a stateful experience-memory
+provider. It converts historical observations and actions into reusable memory,
+retrieves candidate trajectories for the current task, and keeps verification
+and fallback between retrieval and physical execution.</p>
+<table>
+<thead>
+<tr>
+<th>System-level result</th>
+<th>Current capability</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Experience memory</td>
+<td><strong>273,465</strong> indexed robot-execution points</td>
+</tr>
+<tr>
+<td>Online retrieval scale</td>
+<td><strong>39</strong> Qdrant collections with <strong>4,352D</strong> two-view vectors</td>
+</tr>
+<tr>
+<td>Verified service response</td>
+<td>Two images + instruction → <strong>4×7</strong> candidate action trajectory</td>
+</tr>
+<tr>
+<td>Hybrid embodied execution</td>
+<td>More than <strong>2×</strong> acceleration on OpenVLA and nearly <strong>3×</strong> on π0</td>
+</tr>
+</tbody>
+</table>
+<h3>Supported models</h3>
+<table>
+<thead>
+<tr>
+<th>Model family</th>
+<th>Status</th>
+<th>Scope</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>OpenVLA</td>
+<td>✅ Completed</td>
+<td>Scene encoding, Qdrant retrieval, hybrid candidate generation, and action response</td>
+</tr>
+<tr>
+<td>π0</td>
+<td>✅ Completed</td>
+<td>Chunk-level candidate verification in the preserved research implementation</td>
+</tr>
+<tr>
+<td>π0.5 / π0-FAST</td>
+<td>⏳ In progress</td>
+<td>Public end-to-end workflows are not yet completed</td>
+</tr>
+</tbody>
+</table>
+<p><a></a></p>
+<h2>🧠 Architecture Overview</h2>
+
+
+<div>
+  <img width="96%" alt="RoboNix retrieval-augmented memory architecture" src="https://raw.githubusercontent.com/lusunn111/service-memory-action-retrieval-rbnx/main/docs/assets/retrieval-memory-overview-v2.png">
+  <p><b>Figure 1.</b> Offline experience-memory construction and online two-view retrieval with policy fallback and continuous memory updates.</p>
+</div>
+
+<p>The validated two-view Mix path stores both searchable vectors and action
+payloads in Qdrant; it does not require MongoDB. MongoDB remains available for
+legacy collection workflows. The FastAPI embedding service generates OpenVLA
+vision features, while the Flask retrieval service selects a task-specific
+collection and returns a retrieved and optionally averaged action trajectory.</p>
+<p>The single-view pipeline uses a third-person image. The Mix pipeline concatenates features from third-person and wrist views into a 4,352-dimensional representation:</p>
+<table>
+<thead>
+<tr>
+<th>Feature</th>
+<th>Dimension</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Third-person DINOv2</td>
+<td>1,024</td>
+</tr>
+<tr>
+<td>Third-person SigLIP</td>
+<td>1,152</td>
+</tr>
+<tr>
+<td>Wrist-view DINOv2</td>
+<td>1,024</td>
+</tr>
+<tr>
+<td>Wrist-view SigLIP</td>
+<td>1,152</td>
+</tr>
+<tr>
+<td><strong>Mix embedding</strong></td>
+<td><strong>4,352</strong></td>
+</tr>
+</tbody>
+</table>
+<p><a></a></p>
+<h2>🔌 RoboNix Integration and Outlook</h2>
+<p>This Service is an independently deployable RoboNix provider that maintains experience memory for embodied execution. Scene observations and task context form a structured retrieval request; Atlas discovers the provider, Nexus carries multimodal references, and Pilot consumes the retrieved trajectories without embedding database logic into the RoboNix core.</p>
+<div>
+  <img width="96%" alt="RoboNix system architecture" src="https://raw.githubusercontent.com/lusunn111/service-memory-action-retrieval-rbnx/main/docs/assets/robonix-system-architecture.png">
+  <p><b>Figure 2.</b> System-level integration points for reusable memory services, custom services, and VLA-based user skills.</p>
+</div>
+
+<p>Looking forward, the service can evolve toward continuously updated robot memory with pluggable encoders, hierarchical indexes, redundancy compression, expiration policies, and safety-aware trajectory reuse across tasks and robot platforms.</p>
+<p><a></a></p>
+<h2>🧪 Validated Release</h2>
+<p>Release candidate 0.1.0 was validated on 2026-08-01 with RoboNix commit
+<code>48af09190b99f7847dddf68457eec2db42d2c1a7</code>, 20 real dual-view LIBERO
+observations, and the existing 39-collection Qdrant Mix index.</p>
+<table>
+<thead>
+<tr>
+<th>Route</th>
+<th>Calls</th>
+<th>Mean</th>
+<th>P50</th>
+<th>P95</th>
+<th>Throughput</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Direct HTTP</td>
+<td>200</td>
+<td>80.65 ms</td>
+<td>75.57 ms</td>
+<td>88.71 ms</td>
+<td>12.40 calls/s</td>
+</tr>
+<tr>
+<td>Executor -&gt; Atlas -&gt; MCP</td>
+<td>200</td>
+<td>87.95 ms</td>
+<td>84.38 ms</td>
+<td>98.05 ms</td>
+<td>11.37 calls/s</td>
+</tr>
+</tbody>
+</table>
+<p>All direct and RoboNix responses matched, with zero parity failures. Mean
+wrapping overhead was 7.31 ms. Boot-time backend independence, first-call
+connection, real 4 by 7 trajectory retrieval, capability discovery, shutdown,
+and preservation of the shared retrieval and Qdrant processes were also
+checked.</p>
+<p><img alt="Action retrieval latency" src="https://raw.githubusercontent.com/lusunn111/service-memory-action-retrieval-rbnx/main/benchmarks/target_server/results/latency.svg"></p>
+<p>Raw calls, input hashes, exact environment, failure semantics, and reporting
+limits are in <a href="https://github.com/lusunn111/service-memory-action-retrieval-rbnx/blob/main/benchmarks/target_server">benchmarks/target_server/</a> and
+<a href="https://github.com/lusunn111/service-memory-action-retrieval-rbnx/blob/main/VALIDATION.md">VALIDATION.md</a>. This Service benchmark does not create a new
+task-success claim.</p>
+<p><a></a></p>
+<h2>🚀 Quick Start</h2>
+<div class="highlight"><pre><span></span><code>conda<span class="w"> </span>create<span class="w"> </span>-n<span class="w"> </span>robonix-retrieval<span class="w"> </span><span class="nv">python</span><span class="o">=</span><span class="m">3</span>.10<span class="w"> </span>-y
+conda<span class="w"> </span>activate<span class="w"> </span>robonix-retrieval
+python<span class="w"> </span>-m<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span>--upgrade<span class="w"> </span>pip
+python<span class="w"> </span>-m<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span>-r<span class="w"> </span>requirements.txt
+python<span class="w"> </span>-m<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span>-e<span class="w"> </span>.<span class="w"> </span>--no-deps
+
+python<span class="w"> </span>-m<span class="w"> </span>pytest<span class="w"> </span>-q<span class="w"> </span>tests
+python<span class="w"> </span>-m<span class="w"> </span>scripts.run<span class="w"> </span>--help
+</code></pre></div>
+<p>Prepare a large data root and download the pinned modified LIBERO RLDS dataset:</p>
+<div class="highlight"><pre><span></span><code><span class="nb">export</span><span class="w"> </span><span class="nv">DATA_ROOT</span><span class="o">=</span>/data/robonix-retrieval
+<span class="nv">DOWNLOAD_FULL_DATASET</span><span class="o">=</span><span class="m">1</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>scripts/data/download_libero_rlds.sh<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$DATA_ROOT</span><span class="s2">/datasets/libero_rlds&quot;</span>
+</code></pre></div>
+<p>Start Qdrant, then run the two-view embedding and retrieval services in separate
+terminals or tmux sessions. The detailed commands are provided below. The
+repository does not ship models, datasets, populated databases, or outputs.</p>
+<p><a></a></p>
+<h2>📦 Dataset and Checkpoint Sources</h2>
+<table>
+<thead>
+<tr>
+<th>Asset</th>
+<th>Source</th>
+<th>Default placement</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Base OpenVLA</td>
+<td><code>openvla/openvla-7b</code> on Hugging Face</td>
+<td><code>$HF_HOME/hub</code> or a local model directory</td>
+</tr>
+<tr>
+<td>Modified LIBERO RLDS</td>
+<td><code>openvla/modified_libero_rlds</code></td>
+<td><code>$DATA_ROOT/datasets/libero_rlds</code></td>
+</tr>
+<tr>
+<td>Dataset revision</td>
+<td><code>6ce6aaaaabdbe590b1eef5cd29c0d33f14a08551</code></td>
+<td>Pinned by the download script</td>
+</tr>
+<tr>
+<td>Qdrant index</td>
+<td>Built from the RLDS dataset with <code>process_libero_goal_mix.py</code></td>
+<td><code>$DATA_ROOT/databases/rtcache_mix_qdrant</code></td>
+</tr>
+</tbody>
+</table>
+<p>The database is derived from third-person images, wrist images, language
+instructions, the current 7D action, and the next three 7D actions. A public
+release may publish a prebuilt index separately, but the repository itself
+contains only the reproducible builder.</p>
+<p><a></a></p>
+<h2>⚙️ Requirements</h2>
+<table>
+<thead>
+<tr>
+<th>Component</th>
+<th>Requirement</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Operating system</td>
+<td>Linux recommended for CUDA, Docker, LIBERO, and robot integration</td>
+</tr>
+<tr>
+<td>Python</td>
+<td>3.10 or later</td>
+</tr>
+<tr>
+<td>PyTorch</td>
+<td>2.2.0</td>
+</tr>
+<tr>
+<td>CUDA</td>
+<td>Required for practical OpenVLA embedding throughput; match driver, toolkit, and PyTorch versions</td>
+</tr>
+<tr>
+<td>Databases</td>
+<td>Qdrant for the validated Mix path; MongoDB only for legacy workflows</td>
+</tr>
+<tr>
+<td>Models</td>
+<td>OpenVLA checkpoint; CLIP is used by applicable embedding modes</td>
+</tr>
+<tr>
+<td>Simulation</td>
+<td>LIBERO and its dataset assets for simulation experiments</td>
+</tr>
+</tbody>
+</table>
+<p>The repository does not include model weights, datasets, populated databases, or robot-control software. Prepare the following before running the complete pipeline:</p>
+<ul>
+<li>an OpenVLA checkpoint and sufficient GPU memory;</li>
+<li>a Qdrant instance with persistent storage; MongoDB only for legacy workflows;</li>
+<li>robot demonstrations or LIBERO RLDS datasets;</li>
+<li>writable data, image, cache, log, and Qdrant backup directories;</li>
+<li>robot-side controllers when running real-hardware experiments.</li>
+</ul>
+<h2>🧰 Step 1: Installation</h2>
+<p>Clone the project and run all commands from the repository root:</p>
+<div class="highlight"><pre><span></span><code>git<span class="w"> </span>clone<span class="w"> </span>https://github.com/lusunn111/service-memory-action-retrieval-rbnx.git
+<span class="nb">cd</span><span class="w"> </span>service-memory-action-retrieval-rbnx
+
+conda<span class="w"> </span>create<span class="w"> </span>-n<span class="w"> </span>rt-cache<span class="w"> </span><span class="nv">python</span><span class="o">=</span><span class="m">3</span>.10<span class="w"> </span>-y
+conda<span class="w"> </span>activate<span class="w"> </span>rt-cache
+
+python<span class="w"> </span>-m<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span>--upgrade<span class="w"> </span>pip
+python<span class="w"> </span>-m<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span>-r<span class="w"> </span>requirements.txt
+python<span class="w"> </span>-m<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span>-e<span class="w"> </span>.<span class="w"> </span>--no-deps
+</code></pre></div>
+<p>The root <code>requirements.txt</code> is the reproducible installation entry and delegates
+to <code>requirements/requirements.txt</code>. Flash Attention is CUDA- and compiler-sensitive;
+if installation fails, install the compatible PyTorch build first and then build
+Flash Attention separately:</p>
+<div class="highlight"><pre><span></span><code>python<span class="w"> </span>-m<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span>packaging<span class="w"> </span>ninja
+python<span class="w"> </span>-m<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span><span class="s2">&quot;flash-attn==2.5.5&quot;</span><span class="w"> </span>--no-build-isolation
+</code></pre></div>
+<p>Run lightweight smoke checks after installation:</p>
+<div class="highlight"><pre><span></span><code>python<span class="w"> </span>-c<span class="w"> </span><span class="s2">&quot;import service_bootstrap as s; print(s.activate_vendor())&quot;</span>
+python<span class="w"> </span>-m<span class="w"> </span>scripts.run<span class="w"> </span>--help
+</code></pre></div>
+<h2>🗄️ Step 2: Start Qdrant and Optional MongoDB</h2>
+<p>The validated two-view Mix path requires only Qdrant. Start it with persistent
+storage:</p>
+<div class="highlight"><pre><span></span><code>docker<span class="w"> </span>run<span class="w"> </span>-d<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--name<span class="w"> </span>rtcache-qdrant<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>-p<span class="w"> </span><span class="m">6333</span>:6333<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>-p<span class="w"> </span><span class="m">6334</span>:6334<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>-v<span class="w"> </span>rtcache_qdrant:/qdrant/storage<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>qdrant/qdrant
+</code></pre></div>
+<p>Start MongoDB only when using a preserved legacy workflow:</p>
+<div class="highlight"><pre><span></span><code>docker<span class="w"> </span>run<span class="w"> </span>-d<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--name<span class="w"> </span>rtcache-mongo<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>-p<span class="w"> </span><span class="m">27017</span>:27017<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>-v<span class="w"> </span>rtcache_mongo:/data/db<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>mongo:6
+</code></pre></div>
+<p>Check that both services are reachable:</p>
+<div class="highlight"><pre><span></span><code>curl<span class="w"> </span>http://localhost:6333/healthz
+python<span class="w"> </span>-c<span class="w"> </span><span class="s2">&quot;from pymongo import MongoClient; print(MongoClient(&#39;mongodb://localhost:27017/&#39;).admin.command(&#39;ping&#39;))&quot;</span>
+</code></pre></div>
+<p>Use authenticated connections, private networks, access controls, backups, and externally managed secrets for shared or production deployments. The example configuration is intended for local development.</p>
+<h2>🔧 Step 3: Configuration</h2>
+<p>Copy the environment template and customize it:</p>
+<div class="highlight"><pre><span></span><code>cp<span class="w"> </span>configs/.env.example<span class="w"> </span>.env
+</code></pre></div>
+<p>Important settings include:</p>
+<div class="highlight"><pre><span></span><code># Databases
+MONGO_URL=mongodb://localhost:27017/
+MONGO_DB_NAME=OpenVLACollection
+QDRANT_HOST=localhost
+QDRANT_PORT=6333
+
+# Services
+EMBEDDING_SERVER_HOST=0.0.0.0
+EMBEDDING_SERVER_PORT=9020
+EMBEDDING_SERVER_URL=http://127.0.0.1:9020/predict
+RETRIEVAL_SERVER_HOST=0.0.0.0
+RETRIEVAL_SERVER_PORT=5002
+
+# Models and computation
+OPENVLA_MODEL_PATH=/path/to/openvla
+DEVICE=cuda:0
+CUDA_VISIBLE_DEVICES=0
+
+# Data
+DATA_ROOT=/path/to/robot-datasets
+LIBERO_DATASET_ROOT=/path/to/libero-rlds
+QDRANT_BACKUP_ROOT=/path/to/qdrant-backups
+</code></pre></div>
+<p>The centralized configuration implementation is in <code>configs/rtcache/rt_cache_config.py</code>. CLI arguments may override some values. Prefer absolute paths for datasets, model checkpoints, and backups, and verify that no preserved upstream script still contains a source-machine path:</p>
+<div class="highlight"><pre><span></span><code>grep<span class="w"> </span>-R<span class="w"> </span><span class="s2">&quot;/home/\|PATH_TO&quot;</span><span class="w"> </span>scripts<span class="w"> </span>vendor/rtcache/scripts<span class="w"> </span>configs
+</code></pre></div>
+<h2>🧠 Step 4: Start the Embedding Service</h2>
+<h3>Single-view service</h3>
+<p>The standard FastAPI service accepts one image and an optional instruction. It generates OpenVLA and/or CLIP features and listens on port 9020 by default:</p>
+<div class="highlight"><pre><span></span><code>python<span class="w"> </span>-m<span class="w"> </span>scripts.run<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>scripts/embedding/embedding_server.py<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--host<span class="w"> </span><span class="m">0</span>.0.0.0<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--port<span class="w"> </span><span class="m">9020</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--device<span class="w"> </span>cuda:0<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--workers<span class="w"> </span><span class="m">1</span>
+</code></pre></div>
+<p>Verify the service:</p>
+<div class="highlight"><pre><span></span><code>curl<span class="w"> </span>http://localhost:9020/health
+
+curl<span class="w"> </span>-X<span class="w"> </span>POST<span class="w"> </span>http://localhost:9020/predict<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>-F<span class="w"> </span><span class="s2">&quot;file=@/path/to/observation.png&quot;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>-F<span class="w"> </span><span class="s2">&quot;instruction=pick up the red object&quot;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>-F<span class="w"> </span><span class="s2">&quot;option=both&quot;</span>
+</code></pre></div>
+<p>Interactive FastAPI documentation is available at <code>http://localhost:9020/docs</code>.</p>
+<h3>Two-view Mix service</h3>
+<p>The Mix service requires third-person and wrist images and listens on port 9021 by default:</p>
+<div class="highlight"><pre><span></span><code>python<span class="w"> </span>-m<span class="w"> </span>scripts.run<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>scripts/embedding/embedding_server_mix.py<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--host<span class="w"> </span><span class="m">0</span>.0.0.0<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--port<span class="w"> </span><span class="m">9021</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--device<span class="w"> </span>cuda:0<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--workers<span class="w"> </span><span class="m">1</span>
+</code></pre></div>
+<div class="highlight"><pre><span></span><code>curl<span class="w"> </span>-X<span class="w"> </span>POST<span class="w"> </span>http://localhost:9021/predict<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>-F<span class="w"> </span><span class="s2">&quot;third_person_image=@/path/to/third_person.png&quot;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>-F<span class="w"> </span><span class="s2">&quot;wrist_image=@/path/to/wrist.png&quot;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>-F<span class="w"> </span><span class="s2">&quot;instruction=place the object in the bowl&quot;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>-F<span class="w"> </span><span class="s2">&quot;return_individual=false&quot;</span>
+</code></pre></div>
+<p>Do not run multiple model workers unless enough GPU memory is available. Each worker initializes its own model state.</p>
+<p><a></a></p>
+<h2>🗄️ Step 5: Build the Retrieval Index</h2>
+<p>Start the embedding service before processing a dataset. The following example embeds LIBERO-Goal observations and inserts them into task-specific Qdrant collections:</p>
+<div class="highlight"><pre><span></span><code>python<span class="w"> </span>-m<span class="w"> </span>scripts.run<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>scripts/data_processing/process_libero_goal.py<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--dataset_type<span class="w"> </span>goal<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--base_dataset_path<span class="w"> </span>/path/to/libero-rlds<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--embedding_server_url<span class="w"> </span>http://127.0.0.1:9020/predict<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--qdrant_host<span class="w"> </span>localhost<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--qdrant_port<span class="w"> </span><span class="m">6333</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--batch_size<span class="w"> </span><span class="m">50</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--max_episodes<span class="w"> </span>-1
+</code></pre></div>
+<p>Supported single-view dataset types are <code>goal</code>, <code>10</code>, <code>object</code>, and <code>spatial</code>. Collections follow names such as <code>libero_goal_task_0</code>. Use <code>--dataset_path</code> to override the path derived from the dataset type and <code>--use_benchmark</code> when LIBERO benchmark task IDs should replace hash-based mapping.</p>
+<p>For Mix indexing:</p>
+<div class="highlight"><pre><span></span><code>python<span class="w"> </span>-m<span class="w"> </span>scripts.run<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>scripts/data_processing/process_libero_goal_mix.py<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--dataset_type<span class="w"> </span>goal<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--base_dataset_path<span class="w"> </span>/path/to/libero-rlds<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--embedding_server_url<span class="w"> </span>http://127.0.0.1:9021/predict<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--qdrant_host<span class="w"> </span>localhost<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--qdrant_port<span class="w"> </span><span class="m">6333</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--batch_size<span class="w"> </span><span class="m">50</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--max_episodes<span class="w"> </span>-1<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--backup<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--backup_name<span class="w"> </span>mix_base
+</code></pre></div>
+<p>Mix collections use names such as <code>libero_goal_mix_task_0</code>. Options including <code>--clear_db</code> and <code>--clear_all</code> delete existing collections and are destructive; verify the Qdrant target and backup required data before using them.</p>
+<p><a></a></p>
+<h2>🌐 Step 6: Start the Retrieval Service</h2>
+<h3>Single-view LIBERO retrieval</h3>
+<div class="highlight"><pre><span></span><code>python<span class="w"> </span>-m<span class="w"> </span>scripts.run<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>scripts/retrieval/retrieval_libero_goal.py<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--host<span class="w"> </span><span class="m">0</span>.0.0.0<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--port<span class="w"> </span><span class="m">5002</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--embedding-url<span class="w"> </span>http://127.0.0.1:9020/predict<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--qdrant-host<span class="w"> </span>localhost<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--qdrant-port<span class="w"> </span><span class="m">6333</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--dataset-types<span class="w"> </span>goal
+</code></pre></div>
+<p>Send a retrieval request:</p>
+<div class="highlight"><pre><span></span><code>curl<span class="w"> </span>-X<span class="w"> </span>POST<span class="w"> </span>http://localhost:5002/pipeline<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>-F<span class="w"> </span><span class="s2">&quot;file=@/path/to/observation.png&quot;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>-F<span class="w"> </span><span class="s2">&quot;instruction=put the butter in the bowl&quot;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>-F<span class="w"> </span><span class="s2">&quot;dataset_type=goal&quot;</span>
+</code></pre></div>
+<h3>Two-view Mix retrieval</h3>
+<div class="highlight"><pre><span></span><code>python<span class="w"> </span>-m<span class="w"> </span>scripts.run<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>scripts/retrieval/retrieval_libero_goal_mix.py<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--host<span class="w"> </span><span class="m">0</span>.0.0.0<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--port<span class="w"> </span><span class="m">5003</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--embedding-url<span class="w"> </span>http://127.0.0.1:9021/predict<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--qdrant-host<span class="w"> </span>localhost<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--qdrant-port<span class="w"> </span><span class="m">6333</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--dataset-types<span class="w"> </span>goal
+</code></pre></div>
+<div class="highlight"><pre><span></span><code>curl<span class="w"> </span>-X<span class="w"> </span>POST<span class="w"> </span>http://localhost:5003/pipeline<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>-F<span class="w"> </span><span class="s2">&quot;third_person_image=@/path/to/third_person.png&quot;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>-F<span class="w"> </span><span class="s2">&quot;wrist_image=@/path/to/wrist.png&quot;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>-F<span class="w"> </span><span class="s2">&quot;instruction=put the butter in the bowl&quot;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>-F<span class="w"> </span><span class="s2">&quot;dataset_type=goal&quot;</span>
+</code></pre></div>
+<p>Both variants expose <code>GET /health</code>, <code>GET /stats</code>, and <code>POST /pipeline</code>. A successful pipeline response includes retrieval metadata and fields such as <code>rtcache_trajectory</code> and <code>averaged_trajectory</code>. Treat returned actions as untrusted candidates: validate dimensions, limits, freshness, robot state, and collision constraints before execution on physical hardware.</p>
+<h2>🔌 Service Ports</h2>
+<table>
+<thead>
+<tr>
+<th>Service</th>
+<th>Default port</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>MongoDB</td>
+<td>27017</td>
+<td>Trajectory records and metadata</td>
+</tr>
+<tr>
+<td>Qdrant HTTP</td>
+<td>6333</td>
+<td>Vector storage and similarity search</td>
+</tr>
+<tr>
+<td>Qdrant gRPC</td>
+<td>6334</td>
+<td>Optional high-throughput vector API</td>
+</tr>
+<tr>
+<td>Single-view embedding</td>
+<td>9020</td>
+<td>OpenVLA/CLIP embedding API</td>
+</tr>
+<tr>
+<td>Mix embedding</td>
+<td>9021</td>
+<td>Two-view 4,352-dimensional embedding API</td>
+</tr>
+<tr>
+<td>Data collection</td>
+<td>5002</td>
+<td>Robot demonstration collection when enabled</td>
+</tr>
+<tr>
+<td>Single-view retrieval</td>
+<td>5002</td>
+<td>Standard retrieval API; do not colocate with data collection on the same port</td>
+</tr>
+<tr>
+<td>Mix retrieval</td>
+<td>5003</td>
+<td>Two-view retrieval API</td>
+</tr>
+</tbody>
+</table>
+<p>Port 5002 is used by more than one preserved workflow. Assign distinct ports when data collection and retrieval services run concurrently.</p>
+<h2>📊 Benchmarking Guidelines</h2>
+<p>Compare RT-Cache with VINN, BehaviorRetrieval, and non-retrieval baselines using the same observations, task split, control frequency, and robot or simulator configuration. At minimum, report:</p>
+<ul>
+<li>task success rate and completed episodes;</li>
+<li>embedding, vector-search, and end-to-end latency;</li>
+<li>p50, p95, and p99 online latency after warm-up;</li>
+<li>retrieval top score, top-k setting, and similarity threshold;</li>
+<li>database collection count, point count, and embedding dimension;</li>
+<li>GPU memory, embedding throughput, and database resource usage;</li>
+<li>action-horizon length and fallback or rejection count.</li>
+</ul>
+<p>Measure cold start separately from steady-state performance. The retrieval services preload collection payloads into memory, so startup time and host-memory usage scale with the database. Network transfer, image encoding, database placement, and robot control-loop latency must be included in end-to-end measurements.</p>
+<h2>🗂️ Repository Layout</h2>
+<div class="highlight"><pre><span></span><code>.
+├── modules/                       # Lazy module catalogs
+│   ├── database/                  # MongoDB and Qdrant backends
+│   ├── scene_encoding/            # OpenVLA/CLIP feature generation
+│   ├── indexing/                  # Vector indexing views
+│   ├── retrieval/                 # Online similarity retrieval
+│   ├── memory_update/             # Backup, restore, and cleanup
+│   └── verified_execution/        # SpecVLA and rebuttal implementations
+├── scripts/
+│   ├── data/                      # Dataset processing and acquisition
+│   ├── serve/                     # Embedding and retrieval service views
+│   ├── maintenance/               # Qdrant backup and restore utilities
+│   └── run.py                     # Stable RT-Cache script runner
+├── benchmarks/
+│   ├── behavior_retrieval/        # BehaviorRetrieval baseline
+│   ├── vinn/                      # VINN baseline
+│   ├── specvla_validation/        # SpecVLA validation snapshot
+│   └── rebuttal/                  # FLASH/OpenPI rebuttal snapshot
+├── configs/                       # Environment, database, and RT-Cache config
+├── requirements.txt               # Reproducible installation entry
+├── requirements/                  # Python dependency pins
+├── tests/                         # Layout and lazy-import tests
+├── docs/assets/                   # Architecture assets and the web ImageGen prompt
+├── utils/                         # Database, embedding, and image utilities
+├── vendor/rtcache/                # Canonical RT-Cache source tree
+└── service_bootstrap.py           # Vendor activation and guarded runner
+</code></pre></div>
+<p><code>vendor/rtcache/</code> is the canonical import-compatible retrieval implementation. Top-level directories provide an engineering-oriented view of the data, service, maintenance, and benchmark workflows. Validation and rebuttal sources are canonical under their respective benchmark directories.</p>
+<p><a></a></p>
+<h2>🗺️ Roadmap</h2>
+<ul>
+<li>[x] Publish an independently runnable source-only repository.</li>
+<li>[x] Validate OpenVLA embedding, Qdrant retrieval, and a 4×7 action response.</li>
+<li>[x] Preserve the π0 chunk-level retrieval and verification research path.</li>
+<li>[x] Adopt the RoboNix Mulan PSL v2 license and remove citation placeholders.</li>
+<li>[ ] Publish a small public two-view example dataset and prebuilt Qdrant index.</li>
+<li>[ ] Add container images and authenticated production API examples.</li>
+<li>[ ] Add incremental memory deduplication, compression, and expiration policies.</li>
+<li>[ ] Complete public end-to-end workflows for π0.5 and π0-FAST.</li>
+<li>[x] Provide the versioned RoboNix Service adapter and capability contract.</li>
+</ul>
+<p><a></a></p>
+<h2>📝 Citation</h2>
+<p>If this Service supports your research, please consider giving the repository a
+star ⭐ and citing this software repository:</p>
+<div class="highlight"><pre><span></span><code><span class="nc">@software</span><span class="p">{</span><span class="nl">mao2026robonix_memory_action_retrieval_service</span><span class="p">,</span>
+<span class="w">  </span><span class="na">author</span><span class="w">  </span><span class="p">=</span><span class="w"> </span><span class="s">{Mao, Zhihao and He, Huiru and Zheng, Zihao}</span><span class="p">,</span>
+<span class="w">  </span><span class="na">title</span><span class="w">   </span><span class="p">=</span><span class="w"> </span><span class="s">{RoboNix Memory Action Retrieval Service}</span><span class="p">,</span>
+<span class="w">  </span><span class="na">year</span><span class="w">    </span><span class="p">=</span><span class="w"> </span><span class="s">{2026}</span><span class="p">,</span>
+<span class="w">  </span><span class="na">version</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="s">{0.1.0}</span><span class="p">,</span>
+<span class="w">  </span><span class="na">url</span><span class="w">     </span><span class="p">=</span><span class="w"> </span><span class="s">{https://github.com/lusunn111/service-memory-action-retrieval-rbnx}</span>
+<span class="p">}</span>
+</code></pre></div>
+<p><a></a></p>
+<h2>🤝 Contributors</h2>
+<p>We thank <a href="https://github.com/HuiruHe">HuiruHe</a> and
+<a href="https://github.com/zhengzihaoPKU">zhengzihaoPKU</a> for their contributions to
+the Service. See <a href="https://github.com/lusunn111/service-memory-action-retrieval-rbnx/blob/main/CONTRIBUTORS.md">CONTRIBUTORS.md</a> for the contributor policy.</p>
+<p><a></a></p>
+<h2>📄 License</h2>
+<p>The project is licensed under the Mulan Permissive Software License, Version 2
+(Mulan PSL v2); see <a href="https://github.com/lusunn111/service-memory-action-retrieval-rbnx/blob/main/LICENSE">LICENSE</a>. Vendored components retain their included
+licenses.</p>
+        </article>
+      </section>
+      <aside class="panel detail-side">
+        <h2>Package</h2>
+        <div class="kv">
+          <div>Version</div><div><code>0.1.0</code></div>
+          <div>License</div><div><code>MulanPSL-2.0</code></div>
+          <div>Kind</div><div>service</div>
+          <div>Type</div><div>package</div>
+          <div>Maintainers</div><div>Zhihao Mao &lt;lusunn111@users.noreply.github.com&gt;</div>
+          <div>Repository</div><div><a href="https://github.com/lusunn111/service-memory-action-retrieval-rbnx">service-memory-action-retrieval-rbnx</a></div>
+          <div>Branch</div><div><code>main</code></div>
+          <div>Manifest</div><div><code>package_manifest.yaml</code></div>
+          <div>API</div><div><a href="../../api/view/?package=robonix.service.memory.action_retrieval">package metadata</a></div>
+        </div>
+        <div class="tags"><button class="tag tag-green" data-tag="service">service</button> <button class="tag tag-gray" data-tag="memory">memory</button> <button class="tag tag-gray" data-tag="vla">vla</button> <button class="tag tag-gray" data-tag="action-retrieval">action-retrieval</button> <button class="tag tag-gray" data-tag="experience-reuse">experience-reuse</button> <button class="tag tag-gray" data-tag="qdrant">qdrant</button></div>
+        <h2>Capabilities</h2>
+        <ul class="cap-list">
+          <li>robonix/service/memory/action_retrieval/retrieve</li>
+        </ul>
+      </aside>
+    </div>
+  </main>
+  <footer class="site-footer"><div class="shell">Generated on 2026-08-01T08:45:00+00:00.</div></footer>
+</body>
+</html>
