@@ -1,7 +1,111 @@
 {
   "api_version": "1",
-  "generated_at": "2026-08-01T08:30:40+00:00",
+  "generated_at": "2026-08-01T08:36:49+00:00",
   "robots": [
+    {
+      "name": "robonix.robot.agilex.dual_piper",
+      "version": "0.1.0",
+      "description": "Robonix deployment for two AgileX Piper arms and their factory CAN grippers.",
+      "license": "MIT",
+      "tags": [
+        "robot",
+        "deploy",
+        "agilex",
+        "piper",
+        "dual-arm",
+        "gripper"
+      ],
+      "repo": "https://github.com/syswonder/robot-agilex-dual-piper",
+      "maintainers": [
+        "Zhenyu Zhang <768726812@qq.com>"
+      ],
+      "repo_name": "robot-agilex-dual-piper",
+      "default_branch": "main",
+      "kind": "robot",
+      "catalog_type": "robot",
+      "catalog_status": "ok",
+      "catalog_warnings": [],
+      "manifest": "robonix_manifest.yaml",
+      "capabilities": [],
+      "deploy_dependencies": [
+        {
+          "section": "primitive",
+          "name": "left_piper",
+          "repo": "",
+          "path": "./primitives/piper_arm",
+          "branch": "",
+          "manifest": "",
+          "resolution": "robot_repository",
+          "package_name": "",
+          "package_url": "",
+          "resolution_warning": ""
+        },
+        {
+          "section": "primitive",
+          "name": "right_piper",
+          "repo": "",
+          "path": "./primitives/piper_arm",
+          "branch": "",
+          "manifest": "",
+          "resolution": "robot_repository",
+          "package_name": "",
+          "package_url": "",
+          "resolution_warning": ""
+        },
+        {
+          "section": "primitive",
+          "name": "audio_client_bridge",
+          "repo": "https://github.com/syswonder/primitive-audio-client-bridge-rbnx",
+          "path": "",
+          "branch": "main",
+          "manifest": "",
+          "resolution": "catalog",
+          "package_name": "robonix.primitive.audio.client_bridge",
+          "package_url": "../robonix.primitive.audio.client_bridge/",
+          "resolution_warning": ""
+        },
+        {
+          "section": "service",
+          "name": "speech",
+          "repo": "",
+          "path": "${ROBONIX_SOURCE_PATH}/services/speech",
+          "branch": "",
+          "manifest": "",
+          "resolution": "robonix_source",
+          "package_name": "",
+          "package_url": "",
+          "resolution_warning": ""
+        },
+        {
+          "section": "skill",
+          "name": "dual_piper_initialize",
+          "repo": "",
+          "path": "./skills/dual_piper_initialize",
+          "branch": "",
+          "manifest": "",
+          "resolution": "robot_repository",
+          "package_name": "",
+          "package_url": "",
+          "resolution_warning": ""
+        },
+        {
+          "section": "skill",
+          "name": "dual_piper_transfer",
+          "repo": "",
+          "path": "./skills/dual_piper_transfer",
+          "branch": "",
+          "manifest": "",
+          "resolution": "robot_repository",
+          "package_name": "",
+          "package_url": "",
+          "resolution_warning": ""
+        }
+      ],
+      "readme_url": "https://github.com/syswonder/robot-agilex-dual-piper/blob/main/README.md",
+      "preview_image_url": "",
+      "deployment_status": "ok",
+      "deployment_warnings": []
+    },
     {
       "name": "robonix.robot.agilex.ranger_mini_v3",
       "version": "0.2.0",
