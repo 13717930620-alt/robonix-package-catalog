@@ -19,7 +19,7 @@
       document.documentElement.style.colorScheme = resolved;
     })();
   </script>
-  <title>robonix.primitive.beingbeyond.d1.arm - Robonix Package Catalog</title>
+  <title>robonix.service.vla.action_decision - Robonix Package Catalog</title>
   <link rel="icon" type="image/svg+xml" href="../../assets/robonix-mark.svg">
   <link rel="stylesheet" href="../../assets/vendor/pico/pico.classless.min.css">
   <style>
@@ -1023,111 +1023,586 @@ html[data-theme="dark"] .highlight .il { color: #AE81FF } /* Literal.Number.Inte
   </script>
   <header class="shell detail-hero">
     <a class="back" href="../">Back to packages</a>
-    <h1>robonix.primitive.beingbeyond.d1.arm</h1>
-    <p class="lede">D1 6-DOF arm primitive — absolute joint control (rad) + Cartesian move_pose via the SDK&#x27;s arm-only IK.</p>
+    <h1>robonix.service.vla.action_decision</h1>
+    <p class="lede">Lazy in-process VLA action decision service with Drafter verification and target-model fallback.</p>
   </header>
   <main class="shell">
     <div class="detail-layout">
       <section class="panel detail-main">
         <h2>README</h2>
         <article class="readme">
-          <h1>primitive-beingbeyond-d1-arm-rbnx</h1>
-<p><em><a href="https://github.com/syswonder/primitive-beingbeyond-d1-arm-rbnx/blob/main/README_CN.md">中文版</a></em></p>
-<p><code>robonix.primitive.beingbeyond.d1.arm</code> — Robonix primitive for the BeingBeyond D1
-6-DOF arm and 2-DOF head pan/tilt. Talks to the <code>beingbeyond_d1_sdk</code> HeadArm serial
-link directly, with <strong>no ROS backend</strong>.</p>
-<h2>Capabilities</h2>
+          <div>
+
+# RoboNix VLA Action Decision Service
+
+**A system-level action decision, speculative verification, and target-model fallback Service for embodied models**
+
+[中文文档](README-CN.md) · [🚀 Quick Start](#quick-start) · [⚙️ Requirements](#requirements) · [🧪 Validation](#validated-release) · [📝 Citation](#citation)
+
+![Python](https://img.shields.io/badge/Python-3.10+-3776AB?logo=python&amp;logoColor=white)
+![PyTorch](https://img.shields.io/badge/PyTorch-2.2-EE4C2C?logo=pytorch&amp;logoColor=white)
+![CUDA](https://img.shields.io/badge/CUDA-12.1-76B900?logo=nvidia&amp;logoColor=white)
+![LIBERO](https://img.shields.io/badge/LIBERO-rollout_verified-1f9d72)
+[![License](https://img.shields.io/badge/license-MulanPSL--2.0-red)](LICENSE)
+[![GitHub Stars](https://img.shields.io/github/stars/lusunn111/service-vla-action-decision-rbnx?style=flat&amp;logo=github)](https://github.com/lusunn111/service-vla-action-decision-rbnx/stargazers)
+
+</div>
+
+<p>The <strong>RoboNix VLA Action Decision Service</strong> lets
+existing Vision-Language-Action (VLA) models verify low-cost action proposals
+with both the target model and motion priors before execution. Adaptive
+acceptance, motion compensation, and policy fallback reduce repeated large-model
+inference while preserving task-level reliability. The research implementation currently supports
+OpenVLA with Drafter-based proposals, parallel verification, motion-aware
+compensation, and original-policy fallback.</p>
+<h2>RoboNix Service package</h2>
+<p>The repository root is directly publishable as
+<code>robonix.service.vla.action_decision</code>. It exposes
+<code>robonix/service/vla/action_decision/decide</code>, returns candidate actions only,
+and never commands robot hardware. RoboNix activation does not import PyTorch
+or allocate GPU memory; the target model and Drafter load on the first real
+request.</p>
+<p>For repository checks:</p>
+<div class="highlight"><pre><span></span><code>python<span class="w"> </span>-m<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span>-e<span class="w"> </span><span class="s1">&#39;.[dev]&#39;</span>
+python<span class="w"> </span>-m<span class="w"> </span>pytest<span class="w"> </span>-q
+python<span class="w"> </span>scripts/release_audit.py
+python<span class="w"> </span>-m<span class="w"> </span>build
+python<span class="w"> </span>scripts/verify_distribution.py
+rbnx<span class="w"> </span>validate<span class="w"> </span>.
+rbnx<span class="w"> </span>build<span class="w"> </span>-p<span class="w"> </span>.
+</code></pre></div>
+<p>For real inference, use Python 3.10 or 3.11 in a CUDA-compatible environment
+and install <code>.[inference]</code>. The Wheel contains the Service adapter and the
+OpenVLA/SpecVLA inference source; checkpoints remain deployment inputs and are
+not stored in Git. Point <code>ROBONIX_SERVICE_PYTHON</code> at that environment when
+RoboNix starts the Service. See <a href="https://github.com/lusunn111/service-vla-action-decision-rbnx/blob/main/CAPABILITY.md">CAPABILITY.md</a> for the public
+interface, <a href="https://github.com/lusunn111/service-vla-action-decision-rbnx/blob/main/examples/minimal-deployment/README.md">examples/minimal-deployment/README.md</a>
+for complete mock and real configurations, and <a href="https://github.com/lusunn111/service-vla-action-decision-rbnx/blob/main/VALIDATION.md">VALIDATION.md</a>
+for the exact validation boundary. The complete research implementation and
+benchmark material below remain in this repository.</p>
+<p><a></a></p>
+<h2>Real RoboNix deployment</h2>
+<p>The release path is:</p>
+<div class="highlight"><pre><span></span><code>Executor -&gt; Atlas -&gt; MCP -&gt; vla_action_decision
+         -&gt; repository-packaged OpenVLA/SpecVLA source -&gt; external checkpoints
+</code></pre></div>
+<p>It returns one candidate action and never commands robot hardware. Existing
+checkpoints and observations should be connected from a large-volume data root
+through checked symbolic links; do not copy weights into this repository. The
+validation host's concrete storage layout and safe-link procedure are in
+<a href="https://github.com/lusunn111/service-vla-action-decision-rbnx/blob/main/benchmarks/target_server/README.md">benchmarks/target_server/README.md</a>.</p>
+<div class="highlight"><pre><span></span><code>python3.10<span class="w"> </span>-m<span class="w"> </span>venv<span class="w"> </span>/path/to/environments/vla-service
+<span class="nb">source</span><span class="w"> </span>/path/to/environments/vla-service/bin/activate
+python<span class="w"> </span>-m<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span>--upgrade<span class="w"> </span>pip
+python<span class="w"> </span>-m<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span>-e<span class="w"> </span><span class="s1">&#39;.[dev,inference]&#39;</span>
+
+rbnx<span class="w"> </span>validate<span class="w"> </span>.
+rbnx<span class="w"> </span>build<span class="w"> </span>-p<span class="w"> </span>.
+
+<span class="nb">cd</span><span class="w"> </span>examples/real-deployment
+cp<span class="w"> </span>.env.example<span class="w"> </span>.env
+<span class="c1"># Edit the untracked .env with checkpoint, input-root, GPU, cache, runtime,</span>
+<span class="c1"># and Service-Python paths for this deployment.</span>
+<span class="nb">set</span><span class="w"> </span>-a
+<span class="nb">source</span><span class="w"> </span>.env
+<span class="nb">set</span><span class="w"> </span>+a
+
+rbnx<span class="w"> </span>build<span class="w"> </span>-f<span class="w"> </span>robonix_manifest.yaml
+rbnx<span class="w"> </span>boot<span class="w"> </span>-v<span class="w"> </span>--no-update-check<span class="w"> </span>-f<span class="w"> </span>robonix_manifest.yaml
+rbnx<span class="w"> </span>caps<span class="w"> </span>-v<span class="w"> </span>--server<span class="w"> </span><span class="m">127</span>.0.0.1:50351
+rbnx<span class="w"> </span>tools<span class="w"> </span>--server<span class="w"> </span><span class="m">127</span>.0.0.1:50351
+rbnx<span class="w"> </span>describe<span class="w"> </span>--server<span class="w"> </span><span class="m">127</span>.0.0.1:50351<span class="w"> </span>--provider<span class="w"> </span>vla_action_decision
+rbnx<span class="w"> </span>inspect<span class="w"> </span>--server<span class="w"> </span><span class="m">127</span>.0.0.1:50351
+</code></pre></div>
+<p>Before the first call, the Service process must not have mapped PyTorch and
+must not occupy the selected GPU. Invoke through Executor:</p>
+<div class="highlight"><pre><span></span><code>python<span class="w"> </span>../../benchmarks/target_server/invoke_executor.py<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--atlas<span class="w"> </span><span class="m">127</span>.0.0.1:50351<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--provider<span class="w"> </span>vla_action_decision<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--contract<span class="w"> </span>robonix/service/vla/action_decision/decide<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--args-json<span class="w"> </span><span class="s1">&#39;{&quot;instruction&quot;:&quot;pick up the bowl&quot;,&quot;observation_uri&quot;:&quot;/absolute/input/observation.jpg&quot;,&quot;timeout_s&quot;:600}&#39;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--timeout-s<span class="w"> </span><span class="m">900</span>
+
+rbnx<span class="w"> </span>shutdown<span class="w"> </span>-f<span class="w"> </span>robonix_manifest.yaml
+</code></pre></div>
+<p>The first <code>decide</code> lazily imports the inference stack and loads both models.
+If speculative decoding fails, the already-loaded target model is called; only
+dual failure fails the MCP call. The local observation must remain below
+<code>allowed_image_root</code> and pass signature, size, and pixel-count checks.
+Configuration fields and defaults are defined in <a href="https://github.com/lusunn111/service-vla-action-decision-rbnx/blob/main/config.spec">config.spec</a>.</p>
+<p><a></a></p>
+<h2>📊 Performance Snapshot</h2>
+<p>The motion-aware verification and recovery path improves end-to-end execution
+speed while preserving task-level reliability across all four LIBERO suites.</p>
 <table>
 <thead>
 <tr>
-<th>Contract</th>
-<th>Transport</th>
-<th>What it does</th>
+<th>LIBERO suite</th>
+<th>SR</th>
+<th>Speedup</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td><code>robonix/primitive/arm/driver</code></td>
-<td>gRPC</td>
-<td>lifecycle (<code>CMD_INIT</code> / <code>ACTIVATE</code> / <code>DEACTIVATE</code> / <code>SHUTDOWN</code>)</td>
+<td>Goal</td>
+<td>75.6%</td>
+<td>1.54×</td>
 </tr>
 <tr>
-<td><code>robonix/primitive/arm/info</code></td>
-<td>gRPC</td>
-<td>joint count, names, limits and other static facts</td>
+<td>Object</td>
+<td>72.3%</td>
+<td>1.49×</td>
 </tr>
 <tr>
-<td><code>robonix/primitive/arm/move_joint</code></td>
-<td>gRPC</td>
-<td>absolute joint angles for the 6 arm joints (rad)</td>
+<td>Spatial</td>
+<td><strong>83.7%</strong></td>
+<td><strong>1.57×</strong></td>
 </tr>
 <tr>
-<td><code>robonix/primitive/arm/get_state</code></td>
-<td>gRPC</td>
-<td>read the current joint angles / end-effector pose</td>
-</tr>
-<tr>
-<td><code>robonix/primitive/arm/move_pose</code></td>
-<td>gRPC</td>
-<td>Cartesian pose, solved by the SDK's arm-only IK</td>
-</tr>
-<tr>
-<td><code>robonix/primitive/arm/set_head</code></td>
-<td>gRPC</td>
-<td>position the head pan/tilt (yaw / pitch)</td>
+<td>Long</td>
+<td>48.8%</td>
+<td>1.48×</td>
 </tr>
 </tbody>
 </table>
-<p>Only the 6 arm joints are exposed. The 2 head joints share the same serial port and
-are driven separately through <code>set_head</code>, holding their pose during <code>move_joint</code>.
-State is read over rpc — with no ROS backend there is no <code>state_joint</code> <code>topic_out</code>
-stream.</p>
-<h2>Configuration</h2>
-<p>Fields, units, defaults and failure conditions are in <code>config.spec</code>. The essentials:</p>
+<h2>📚 Table of Contents</h2>
 <ul>
-<li><code>dev</code> (default <code>/dev/ttyUSB0</code>) — the HeadArm serial device. <strong>The arm and the head
-  share this one port</strong>; do not open it from another process at the same time.</li>
-<li><code>baudrate</code> (default <code>1000000</code>) — must match the controller firmware.</li>
-<li><code>urdf_path</code> (default <code>""</code>) — the URDF used for <code>move_pose</code> IK; empty falls back to
-  the SDK's packaged model.</li>
-<li><code>ik_pos_tol</code> (default <code>0.05</code> m) — IK position tolerance; a solution exceeding it is
-  rejected.</li>
+<li><a href="#real-robonix-deployment">Real RoboNix deployment</a></li>
+<li><a href="#performance-snapshot">📊 Performance Snapshot</a></li>
+<li><a href="#news">📰 News</a></li>
+<li><a href="#system-results">⚡ System Capability and Results</a></li>
+<li><a href="#architecture">🧠 Architecture Overview</a></li>
+<li><a href="#robonix-integration">🔌 RoboNix Integration and Outlook</a></li>
+<li><a href="#validated-release">🧪 Validated Release</a></li>
+<li><a href="#requirements">⚙️ Requirements</a></li>
+<li><a href="#quick-start">🚀 Quick Start</a></li>
+<li><a href="#installation">🧰 Installation and Configuration</a></li>
+<li><a href="#training">🏋️ Drafter Training</a></li>
+<li><a href="#rollout">🎬 LIBERO Rollout</a></li>
+<li><a href="#roadmap">🗺️ Roadmap</a></li>
+<li><a href="#citation">📝 Citation</a></li>
+<li><a href="#contributors">🤝 Contributors</a></li>
+<li><a href="#license">📄 License</a></li>
 </ul>
-<p>Every field also falls back to a matching <code>D1_ARM_*</code> env var.</p>
-<h2>Dependencies and permissions</h2>
+<p><a></a></p>
+<h2>📰 News</h2>
 <ul>
-<li>Python <strong>3.10</strong> (the wheel is <code>cp310</code> + <code>manylinux_2_17_x86_64</code>, so nothing else
-  will install it).</li>
-<li><code>beingbeyond_d1_sdk</code> (≥ 0.2.0) and <code>robonix_api</code>. The SDK wheel ships in the
-  <code>robot-beingbeyond-d1</code> deployment repo under <code>tools/func_verify/lib/</code> — just
-  <code>pip install</code> that whl.</li>
-<li>Serial permissions: <code>sudo chmod 666 /dev/ttyUSB0</code>, or add your user to <code>dialout</code>.</li>
-<li><code>scripts/start.sh</code> defaults to <code>$HOME/miniconda3/envs/bb_d1_robonix/bin/python3</code>;
-  override with <code>BLOCK_GRASP_PYTHON</code>.</li>
+<li><strong>2026-07-19</strong>: 🆕 Released the system-level VLA action decision
+  Service with capability results, model support, and bilingual documentation.</li>
+<li><strong>2026-07-18</strong>: 🔥 Validated independent-root execution, target and Drafter
+  checkpoint loading, and a bounded 100-step LIBERO rollout with H.264 video export.</li>
+<li><strong>2026-07-18</strong>: 🛠️ Added configurable DeepSpeed paths, task selection, rollout
+  step caps, and an import-compatible OpenVLA namespace.</li>
 </ul>
-<h2>Build and run</h2>
-<div class="highlight"><pre><span></span><code>bash<span class="w"> </span>scripts/build.sh<span class="w">     </span><span class="c1"># rbnx codegen, generating the gRPC stubs</span>
-bash<span class="w"> </span>scripts/start.sh<span class="w">     </span><span class="c1"># or let rbnx boot start it from a deployment manifest</span>
-rbnx<span class="w"> </span>caps<span class="w"> </span>-v<span class="w"> </span><span class="p">|</span><span class="w"> </span>grep<span class="w"> </span>arm<span class="w">   </span><span class="c1"># check all 6 capabilities registered and the provider is ACTIVE</span>
+<p><a></a></p>
+<h2>⚡ System Capability and Results</h2>
+<p>From the RoboNix runtime perspective, this Service sits between candidate action
+generation and robot execution. It verifies proposed actions, compensates
+recoverable motion errors, and triggers deterministic policy fallback when a
+candidate cannot be trusted.</p>
+<table>
+<thead>
+<tr>
+<th>System-level result</th>
+<th>Current capability</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>End-to-end acceleration</td>
+<td>More than <strong>1.45×</strong> across evaluated LIBERO suites</td>
+</tr>
+<tr>
+<td>Gain over fixed-threshold speculative execution</td>
+<td>More than <strong>25%</strong> additional acceleration</td>
+</tr>
+<tr>
+<td>Execution reliability</td>
+<td>Near-baseline task success with motion-aware compensation and fallback</td>
+</tr>
+<tr>
+<td>Open-source rollout</td>
+<td>OpenVLA + trained Drafter, 100 bounded steps, H.264 video exported</td>
+</tr>
+</tbody>
+</table>
+<h3>Supported models</h3>
+<table>
+<thead>
+<tr>
+<th>Model family</th>
+<th>Status</th>
+<th>Scope</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>OpenVLA</td>
+<td>✅ Completed</td>
+<td>Drafter training, candidate generation, verification, compensation, fallback, and LIBERO rollout</td>
+</tr>
+<tr>
+<td>Other token-based VLA models</td>
+<td>⏳ In progress</td>
+<td>Pluggable model and Drafter interfaces are planned</td>
+</tr>
+</tbody>
+</table>
+<p><a></a></p>
+<h2>🧠 Architecture Overview</h2>
+
+
+<div>
+  <img width="96%" alt="RoboNix speculative decoding architecture" src="https://raw.githubusercontent.com/lusunn111/service-vla-action-decision-rbnx/main/docs/assets/speculative-decoding-overview-v2.png">
+  <p><b>Figure 1.</b> Offline Drafter preparation and online speculative execution with confidence, kinematic acceptance, and target-policy fallback.</p>
+</div>
+
+<p>Unlike fully autoregressive decoding, speculative decoding uses a smaller draft model to propose multiple candidates before invoking the target model. The target model validates these candidates in parallel. Actual speedup depends on the acceptance rate, candidate-tree shape, GPU, model configuration, and task, and must be measured against an autoregressive baseline under identical conditions.</p>
+<p><a></a></p>
+<h2>🔌 RoboNix Integration and Outlook</h2>
+<p>This Service is an independently deployable RoboNix provider connected through stable capability contracts. Physics-prior verification and fallback remain inside the provider, while Atlas handles discovery, Nexus transports requests, and Executor dispatches the resulting capability without changing the RoboNix core.</p>
+<div>
+  <img width="96%" alt="RoboNix system architecture" src="https://raw.githubusercontent.com/lusunn111/service-vla-action-decision-rbnx/main/docs/assets/robonix-system-architecture.png">
+  <p><b>Figure 2.</b> System-level integration points for reusable memory services, custom services, and VLA-based user skills.</p>
+</div>
+
+<p>Looking forward, the same interface can support additional Drafters, physical constraints, verification policies, and online data feedback. The long-term goal is a reusable embodied-execution service whose algorithms can evolve independently from robot hardware and the RoboNix runtime.</p>
+<p><a></a></p>
+<h2>🧪 Validated Release</h2>
+<p>Release candidate 0.1.0 was validated on 2026-08-01 with RoboNix commit
+<code>48af09190b99f7847dddf68457eec2db42d2c1a7</code>, an A100 40GB GPU, the external
+OpenVLA LIBERO-Goal checkpoint and compatible Drafter, and ten real
+LIBERO-Goal observations.</p>
+<table>
+<thead>
+<tr>
+<th>Route</th>
+<th>Calls</th>
+<th>Mean</th>
+<th>P50</th>
+<th>P95</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Direct target-only</td>
+<td>30</td>
+<td>179.31 ms</td>
+<td>178.95 ms</td>
+<td>181.03 ms</td>
+</tr>
+<tr>
+<td>Direct speculative</td>
+<td>30</td>
+<td>176.12 ms</td>
+<td>173.00 ms</td>
+<td>202.72 ms</td>
+</tr>
+<tr>
+<td>Executor -&gt; Atlas -&gt; MCP</td>
+<td>30</td>
+<td>187.45 ms</td>
+<td>182.88 ms</td>
+<td>212.10 ms</td>
+</tr>
+</tbody>
+</table>
+<p>The 30 direct speculative and 30 full RoboNix actions matched exactly:
+maximum error <code>0.0</code>. A real Drafter fault injection reached target-model
+fallback, and shutdown returned GPU 1 from model occupancy to its 3 MiB idle
+baseline. Model construction took 12.64 s; the first full Service call took
+13.98 s; P50 wrapping overhead was 9.88 ms.</p>
+<p>The measured target-to-speculative P50 speedup was only 1.034x, so this release
+does not claim a material speedup. Process-level GPU allocation peaked at
+39,603 MiB because the preserved TensorFlow preprocessing stack reserved most
+remaining memory; this is an explicit deployment risk on a 40GB GPU.</p>
+<p><img alt="VLA action-decision latency" src="https://raw.githubusercontent.com/lusunn111/service-vla-action-decision-rbnx/main/benchmarks/target_server/results/latency.svg"></p>
+<p>Raw calls, fallback evidence, exact environment, and reporting limits are in
+<a href="https://github.com/lusunn111/service-vla-action-decision-rbnx/blob/main/benchmarks/target_server">benchmarks/target_server/</a> and
+<a href="https://github.com/lusunn111/service-vla-action-decision-rbnx/blob/main/VALIDATION.md">VALIDATION.md</a>.</p>
+<p>Separately, the preserved research workflow previously completed a bounded
+100-step LIBERO smoke rollout. It proves simulator integration and video
+export, not task success:</p>
+<p><img alt="Validated 100-step LIBERO rollout" src="https://raw.githubusercontent.com/lusunn111/service-vla-action-decision-rbnx/main/docs/assets/validated-rollout-preview.png"></p>
+<p><em>Validated smoke rollout: first, middle, and final frames from the 100-step run.</em></p>
+<p><a></a></p>
+<h2>🚀 Quick Start</h2>
+<p>The repository never ships model weights or datasets. Point the commands below
+to existing assets on a large data volume.</p>
+<div class="highlight"><pre><span></span><code>conda<span class="w"> </span>create<span class="w"> </span>-n<span class="w"> </span>robonix-spec<span class="w"> </span><span class="nv">python</span><span class="o">=</span><span class="m">3</span>.10<span class="w"> </span>-y
+conda<span class="w"> </span>activate<span class="w"> </span>robonix-spec
+python<span class="w"> </span>-m<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span>--upgrade<span class="w"> </span>pip
+python<span class="w"> </span>-m<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span>-r<span class="w"> </span>requirements.txt
+python<span class="w"> </span>-m<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span>-e<span class="w"> </span>.<span class="w"> </span>--no-deps
+
+python<span class="w"> </span>-m<span class="w"> </span>pytest<span class="w"> </span>-q<span class="w"> </span>tests
+python<span class="w"> </span>-m<span class="w"> </span>scripts.run<span class="w"> </span>--help
 </code></pre></div>
-<p>Shutdown is handled by the Driver's <code>CMD_SHUTDOWN</code> (<code>on_shutdown</code> calls
-<code>robot.close()</code> to release the serial port). There is no cleanup beyond that, so no
-<code>scripts/stop.sh</code> is provided.</p>
-<h2>Safety</h2>
-<ul>
-<li>On a new robot, run the read-only paths first (<code>get_state</code> / <code>info</code>) and confirm the
-  hardware e-stop independently halts the arm before commanding any motion.</li>
-<li>Providers stop hardware output on input timeout, process exit, or <code>CMD_SHUTDOWN</code>.</li>
-<li><code>move_pose</code> only commands a pose when IK converges within <code>ik_pos_tol</code>; otherwise it
-  returns an error without moving.</li>
-</ul>
-<h2>Layout</h2>
-<div class="highlight"><pre><span></span><code>package_manifest.yaml   config.spec   README.md   README_CN.md
-scripts/{build.sh, start.sh}
-d1_arm/{__init__.py, main.py}
+<p>Run one bounded rollout with a compatible target checkpoint and Drafter:</p>
+<div class="highlight"><pre><span></span><code><span class="nb">export</span><span class="w"> </span><span class="nv">PYTHONPATH</span><span class="o">=</span><span class="s2">&quot;</span><span class="nv">$PWD</span><span class="s2">/vendor/openvla:/path/to/LIBERO:</span><span class="si">${</span><span class="nv">PYTHONPATH</span><span class="k">:-</span><span class="si">}</span><span class="s2">&quot;</span>
+<span class="nb">export</span><span class="w"> </span><span class="nv">CUDA_VISIBLE_DEVICES</span><span class="o">=</span><span class="m">0</span>
+<span class="nb">export</span><span class="w"> </span><span class="nv">MUJOCO_GL</span><span class="o">=</span>egl
+<span class="nb">export</span><span class="w"> </span><span class="nv">MUJOCO_EGL_DEVICE_ID</span><span class="o">=</span><span class="m">0</span>
+
+python<span class="w"> </span>-m<span class="w"> </span>scripts.run<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>experiments/robot/libero/run_libero_goal_Spec.py<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--model_family<span class="w"> </span>openvla<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--pretrained_checkpoint<span class="w"> </span>/data/checkpoints/openvla_goal<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--spec_checkpoint<span class="w"> </span>/data/checkpoints/drafter_goal<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--task_suite_name<span class="w"> </span>libero_goal<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--task_ids<span class="w"> </span><span class="m">0</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--num_trials_per_task<span class="w"> </span><span class="m">1</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--max_steps_override<span class="w"> </span><span class="m">100</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--local_log_dir<span class="w"> </span>/data/outputs/speculative<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--center_crop<span class="w"> </span>True<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--use_wandb<span class="w"> </span>False
 </code></pre></div>
-<h2>License</h2>
-<p>MulanPSL-2.0</p>
+<p>Videos are written below <code>./rollouts/&lt;date&gt;/</code>; evaluation logs use the supplied
+<code>--local_log_dir</code>. A 100-step cap is for deployment verification, not success
+rate measurement.</p>
+<p><a></a></p>
+<h2>⚙️ Requirements</h2>
+<table>
+<thead>
+<tr>
+<th>Component</th>
+<th>Requirement</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Operating system</td>
+<td>Linux recommended, especially for DeepSpeed and headless LIBERO/MuJoCo</td>
+</tr>
+<tr>
+<td>Python</td>
+<td>3.10+ for package checks; 3.10 or 3.11 for the pinned inference dependencies</td>
+</tr>
+<tr>
+<td>PyTorch</td>
+<td>2.2.0</td>
+</tr>
+<tr>
+<td>CUDA</td>
+<td>The upstream setup was tested with CUDA 12.1; match PyTorch, CUDA, and driver versions</td>
+</tr>
+<tr>
+<td>Simulation</td>
+<td>LIBERO 0.1.0 and MuJoCo/EGL for evaluation</td>
+</tr>
+<tr>
+<td>Training</td>
+<td>DeepSpeed 0.16.6; multi-GPU hardware recommended</td>
+</tr>
+</tbody>
+</table>
+<p>The repository does not include model weights, datasets, or LIBERO assets. Prepare the following before running the full pipeline:</p>
+<ul>
+<li>a target OpenVLA/VLA checkpoint;</li>
+<li>a compatible draft-model checkpoint for speculative evaluation;</li>
+<li>the LIBERO dataset and simulator environment;</li>
+<li>writable directories for generated data, checkpoints, and evaluation logs.</li>
+</ul>
+<p><a></a></p>
+<h2>🧰 Step 1: Installation</h2>
+<p>Clone the project and run all commands from the repository root:</p>
+<div class="highlight"><pre><span></span><code>git<span class="w"> </span>clone<span class="w"> </span>https://github.com/lusunn111/service-vla-action-decision-rbnx.git
+<span class="nb">cd</span><span class="w"> </span>service-vla-action-decision-rbnx
+
+conda<span class="w"> </span>create<span class="w"> </span>-n<span class="w"> </span>spec-decoding<span class="w"> </span><span class="nv">python</span><span class="o">=</span><span class="m">3</span>.10<span class="w"> </span>-y
+conda<span class="w"> </span>activate<span class="w"> </span>spec-decoding
+
+python<span class="w"> </span>-m<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span>--upgrade<span class="w"> </span>pip
+python<span class="w"> </span>-m<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span>-r<span class="w"> </span>requirements.txt
+python<span class="w"> </span>-m<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span>-e<span class="w"> </span>.<span class="w"> </span>--no-deps
+</code></pre></div>
+<p>The root <code>requirements.txt</code> is the reproducible installation entry and delegates
+to <code>requirements/requirements-min.txt</code>. Additional LIBERO dependencies are in
+<code>benchmarks/libero/experiments/libero_requirements.txt</code>. Install CUDA-dependent
+packages using builds compatible with the local driver and toolkit.</p>
+<p>Run lightweight smoke checks after installation:</p>
+<div class="highlight"><pre><span></span><code>python<span class="w"> </span>-c<span class="w"> </span><span class="s2">&quot;import service_bootstrap as s; print(s.activate_vendor())&quot;</span>
+python<span class="w"> </span>-m<span class="w"> </span>scripts.run<span class="w"> </span>--help
+</code></pre></div>
+<h2>🔧 Step 2: Configuration</h2>
+<p>Copy the environment template and replace every placeholder with a local path:</p>
+<div class="highlight"><pre><span></span><code>cp<span class="w"> </span>configs/.env.example<span class="w"> </span>configs/.env
+</code></pre></div>
+<div class="highlight"><pre><span></span><code>SPEC_MODEL_ROOT=/path/to/models
+SPEC_DATA_ROOT=/path/to/datasets
+SPEC_OUTPUT_ROOT=/path/to/outputs
+LIBERO_ROOT=/path/to/libero
+CUDA_VISIBLE_DEVICES=0
+</code></pre></div>
+<p>The template documents the path convention but is not loaded automatically by the current research scripts. Export the variables in the shell or pass the corresponding paths through each script's configuration.</p>
+<p>Some preserved upstream scripts still contain machine-specific or <code>PATH_TO_*</code> placeholders. Locate and replace them before running a full experiment:</p>
+<div class="highlight"><pre><span></span><code>grep<span class="w"> </span>-R<span class="w"> </span><span class="s2">&quot;PATH_TO\|/SpecVLA&quot;</span><span class="w"> </span>scripts<span class="w"> </span>vendor/openvla/specdecoding<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>vendor/openvla/experiments/robot/libero
+</code></pre></div>
+<h2>🧱 Step 3: Generate Draft-Model Training Data</h2>
+<p>The stable runner accepts a script path relative to <code>vendor/openvla/</code> and forwards all remaining arguments unchanged:</p>
+<div class="highlight"><pre><span></span><code>python<span class="w"> </span>-m<span class="w"> </span>scripts.run<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>specdecoding/train-scripts/ge_data_all_openvla_token_only_libero_goal.py<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--start<span class="w"> </span><span class="m">0</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--end<span class="w"> </span><span class="m">100</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--index<span class="w"> </span><span class="m">0</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--gpu_index<span class="w"> </span><span class="m">0</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--outdir<span class="w"> </span>/path/to/generated-data
+</code></pre></div>
+<table>
+<thead>
+<tr>
+<th>Argument</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>--start</code>, <code>--end</code></td>
+<td>Range of samples to process</td>
+</tr>
+<tr>
+<td><code>--index</code></td>
+<td>Worker or generation job index</td>
+</tr>
+<tr>
+<td><code>--gpu_index</code></td>
+<td>One or more GPU indices</td>
+</tr>
+<tr>
+<td><code>--outdir</code></td>
+<td>Output directory for generated training samples</td>
+</tr>
+</tbody>
+</table>
+<p>The script's <code>vla_path</code>, dataset path, and related values are currently source-level configuration fields. Set them to valid local assets before execution.</p>
+<p><a></a></p>
+<h2>🏋️ Step 4: Train the Draft Model</h2>
+<ol>
+<li>Review <code>configs/ds_config.json</code> and <code>configs/llama_2_chat_7B_config.json</code>.</li>
+<li>Configure the target VLA, generated dataset, and output paths in <code>FinetuneConfig</code>.</li>
+<li>Launch training with DeepSpeed.</li>
+</ol>
+<p>Example:</p>
+<div class="highlight"><pre><span></span><code><span class="nb">cd</span><span class="w"> </span>vendor/openvla/specdecoding/train-scripts
+
+<span class="nv">OPENVLA_CHECKPOINT</span><span class="o">=</span>/path/to/openvla<span class="w"> </span><span class="se">\</span>
+<span class="nv">DRAFTER_TRAIN_DATA</span><span class="o">=</span>/path/to/generated-data<span class="w"> </span><span class="se">\</span>
+<span class="nv">DRAFTER_OUTPUT_DIR</span><span class="o">=</span>/path/to/drafter-checkpoints<span class="w"> </span><span class="se">\</span>
+<span class="nv">GPU_IDS</span><span class="o">=</span><span class="m">0</span>,1<span class="w"> </span><span class="se">\</span>
+<span class="nv">WANDB_MODE</span><span class="o">=</span>offline<span class="w"> </span><span class="se">\</span>
+bash<span class="w"> </span>train_ds_libero_goal.sh
+</code></pre></div>
+<p>Adjust GPU indices and the distributed port for the local environment. For reproducibility, record the Git revision, target-model version, data version, DeepSpeed configuration, GPU model, and random seed for every training run.</p>
+<p><a></a></p>
+<h2>🎬 Step 5: Evaluate on LIBERO</h2>
+<p>Configure headless rendering before running an evaluation:</p>
+<div class="highlight"><pre><span></span><code><span class="nb">export</span><span class="w"> </span><span class="nv">CUDA_VISIBLE_DEVICES</span><span class="o">=</span><span class="m">0</span>
+<span class="nb">export</span><span class="w"> </span><span class="nv">MUJOCO_GL</span><span class="o">=</span>egl
+<span class="nb">export</span><span class="w"> </span><span class="nv">MUJOCO_EGL_DEVICE_ID</span><span class="o">=</span><span class="m">0</span>
+</code></pre></div>
+<h3>Autoregressive Baseline</h3>
+<div class="highlight"><pre><span></span><code>python<span class="w"> </span>-m<span class="w"> </span>scripts.run<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>experiments/robot/libero/run_libero_goal_AR.py<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--model_family<span class="w"> </span>openvla<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--pretrained_checkpoint<span class="w"> </span>/path/to/openvla-checkpoint<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--task_suite_name<span class="w"> </span>libero_goal<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--center_crop<span class="w"> </span>True<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--use_wandb<span class="w"> </span>False
+</code></pre></div>
+<h3>Standard Speculative Decoding</h3>
+<div class="highlight"><pre><span></span><code>python<span class="w"> </span>-m<span class="w"> </span>scripts.run<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>experiments/robot/libero/run_libero_goal_Spec.py<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--model_family<span class="w"> </span>openvla<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--pretrained_checkpoint<span class="w"> </span>/path/to/openvla-checkpoint<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--spec_checkpoint<span class="w"> </span>/path/to/drafter-checkpoint<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--task_suite_name<span class="w"> </span>libero_goal<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--task_ids<span class="w"> </span><span class="m">0</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--num_trials_per_task<span class="w"> </span><span class="m">1</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--center_crop<span class="w"> </span>True<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--use_wandb<span class="w"> </span>False
+</code></pre></div>
+<h3>Relaxed Acceptance</h3>
+<p>The repository retains experimental entry points for thresholds 9, 15, and 20. For example:</p>
+<div class="highlight"><pre><span></span><code>python<span class="w"> </span>-m<span class="w"> </span>scripts.run<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>experiments/robot/libero/run_libero_goal_Spec_Relaxed_15.py<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--model_family<span class="w"> </span>openvla<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--pretrained_checkpoint<span class="w"> </span>/path/to/openvla-checkpoint<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--task_suite_name<span class="w"> </span>libero_goal<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--center_crop<span class="w"> </span>True<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--use_wandb<span class="w"> </span>False
+</code></pre></div>
+<p>Supported task suites include <code>libero_spatial</code>, <code>libero_object</code>, <code>libero_goal</code>, <code>libero_10</code>, and <code>libero_90</code>. Use <code>--center_crop True</code> when the target model was fine-tuned with the corresponding image augmentation. Supply a compatible Drafter with <code>--spec_checkpoint</code>; use <code>--task_ids</code> and <code>--max_steps_override</code> for bounded validation before running a complete suite.</p>
+<h2>📊 Benchmarking Guidelines</h2>
+<p>Run autoregressive and speculative entry points with the same hardware, target model, task suite, and random seeds. At minimum, report:</p>
+<ul>
+<li>task success rate and successful episode count;</li>
+<li>end-to-end episode latency;</li>
+<li>per-action generation latency and throughput;</li>
+<li>candidate acceptance rate and average accepted length;</li>
+<li>fallback count;</li>
+<li>peak GPU memory and utilization;</li>
+<li>candidate-tree width, depth, and acceptance configuration.</li>
+</ul>
+<p>Do not report model-forward latency as end-to-end latency. Image preprocessing, simulator stepping, warm-up, synchronization, and logging can materially affect results. Warm up the model, repeat runs, and report both averages and percentiles.</p>
+<h2>🗂️ Repository Layout</h2>
+<div class="highlight"><pre><span></span><code>.
+├── modules/                  # Lazy, task-oriented module catalogs
+│   ├── drafter/              # Draft networks and proposal logic
+│   ├── candidate_generation/ # Candidate-tree generation
+│   ├── verification/         # Parallel target-model verification
+│   ├── acceptance/           # Acceptance, KV cache, and fallback
+│   ├── strategies/           # Standard and experimental strategies
+│   ├── data/                 # Data-related entry points
+│   └── training/             # Training-related entry points
+├── scripts/                  # Stable runner and workflow entry points
+├── benchmarks/libero/        # LIBERO experiments and speed tests
+├── configs/                  # DeepSpeed, model, and environment templates
+├── requirements.txt          # Reproducible installation entry
+├── requirements/             # Core dependency pins
+├── tests/                    # Layout, registry, and lazy-import tests
+├── docs/assets/              # Architecture assets and the web ImageGen prompt
+├── utils/                    # Common, loading, and KV-cache utilities
+├── vendor/openvla/           # Canonical, import-compatible source tree
+└── service_bootstrap.py      # Vendor activation and guarded script runner
+</code></pre></div>
+<p><code>vendor/openvla/</code> is the canonical compatibility copy. The top-level <code>modules/</code>, <code>scripts/</code>, and <code>benchmarks/</code> directories provide an engineering-oriented view of the implementation. When changing an algorithm, clearly identify the authoritative layer and keep any convenience copies synchronized.</p>
+<p>The default strategy is <code>modules.strategies.modeling_speculation</code>. The <code>_1</code>, <code>_14</code>, <code>_7d</code>, <code>_jiou</code>, and <code>_yuzhi</code> variants represent distinct research experiments and intentionally remain separate.</p>
+<p><a></a></p>
+<h2>🗺️ Roadmap</h2>
+<ul>
+<li>[x] Publish an independently runnable source-only repository.</li>
+<li>[x] Validate target-model and Drafter loading plus bounded video rollout.</li>
+<li>[x] Package motion-aware verification, compensation, and policy fallback as one execution path.</li>
+<li>[x] Adopt the RoboNix Mulan PSL v2 license and remove citation placeholders.</li>
+<li>[ ] Publish compatible Drafter checkpoints with checksums and model cards.</li>
+<li>[ ] Add autoregressive-versus-speculative benchmark tables and acceptance metrics.</li>
+<li>[ ] Add more Drafter architectures and verification strategies.</li>
+<li>[ ] Validate additional VLA model families through the same Service contract.</li>
+<li>[x] Provide the versioned RoboNix Service adapter and capability contract.</li>
+</ul>
+<p><a></a></p>
+<h2>📝 Citation</h2>
+<p>If this Service supports your research, please consider giving the repository a
+star ⭐ and citing this software repository:</p>
+<div class="highlight"><pre><span></span><code><span class="nc">@software</span><span class="p">{</span><span class="nl">mao2026robonix_vla_action_decision_service</span><span class="p">,</span>
+<span class="w">  </span><span class="na">author</span><span class="w">  </span><span class="p">=</span><span class="w"> </span><span class="s">{Mao, Zhihao and He, Huiru and Zheng, Zihao}</span><span class="p">,</span>
+<span class="w">  </span><span class="na">title</span><span class="w">   </span><span class="p">=</span><span class="w"> </span><span class="s">{RoboNix VLA Action Decision Service}</span><span class="p">,</span>
+<span class="w">  </span><span class="na">year</span><span class="w">    </span><span class="p">=</span><span class="w"> </span><span class="s">{2026}</span><span class="p">,</span>
+<span class="w">  </span><span class="na">version</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="s">{0.1.0}</span><span class="p">,</span>
+<span class="w">  </span><span class="na">url</span><span class="w">     </span><span class="p">=</span><span class="w"> </span><span class="s">{https://github.com/lusunn111/service-vla-action-decision-rbnx}</span>
+<span class="p">}</span>
+</code></pre></div>
+<p><a></a></p>
+<h2>🤝 Contributors</h2>
+<p>We thank <a href="https://github.com/HuiruHe">HuiruHe</a> and
+<a href="https://github.com/zhengzihaoPKU">zhengzihaoPKU</a> for their contributions to
+the Service. See <a href="https://github.com/lusunn111/service-vla-action-decision-rbnx/blob/main/CONTRIBUTORS.md">CONTRIBUTORS.md</a> for the contributor policy.</p>
+<p><a></a></p>
+<h2>📄 License</h2>
+<p>The project is licensed under the Mulan Permissive Software License, Version 2
+(Mulan PSL v2); see <a href="https://github.com/lusunn111/service-vla-action-decision-rbnx/blob/main/LICENSE">LICENSE</a>. Vendored components retain their included
+licenses.</p>
         </article>
       </section>
       <aside class="panel detail-side">
@@ -1135,23 +1610,18 @@ d1_arm/{__init__.py, main.py}
         <div class="kv">
           <div>Version</div><div><code>0.1.0</code></div>
           <div>License</div><div><code>MulanPSL-2.0</code></div>
-          <div>Kind</div><div>primitive</div>
+          <div>Kind</div><div>service</div>
           <div>Type</div><div>package</div>
-          <div>Maintainers</div><div>Felix &lt;xi.lifeng@qq.com&gt;</div>
-          <div>Repository</div><div><a href="https://github.com/syswonder/primitive-beingbeyond-d1-arm-rbnx">primitive-beingbeyond-d1-arm-rbnx</a></div>
+          <div>Maintainers</div><div>Zhihao Mao &lt;lusunn111@users.noreply.github.com&gt;</div>
+          <div>Repository</div><div><a href="https://github.com/lusunn111/service-vla-action-decision-rbnx">service-vla-action-decision-rbnx</a></div>
           <div>Branch</div><div><code>main</code></div>
           <div>Manifest</div><div><code>package_manifest.yaml</code></div>
-          <div>API</div><div><a href="../../api/view/?package=robonix.primitive.beingbeyond.d1.arm">package metadata</a></div>
+          <div>API</div><div><a href="../../api/view/?package=robonix.service.vla.action_decision">package metadata</a></div>
         </div>
-        <div class="tags"><button class="tag tag-blue" data-tag="primitive">primitive</button> <button class="tag tag-gray" data-tag="arm">arm</button> <button class="tag tag-gray" data-tag="manipulator">manipulator</button> <button class="tag tag-gray" data-tag="beingbeyond">beingbeyond</button> <button class="tag tag-gray" data-tag="d1">d1</button></div>
+        <div class="tags"><button class="tag tag-green" data-tag="service">service</button> <button class="tag tag-gray" data-tag="vla">vla</button> <button class="tag tag-gray" data-tag="action-decision">action-decision</button> <button class="tag tag-gray" data-tag="speculative-decoding">speculative-decoding</button> <button class="tag tag-gray" data-tag="drafter">drafter</button> <button class="tag tag-gray" data-tag="openvla">openvla</button></div>
         <h2>Capabilities</h2>
         <ul class="cap-list">
-          <li>robonix/primitive/arm/driver</li>
-<li>robonix/primitive/arm/info</li>
-<li>robonix/primitive/arm/move_joint</li>
-<li>robonix/primitive/arm/get_state</li>
-<li>robonix/primitive/arm/move_pose</li>
-<li>robonix/primitive/arm/set_head</li>
+          <li>robonix/service/vla/action_decision/decide</li>
         </ul>
       </aside>
     </div>

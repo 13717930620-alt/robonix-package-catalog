@@ -216,7 +216,7 @@ but browser-facing links and new integrations should use the `.json` paths above
 The generated commit uses `[skip ci]`; normal CI only triggers from
 `catalog.yaml`, the builder script, the workflow, or manual dispatch.
 
-Generated on `2026-08-01T08:45:00+00:00`.
+Generated on `2026-08-01T08:47:55+00:00`.
 
 ## Packages
 
@@ -259,6 +259,7 @@ Generated on `2026-08-01T08:45:00+00:00`.
 | [`robonix.service.pcld2lscan`](https://syswonder.github.io/robonix-package-catalog/packages/robonix.service.pcld2lscan/) | `0.1.0` | `service` | Bunnycxk <2501213313@stu.pku.edu.cn> | service, lidar, pointcloud, laserscan, ros2 | [repo](https://github.com/syswonder/service-pcld2lscan-rbnx) |
 | [`robonix.service.piper_moveit`](https://syswonder.github.io/robonix-package-catalog/packages/robonix.service.piper_moveit/) | `0.1.0` | `service` | lhw2002426 <lhw2002426@users.noreply.github.com> | service, manipulation, moveit, agilex, piper, ros2 | [repo](https://github.com/syswonder/service-piper-moveit-rbnx) |
 | [`robonix.service.roboarm.ik`](https://syswonder.github.io/robonix-package-catalog/packages/robonix.service.roboarm.ik/) | `0.1.0` | `service` | lhw2002426 <lhw2002426@users.noreply.github.com> | service, manipulation, ik, agilex, piper, ros2 | [repo](https://github.com/syswonder/service-roboarm-ik-rbnx) |
+| [`robonix.service.vla.action_decision`](https://syswonder.github.io/robonix-package-catalog/packages/robonix.service.vla.action_decision/) | `0.1.0` | `service` | Zhihao Mao <lusunn111@users.noreply.github.com> | service, vla, action-decision, speculative-decoding, drafter, openvla | [repo](https://github.com/lusunn111/service-vla-action-decision-rbnx) |
 | [`robonix.skill.dual_piper_initialize`](https://syswonder.github.io/robonix-package-catalog/packages/robonix.skill.dual_piper_initialize/) | `0.1.0` | `skill` | Zhenyu Zhang <768726812@qq.com> | skill, dual-arm, piper, initialization | [repo](https://github.com/syswonder/skill-dual-piper-initialize-rbnx) |
 | [`robonix.skill.dual_piper_transfer`](https://syswonder.github.io/robonix-package-catalog/packages/robonix.skill.dual_piper_transfer/) | `0.1.0` | `skill` | Zhenyu Zhang <768726812@qq.com> | skill, dual-arm, piper, transfer | [repo](https://github.com/syswonder/skill-dual-piper-transfer-rbnx) |
 | [`robonix.skill.explore`](https://syswonder.github.io/robonix-package-catalog/packages/robonix.skill.explore/) | `0.1.0` | `skill` | wheatfox <wheatfox17@icloud.com> | skill, explore, frontier, navigation, mapping | [repo](https://github.com/syswonder/skill-explore-rbnx) |
