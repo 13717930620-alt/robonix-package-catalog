@@ -1031,23 +1031,17 @@ html[data-theme="dark"] .highlight .il { color: #AE81FF } /* Literal.Number.Inte
       <section class="panel detail-main">
         <h2>README</h2>
         <article class="readme">
-          <div>
-
-# RoboNix Memory Action Retrieval Service
-
-**A system-level experience memory and candidate-action retrieval Service for embodied models**
-
-[中文文档](README-CN.md) · [🚀 Quick Start](#quick-start) · [📦 Dataset](#datasets) · [🗄️ Build Database](#build-index) · [📝 Citation](#citation)
-
-![Python](https://img.shields.io/badge/Python-3.10+-3776AB?logo=python&amp;logoColor=white)
-![PyTorch](https://img.shields.io/badge/PyTorch-2.2-EE4C2C?logo=pytorch&amp;logoColor=white)
-![Qdrant](https://img.shields.io/badge/Qdrant-1.16-DC244C)
-![Status](https://img.shields.io/badge/two--view_pipeline-verified-1f9d72)
-[![License](https://img.shields.io/badge/license-MulanPSL--2.0-red)](LICENSE)
-[![GitHub Stars](https://img.shields.io/github/stars/lusunn111/service-memory-action-retrieval-rbnx?style=flat&amp;logo=github)](https://github.com/lusunn111/service-memory-action-retrieval-rbnx/stargazers)
-
+          <div align="center">
+<h1>RoboNix Memory Action Retrieval Service</h1>
+<p><strong>A system-level experience memory and candidate-action retrieval Service for embodied models</strong></p>
+<p><a href="https://github.com/lusunn111/service-memory-action-retrieval-rbnx/blob/main/README-CN.md">中文文档</a> · <a href="#quick-start">🚀 Quick Start</a> · <a href="#datasets">📦 Dataset</a> · <a href="#build-index">🗄️ Build Database</a> · <a href="#citation">📝 Citation</a></p>
+<p><img alt="Python" src="https://img.shields.io/badge/Python-3.10+-3776AB?logo=python&amp;logoColor=white">
+<img alt="PyTorch" src="https://img.shields.io/badge/PyTorch-2.2-EE4C2C?logo=pytorch&amp;logoColor=white">
+<img alt="Qdrant" src="https://img.shields.io/badge/Qdrant-1.16-DC244C">
+<img alt="Status" src="https://img.shields.io/badge/two--view_pipeline-verified-1f9d72">
+<a href="https://github.com/lusunn111/service-memory-action-retrieval-rbnx/blob/main/LICENSE"><img alt="License" src="https://img.shields.io/badge/license-MulanPSL--2.0-red"></a>
+<a href="https://github.com/lusunn111/service-memory-action-retrieval-rbnx/stargazers"><img alt="GitHub Stars" src="https://img.shields.io/github/stars/lusunn111/service-memory-action-retrieval-rbnx?style=flat&amp;logo=github"></a></p>
 </div>
-
 <p>The <strong>RoboNix Memory Action Retrieval Service</strong> lets existing embodied models
 use historical execution experience during online decision-making instead of
 leaving it as offline data. It retrieves candidate actions that match the
@@ -1285,11 +1279,11 @@ and fallback between retrieval and physical execution.</p>
 <h2>🧠 Architecture Overview</h2>
 
 
-<div>
-  <img width="96%" alt="RoboNix retrieval-augmented memory architecture" src="https://raw.githubusercontent.com/lusunn111/service-memory-action-retrieval-rbnx/main/docs/assets/retrieval-memory-overview-v2.png">
-  <p><b>Figure 1.</b> Offline experience-memory construction and online two-view retrieval with policy fallback and continuous memory updates.</p>
+<div align="center">
+<p><img width="96%" alt="RoboNix retrieval-augmented memory architecture" src="https://raw.githubusercontent.com/lusunn111/service-memory-action-retrieval-rbnx/main/docs/assets/retrieval-memory-overview-v2.png">
+  </p>
+<p><b>Figure 1.</b> Offline experience-memory construction and online two-view retrieval with policy fallback and continuous memory updates.</p>
 </div>
-
 <p>The validated two-view Mix path stores both searchable vectors and action
 payloads in Qdrant; it does not require MongoDB. MongoDB remains available for
 legacy collection workflows. The FastAPI embedding service generates OpenVLA
@@ -1329,11 +1323,11 @@ collection and returns a retrieved and optionally averaged action trajectory.</p
 <p><a></a></p>
 <h2>🔌 RoboNix Integration and Outlook</h2>
 <p>This Service is an independently deployable RoboNix provider that maintains experience memory for embodied execution. Scene observations and task context form a structured retrieval request; Atlas discovers the provider, Nexus carries multimodal references, and Pilot consumes the retrieved trajectories without embedding database logic into the RoboNix core.</p>
-<div>
-  <img width="96%" alt="RoboNix system architecture" src="https://raw.githubusercontent.com/lusunn111/service-memory-action-retrieval-rbnx/main/docs/assets/robonix-system-architecture.png">
-  <p><b>Figure 2.</b> System-level integration points for reusable memory services, custom services, and VLA-based user skills.</p>
+<div align="center">
+<p><img width="96%" alt="RoboNix system architecture" src="https://raw.githubusercontent.com/lusunn111/service-memory-action-retrieval-rbnx/main/docs/assets/robonix-system-architecture.png">
+  </p>
+<p><b>Figure 2.</b> System-level integration points for reusable memory services, custom services, and VLA-based user skills.</p>
 </div>
-
 <p>Looking forward, the service can evolve toward continuously updated robot memory with pluggable encoders, hierarchical indexes, redundancy compression, expiration policies, and safety-aware trajectory reuse across tasks and robot platforms.</p>
 <p><a></a></p>
 <h2>🧪 Validated Release</h2>
@@ -1810,6 +1804,6 @@ licenses.</p>
       </aside>
     </div>
   </main>
-  <footer class="site-footer"><div class="shell">Generated on 2026-08-01T08:47:55+00:00.</div></footer>
+  <footer class="site-footer"><div class="shell">Generated on 2026-08-01T09:43:12+00:00.</div></footer>
 </body>
 </html>

@@ -1032,7 +1032,7 @@ html[data-theme="dark"] .highlight .il { color: #AE81FF } /* Literal.Number.Inte
         <h2>README</h2>
         <article class="readme">
           
-<div>
+<div align="center">
 <p><strong>This RoboNix Service is provided and maintained by Prof. Xiang Chen's group (<a href="https://if-lab-pku.github.io/">IFLab</a>), School of Computer Science, Peking University.</strong></p>
 <h1>RoboNix Compute Optimization</h1>
 <p><strong>An open-source compute optimization tool for RoboNix dual-system vision-language navigation</strong></p>
@@ -1050,7 +1050,6 @@ html[data-theme="dark"] .highlight .il { color: #AE81FF } /* Literal.Number.Inte
   <a href="#benchmark-results"><img src="https://raw.githubusercontent.com/i6bimua/service-navigation-vln-rbnx/main/docs/assets/result_badges.svg" alt="Project metrics"></a>
 </p>
 </div>
-
 <p><a></a></p>
 <h2>🎯 What this adds to RoboNix</h2>
 <p>This repository turns a dual-system VLN S1/S2 inference path into a
@@ -1105,26 +1104,18 @@ Service control path in Habitat / R2R-CE. They are <strong>real-policy simulatio
 demos, not physical-robot validation</strong>. The two representative reels cover
 robustness and actual task completion time without a redundant grid or
 single-lane clip.</p>
-<div>
-
-**1 · Robustness: Naive ECC times out, Ours succeeds**
-
-<a href="https://github.com/i6bimua/service-navigation-vln-rbnx/blob/main/docs/assets/demo/habitat_comparison_fail.mp4">
+<div align="center">
+<p><strong>1 · Robustness: Naive ECC times out, Ours succeeds</strong></p>
+<p><a href="https://github.com/i6bimua/service-navigation-vln-rbnx/blob/main/docs/assets/demo/habitat_comparison_fail.mp4">
   <img width="100%" src="https://raw.githubusercontent.com/i6bimua/service-navigation-vln-rbnx/main/docs/assets/demo/habitat_comparison_fail.gif" alt="Fail reel: Naive ECC TIMEOUT vs Ours SUCCEEDED">
-</a>
-
-<a href="https://github.com/i6bimua/service-navigation-vln-rbnx/blob/main/docs/assets/demo/habitat_comparison_fail.mp4">habitat_comparison_fail.mp4</a>
-
-**2 · Completion time: Edge Only and Ours succeed, Ours is about 2× faster**
-
-<a href="https://github.com/i6bimua/service-navigation-vln-rbnx/blob/main/docs/assets/demo/habitat_comparison_speed.mp4">
+</a></p>
+<p><a href="https://github.com/i6bimua/service-navigation-vln-rbnx/blob/main/docs/assets/demo/habitat_comparison_fail.mp4">habitat_comparison_fail.mp4</a></p>
+<p><strong>2 · Completion time: Edge Only and Ours succeed, Ours is about 2× faster</strong></p>
+<p><a href="https://github.com/i6bimua/service-navigation-vln-rbnx/blob/main/docs/assets/demo/habitat_comparison_speed.mp4">
   <img width="100%" src="https://raw.githubusercontent.com/i6bimua/service-navigation-vln-rbnx/main/docs/assets/demo/habitat_comparison_speed.gif" alt="Speed reel: Edge Only and Ours both succeed, Ours finishes first">
-</a>
-
-<a href="https://github.com/i6bimua/service-navigation-vln-rbnx/blob/main/docs/assets/demo/habitat_comparison_speed.mp4">habitat_comparison_speed.mp4</a>
-
+</a></p>
+<p><a href="https://github.com/i6bimua/service-navigation-vln-rbnx/blob/main/docs/assets/demo/habitat_comparison_speed.mp4">habitat_comparison_speed.mp4</a></p>
 </div>
-
 <p>The complete RoboNix TUI sequence — startup, instruction entry, tool invocation,
 and terminal state — appears under
 <a href="#robonix-integration-boundary">RoboNix Integration Boundary</a> instead of being
@@ -1167,10 +1158,9 @@ duplicated here.</p>
 </tr>
 </tbody>
 </table>
-<div>
-  <img width="100%" src="https://raw.githubusercontent.com/i6bimua/service-navigation-vln-rbnx/main/docs/assets/benchmark_overview.svg" alt="R2R-CE benchmark overview">
+<div align="center">
+<p><img width="100%" src="https://raw.githubusercontent.com/i6bimua/service-navigation-vln-rbnx/main/docs/assets/benchmark_overview.svg" alt="R2R-CE benchmark overview"></p>
 </div>
-
 <p>Compute Skill optimizes the latency–accuracy trade-off rather than a single
 metric. On Orin+A100, SR remains on par with Edge Only (<code>62.8</code> versus <code>62.9</code>)
 while average step latency falls by 2.22×. Step Sync reaches a higher SR but
@@ -1365,10 +1355,9 @@ loop. Compute Skill switches between these behaviors according to runtime
 state.</p>
 <p><a></a></p>
 <h2>🧠 Architecture</h2>
-<div>
-  <img width="100%" src="https://raw.githubusercontent.com/i6bimua/service-navigation-vln-rbnx/main/docs/assets/compute_optimization_architecture.png" alt="Compute optimization runtime architecture">
+<div align="center">
+<p><img width="100%" src="https://raw.githubusercontent.com/i6bimua/service-navigation-vln-rbnx/main/docs/assets/compute_optimization_architecture.png" alt="Compute optimization runtime architecture"></p>
 </div>
-
 <ol>
 <li><strong>Fast local loop:</strong> edge S1 consumes the latest observation and active
    context to produce the next action without waiting for cloud inference.</li>
@@ -1382,10 +1371,9 @@ state.</p>
 memory, and optional diffusion latents remain behind adapters.</p>
 <p><a></a></p>
 <h2>🖼️ Running Images</h2>
-<div>
-  <img width="100%" src="https://raw.githubusercontent.com/i6bimua/service-navigation-vln-rbnx/main/docs/assets/demo/habitat_running_images.png" alt="Habitat running images and navigation path">
+<div align="center">
+<p><img width="100%" src="https://raw.githubusercontent.com/i6bimua/service-navigation-vln-rbnx/main/docs/assets/demo/habitat_running_images.png" alt="Habitat running images and navigation path"></p>
 </div>
-
 <p><a></a></p>
 <h2>🔌 RoboNix Integration Boundary</h2>
 <p>This repository is a RoboNix <strong>Service package</strong> — <code>robonix.service.navigation.vln</code>.
@@ -1441,14 +1429,13 @@ Naive ECC is on top and Ours is below; both complete the same kind of task, whil
 Ours reaches a terminal result first. This validates the <strong>RoboNix integration
 path and wall-clock completion behavior</strong>; it does not replace the full R2R-CE
 benchmark.</p>
-<div>
-<a href="https://github.com/i6bimua/service-navigation-vln-rbnx/blob/main/docs/assets/demo/robonix_tui_demo.mp4">
+<div align="center">
+<p><a href="https://github.com/i6bimua/service-navigation-vln-rbnx/blob/main/docs/assets/demo/robonix_tui_demo.mp4">
   <img width="100%" src="https://raw.githubusercontent.com/i6bimua/service-navigation-vln-rbnx/main/docs/assets/demo/robonix_tui_demo.jpg" alt="RoboNix TUI: Naive ECC on top, Ours below">
 </a>
 <br>
-<a href="https://github.com/i6bimua/service-navigation-vln-rbnx/blob/main/docs/assets/demo/robonix_tui_demo.mp4">robonix_tui_demo.mp4</a> — click the image to play the full video
+<a href="https://github.com/i6bimua/service-navigation-vln-rbnx/blob/main/docs/assets/demo/robonix_tui_demo.mp4">robonix_tui_demo.mp4</a> — click the image to play the full video</p>
 </div>
-
 <p>Natural-language invocation needs nothing else deployed alongside: pilot
 discovers these MCP contracts on the service directly, and because
 <code>navigate</code>, <code>navigate/status</code> and <code>navigate/cancel</code> form an async contract
@@ -2763,6 +2750,6 @@ see <code>THIRD_PARTY_LICENSES.md</code>.</p>
       </aside>
     </div>
   </main>
-  <footer class="site-footer"><div class="shell">Generated on 2026-08-01T08:47:55+00:00.</div></footer>
+  <footer class="site-footer"><div class="shell">Generated on 2026-08-01T09:43:12+00:00.</div></footer>
 </body>
 </html>
