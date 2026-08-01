@@ -216,7 +216,7 @@ but browser-facing links and new integrations should use the `.json` paths above
 The generated commit uses `[skip ci]`; normal CI only triggers from
 `catalog.yaml`, the builder script, the workflow, or manual dispatch.
 
-Generated on `2026-08-01T08:36:49+00:00`.
+Generated on `2026-08-01T08:45:00+00:00`.
 
 ## Packages
 
@@ -250,6 +250,7 @@ Generated on `2026-08-01T08:36:49+00:00`.
 | [`robonix.robot.wowrobo.roboarm`](https://syswonder.github.io/robonix-package-catalog/robots/robonix.robot.wowrobo.roboarm/) | `0.1.0` | `robot` | Yuzheng Gao <2300013159@stuu.pku.edu.cn> | robot, deploy, robonix, manipulator, lerobo | [repo](https://github.com/syswonder/robot-wowrobo-roboarm) |
 | [`robonix.service.grasp_pose`](https://syswonder.github.io/robonix-package-catalog/packages/robonix.service.grasp_pose/) | `0.1.0` | `service` | lhw2002426 <lhw2002426@users.noreply.github.com> | service, perception, grasp_pose, grasp, ros2 | [repo](https://github.com/syswonder/service-grasp-pose-rbnx) |
 | [`robonix.service.mapping`](https://syswonder.github.io/robonix-package-catalog/packages/robonix.service.mapping/) | `0.5.0` | `service` | wheatfox <wheatfox17@icloud.com> | service, mapping, slam, rtabmap, ros2 | [repo](https://github.com/syswonder/service-map-rbnx) |
+| [`robonix.service.memory.action_retrieval`](https://syswonder.github.io/robonix-package-catalog/packages/robonix.service.memory.action_retrieval/) | `0.1.0` | `service` | Zhihao Mao <lusunn111@users.noreply.github.com> | service, memory, vla, action-retrieval, experience-reuse, qdrant | [repo](https://github.com/lusunn111/service-memory-action-retrieval-rbnx) |
 | [`robonix.service.minecraft_costmap`](https://syswonder.github.io/robonix-package-catalog/packages/robonix.service.minecraft_costmap/) | `0.1.0` | `service` | ZZJJWarth <jzeng25@stu.pku.edu.cn> | service, minecraft, mapping, costmap, navigation | [repo](https://github.com/syswonder/service-minecraft-costmap-rbnx) |
 | [`robonix.service.minecraft_navigation`](https://syswonder.github.io/robonix-package-catalog/packages/robonix.service.minecraft_navigation/) | `0.1.0` | `service` | ZZJJWarth <jzeng25@stu.pku.edu.cn> | service, minecraft, navigation, path-planning, costmap | [repo](https://github.com/syswonder/service-minecraft-navigation-rbnx) |
 | [`robonix.service.navigation`](https://syswonder.github.io/robonix-package-catalog/packages/robonix.service.navigation/) | `0.1.0` | `service` | wheatfox <wheatfox17@icloud.com> | service, navigation, nav2, ros2 | [repo](https://github.com/syswonder/service-navigation-rbnx) |
@@ -263,6 +264,7 @@ Generated on `2026-08-01T08:36:49+00:00`.
 | [`robonix.skill.explore`](https://syswonder.github.io/robonix-package-catalog/packages/robonix.skill.explore/) | `0.1.0` | `skill` | wheatfox <wheatfox17@icloud.com> | skill, explore, frontier, navigation, mapping | [repo](https://github.com/syswonder/skill-explore-rbnx) |
 | [`robonix.skill.hand_gesture`](https://syswonder.github.io/robonix-package-catalog/packages/robonix.skill.hand_gesture/) | `0.1.0` | `skill` | Felix <xi.lifeng@qq.com> | skill, gesture, dance, hand, beingbeyond, d1 | [repo](https://github.com/syswonder/skill-hand-gesture-rbnx) |
 | [`robonix.skill.minecraft_explore`](https://syswonder.github.io/robonix-package-catalog/packages/robonix.skill.minecraft_explore/) | `0.1.0` | `skill` | ZZJJWarth <jzeng25@stu.pku.edu.cn> | skill, minecraft, exploration, frontier, navigation | [repo](https://github.com/syswonder/skill-minecraft-explore-rbnx) |
+| [`robonix.skill.openvla_oft_accel`](https://syswonder.github.io/robonix-package-catalog/packages/robonix.skill.openvla_oft_accel/) | `0.2.0` | `skill` | Lingyue Zhang <zly3404842897@gmail.com> | skill, vla, openvla, oft, manipulation, multitask, piper | [repo](https://github.com/QingFeng34048/Robonix-Skill-Sim2Real-Completed) |
 | [`robonix.skill.pick.vertical_grasp`](https://syswonder.github.io/robonix-package-catalog/packages/robonix.skill.pick.vertical_grasp/) | `0.1.0` | `skill` | lhw2002426 <lhw2002426@users.noreply.github.com> | skill, pick, manipulation, grasp | [repo](https://github.com/syswonder/skill-pick-vertical-grasp-rbnx) |
 | [`robonix.skill.vertical_grasp_object`](https://syswonder.github.io/robonix-package-catalog/packages/robonix.skill.vertical_grasp_object/) | `0.1.0` | `skill` | Felix <xi.lifeng@qq.com> | skill, grasp, pick, place, manipulation, beingbeyond, d1 | [repo](https://github.com/syswonder/skill-vertical-grasp-object-rbnx) |
 | [`robonix.skill.vla.openvla`](https://syswonder.github.io/robonix-package-catalog/packages/robonix.skill.vla.openvla/) | `0.2.0` | `skill` | lhw2002426 <lhw2002426@users.noreply.github.com> | skill, vla, manipulation, llm | [repo](https://github.com/syswonder/skill-vla-openvla-rbnx) |
