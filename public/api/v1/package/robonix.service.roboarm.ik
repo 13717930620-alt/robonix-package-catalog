@@ -19,6 +19,8 @@
   "default_branch": "main",
   "kind": "service",
   "catalog_type": "package",
+  "catalog_status": "ok",
+  "catalog_warnings": [],
   "manifest": "package_manifest.yaml",
   "capabilities": [
     "robonix/service/manipulation/driver",

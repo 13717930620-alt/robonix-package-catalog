@@ -1,6 +1,6 @@
 {
   "api_version": "1",
-  "generated_at": "2026-07-30T12:35:12+00:00",
+  "generated_at": "2026-08-01T08:30:40+00:00",
   "robots": [
     {
       "name": "robonix.robot.agilex.ranger_mini_v3",
@@ -27,6 +27,8 @@
       "default_branch": "main",
       "kind": "robot",
       "catalog_type": "robot",
+      "catalog_status": "ok",
+      "catalog_warnings": [],
       "manifest": "robonix_manifest.yaml",
       "capabilities": [],
       "deploy_dependencies": [
@@ -297,6 +299,8 @@
       "default_branch": "main",
       "kind": "robot",
       "catalog_type": "robot",
+      "catalog_status": "ok",
+      "catalog_warnings": [],
       "manifest": "robonix_manifest.yaml",
       "capabilities": [],
       "deploy_dependencies": [
@@ -415,6 +419,8 @@
       "default_branch": "main",
       "kind": "robot",
       "catalog_type": "robot",
+      "catalog_status": "ok",
+      "catalog_warnings": [],
       "manifest": "robonix_manifest.yaml",
       "capabilities": [],
       "deploy_dependencies": [
@@ -525,6 +531,18 @@
           "package_name": "robonix.service.navigation",
           "package_url": "../robonix.service.navigation/",
           "resolution_warning": ""
+        },
+        {
+          "section": "skill",
+          "name": "explore",
+          "repo": "https://github.com/syswonder/skill-explore-rbnx",
+          "path": "",
+          "branch": "main",
+          "manifest": "",
+          "resolution": "catalog",
+          "package_name": "robonix.skill.explore",
+          "package_url": "../robonix.skill.explore/",
+          "resolution_warning": ""
         }
       ],
       "readme_url": "https://github.com/syswonder/robot-deep_robotics-lite3/blob/main/README.md",
@@ -551,6 +569,8 @@
       "default_branch": "main",
       "kind": "robot",
       "catalog_type": "robot",
+      "catalog_status": "ok",
+      "catalog_warnings": [],
       "manifest": "robonix_manifest.yaml",
       "capabilities": [],
       "deploy_dependencies": [
@@ -634,6 +654,8 @@
       "default_branch": "main",
       "kind": "robot",
       "catalog_type": "robot",
+      "catalog_status": "ok",
+      "catalog_warnings": [],
       "manifest": "robonix_manifest.yaml",
       "capabilities": [],
       "deploy_dependencies": [
@@ -769,20 +791,107 @@
       "default_branch": "main",
       "kind": "robot",
       "catalog_type": "robot",
+      "catalog_status": "warning",
+      "catalog_warnings": [
+        {
+          "type": "manifest_name_mismatch",
+          "manifest_name": "robonix.robot.wheeltec_robot",
+          "expected_name": "robonix.robot.wheeltec.r550",
+          "reason": "manifest catalog name is 'robonix.robot.wheeltec_robot', expected 'robonix.robot.wheeltec.r550'"
+        }
+      ],
       "manifest": "robonix_manifest.yaml",
       "capabilities": [],
-      "deploy_dependencies": [],
+      "deploy_dependencies": [
+        {
+          "section": "primitive",
+          "name": "robot_description",
+          "repo": "",
+          "path": "${ROBONIX_DEPLOY_DIR}/robot_wheeltec_r550/primitives/robot_description",
+          "branch": "",
+          "manifest": "",
+          "resolution": "robonix_deploy",
+          "package_name": "",
+          "package_url": "",
+          "resolution_warning": ""
+        },
+        {
+          "section": "primitive",
+          "name": "r550_chassis",
+          "repo": "",
+          "path": "${ROBONIX_DEPLOY_DIR}/robot_wheeltec_r550/primitives/r550_chassis",
+          "branch": "",
+          "manifest": "",
+          "resolution": "robonix_deploy",
+          "package_name": "",
+          "package_url": "",
+          "resolution_warning": ""
+        },
+        {
+          "section": "primitive",
+          "name": "n10p_lslidar",
+          "repo": "",
+          "path": "${ROBONIX_DEPLOY_DIR}/robot_wheeltec_r550/primitives/n10p_lslidar",
+          "branch": "",
+          "manifest": "",
+          "resolution": "robonix_deploy",
+          "package_name": "",
+          "package_url": "",
+          "resolution_warning": ""
+        },
+        {
+          "section": "primitive",
+          "name": "astra_s_camera",
+          "repo": "",
+          "path": "./primitives/astra_s_camera",
+          "branch": "",
+          "manifest": "",
+          "resolution": "robot_repository",
+          "package_name": "",
+          "package_url": "",
+          "resolution_warning": ""
+        },
+        {
+          "section": "service",
+          "name": "mapping",
+          "repo": "",
+          "path": "${ROBONIX_DEPLOY_DIR}/robot_wheeltec_r550/services/service-map-rbnx",
+          "branch": "",
+          "manifest": "package_manifest.jetson-native.yaml",
+          "resolution": "robonix_deploy",
+          "package_name": "",
+          "package_url": "",
+          "resolution_warning": ""
+        },
+        {
+          "section": "service",
+          "name": "nav2",
+          "repo": "",
+          "path": "./services/service-navigation-rbnx",
+          "branch": "",
+          "manifest": "package_manifest.jetson-docker.yaml",
+          "resolution": "robot_repository",
+          "package_name": "",
+          "package_url": "",
+          "resolution_warning": ""
+        },
+        {
+          "section": "skill",
+          "name": "explore",
+          "repo": "",
+          "path": "./skills/skill-explore-rbnx",
+          "branch": "",
+          "manifest": "",
+          "resolution": "robot_repository",
+          "package_name": "",
+          "package_url": "",
+          "resolution_warning": ""
+        }
+      ],
       "readme_url": "https://github.com/syswonder/robot-wheeltec-r550/blob/main/README.md",
       "preview_image_url": "",
-      "deployment_status": "warning",
-      "deployment_warnings": [
-        {
-          "section": "manifest",
-          "name": "robonix_manifest.yaml",
-          "source": "https://github.com/syswonder/robot-wheeltec-r550/blob/main/robonix_manifest.yaml",
-          "reason": "Invalid robonix_manifest.yaml at line 77, column 5: could not find expected ':'. Showing last-known-good catalog metadata; deployment dependencies cannot be inspected until the robot manifest is fixed."
-        }
-      ]
+      "deployment_status": "ok",
+      "deployment_warnings": []
     },
     {
       "name": "robonix.robot.wowrobo.roboarm",
@@ -804,6 +913,8 @@
       "default_branch": "main",
       "kind": "robot",
       "catalog_type": "robot",
+      "catalog_status": "ok",
+      "catalog_warnings": [],
       "manifest": "robonix_manifest.yaml",
       "capabilities": [],
       "deploy_dependencies": [
