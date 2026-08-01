@@ -325,7 +325,7 @@ class CatalogMetadataTests(unittest.TestCase):
             "maintainers": ["Example <example@example.com>"],
         }
 
-        _, _, license_name, _, _ = BUILD_CATALOG.validate_catalog_metadata(
+        _, _, license_name, _, _, _ = BUILD_CATALOG.validate_catalog_metadata(
             "robonix.robot.example", metadata, "robonix.robot.example"
         )
 
@@ -354,7 +354,7 @@ class CatalogMetadataTests(unittest.TestCase):
             "maintainers": ["Example <example@example.com>"],
         }
 
-        _, _, license_name, _, _ = BUILD_CATALOG.validate_catalog_metadata(
+        _, _, license_name, _, _, _ = BUILD_CATALOG.validate_catalog_metadata(
             "robonix.robot.wheeltec.r550", metadata, "robonix.robot.wheeltec.r550"
         )
 
@@ -374,6 +374,137 @@ class CatalogMetadataTests(unittest.TestCase):
             BUILD_CATALOG.validate_catalog_metadata(
                 "robonix.service.example", metadata, "robonix.service.example"
             )
+
+    def test_name_mismatch_is_strict_by_default(self):
+        metadata = {
+            "name": "robonix.service.wrong",
+            "version": "0.1.0",
+            "description": "Example service",
+            "license": "Apache-2.0",
+            "tags": ["service"],
+            "maintainers": ["Example <example@example.com>"],
+        }
+
+        with self.assertRaises(SystemExit):
+            BUILD_CATALOG.validate_catalog_metadata(
+                "robonix.service.example", metadata, "robonix.service.example"
+            )
+
+    def test_unchanged_base_entry_name_mismatch_becomes_warning(self):
+        entry = {
+            "name": "robonix.service.example",
+            "repo": "https://github.com/syswonder/service-example-rbnx",
+        }
+        metadata = {
+            "name": "robonix.service.wrong",
+            "version": "0.1.0",
+            "description": "Example service",
+            "license": "Apache-2.0",
+            "tags": ["service"],
+            "maintainers": ["Example <example@example.com>"],
+        }
+        with tempfile.TemporaryDirectory() as tmp:
+            catalog = Path(tmp) / "catalog.yaml"
+            catalog.write_text(
+                "packages:\n"
+                "  - name: robonix.service.example\n"
+                "    repo: https://github.com/syswonder/service-example-rbnx\n"
+            )
+            baseline_entry = {**entry, "_catalog_type": "package"}
+            baseline_keys = {BUILD_CATALOG.catalog_entry_key(baseline_entry)}
+            with mock.patch.object(
+                BUILD_CATALOG,
+                "load_remote_manifest",
+                return_value=("main", {"package": metadata, "capabilities": []}, ""),
+            ):
+                packages = BUILD_CATALOG.collect(catalog, baseline_keys)
+                catalog.write_text(
+                    "packages:\n"
+                    "  - name: robonix.service.example\n"
+                    "    repo: https://github.com/syswonder/service-example-renamed\n"
+                )
+                with self.assertRaises(SystemExit):
+                    BUILD_CATALOG.collect(catalog, baseline_keys)
+
+        self.assertEqual(packages[0]["catalog_status"], "warning")
+        self.assertEqual(
+            packages[0]["catalog_warnings"][0]["type"],
+            "manifest_name_mismatch",
+        )
+
+    def test_catalog_warning_reaches_ci_api_listing_and_detail(self):
+        warning = {
+            "type": "manifest_name_mismatch",
+            "manifest_name": "robonix.service.wrong",
+            "expected_name": "robonix.service.example",
+            "reason": (
+                "manifest catalog name is 'robonix.service.wrong', expected "
+                "'robonix.service.example'"
+            ),
+        }
+        package = {
+            "name": "robonix.service.example",
+            "version": "0.1.0",
+            "kind": "service",
+            "description": "Example service",
+            "license": "Apache-2.0",
+            "repo": "https://github.com/syswonder/service-example-rbnx",
+            "repo_name": "service-example-rbnx",
+            "default_branch": "main",
+            "catalog_type": "package",
+            "catalog_status": "warning",
+            "catalog_warnings": [warning],
+            "manifest": "package_manifest.yaml",
+            "tags": ["service"],
+            "maintainers": ["Example <example@example.com>"],
+            "capabilities": [],
+            "deploy_dependencies": [],
+            "deployment_warnings": [],
+            "preview_image_url": "",
+            "_readme_markdown": "",
+        }
+
+        with tempfile.TemporaryDirectory() as tmp:
+            public = Path(tmp) / "public"
+            summary = Path(tmp) / "summary.md"
+            api = Path(tmp) / "package.json"
+            stderr = io.StringIO()
+            BUILD_CATALOG.render_listing_page(
+                public,
+                "2026-08-01T00:00:00+00:00",
+                [package],
+                page="packages",
+                title="Packages",
+                empty_label="packages",
+            )
+            BUILD_CATALOG.render_package_pages(
+                public, "2026-08-01T00:00:00+00:00", [package]
+            )
+            BUILD_CATALOG.write_json(api, package)
+            with mock.patch.dict(
+                BUILD_CATALOG.os.environ,
+                {
+                    "GITHUB_ACTIONS": "true",
+                    "GITHUB_STEP_SUMMARY": str(summary),
+                },
+            ), mock.patch.object(BUILD_CATALOG.sys, "stderr", stderr):
+                count = BUILD_CATALOG.report_catalog_warnings([package])
+
+            listing = (public / "packages" / "index.html").read_text()
+            detail = (
+                public / "packages" / "robonix.service.example" / "index.html"
+            ).read_text()
+            api_data = api.read_text()
+            report = summary.read_text()
+
+        self.assertEqual(count, 1)
+        self.assertIn("::warning title=Catalog name mismatch", stderr.getvalue())
+        self.assertIn("## Catalog metadata warning report", report)
+        self.assertIn('class="package-card has-warning"', listing)
+        self.assertIn("Catalog metadata warning", listing)
+        self.assertIn('aria-label="Catalog metadata warning"', detail)
+        self.assertIn('"catalog_status": "warning"', api_data)
+        self.assertIn('"manifest_name_mismatch"', api_data)
 
 
 class DeploymentDependencyWarningTests(unittest.TestCase):
