@@ -19,6 +19,8 @@
     "default_branch": "main",
     "kind": "primitive",
     "catalog_type": "package",
+    "catalog_status": "ok",
+    "catalog_warnings": [],
     "manifest": "package_manifest.yaml",
     "capabilities": [
       "robonix/primitive/arm/driver",
@@ -53,6 +55,8 @@
     "default_branch": "main",
     "kind": "primitive",
     "catalog_type": "package",
+    "catalog_status": "ok",
+    "catalog_warnings": [],
     "manifest": "package_manifest.yaml",
     "capabilities": [],
     "deploy_dependencies": [],
@@ -81,6 +85,8 @@
     "default_branch": "main",
     "kind": "primitive",
     "catalog_type": "package",
+    "catalog_status": "ok",
+    "catalog_warnings": [],
     "manifest": "package_manifest.yaml",
     "capabilities": [],
     "deploy_dependencies": [],
@@ -107,6 +113,8 @@
     "default_branch": "main",
     "kind": "primitive",
     "catalog_type": "package",
+    "catalog_status": "ok",
+    "catalog_warnings": [],
     "manifest": "package_manifest.yaml",
     "capabilities": [
       "robonix/primitive/chassis/driver",
@@ -137,6 +145,8 @@
     "default_branch": "main",
     "kind": "primitive",
     "catalog_type": "package",
+    "catalog_status": "ok",
+    "catalog_warnings": [],
     "manifest": "package_manifest.yaml",
     "capabilities": [
       "robonix/primitive/audio/mic",
@@ -170,6 +180,8 @@
     "default_branch": "main",
     "kind": "primitive",
     "catalog_type": "package",
+    "catalog_status": "ok",
+    "catalog_warnings": [],
     "manifest": "package_manifest.yaml",
     "capabilities": [
       "robonix/primitive/audio/mic",
@@ -203,6 +215,8 @@
     "default_branch": "main",
     "kind": "primitive",
     "catalog_type": "package",
+    "catalog_status": "ok",
+    "catalog_warnings": [],
     "manifest": "package_manifest.yaml",
     "capabilities": [
       "robonix/primitive/arm/driver",
@@ -237,6 +251,8 @@
     "default_branch": "main",
     "kind": "primitive",
     "catalog_type": "package",
+    "catalog_status": "ok",
+    "catalog_warnings": [],
     "manifest": "package_manifest.yaml",
     "capabilities": [
       "robonix/primitive/camera/snapshot",
@@ -268,6 +284,8 @@
     "default_branch": "main",
     "kind": "primitive",
     "catalog_type": "package",
+    "catalog_status": "ok",
+    "catalog_warnings": [],
     "manifest": "package_manifest.yaml",
     "capabilities": [
       "robonix/primitive/hand/driver",
@@ -303,6 +321,8 @@
     "default_branch": "main",
     "kind": "primitive",
     "catalog_type": "package",
+    "catalog_status": "ok",
+    "catalog_warnings": [],
     "manifest": "package_manifest.yaml",
     "capabilities": [
       "robonix/primitive/lite3/description"
@@ -332,6 +352,8 @@
     "default_branch": "main",
     "kind": "primitive",
     "catalog_type": "package",
+    "catalog_status": "ok",
+    "catalog_warnings": [],
     "manifest": "package_manifest.yaml",
     "capabilities": [
       "robonix/primitive/chassis/driver",
@@ -364,6 +386,8 @@
     "default_branch": "main",
     "kind": "primitive",
     "catalog_type": "package",
+    "catalog_status": "ok",
+    "catalog_warnings": [],
     "manifest": "package_manifest.yaml",
     "capabilities": [
       "robonix/primitive/camera/driver",
@@ -396,6 +420,8 @@
     "default_branch": "main",
     "kind": "primitive",
     "catalog_type": "package",
+    "catalog_status": "ok",
+    "catalog_warnings": [],
     "manifest": "package_manifest.yaml",
     "capabilities": [
       "robonix/primitive/imu/driver",
@@ -425,6 +451,8 @@
     "default_branch": "main",
     "kind": "primitive",
     "catalog_type": "package",
+    "catalog_status": "ok",
+    "catalog_warnings": [],
     "manifest": "package_manifest.yaml",
     "capabilities": [
       "robonix/primitive/lidar/lidar3d",
@@ -455,6 +483,8 @@
     "default_branch": "main",
     "kind": "primitive",
     "catalog_type": "package",
+    "catalog_status": "ok",
+    "catalog_warnings": [],
     "manifest": "package_manifest.yaml",
     "capabilities": [
       "robonix/primitive/camera/driver",
@@ -487,6 +517,8 @@
     "default_branch": "main",
     "kind": "primitive",
     "catalog_type": "package",
+    "catalog_status": "ok",
+    "catalog_warnings": [],
     "manifest": "package_manifest.yaml",
     "capabilities": [
       "robonix/primitive/camera/rgb",
@@ -520,6 +552,8 @@
     "default_branch": "main",
     "kind": "primitive",
     "catalog_type": "package",
+    "catalog_status": "ok",
+    "catalog_warnings": [],
     "manifest": "package_manifest.yaml",
     "capabilities": [
       "robonix/primitive/robot_description/driver"
@@ -549,6 +583,8 @@
     "default_branch": "main",
     "kind": "primitive",
     "catalog_type": "package",
+    "catalog_status": "ok",
+    "catalog_warnings": [],
     "manifest": "package_manifest.yaml",
     "capabilities": [
       "robonix/primitive/camera/snapshot",
@@ -569,6 +605,110 @@
     "deploy_dependencies": [],
     "readme_url": "https://github.com/syswonder/primitive-syswonder-minecraft_bot-rbnx/blob/main/README.md",
     "preview_image_url": ""
+  },
+  {
+    "name": "robonix.robot.agilex.dual_piper",
+    "version": "0.1.0",
+    "description": "Robonix deployment for two AgileX Piper arms and their factory CAN grippers.",
+    "license": "MIT",
+    "tags": [
+      "robot",
+      "deploy",
+      "agilex",
+      "piper",
+      "dual-arm",
+      "gripper"
+    ],
+    "repo": "https://github.com/syswonder/robot-agilex-dual-piper",
+    "maintainers": [
+      "Zhenyu Zhang <768726812@qq.com>"
+    ],
+    "repo_name": "robot-agilex-dual-piper",
+    "default_branch": "main",
+    "kind": "robot",
+    "catalog_type": "robot",
+    "catalog_status": "ok",
+    "catalog_warnings": [],
+    "manifest": "robonix_manifest.yaml",
+    "capabilities": [],
+    "deploy_dependencies": [
+      {
+        "section": "primitive",
+        "name": "left_piper",
+        "repo": "",
+        "path": "./primitives/piper_arm",
+        "branch": "",
+        "manifest": "",
+        "resolution": "robot_repository",
+        "package_name": "",
+        "package_url": "",
+        "resolution_warning": ""
+      },
+      {
+        "section": "primitive",
+        "name": "right_piper",
+        "repo": "",
+        "path": "./primitives/piper_arm",
+        "branch": "",
+        "manifest": "",
+        "resolution": "robot_repository",
+        "package_name": "",
+        "package_url": "",
+        "resolution_warning": ""
+      },
+      {
+        "section": "primitive",
+        "name": "audio_client_bridge",
+        "repo": "https://github.com/syswonder/primitive-audio-client-bridge-rbnx",
+        "path": "",
+        "branch": "main",
+        "manifest": "",
+        "resolution": "catalog",
+        "package_name": "robonix.primitive.audio.client_bridge",
+        "package_url": "../robonix.primitive.audio.client_bridge/",
+        "resolution_warning": ""
+      },
+      {
+        "section": "service",
+        "name": "speech",
+        "repo": "",
+        "path": "${ROBONIX_SOURCE_PATH}/services/speech",
+        "branch": "",
+        "manifest": "",
+        "resolution": "robonix_source",
+        "package_name": "",
+        "package_url": "",
+        "resolution_warning": ""
+      },
+      {
+        "section": "skill",
+        "name": "dual_piper_initialize",
+        "repo": "",
+        "path": "./skills/dual_piper_initialize",
+        "branch": "",
+        "manifest": "",
+        "resolution": "robot_repository",
+        "package_name": "",
+        "package_url": "",
+        "resolution_warning": ""
+      },
+      {
+        "section": "skill",
+        "name": "dual_piper_transfer",
+        "repo": "",
+        "path": "./skills/dual_piper_transfer",
+        "branch": "",
+        "manifest": "",
+        "resolution": "robot_repository",
+        "package_name": "",
+        "package_url": "",
+        "resolution_warning": ""
+      }
+    ],
+    "readme_url": "https://github.com/syswonder/robot-agilex-dual-piper/blob/main/README.md",
+    "preview_image_url": "",
+    "deployment_status": "ok",
+    "deployment_warnings": []
   },
   {
     "name": "robonix.robot.agilex.ranger_mini_v3",
@@ -595,6 +735,8 @@
     "default_branch": "main",
     "kind": "robot",
     "catalog_type": "robot",
+    "catalog_status": "ok",
+    "catalog_warnings": [],
     "manifest": "robonix_manifest.yaml",
     "capabilities": [],
     "deploy_dependencies": [
@@ -865,6 +1007,8 @@
     "default_branch": "main",
     "kind": "robot",
     "catalog_type": "robot",
+    "catalog_status": "ok",
+    "catalog_warnings": [],
     "manifest": "robonix_manifest.yaml",
     "capabilities": [],
     "deploy_dependencies": [
@@ -983,6 +1127,8 @@
     "default_branch": "main",
     "kind": "robot",
     "catalog_type": "robot",
+    "catalog_status": "ok",
+    "catalog_warnings": [],
     "manifest": "robonix_manifest.yaml",
     "capabilities": [],
     "deploy_dependencies": [
@@ -1093,6 +1239,18 @@
         "package_name": "robonix.service.navigation",
         "package_url": "../robonix.service.navigation/",
         "resolution_warning": ""
+      },
+      {
+        "section": "skill",
+        "name": "explore",
+        "repo": "https://github.com/syswonder/skill-explore-rbnx",
+        "path": "",
+        "branch": "main",
+        "manifest": "",
+        "resolution": "catalog",
+        "package_name": "robonix.skill.explore",
+        "package_url": "../robonix.skill.explore/",
+        "resolution_warning": ""
       }
     ],
     "readme_url": "https://github.com/syswonder/robot-deep_robotics-lite3/blob/main/README.md",
@@ -1119,6 +1277,8 @@
     "default_branch": "main",
     "kind": "robot",
     "catalog_type": "robot",
+    "catalog_status": "ok",
+    "catalog_warnings": [],
     "manifest": "robonix_manifest.yaml",
     "capabilities": [],
     "deploy_dependencies": [
@@ -1202,6 +1362,8 @@
     "default_branch": "main",
     "kind": "robot",
     "catalog_type": "robot",
+    "catalog_status": "ok",
+    "catalog_warnings": [],
     "manifest": "robonix_manifest.yaml",
     "capabilities": [],
     "deploy_dependencies": [
@@ -1337,20 +1499,107 @@
     "default_branch": "main",
     "kind": "robot",
     "catalog_type": "robot",
+    "catalog_status": "warning",
+    "catalog_warnings": [
+      {
+        "type": "manifest_name_mismatch",
+        "manifest_name": "robonix.robot.wheeltec_robot",
+        "expected_name": "robonix.robot.wheeltec.r550",
+        "reason": "manifest catalog name is 'robonix.robot.wheeltec_robot', expected 'robonix.robot.wheeltec.r550'"
+      }
+    ],
     "manifest": "robonix_manifest.yaml",
     "capabilities": [],
-    "deploy_dependencies": [],
+    "deploy_dependencies": [
+      {
+        "section": "primitive",
+        "name": "robot_description",
+        "repo": "",
+        "path": "${ROBONIX_DEPLOY_DIR}/robot_wheeltec_r550/primitives/robot_description",
+        "branch": "",
+        "manifest": "",
+        "resolution": "robonix_deploy",
+        "package_name": "",
+        "package_url": "",
+        "resolution_warning": ""
+      },
+      {
+        "section": "primitive",
+        "name": "r550_chassis",
+        "repo": "",
+        "path": "${ROBONIX_DEPLOY_DIR}/robot_wheeltec_r550/primitives/r550_chassis",
+        "branch": "",
+        "manifest": "",
+        "resolution": "robonix_deploy",
+        "package_name": "",
+        "package_url": "",
+        "resolution_warning": ""
+      },
+      {
+        "section": "primitive",
+        "name": "n10p_lslidar",
+        "repo": "",
+        "path": "${ROBONIX_DEPLOY_DIR}/robot_wheeltec_r550/primitives/n10p_lslidar",
+        "branch": "",
+        "manifest": "",
+        "resolution": "robonix_deploy",
+        "package_name": "",
+        "package_url": "",
+        "resolution_warning": ""
+      },
+      {
+        "section": "primitive",
+        "name": "astra_s_camera",
+        "repo": "",
+        "path": "./primitives/astra_s_camera",
+        "branch": "",
+        "manifest": "",
+        "resolution": "robot_repository",
+        "package_name": "",
+        "package_url": "",
+        "resolution_warning": ""
+      },
+      {
+        "section": "service",
+        "name": "mapping",
+        "repo": "",
+        "path": "${ROBONIX_DEPLOY_DIR}/robot_wheeltec_r550/services/service-map-rbnx",
+        "branch": "",
+        "manifest": "package_manifest.jetson-native.yaml",
+        "resolution": "robonix_deploy",
+        "package_name": "",
+        "package_url": "",
+        "resolution_warning": ""
+      },
+      {
+        "section": "service",
+        "name": "nav2",
+        "repo": "",
+        "path": "./services/service-navigation-rbnx",
+        "branch": "",
+        "manifest": "package_manifest.jetson-docker.yaml",
+        "resolution": "robot_repository",
+        "package_name": "",
+        "package_url": "",
+        "resolution_warning": ""
+      },
+      {
+        "section": "skill",
+        "name": "explore",
+        "repo": "",
+        "path": "./skills/skill-explore-rbnx",
+        "branch": "",
+        "manifest": "",
+        "resolution": "robot_repository",
+        "package_name": "",
+        "package_url": "",
+        "resolution_warning": ""
+      }
+    ],
     "readme_url": "https://github.com/syswonder/robot-wheeltec-r550/blob/main/README.md",
     "preview_image_url": "",
-    "deployment_status": "warning",
-    "deployment_warnings": [
-      {
-        "section": "manifest",
-        "name": "robonix_manifest.yaml",
-        "source": "https://github.com/syswonder/robot-wheeltec-r550/blob/main/robonix_manifest.yaml",
-        "reason": "Invalid robonix_manifest.yaml at line 77, column 5: could not find expected ':'. Showing last-known-good catalog metadata; deployment dependencies cannot be inspected until the robot manifest is fixed."
-      }
-    ]
+    "deployment_status": "ok",
+    "deployment_warnings": []
   },
   {
     "name": "robonix.robot.wowrobo.roboarm",
@@ -1372,6 +1621,8 @@
     "default_branch": "main",
     "kind": "robot",
     "catalog_type": "robot",
+    "catalog_status": "ok",
+    "catalog_warnings": [],
     "manifest": "robonix_manifest.yaml",
     "capabilities": [],
     "deploy_dependencies": [
@@ -1437,6 +1688,8 @@
     "default_branch": "main",
     "kind": "service",
     "catalog_type": "package",
+    "catalog_status": "ok",
+    "catalog_warnings": [],
     "manifest": "package_manifest.yaml",
     "capabilities": [
       "robonix/service/perception/grasp_pose/driver",
@@ -1466,6 +1719,8 @@
     "default_branch": "main",
     "kind": "service",
     "catalog_type": "package",
+    "catalog_status": "ok",
+    "catalog_warnings": [],
     "manifest": "package_manifest.yaml",
     "capabilities": [
       "robonix/service/map/occupancy_grid",
@@ -1503,6 +1758,8 @@
     "default_branch": "main",
     "kind": "service",
     "catalog_type": "package",
+    "catalog_status": "ok",
+    "catalog_warnings": [],
     "manifest": "package_manifest.yaml",
     "capabilities": [
       "robonix/service/map/driver",
@@ -1533,6 +1790,8 @@
     "default_branch": "main",
     "kind": "service",
     "catalog_type": "package",
+    "catalog_status": "ok",
+    "catalog_warnings": [],
     "manifest": "package_manifest.yaml",
     "capabilities": [
       "robonix/service/navigation/driver",
@@ -1563,6 +1822,8 @@
     "default_branch": "main",
     "kind": "service",
     "catalog_type": "package",
+    "catalog_status": "ok",
+    "catalog_warnings": [],
     "manifest": "package_manifest.yaml",
     "capabilities": [
       "robonix/service/navigation/driver",
@@ -1596,6 +1857,8 @@
     "default_branch": "main",
     "kind": "service",
     "catalog_type": "package",
+    "catalog_status": "ok",
+    "catalog_warnings": [],
     "manifest": "package_manifest.yaml",
     "capabilities": [
       "robonix/service/navigation/vln/driver",
@@ -1629,6 +1892,8 @@
     "default_branch": "main",
     "kind": "service",
     "catalog_type": "package",
+    "catalog_status": "ok",
+    "catalog_warnings": [],
     "manifest": "package_manifest.yaml",
     "capabilities": [
       "robonix/service/perception/object_detect/driver",
@@ -1658,6 +1923,8 @@
     "default_branch": "main",
     "kind": "service",
     "catalog_type": "package",
+    "catalog_status": "ok",
+    "catalog_warnings": [],
     "manifest": "package_manifest.yaml",
     "capabilities": [
       "robonix/service/lidar/scan_converter/driver",
@@ -1688,6 +1955,8 @@
     "default_branch": "main",
     "kind": "service",
     "catalog_type": "package",
+    "catalog_status": "ok",
+    "catalog_warnings": [],
     "manifest": "package_manifest.yaml",
     "capabilities": [
       "robonix/service/manipulation/driver",
@@ -1719,6 +1988,8 @@
     "default_branch": "main",
     "kind": "service",
     "catalog_type": "package",
+    "catalog_status": "ok",
+    "catalog_warnings": [],
     "manifest": "package_manifest.yaml",
     "capabilities": [
       "robonix/service/manipulation/driver",
@@ -1750,6 +2021,8 @@
     "default_branch": "main",
     "kind": "skill",
     "catalog_type": "package",
+    "catalog_status": "ok",
+    "catalog_warnings": [],
     "manifest": "package_manifest.yaml",
     "capabilities": [
       "robonix/skill/dual_piper_initialize/driver",
@@ -1778,6 +2051,8 @@
     "default_branch": "main",
     "kind": "skill",
     "catalog_type": "package",
+    "catalog_status": "ok",
+    "catalog_warnings": [],
     "manifest": "package_manifest.yaml",
     "capabilities": [
       "robonix/skill/dual_piper_transfer/driver",
@@ -1807,6 +2082,8 @@
     "default_branch": "main",
     "kind": "skill",
     "catalog_type": "package",
+    "catalog_status": "ok",
+    "catalog_warnings": [],
     "manifest": "package_manifest.yaml",
     "capabilities": [
       "robonix/skill/explore/driver",
@@ -1839,6 +2116,8 @@
     "default_branch": "main",
     "kind": "skill",
     "catalog_type": "package",
+    "catalog_status": "ok",
+    "catalog_warnings": [],
     "manifest": "package_manifest.yaml",
     "capabilities": [
       "robonix/skill/hand_gesture/driver",
@@ -1868,6 +2147,8 @@
     "default_branch": "main",
     "kind": "skill",
     "catalog_type": "package",
+    "catalog_status": "ok",
+    "catalog_warnings": [],
     "manifest": "package_manifest.yaml",
     "capabilities": [
       "robonix/skill/explore/driver",
@@ -1898,6 +2179,8 @@
     "default_branch": "main",
     "kind": "skill",
     "catalog_type": "package",
+    "catalog_status": "ok",
+    "catalog_warnings": [],
     "manifest": "package_manifest.yaml",
     "capabilities": [
       "robonix/skill/pick/driver",
@@ -1930,6 +2213,8 @@
     "default_branch": "main",
     "kind": "skill",
     "catalog_type": "package",
+    "catalog_status": "ok",
+    "catalog_warnings": [],
     "manifest": "package_manifest.yaml",
     "capabilities": [
       "robonix/skill/vertical_grasp_object/driver",
@@ -1965,6 +2250,8 @@
     "default_branch": "main",
     "kind": "skill",
     "catalog_type": "package",
+    "catalog_status": "ok",
+    "catalog_warnings": [],
     "manifest": "package_manifest.yaml",
     "capabilities": [
       "robonix/skill/vla/driver",

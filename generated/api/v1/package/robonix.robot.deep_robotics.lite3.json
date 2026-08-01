@@ -23,6 +23,8 @@
   "default_branch": "main",
   "kind": "robot",
   "catalog_type": "robot",
+  "catalog_status": "ok",
+  "catalog_warnings": [],
   "manifest": "robonix_manifest.yaml",
   "capabilities": [],
   "deploy_dependencies": [
@@ -132,6 +134,18 @@
       "resolution": "catalog",
       "package_name": "robonix.service.navigation",
       "package_url": "../robonix.service.navigation/",
+      "resolution_warning": ""
+    },
+    {
+      "section": "skill",
+      "name": "explore",
+      "repo": "https://github.com/syswonder/skill-explore-rbnx",
+      "path": "",
+      "branch": "main",
+      "manifest": "",
+      "resolution": "catalog",
+      "package_name": "robonix.skill.explore",
+      "package_url": "../robonix.skill.explore/",
       "resolution_warning": ""
     }
   ],

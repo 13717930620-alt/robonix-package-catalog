@@ -1025,7 +1025,7 @@ html[data-theme="dark"] .highlight .il { color: #AE81FF } /* Literal.Number.Inte
     <a class="back" href="../">Back to robots</a>
     <h1>robonix.robot.wheeltec.r550</h1>
     <p class="lede">Wheeltec R550 mini_tank — 2D SLAM mapping deploy (N10P lidar + rtabmap).</p>
-    <div class="detail-warning" role="note" aria-label="Deployment warning"><strong>Deployment warning · 1 issue</strong><ul><li><code>manifest robonix_manifest.yaml</code>: Invalid robonix_manifest.yaml at line 77, column 5: could not find expected &#x27;:&#x27;. Showing last-known-good catalog metadata; deployment dependencies cannot be inspected until the robot manifest is fixed.</li></ul></div>
+    <div class="detail-warning" role="note" aria-label="Catalog metadata warning"><strong>Catalog metadata warning · 1 issue</strong><ul><li>manifest catalog name is &#x27;robonix.robot.wheeltec_robot&#x27;, expected &#x27;robonix.robot.wheeltec.r550&#x27;</li></ul></div>
   </header>
   <main class="shell">
     <div class="detail-layout">
@@ -1350,11 +1350,17 @@ rbnx<span class="w"> </span>chat
         <div class="tags"><button class="tag tag-red" data-tag="robot">robot</button> <button class="tag tag-slate" data-tag="deploy">deploy</button> <button class="tag tag-gray" data-tag="robonix">robonix</button></div>
         <h2>Deployment Packages</h2>
         <ul class="cap-list">
-          
+          <li><span>primitive</span> <code>robot_description</code><br>${ROBONIX_DEPLOY_DIR}/robot_wheeltec_r550/primitives/robot_description</li>
+<li><span>primitive</span> <code>r550_chassis</code><br>${ROBONIX_DEPLOY_DIR}/robot_wheeltec_r550/primitives/r550_chassis</li>
+<li><span>primitive</span> <code>n10p_lslidar</code><br>${ROBONIX_DEPLOY_DIR}/robot_wheeltec_r550/primitives/n10p_lslidar</li>
+<li><span>primitive</span> <code>astra_s_camera</code><br>./primitives/astra_s_camera</li>
+<li><span>service</span> <code>mapping</code><br>${ROBONIX_DEPLOY_DIR}/robot_wheeltec_r550/services/service-map-rbnx</li>
+<li><span>service</span> <code>nav2</code><br>./services/service-navigation-rbnx</li>
+<li><span>skill</span> <code>explore</code><br>./skills/skill-explore-rbnx</li>
         </ul>
       </aside>
     </div>
   </main>
-  <footer class="site-footer"><div class="shell">Generated on 2026-07-30T12:35:12+00:00.</div></footer>
+  <footer class="site-footer"><div class="shell">Generated on 2026-08-01T08:36:49+00:00.</div></footer>
 </body>
 </html>

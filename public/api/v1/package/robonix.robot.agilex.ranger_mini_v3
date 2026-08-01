@@ -23,6 +23,8 @@
   "default_branch": "main",
   "kind": "robot",
   "catalog_type": "robot",
+  "catalog_status": "ok",
+  "catalog_warnings": [],
   "manifest": "robonix_manifest.yaml",
   "capabilities": [],
   "deploy_dependencies": [
