@@ -59,6 +59,8 @@ packages:
     repo: https://github.com/i6bimua/service-navigation-vln-rbnx
   - name: robonix.service.memory.action_retrieval
     repo: https://github.com/lusunn111/service-memory-action-retrieval-rbnx
+  - name: robonix.service.vla.action_decision
+    repo: https://github.com/lusunn111/service-vla-action-decision-rbnx
   - name: robonix.skill.openvla_oft_accel
     repo: https://github.com/QingFeng34048/Robonix-Skill-Sim2Real-Completed
 
