@@ -18,6 +18,8 @@
   "default_branch": "main",
   "kind": "robot",
   "catalog_type": "robot",
+  "catalog_status": "ok",
+  "catalog_warnings": [],
   "manifest": "robonix_manifest.yaml",
   "capabilities": [],
   "deploy_dependencies": [
@@ -41,30 +43,6 @@
       "branch": "",
       "manifest": "",
       "resolution": "robot_repository",
-      "package_name": "",
-      "package_url": "",
-      "resolution_warning": ""
-    },
-    {
-      "section": "primitive",
-      "name": "audio_driver",
-      "repo": "https://github.com/syswonder/primitive-audio-driver-rbnx",
-      "path": "",
-      "branch": "main",
-      "manifest": "",
-      "resolution": "catalog",
-      "package_name": "robonix.primitive.audio.alsa",
-      "package_url": "../robonix.primitive.audio.alsa/",
-      "resolution_warning": ""
-    },
-    {
-      "section": "service",
-      "name": "speech",
-      "repo": "",
-      "path": "${ROBONIX_SOURCE_PATH}/services/speech",
-      "branch": "",
-      "manifest": "",
-      "resolution": "robonix_source",
       "package_name": "",
       "package_url": "",
       "resolution_warning": ""

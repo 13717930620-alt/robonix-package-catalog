@@ -1,0 +1,40 @@
+{
+  "name": "robonix.skill.vertical_grasp_object",
+  "version": "0.1.0",
+  "description": "Detect objects on the table (YOLO cubes, or open-vocabulary via a VLM), then grasp and place them (with optional grasp angle and gripper aperture) — MCP tools for the D1 dexterous hand.",
+  "license": "MulanPSL-2.0",
+  "tags": [
+    "skill",
+    "grasp",
+    "pick",
+    "place",
+    "manipulation",
+    "beingbeyond",
+    "d1"
+  ],
+  "repo": "https://github.com/syswonder/skill-vertical-grasp-object-rbnx",
+  "maintainers": [
+    "Felix <xi.lifeng@qq.com>"
+  ],
+  "repo_name": "skill-vertical-grasp-object-rbnx",
+  "default_branch": "main",
+  "kind": "skill",
+  "catalog_type": "package",
+  "catalog_status": "ok",
+  "catalog_warnings": [],
+  "manifest": "package_manifest.yaml",
+  "capabilities": [
+    "robonix/skill/vertical_grasp_object/driver",
+    "robonix/skill/vertical_grasp_object/pick_cube",
+    "robonix/skill/vertical_grasp_object/place_cube",
+    "robonix/skill/vertical_grasp_object/detect_cubes",
+    "robonix/skill/vertical_grasp_object/detect_objects",
+    "robonix/skill/vertical_grasp_object/verify_grasp",
+    "robonix/skill/vertical_grasp_object/stack_cubes",
+    "robonix/skill/vertical_grasp_object/put_cube_in_container",
+    "robonix/skill/vertical_grasp_object/sort_cubes"
+  ],
+  "deploy_dependencies": [],
+  "readme_url": "https://github.com/syswonder/skill-vertical-grasp-object-rbnx/blob/main/README.md",
+  "preview_image_url": ""
+}

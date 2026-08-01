@@ -1127,6 +1127,58 @@ ros2<span class="w"> </span>topic<span class="w"> </span>list
 <div class="highlight"><pre><span></span><code>抓取红色积木
 </code></pre></div>
 测试catch by instruction<p></p>
+<h2>dev模式下的可视化：</h2>
+<table>
+<thead>
+<tr>
+<th>元素</th>
+<th>颜色</th>
+<th>含义</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>----</td>
+<td>--LLM--</td>
+<td>----</td>
+</tr>
+<tr>
+<td>半透明区域</td>
+<td>青色</td>
+<td>SAM分割掩码</td>
+</tr>
+<tr>
+<td>旋转矩形</td>
+<td>绿色</td>
+<td>cv2.minAreaRect</td>
+</tr>
+<tr>
+<td>圆点</td>
+<td>蓝色</td>
+<td>LLM 提示点</td>
+</tr>
+<tr>
+<td>矩形</td>
+<td>蓝色细框</td>
+<td>LLM 预测的物体框</td>
+</tr>
+<tr>
+<td>旋转矩形</td>
+<td>红色</td>
+<td>最终抓取框（SAM 精化后）</td>
+</tr>
+<tr>
+<td>----</td>
+<td>--YOLO--</td>
+<td>----</td>
+</tr>
+<tr>
+<td>矩形框</td>
+<td>红色</td>
+<td>YOLO识别框</td>
+</tr>
+</tbody>
+</table>
         </article>
       </section>
       <aside class="panel detail-side">
@@ -1147,13 +1199,11 @@ ros2<span class="w"> </span>topic<span class="w"> </span>list
         <ul class="cap-list">
           <li><span>primitive</span> <code>roboarm_arm</code><br>primitives/roboarm_arm</li>
 <li><span>primitive</span> <code>orbbec_camera_roboarm</code><br>primitives/orbbec_camera_roboarm</li>
-<li><span>primitive</span> <code>audio_driver</code><br><a href="../../packages/robonix.primitive.audio.alsa/">robonix.primitive.audio.alsa</a></li>
-<li><span>service</span> <code>speech</code><br>${ROBONIX_SOURCE_PATH}/services/speech</li>
 <li><span>skill</span> <code>roboarm_grasp</code><br>skills/roboarm_grasp</li>
         </ul>
       </aside>
     </div>
   </main>
-  <footer class="site-footer"><div class="shell">Generated on 2026-07-27T19:56:41+00:00.</div></footer>
+  <footer class="site-footer"><div class="shell">Generated on 2026-08-01T08:30:40+00:00.</div></footer>
 </body>
 </html>

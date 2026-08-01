@@ -1,0 +1,32 @@
+{
+  "name": "robonix.skill.hand_gesture",
+  "version": "0.1.0",
+  "description": "Make the D1 dexterous hand perform a finger \"dance\" — a rhythmic open/close wiggle across all fingers for a given duration. A single MCP tool for the D1 hand.",
+  "license": "MulanPSL-2.0",
+  "tags": [
+    "skill",
+    "gesture",
+    "dance",
+    "hand",
+    "beingbeyond",
+    "d1"
+  ],
+  "repo": "https://github.com/syswonder/skill-hand-gesture-rbnx",
+  "maintainers": [
+    "Felix <xi.lifeng@qq.com>"
+  ],
+  "repo_name": "skill-hand-gesture-rbnx",
+  "default_branch": "main",
+  "kind": "skill",
+  "catalog_type": "package",
+  "catalog_status": "ok",
+  "catalog_warnings": [],
+  "manifest": "package_manifest.yaml",
+  "capabilities": [
+    "robonix/skill/hand_gesture/driver",
+    "robonix/skill/hand_gesture/gesture_dance"
+  ],
+  "deploy_dependencies": [],
+  "readme_url": "https://github.com/syswonder/skill-hand-gesture-rbnx/blob/main/README.md",
+  "preview_image_url": ""
+}

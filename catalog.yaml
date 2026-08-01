@@ -60,6 +60,23 @@ packages:
   - name: robonix.skill.openvla_oft_accel
     repo: https://github.com/QingFeng34048/Robonix-Skill-Sim2Real-Completed
 
+  - name: robonix.primitive.beingbeyond.d1.arm
+    repo: https://github.com/syswonder/primitive-beingbeyond-d1-arm-rbnx
+  - name: robonix.primitive.beingbeyond.d1.hand
+    repo: https://github.com/syswonder/primitive-beingbeyond-d1-hand-rbnx
+  - name: robonix.primitive.beingbeyond.d1.camera
+    repo: https://github.com/syswonder/primitive-beingbeyond-d1-camera-rbnx
+  - name: robonix.skill.vertical_grasp_object
+    repo: https://github.com/syswonder/skill-vertical-grasp-object-rbnx
+  - name: robonix.skill.hand_gesture
+    repo: https://github.com/syswonder/skill-hand-gesture-rbnx
+
+  - name: robonix.skill.dual_piper_initialize
+    repo: https://github.com/syswonder/skill-dual-piper-initialize-rbnx
+
+  - name: robonix.skill.dual_piper_transfer
+    repo: https://github.com/syswonder/skill-dual-piper-transfer-rbnx
+
 robots:
   - name: robonix.robot.agilex.ranger_mini_v3
     repo: https://github.com/syswonder/robot-agilex-ranger_mini_v3
@@ -73,3 +90,5 @@ robots:
     repo: https://github.com/syswonder/robot-wowrobo-roboarm
   - name: robonix.robot.syswonder.minecraft_bot
     repo: https://github.com/syswonder/robot-syswonder-minecraft_bot
+  - name: robonix.robot.beingbeyond.d1
+    repo: https://github.com/syswonder/robot-beingbeyond-d1
