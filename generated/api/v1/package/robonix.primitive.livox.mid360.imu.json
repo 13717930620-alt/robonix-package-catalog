@@ -17,6 +17,8 @@
   "default_branch": "main",
   "kind": "primitive",
   "catalog_type": "package",
+  "catalog_status": "ok",
+  "catalog_warnings": [],
   "manifest": "package_manifest.yaml",
   "capabilities": [
     "robonix/primitive/imu/driver",

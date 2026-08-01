@@ -188,8 +188,7 @@ def package_slug(name: str) -> str:
     return name.replace("/", "_")
 
 
-def read_catalog(path: Path) -> list[dict]:
-    raw = yaml.safe_load(path.read_text()) or {}
+def parse_catalog(raw: dict) -> list[dict]:
     packages = raw.get("packages")
     if not isinstance(packages, list):
         fail("catalog.yaml must contain a top-level packages list")
@@ -208,6 +207,71 @@ def read_catalog(path: Path) -> list[dict]:
     return entries
 
 
+def read_catalog(path: Path) -> list[dict]:
+    return parse_catalog(yaml.safe_load(path.read_text()) or {})
+
+
+def catalog_entry_key(entry: dict) -> tuple[str, str, str, str] | None:
+    """Return the fields that make a catalog entry unchanged from the base."""
+    if not isinstance(entry, dict):
+        return None
+    name = entry.get("name")
+    repo = entry.get("repo")
+    if not isinstance(name, str) or not isinstance(repo, str):
+        return None
+    catalog_type = entry.get("_catalog_type") or (
+        "robot" if name.startswith("robonix.robot.") else "package"
+    )
+    manifest = entry.get("manifest")
+    if manifest is None:
+        manifest = (
+            "robonix_manifest.yaml"
+            if catalog_type == "robot"
+            else "package_manifest.yaml"
+        )
+    if not isinstance(manifest, str):
+        return None
+    return catalog_type, name, repo, manifest
+
+
+def pull_request_base_ref() -> str:
+    """Prefer the immutable PR base SHA over a branch name that may move."""
+    event_path = os.environ.get("GITHUB_EVENT_PATH", "")
+    if event_path:
+        try:
+            event = json.loads(Path(event_path).read_text(encoding="utf-8"))
+            base_sha = event.get("pull_request", {}).get("base", {}).get("sha")
+            if isinstance(base_sha, str) and base_sha:
+                return base_sha
+        except (OSError, json.JSONDecodeError):
+            pass
+    return os.environ.get("GITHUB_BASE_REF", "")
+
+
+def catalog_baseline_keys(catalog_path: Path) -> set[tuple[str, str, str, str]]:
+    """Load entries already accepted by the PR base, or current main build."""
+    entries = read_catalog(catalog_path)
+    if os.environ.get("GITHUB_EVENT_NAME") != "pull_request":
+        return {key for entry in entries if (key := catalog_entry_key(entry))}
+
+    repository = os.environ.get("GITHUB_REPOSITORY", "")
+    base_ref = pull_request_base_ref()
+    if repository.count("/") != 1 or not base_ref:
+        fail("pull request build is missing GITHUB_REPOSITORY or GITHUB_BASE_REF")
+    owner, repo = repository.split("/", 1)
+    catalog_repo_path = catalog_path.as_posix()
+    if catalog_path.is_absolute():
+        catalog_repo_path = catalog_path.name
+    raw = load_remote_text(owner, repo, catalog_repo_path, base_ref, required=True)
+    try:
+        baseline_entries = parse_catalog(yaml.safe_load(raw) or {})
+    except yaml.YAMLError as error:
+        fail(f"base {catalog_repo_path} is invalid YAML: {error}")
+    return {
+        key for entry in baseline_entries if (key := catalog_entry_key(entry))
+    }
+
+
 def norm_list(value, field: str, package_name: str) -> list[str]:
     if value is None:
         return []
@@ -216,7 +280,13 @@ def norm_list(value, field: str, package_name: str) -> list[str]:
     return value
 
 
-def validate_catalog_metadata(package_name: str, meta: dict, expected_name: str) -> tuple[str, str, str, list[str], list[str]]:
+def validate_catalog_metadata(
+    package_name: str,
+    meta: dict,
+    expected_name: str,
+    *,
+    allow_name_mismatch: bool = False,
+) -> tuple[str, str, str, list[str], list[str], list[dict]]:
     if not isinstance(meta, dict):
         fail(f"{package_name}: catalog metadata must be a mapping")
     manifest_name = meta.get("name")
@@ -225,8 +295,21 @@ def validate_catalog_metadata(package_name: str, meta: dict, expected_name: str)
     license_name = meta.get("license")
     tags = meta.get("tags")
     maintainers = meta.get("maintainers")
+    catalog_warnings = []
     if manifest_name != expected_name:
-        fail(f"{package_name}: manifest catalog name is {manifest_name!r}, expected {expected_name!r}")
+        reason = (
+            f"manifest catalog name is {manifest_name!r}, expected {expected_name!r}"
+        )
+        if not allow_name_mismatch:
+            fail(f"{package_name}: {reason}")
+        catalog_warnings.append(
+            {
+                "type": "manifest_name_mismatch",
+                "manifest_name": manifest_name,
+                "expected_name": expected_name,
+                "reason": reason,
+            }
+        )
     if not isinstance(version, str) or not version.strip():
         fail(f"{package_name}: version is required")
     if not isinstance(description, str) or not description.strip():
@@ -254,7 +337,7 @@ def validate_catalog_metadata(package_name: str, meta: dict, expected_name: str)
             fail(
                 f"{package_name}: maintainers entries must use 'Name <email@domain>' format: {maintainer!r}"
             )
-    return version, description, license_name, tags, maintainers
+    return version, description, license_name, tags, maintainers, catalog_warnings
 
 
 def collect_capabilities(package_name: str, manifest: dict) -> list[str]:
@@ -468,8 +551,64 @@ def report_deployment_warnings(packages: list[dict]) -> int:
     return len(warnings)
 
 
-def collect(catalog_path: Path) -> list[dict]:
+def report_catalog_warnings(packages: list[dict]) -> int:
+    warnings = [
+        (package["name"], warning)
+        for package in packages
+        for warning in package.get("catalog_warnings", [])
+    ]
+    github_actions = os.environ.get("GITHUB_ACTIONS", "").lower() == "true"
+    for package_name, warning in warnings:
+        message = f"{package_name}: {warning.get('reason', '')}"
+        print(f"warning: {message}", file=sys.stderr)
+        if github_actions:
+            title = github_command_escape(f"Catalog name mismatch: {package_name}")
+            print(
+                f"::warning title={title}::{github_command_escape(message)}",
+                file=sys.stderr,
+            )
+
+    summary_path = os.environ.get("GITHUB_STEP_SUMMARY")
+    if summary_path:
+        lines = ["## Catalog metadata warning report", ""]
+        if not warnings:
+            lines.append("All indexed manifest names match their catalog entries.")
+        else:
+            warning_label = "warning" if len(warnings) == 1 else "warnings"
+            lines.extend(
+                [
+                    f"Found **{len(warnings)} catalog metadata {warning_label}**. "
+                    "Catalog generation continues for entries already accepted on the base branch; new or modified entries remain strict.",
+                    "",
+                    "| Catalog entry | Manifest name | Expected name | Reason |",
+                    "| --- | --- | --- | --- |",
+                ]
+            )
+            for package_name, warning in warnings:
+                lines.append(
+                    "| "
+                    + " | ".join(
+                        markdown_cell(str(value))
+                        for value in (
+                            package_name,
+                            warning.get("manifest_name"),
+                            warning.get("expected_name", ""),
+                            warning.get("reason", ""),
+                        )
+                    )
+                    + " |"
+                )
+        with open(summary_path, "a", encoding="utf-8") as summary:
+            summary.write("\n".join(lines) + "\n")
+    return len(warnings)
+
+
+def collect(
+    catalog_path: Path,
+    baseline_keys: set[tuple[str, str, str, str]] | None = None,
+) -> list[dict]:
     entries = read_catalog(catalog_path)
+    baseline_keys = baseline_keys or set()
     seen_names = set()
     seen_repos = set()
     out = []
@@ -496,6 +635,7 @@ def collect(catalog_path: Path) -> list[dict]:
         if not isinstance(manifest_path, str) or not manifest_path.strip():
             fail(f"{name}: manifest must be a non-empty string")
         catalog_type = entry.get("_catalog_type") or ("robot" if manifest_path == "robonix_manifest.yaml" or name.startswith("robonix.robot.") else "package")
+        allow_name_mismatch = catalog_entry_key(entry) in baseline_keys
         source_warnings = []
         cached = None
         try:
@@ -543,7 +683,19 @@ def collect(catalog_path: Path) -> list[dict]:
             cap_names = []
             if cached is None:
                 meta = manifest.get("catalog")
-                version, description, license_name, tags, maintainers = validate_catalog_metadata(name, meta, name)
+                (
+                    version,
+                    description,
+                    license_name,
+                    tags,
+                    maintainers,
+                    catalog_warnings,
+                ) = validate_catalog_metadata(
+                    name,
+                    meta,
+                    name,
+                    allow_name_mismatch=allow_name_mismatch,
+                )
                 deploy_dependencies = collect_deploy_dependencies(name, manifest)
             else:
                 version = cached.get("version", "")
@@ -564,11 +716,24 @@ def collect(catalog_path: Path) -> list[dict]:
                     name,
                 )
                 deploy_dependencies = []
+                catalog_warnings = []
         else:
             package = manifest.get("package")
             if not isinstance(package, dict):
                 fail(f"{name}: package_manifest.yaml missing package mapping")
-            version, description, license_name, tags, maintainers = validate_catalog_metadata(name, package, name)
+            (
+                version,
+                description,
+                license_name,
+                tags,
+                maintainers,
+                catalog_warnings,
+            ) = validate_catalog_metadata(
+                name,
+                package,
+                name,
+                allow_name_mismatch=allow_name_mismatch,
+            )
             cap_names = collect_capabilities(name, manifest)
             deploy_dependencies = []
         kind = name.split(".")[1] if name.startswith("robonix.") and "." in name else ""
@@ -585,6 +750,8 @@ def collect(catalog_path: Path) -> list[dict]:
                 "default_branch": branch,
                 "kind": kind,
                 "catalog_type": catalog_type,
+                "catalog_status": "warning" if catalog_warnings else "ok",
+                "catalog_warnings": catalog_warnings,
                 "manifest": manifest_path,
                 "capabilities": cap_names,
                 "deploy_dependencies": deploy_dependencies,
@@ -1574,16 +1741,26 @@ def render_listing_page(public_dir: Path, generated_at: str, packages: list[dict
                 f'loading="lazy" decoding="async" fetchpriority="low">'
             )
         preview_line = f"\n          {preview_html}" if preview_html else ""
+        catalog_warnings = p.get("catalog_warnings", [])
         deployment_warnings = p.get("deployment_warnings", [])
-        card_class = "package-card has-warning" if deployment_warnings else "package-card"
-        warning_count = len(deployment_warnings)
+        warning_count = len(catalog_warnings) + len(deployment_warnings)
+        card_class = "package-card has-warning" if warning_count else "package-card"
         warning_badge = (
             f'<span class="warning-badge">Warning · {warning_count} '
             f'{"issue" if warning_count == 1 else "issues"}</span>'
-            if deployment_warnings
+            if warning_count
             else ""
         )
-        warning_summary = ""
+        warning_summaries = []
+        if catalog_warnings:
+            warning_items = "".join(
+                "<li>" + html.escape(warning.get("reason", "")) + "</li>"
+                for warning in catalog_warnings
+            )
+            warning_summaries.append(
+                '<div class="warning-summary"><strong>Catalog metadata warning</strong>'
+                f"<ul>{warning_items}</ul></div>"
+            )
         if deployment_warnings:
             warning_items = "".join(
                 "<li><code>"
@@ -1593,10 +1770,11 @@ def render_listing_page(public_dir: Path, generated_at: str, packages: list[dict
                 + "</li>"
                 for warning in deployment_warnings
             )
-            warning_summary = (
+            warning_summaries.append(
                 '<div class="warning-summary"><strong>Deployment source warning</strong>'
                 f"<ul>{warning_items}</ul></div>"
             )
+        warning_summary = "".join(warning_summaries)
         warning_summary_line = f"\n          {warning_summary}" if warning_summary else ""
         cards.append(
             f"""<article class="{card_class}" data-kind="{html.escape(p['kind'])}" data-tags="{html.escape(' '.join(p['tags']))}" data-search="{html.escape(search_text.lower())}">
@@ -2083,7 +2261,19 @@ def render_package_pages(public_dir: Path, generated_at: str, packages: list[dic
         base = detail_base(p)
         package_dir = public_dir / base / package_slug(p["name"])
         package_dir.mkdir(parents=True, exist_ok=True)
-        detail_warning = ""
+        detail_warnings = []
+        catalog_warnings = p.get("catalog_warnings", [])
+        if catalog_warnings:
+            warning_items = "".join(
+                "<li>" + html.escape(warning.get("reason", "")) + "</li>"
+                for warning in catalog_warnings
+            )
+            detail_warnings.append(
+                '\n    <div class="detail-warning" role="note" aria-label="Catalog metadata warning">'
+                f"<strong>Catalog metadata warning · {len(catalog_warnings)} "
+                f'{"issue" if len(catalog_warnings) == 1 else "issues"}</strong>'
+                f"<ul>{warning_items}</ul></div>"
+            )
         if p.get("catalog_type") == "robot":
             cap_title = "Deployment Packages"
             dep_items = []
@@ -2121,7 +2311,7 @@ def render_package_pages(public_dir: Path, generated_at: str, packages: list[dic
                     + "</li>"
                     for warning in deployment_warnings
                 )
-                detail_warning = (
+                detail_warnings.append(
                     '\n    <div class="detail-warning" role="note" aria-label="Deployment warning">'
                     f"<strong>Deployment warning · {len(deployment_warnings)} "
                     f'{"issue" if len(deployment_warnings) == 1 else "issues"}</strong>'
@@ -2133,6 +2323,7 @@ def render_package_pages(public_dir: Path, generated_at: str, packages: list[dic
         readme_html = render_markdown(
             p.get("_readme_markdown", ""), p["repo"], p["default_branch"]
         )
+        detail_warning = "".join(detail_warnings)
         package_dir.joinpath("index.html").write_text(
             f"""<!doctype html>
 <html lang="en">
@@ -2436,7 +2627,9 @@ def main() -> None:
     args = parser.parse_args()
 
     generated_at = dt.datetime.now(dt.timezone.utc).replace(microsecond=0).isoformat()
-    packages = collect(Path(args.catalog))
+    catalog_path = Path(args.catalog)
+    packages = collect(catalog_path, catalog_baseline_keys(catalog_path))
+    report_catalog_warnings(packages)
     report_deployment_warnings(packages)
     out = Path(args.out)
     public = Path(args.public)
