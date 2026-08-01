@@ -84,6 +84,8 @@ robots:
     repo: https://github.com/syswonder/robot-wheeltec-r550
   - name: robonix.robot.unitree.go2
     repo: https://github.com/syswonder/robot-unitree-go2
+  - name: robonix.robot.agilex.dual_piper
+    repo: https://github.com/syswonder/robot-agilex-dual-piper
   - name: robonix.robot.wowrobo.roboarm
     repo: https://github.com/syswonder/robot-wowrobo-roboarm
   - name: robonix.robot.syswonder.minecraft_bot
