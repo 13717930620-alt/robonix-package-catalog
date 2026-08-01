@@ -2201,12 +2201,42 @@ def rewrite_readme_urls(rendered: str, repo_url: str, branch: str) -> str:
     return replace(r'(<a\b[^>]*\bhref=")([^"]+)(")', rendered, raw=False)
 
 
+def enable_markdown_in_html_divs(md: str) -> str:
+    """Parse GitHub-style Markdown inside standalone HTML div containers."""
+    rendered_lines = []
+    fence_char = None
+    fence_length = 0
+    fence_pattern = re.compile(r"^ {0,3}(`{3,}|~{3,})")
+    div_pattern = re.compile(
+        r'^( {0,3})<div\b(?![^>]*\bmarkdown\s*=)([^>]*)>([ \t]*)$',
+        re.IGNORECASE,
+    )
+
+    for line in md.splitlines(keepends=True):
+        body = line.rstrip("\r\n")
+        ending = line[len(body) :]
+        fence = fence_pattern.match(body)
+        if fence:
+            marker = fence.group(1)
+            if fence_char is None:
+                fence_char = marker[0]
+                fence_length = len(marker)
+            elif marker[0] == fence_char and len(marker) >= fence_length:
+                fence_char = None
+                fence_length = 0
+        elif fence_char is None:
+            body = div_pattern.sub(r'\1<div markdown="1"\2>\3', body)
+        rendered_lines.append(body + ending)
+
+    return "".join(rendered_lines)
+
+
 def render_markdown(md: str, repo_url: str, branch: str) -> str:
     if not md.strip():
         return "<p>No README.md was found in this package repository.</p>"
     rendered = markdown.markdown(
-        md,
-        extensions=["tables", "pymdownx.highlight", "pymdownx.superfences"],
+        enable_markdown_in_html_divs(md),
+        extensions=["tables", "md_in_html", "pymdownx.highlight", "pymdownx.superfences"],
         extension_configs={
             "pymdownx.highlight": {
                 "css_class": "highlight",
@@ -2247,7 +2277,7 @@ def render_markdown(md: str, repo_url: str, branch: str) -> str:
     allowed_attrs = {
         "a": ["href", "title"],
         "code": ["class"],
-        "div": ["class"],
+        "div": ["class", "align"],
         "span": ["class"],
         "img": ["src", "alt", "title", "width", "height", "loading"],
         "th": ["align"],
