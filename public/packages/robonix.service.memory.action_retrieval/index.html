@@ -1031,16 +1031,26 @@ html[data-theme="dark"] .highlight .il { color: #AE81FF } /* Literal.Number.Inte
       <section class="panel detail-main">
         <h2>README</h2>
         <article class="readme">
-          <div align="center">
+          
+<div align="center">
+<p><strong>This RoboNix Service is provided and maintained by Prof. Xiang Chen's group (<a href="https://if-lab-pku.github.io/">IFLab</a>), School of Computer Science, Peking University.</strong></p>
 <h1>RoboNix Memory Action Retrieval Service</h1>
-<p><strong>A system-level experience memory and candidate-action retrieval Service for embodied models</strong></p>
-<p><a href="https://github.com/lusunn111/service-memory-action-retrieval-rbnx/blob/main/README-CN.md">中文文档</a> · <a href="#quick-start">🚀 Quick Start</a> · <a href="#datasets">📦 Dataset</a> · <a href="#build-index">🗄️ Build Database</a> · <a href="#citation">📝 Citation</a></p>
-<p><img alt="Python" src="https://img.shields.io/badge/Python-3.10+-3776AB?logo=python&amp;logoColor=white">
-<img alt="PyTorch" src="https://img.shields.io/badge/PyTorch-2.2-EE4C2C?logo=pytorch&amp;logoColor=white">
-<img alt="Qdrant" src="https://img.shields.io/badge/Qdrant-1.16-DC244C">
-<img alt="Status" src="https://img.shields.io/badge/two--view_pipeline-verified-1f9d72">
-<a href="https://github.com/lusunn111/service-memory-action-retrieval-rbnx/blob/main/LICENSE"><img alt="License" src="https://img.shields.io/badge/license-MulanPSL--2.0-red"></a>
-<a href="https://github.com/lusunn111/service-memory-action-retrieval-rbnx/stargazers"><img alt="GitHub Stars" src="https://img.shields.io/github/stars/lusunn111/service-memory-action-retrieval-rbnx?style=flat&amp;logo=github"></a></p>
+<p><strong>Turn embodied execution history into a queryable, provenance-aware action memory.</strong></p>
+<p>
+    <a href="https://github.com/lusunn111/service-memory-action-retrieval-rbnx/blob/main/README-CN.md">简体中文</a> ·
+    <a href="https://github.com/lusunn111/service-memory-action-retrieval-rbnx#what-this-adds">What this adds</a> ·
+    <a href="https://github.com/lusunn111/service-memory-action-retrieval-rbnx#demo-video">Demo Video</a> ·
+    <a href="https://github.com/lusunn111/service-memory-action-retrieval-rbnx#release-results">Release results</a> ·
+    <a href="https://github.com/lusunn111/service-memory-action-retrieval-rbnx#quick-start">Quick Start</a> ·
+    <a href="https://github.com/lusunn111/service-memory-action-retrieval-rbnx#citation">Citation</a>
+  </p>
+<p>
+    <a href="https://github.com/lusunn111/service-memory-action-retrieval-rbnx/actions/workflows/ci.yml"><img src="https://github.com/lusunn111/service-memory-action-retrieval-rbnx/actions/workflows/ci.yml/badge.svg" alt="CI status"></a>
+    <a href="https://github.com/lusunn111/service-memory-action-retrieval-rbnx/blob/main/LICENSE"><img src="https://img.shields.io/badge/license-MulanPSL--2.0-red" alt="MulanPSL-2.0 license"></a>
+    <a href="https://github.com/lusunn111/service-memory-action-retrieval-rbnx/stargazers"><img src="https://img.shields.io/github/stars/lusunn111/service-memory-action-retrieval-rbnx?style=flat&amp;logo=github" alt="GitHub stars"></a>
+  </p>
+<p><img width="100%" src="https://raw.githubusercontent.com/lusunn111/service-memory-action-retrieval-rbnx/main/docs/assets/readme/memory-retrieval-hero.webp" alt="Two synchronized observations flowing through vector memory into a candidate action trajectory"></p>
+<p><a href="https://github.com/lusunn111/service-memory-action-retrieval-rbnx#performance-snapshot"><img width="92%" src="https://raw.githubusercontent.com/lusunn111/service-memory-action-retrieval-rbnx/main/docs/assets/readme/result-badges.svg" alt="2.45 times peak OpenVLA speedup, 3.01 times peak pi0 speedup, and 273465 indexed experience points"></a></p>
 </div>
 <p>The <strong>RoboNix Memory Action Retrieval Service</strong> lets existing embodied models
 use historical execution experience during online decision-making instead of
@@ -1048,7 +1058,178 @@ leaving it as offline data. It retrieves candidate actions that match the
 current scene and instruction, then uses verification and policy fallback to
 contain retrieval errors, reducing repeated inference without replacing the
 original policy. The research implementation currently supports OpenVLA and π0, single-view and
-two-view Mix retrieval, and chunk-level hybrid verification.</p>
+two-view Mix retrieval, and chunk-level hybrid verification.
+Across the evaluated LIBERO workloads, the complete project reaches up to
+<strong>2.45×</strong> speedup with OpenVLA and <strong>3.01×</strong> with π0 while retaining the
+original target-policy fallback boundary.</p>
+<p><a></a></p>
+<h2>🎯 What this adds to RoboNix</h2>
+<p>This repository turns a research retrieval pipeline into an independently
+deployable RoboNix capability. The important boundary is not merely “Qdrant
+behind MCP”: the Service validates local observations, delays backend access
+until the first call, checks every returned trajectory, and preserves enough
+provenance for the caller to decide whether a candidate is safe to use.</p>
+<table>
+<thead>
+<tr>
+<th>RoboNix gets</th>
+<th>Concrete behavior</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>A stable memory capability</td>
+<td><code>retrieve</code> accepts an instruction and synchronized third-person/wrist observations, then returns a bounded candidate trajectory.</td>
+</tr>
+<tr>
+<td>A release-safe lifecycle</td>
+<td><code>rbnx boot</code> does not contact the HTTP backend; connectivity is checked on the first real request.</td>
+</tr>
+<tr>
+<td>Defensive multimodal input handling</td>
+<td>Only configured local roots and valid JPEG/PNG/WebP files are accepted, with file-size and signature checks.</td>
+</tr>
+<tr>
+<td>Explicit failure semantics</td>
+<td>A genuine no-match requests policy fallback; missing collections, transport failures, malformed JSON, invalid shapes, and non-finite actions fail the call.</td>
+</tr>
+<tr>
+<td>A hardware safety boundary</td>
+<td>The Service returns candidates and provenance only. It never drives a robot or closes the control loop.</td>
+</tr>
+<tr>
+<td>Reproducible full-chain evidence</td>
+<td>20 real dual-view LIBERO cases produced 200 matched HTTP ↔ Executor/MCP call pairs with zero parity failures.</td>
+</tr>
+</tbody>
+</table>
+<p>The catalog identity is <code>robonix.service.memory.action_retrieval</code>; the public
+contract is <code>robonix/service/memory/action_retrieval/retrieve</code>.</p>
+<p><a></a></p>
+<h2>🎬 Demo Video</h2>
+<div align="center">
+<p><a href="https://github.com/lusunn111/service-memory-action-retrieval-rbnx/blob/main/docs/assets/readme/retrieval-validation-reel.mp4"><img width="100%" src="https://raw.githubusercontent.com/lusunn111/service-memory-action-retrieval-rbnx/main/docs/assets/readme/retrieval-validation-reel.gif" alt="Real RoboNix retrieval rollout in LIBERO"></a>
+  </p>
+<p>Click the moving preview to play the MP4. Every action chunk in this successful LIBERO rollout was retrieved through Executor → Atlas → MCP → Service → 5003.</p>
+</div>
+<p>The demo completes <strong>put the bowl on the plate</strong> in 101 simulator steps. An
+external benchmark driver made 26 real RoboNix retrieval calls, applied each
+returned <code>4 × 7</code> LIBERO action chunk, and recorded both camera streams. Mean
+retrieval similarity was <code>0.9672</code>; P50/P95 Executor-to-result latency was
+<code>88.82/110.49 ms</code>. The Service still returns candidates only: the benchmark
+driver, not the Service, owns simulation execution. No physical robot was
+commanded. Reproduce the rollout with a licensed LIBERO installation and a
+booted real deployment:</p>
+<div class="highlight"><pre><span></span><code><span class="nv">MUJOCO_GL</span><span class="o">=</span>egl<span class="w"> </span>python<span class="w"> </span>benchmarks/target_server/run_robonix_rollout.py<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--atlas<span class="w"> </span><span class="m">127</span>.0.0.1:50251<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--provider<span class="w"> </span>action_retrieval<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--output-dir<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$RUN_ROOT</span><span class="s2">/retrieval-rollout&quot;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--task-suite<span class="w"> </span>libero_goal<span class="w"> </span>--dataset-type<span class="w"> </span>goal<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--task-id<span class="w"> </span><span class="m">8</span><span class="w"> </span>--initial-state<span class="w"> </span><span class="m">0</span>
+</code></pre></div>
+<p><a></a></p>
+<h2>⚡ RoboNix release results</h2>
+<p>Release candidate 0.1.0 was exercised through the real path
+<code>Executor → Atlas → MCP → Service → retrieval backend</code>, rather than by
+importing the provider class directly.</p>
+<table>
+<thead>
+<tr>
+<th>Release evidence</th>
+<th>Measured value</th>
+<th>Structured source</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Real dual-view inputs</td>
+<td>20 LIBERO cases across four suites</td>
+<td><code>benchmarks/target_server/input_manifest.json</code></td>
+</tr>
+<tr>
+<td>Direct/backend parity</td>
+<td>200 paired calls, 0 failures</td>
+<td><code>benchmarks/target_server/results/summary.json</code></td>
+</tr>
+<tr>
+<td>Direct HTTP latency</td>
+<td>P50 75.57 ms, P95 88.71 ms</td>
+<td><code>benchmarks/target_server/results/calls.csv</code></td>
+</tr>
+<tr>
+<td>Executor/MCP latency</td>
+<td>P50 84.38 ms, P95 98.05 ms</td>
+<td><code>benchmarks/target_server/results/calls.csv</code></td>
+</tr>
+<tr>
+<td>Service wrapping cost</td>
+<td>7.31 ms mean</td>
+<td><code>benchmarks/target_server/results/summary.json</code></td>
+</tr>
+<tr>
+<td>Retrieval memory</td>
+<td>39 collections, 273,465 points, 4,352-D vectors</td>
+<td><code>benchmarks/target_server/metadata.yaml</code></td>
+</tr>
+<tr>
+<td>Recorded live demo</td>
+<td>4 × 7 trajectory, similarity 0.9952566</td>
+<td><code>benchmarks/target_server/results/live-demo.json</code></td>
+</tr>
+<tr>
+<td>Successful retrieval rollout</td>
+<td>101 steps, 26 RoboNix calls, mean similarity 0.9672</td>
+<td><code>benchmarks/target_server/results/rollout-summary.json</code></td>
+</tr>
+</tbody>
+</table>
+<div align="center">
+<p><img width="100%" src="https://raw.githubusercontent.com/lusunn111/service-memory-action-retrieval-rbnx/main/docs/assets/readme/retrieval-validation-summary.webp" alt="Validated retrieval latency and parity summary">
+  </p>
+<p><strong>Figure 1.</strong> Real release validation. Latency values describe this deployment and are not universal model-performance guarantees.</p>
+</div>
+<h3>Start by goal</h3>
+<table>
+<thead>
+<tr>
+<th>Goal</th>
+<th>Entry point</th>
+<th>Required resources</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Verify the package contract</td>
+<td><code>python -m pytest -q &amp;&amp; python scripts/release_audit.py</code></td>
+<td>CPU only</td>
+</tr>
+<tr>
+<td>Run a mock RoboNix deployment</td>
+<td><code>examples/minimal-deployment/README.md</code></td>
+<td>CPU only; no backend</td>
+</tr>
+<tr>
+<td>Run the real Service</td>
+<td><code>examples/real-deployment/README.md</code></td>
+<td>RoboNix plus a compatible retrieval backend</td>
+</tr>
+<tr>
+<td>Invoke through Executor/MCP</td>
+<td><code>benchmarks/target_server/invoke_executor.py</code></td>
+<td>A booted deployment and valid local images</td>
+</tr>
+<tr>
+<td>Reproduce the release benchmark</td>
+<td><code>benchmarks/target_server/run_benchmark.py</code></td>
+<td>Licensed inputs and the validated retrieval index</td>
+</tr>
+<tr>
+<td>Run the real retrieval rollout</td>
+<td><code>benchmarks/target_server/run_robonix_rollout.py</code></td>
+<td>LIBERO, a booted deployment, and the validated retrieval index</td>
+</tr>
+</tbody>
+</table>
 <h2>RoboNix Service package</h2>
 <p>The repository root is directly publishable as
 <code>robonix.service.memory.action_retrieval</code>. It exposes
@@ -1123,10 +1304,10 @@ non-finite action fails the MCP call. Configuration fields and defaults are
 defined in <a href="https://github.com/lusunn111/service-memory-action-retrieval-rbnx/blob/main/config.spec">config.spec</a>. The existing backend uses wire value
 <code>dataset_type="10"</code> for the LIBERO-Long suite.</p>
 <p><a></a></p>
-<h2>📊 Performance Snapshot</h2>
-<p>The experience-memory path has been evaluated as part of verified hybrid
-execution on both token-based and diffusion-based VLA models. Results report
-task success rate (SR) and end-to-end speedup over the original model.</p>
+<h2>📊 Performance snapshot</h2>
+<p>The project evaluates experience-backed hybrid execution on both token-based
+and diffusion-based VLA models. Results report task success rate (SR) and
+end-to-end speedup over the original target model.</p>
 <table>
 <thead>
 <tr>
@@ -1189,8 +1370,11 @@ task success rate (SR) and end-to-end speedup over the original model.</p>
 </table>
 <h2>📚 Table of Contents</h2>
 <ul>
+<li><a href="#what-this-adds">What this adds to RoboNix</a></li>
+<li><a href="#demo-video">Demo Video</a></li>
+<li><a href="#release-results">RoboNix release results</a></li>
 <li><a href="#real-robonix-deployment">Real RoboNix deployment</a></li>
-<li><a href="#performance-snapshot">📊 Performance Snapshot</a></li>
+<li><a href="#performance-snapshot">📊 Performance snapshot</a></li>
 <li><a href="#news">📰 News</a></li>
 <li><a href="#system-results">⚡ System Capability and Results</a></li>
 <li><a href="#architecture">🧠 Architecture Overview</a></li>
@@ -1201,6 +1385,7 @@ task success rate (SR) and end-to-end speedup over the original model.</p>
 <li><a href="#datasets">📦 Dataset and Checkpoint Sources</a></li>
 <li><a href="#build-index">🗄️ Build the Retrieval Index</a></li>
 <li><a href="#retrieval-service">🌐 Start the Retrieval Service</a></li>
+<li><a href="#troubleshooting">🩺 Troubleshooting</a></li>
 <li><a href="#roadmap">🗺️ Roadmap</a></li>
 <li><a href="#citation">📝 Citation</a></li>
 <li><a href="#contributors">🤝 Contributors</a></li>
@@ -1282,7 +1467,7 @@ and fallback between retrieval and physical execution.</p>
 <div align="center">
 <p><img width="96%" alt="RoboNix retrieval-augmented memory architecture" src="https://raw.githubusercontent.com/lusunn111/service-memory-action-retrieval-rbnx/main/docs/assets/retrieval-memory-overview-v2.png">
   </p>
-<p><b>Figure 1.</b> Offline experience-memory construction and online two-view retrieval with policy fallback and continuous memory updates.</p>
+<p><b>Figure 2.</b> Offline experience-memory construction and online two-view retrieval with policy fallback and continuous memory updates.</p>
 </div>
 <p>The validated two-view Mix path stores both searchable vectors and action
 payloads in Qdrant; it does not require MongoDB. MongoDB remains available for
@@ -1326,7 +1511,7 @@ collection and returns a retrieved and optionally averaged action trajectory.</p
 <div align="center">
 <p><img width="96%" alt="RoboNix system architecture" src="https://raw.githubusercontent.com/lusunn111/service-memory-action-retrieval-rbnx/main/docs/assets/robonix-system-architecture.png">
   </p>
-<p><b>Figure 2.</b> System-level integration points for reusable memory services, custom services, and VLA-based user skills.</p>
+<p><b>Figure 3.</b> System-level integration points for reusable memory services, custom services, and VLA-based user skills.</p>
 </div>
 <p>Looking forward, the service can evolve toward continuously updated robot memory with pluggable encoders, hierarchical indexes, redundancy compression, expiration policies, and safety-aware trajectory reuse across tasks and robot platforms.</p>
 <p><a></a></p>
@@ -1747,6 +1932,37 @@ curl<span class="w"> </span>-X<span class="w"> </span>POST<span class="w"> </spa
 </code></pre></div>
 <p><code>vendor/rtcache/</code> is the canonical import-compatible retrieval implementation. Top-level directories provide an engineering-oriented view of the data, service, maintenance, and benchmark workflows. Validation and rebuttal sources are canonical under their respective benchmark directories.</p>
 <p><a></a></p>
+<h2>🩺 Troubleshooting</h2>
+<h3>RoboNix boots, but the first retrieval fails</h3>
+<p>Activation is deliberately offline; the first <code>retrieve</code> performs the backend
+health check. Confirm the configured loopback URL, call the backend <code>/health</code>
+endpoint, and verify that the Service environment can reach it. Do not make
+activation eagerly connect merely to hide a deployment error.</p>
+<h3>An input image is rejected before the backend is called</h3>
+<p>Resolve the file with <code>readlink -f</code> and confirm it stays below
+<code>allowed_image_root</code>. A filename extension is insufficient: the Service checks
+the JPEG, PNG, or WebP signature, file size, and decoded image limits. Put test
+inputs in the configured validation directory instead of broadening the root to
+the whole filesystem.</p>
+<h3>No match and backend failure look similar</h3>
+<p>A genuine no-match is a completed call with <code>fallback_required=true</code>; a missing
+collection, transport error, malformed response, invalid shape, or non-finite
+action fails the capability call. This distinction prevents infrastructure
+failure from being silently treated as ordinary policy fallback.</p>
+<h3>LIBERO-Long requests reach the wrong collection</h3>
+<p>The existing backend uses wire value <code>dataset_type="10"</code>. The public Service
+configuration can map a readable suite name to that value, but the benchmark,
+Service, and backend must use the mapping consistently.</p>
+<h3>Port 5002 is already occupied</h3>
+<p>Preserved data-collection and single-view retrieval workflows both use 5002.
+Assign one a different port; never stop an unidentified process. The validated
+two-view path uses 5003.</p>
+<h3>Cleanup after validation</h3>
+<p>Use <code>rbnx shutdown -f robonix_manifest.yaml</code>, then check Atlas, Executor, and
+the provider process individually. Only stop processes started by the current
+deployment. Shared Qdrant, embedding, and retrieval services may belong to
+other experiments and must remain untouched.</p>
+<p><a></a></p>
 <h2>🗺️ Roadmap</h2>
 <ul>
 <li>[x] Publish an independently runnable source-only repository.</li>
@@ -1804,6 +2020,6 @@ licenses.</p>
       </aside>
     </div>
   </main>
-  <footer class="site-footer"><div class="shell">Generated on 2026-08-01T19:35:22+00:00.</div></footer>
+  <footer class="site-footer"><div class="shell">Generated on 2026-08-02T19:35:59+00:00.</div></footer>
 </body>
 </html>
