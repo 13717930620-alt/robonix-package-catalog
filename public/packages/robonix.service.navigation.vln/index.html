@@ -1034,8 +1034,8 @@ html[data-theme="dark"] .highlight .il { color: #AE81FF } /* Literal.Number.Inte
           
 <div align="center">
 <p><strong>This RoboNix Service is provided and maintained by Prof. Xiang Chen's group (<a href="https://if-lab-pku.github.io/">IFLab</a>), School of Computer Science, Peking University.</strong></p>
-<h1>RoboNix Compute Optimization</h1>
-<p><strong>An open-source compute optimization tool for RoboNix dual-system vision-language navigation</strong></p>
+<h1>RoboNix Navigation Computing Optimization</h1>
+<p><strong>An open-source navigation computing optimization toolkit for RoboNix dual-system VLN</strong></p>
 <p>
   <a href="https://github.com/i6bimua/service-navigation-vln-rbnx/blob/main/README.zh-CN.md">简体中文</a> ·
   <a href="#what-this-adds">What this adds</a> ·
@@ -1161,7 +1161,7 @@ duplicated here.</p>
 <div align="center">
 <p><img width="100%" src="https://raw.githubusercontent.com/i6bimua/service-navigation-vln-rbnx/main/docs/assets/benchmark_overview.svg" alt="R2R-CE benchmark overview"></p>
 </div>
-<p>Compute Skill optimizes the latency–accuracy trade-off rather than a single
+<p>Navigation Computing optimizes the latency–accuracy trade-off rather than a single
 metric. On Orin+A100, SR remains on par with Edge Only (<code>62.8</code> versus <code>62.9</code>)
 while average step latency falls by 2.22×. Step Sync reaches a higher SR but
 blocks for <code>1644.5 ms</code> per step. The complete Orin and Thor tables are included
@@ -1246,6 +1246,9 @@ in <a href="#benchmark-results">Benchmark Results</a>.</p>
 <p><a></a></p>
 <h2>📰 News</h2>
 <ul>
+<li><strong>2026-08-03 — v0.4.2:</strong> Public branding now uses <strong>Navigation Computing
+  Optimization</strong>; the benchmark method label is <strong>Navigation Computing</strong>. See
+  <a href="https://github.com/i6bimua/service-navigation-vln-rbnx/blob/main/CHANGELOG.md">CHANGELOG.md</a>.</li>
 <li><strong>2026-07-29 — v0.4.1:</strong> Corrected the trained InternVLA-N1 service loop:
   one action per observed frame, S2 history replay across edge-only steps,
   action-only STOP / LOOK_DOWN handling, forced refresh after an exhausted
@@ -1351,12 +1354,12 @@ python<span class="w"> </span>scripts/demo/make_demo_reels.py<span class="w"> </
 </table>
 <p>Naive asynchronous execution is fast but may repeatedly consume stale semantic
 context. Full step synchronization keeps context fresh but blocks the control
-loop. Compute Skill switches between these behaviors according to runtime
+loop. Navigation Computing switches between these behaviors according to runtime
 state.</p>
 <p><a></a></p>
 <h2>🧠 Architecture</h2>
 <div align="center">
-<p><img width="100%" src="https://raw.githubusercontent.com/i6bimua/service-navigation-vln-rbnx/main/docs/assets/compute_optimization_architecture.png" alt="Compute optimization runtime architecture"></p>
+<p><img width="100%" src="https://raw.githubusercontent.com/i6bimua/service-navigation-vln-rbnx/main/docs/assets/compute_optimization_architecture.png" alt="Navigation computing optimization runtime architecture"></p>
 </div>
 <ol>
 <li><strong>Fast local loop:</strong> edge S1 consumes the latest observation and active
@@ -1635,7 +1638,7 @@ licensed assets were parsed and validated but no model result is claimed.</p>
 <tr>
 <td>R2R difficulty / RxR / REVERIE proxy results</td>
 <td>Data preparation only</td>
-<td>No Compute Skill full-split result is claimed</td>
+<td>No Navigation Computing full-split result is claimed</td>
 </tr>
 <tr>
 <td>Original REVERIE task</td>
@@ -2035,7 +2038,7 @@ scene IDs, GLB files, and navmeshes. It does not validate model inference.</p>
 </tr>
 </tbody>
 </table>
-<p>Passing the extended data check does not imply that Compute Skill has a
+<p>Passing the extended data check does not imply that Navigation Computing has a
 full-split result on those optional datasets.</p>
 <p><a></a></p>
 <h2>🔍 Step 4: Strict Preflight</h2>
@@ -2212,7 +2215,7 @@ and orchestration remain external.</p>
 </tr>
 <tr>
 <td>Compared strategies</td>
-<td>Edge Only, Cloud Only, Naive ECC, Step Sync, Compute Skill</td>
+<td>Edge Only, Cloud Only, Naive ECC, Step Sync, Navigation Computing</td>
 </tr>
 </tbody>
 </table>
@@ -2327,7 +2330,7 @@ real Wi-Fi, 5G, or cellular trace.</p>
 <td>16.03 GB</td>
 </tr>
 <tr>
-<td><strong>Compute Skill</strong></td>
+<td><strong>Navigation Computing</strong></td>
 <td><strong>4.18</strong></td>
 <td><strong>62.8</strong></td>
 <td><strong>57.8</strong></td>
@@ -2388,7 +2391,7 @@ real Wi-Fi, 5G, or cellular trace.</p>
 <td>16.03 GB</td>
 </tr>
 <tr>
-<td><strong>Compute Skill</strong></td>
+<td><strong>Navigation Computing</strong></td>
 <td><strong>4.14</strong></td>
 <td><strong>63.1</strong></td>
 <td><strong>58.1</strong></td>
@@ -2458,7 +2461,7 @@ real Wi-Fi, 5G, or cellular trace.</p>
 </table>
 <p>Cloud Only is a compute upper bound and does not represent an edge-owned local
 control loop. Step Sync is a freshness upper bound with substantial blocking.
-Compute Skill targets the accuracy–latency trade-off.</p>
+Navigation Computing targets the accuracy–latency trade-off.</p>
 <h3>Reporting boundaries</h3>
 <ul>
 <li>The committed CSV files are compact project benchmark summaries.</li>
@@ -2479,7 +2482,7 @@ the readiness levels are intentionally narrow:</p>
 <tr>
 <th>Dataset</th>
 <th>Data validation</th>
-<th>Public Compute Skill result</th>
+<th>Public Navigation Computing result</th>
 </tr>
 </thead>
 <tbody>
@@ -2709,9 +2712,9 @@ Contribution rules are in <code>CONTRIBUTING.md</code>; release history is in
 and citing it:</p>
 <div class="highlight"><pre><span></span><code><span class="nc">@software</span><span class="p">{</span><span class="nl">robonix_compute_optimization_2026</span><span class="p">,</span>
 <span class="w">  </span><span class="na">author</span><span class="w">  </span><span class="p">=</span><span class="w"> </span><span class="s">{Cao, Hangyu and Zheng, Zihao}</span><span class="p">,</span>
-<span class="w">  </span><span class="na">title</span><span class="w">   </span><span class="p">=</span><span class="w"> </span><span class="s">{RoboNix Compute Optimization}</span><span class="p">,</span>
+<span class="w">  </span><span class="na">title</span><span class="w">   </span><span class="p">=</span><span class="w"> </span><span class="s">{RoboNix Navigation Computing Optimization}</span><span class="p">,</span>
 <span class="w">  </span><span class="na">year</span><span class="w">    </span><span class="p">=</span><span class="w"> </span><span class="s">{2026}</span><span class="p">,</span>
-<span class="w">  </span><span class="na">version</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="s">{0.4.1}</span><span class="p">,</span>
+<span class="w">  </span><span class="na">version</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="s">{0.4.2}</span><span class="p">,</span>
 <span class="w">  </span><span class="na">url</span><span class="w">     </span><span class="p">=</span><span class="w"> </span><span class="s">{https://github.com/i6bimua/service-navigation-vln-rbnx}</span>
 <span class="p">}</span>
 </code></pre></div>
@@ -2728,7 +2731,7 @@ see <code>THIRD_PARTY_LICENSES.md</code>.</p>
       <aside class="panel detail-side">
         <h2>Package</h2>
         <div class="kv">
-          <div>Version</div><div><code>0.4.1</code></div>
+          <div>Version</div><div><code>0.4.2</code></div>
           <div>License</div><div><code>MulanPSL-2.0</code></div>
           <div>Kind</div><div>service</div>
           <div>Type</div><div>package</div>
@@ -2738,7 +2741,7 @@ see <code>THIRD_PARTY_LICENSES.md</code>.</p>
           <div>Manifest</div><div><code>package_manifest.yaml</code></div>
           <div>API</div><div><a href="../../api/view/?package=robonix.service.navigation.vln">package metadata</a></div>
         </div>
-        <div class="tags"><button class="tag tag-green" data-tag="service">service</button> <button class="tag tag-green" data-tag="navigation">navigation</button> <button class="tag tag-gray" data-tag="vln">vln</button> <button class="tag tag-gray" data-tag="compute-optimization">compute-optimization</button> <button class="tag tag-gray" data-tag="cloud-edge">cloud-edge</button> <button class="tag tag-gray" data-tag="dual-system">dual-system</button> <button class="tag tag-gray" data-tag="embodied-ai">embodied-ai</button></div>
+        <div class="tags"><button class="tag tag-green" data-tag="service">service</button> <button class="tag tag-green" data-tag="navigation">navigation</button> <button class="tag tag-gray" data-tag="vln">vln</button> <button class="tag tag-gray" data-tag="navigation-computing-optimization">navigation-computing-optimization</button> <button class="tag tag-gray" data-tag="cloud-edge">cloud-edge</button> <button class="tag tag-gray" data-tag="dual-system">dual-system</button> <button class="tag tag-gray" data-tag="embodied-ai">embodied-ai</button></div>
         <h2>Capabilities</h2>
         <ul class="cap-list">
           <li>robonix/service/navigation/vln/driver</li>
@@ -2750,6 +2753,6 @@ see <code>THIRD_PARTY_LICENSES.md</code>.</p>
       </aside>
     </div>
   </main>
-  <footer class="site-footer"><div class="shell">Generated on 2026-08-02T19:35:59+00:00.</div></footer>
+  <footer class="site-footer"><div class="shell">Generated on 2026-08-03T19:59:14+00:00.</div></footer>
 </body>
 </html>

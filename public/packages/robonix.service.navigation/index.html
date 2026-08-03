@@ -1048,6 +1048,11 @@ robot must carry a complete Nav2 YAML and reference it with <code>params_file</c
 <span class="w">        </span><span class="nt">map</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">mapping</span>
 <span class="w">        </span><span class="nt">odom</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">chassis</span>
 <span class="w">        </span><span class="nt">scan</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">lidar</span>
+<span class="w">      </span><span class="nt">dynamic_speed</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">max_linear_speed_mps</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.3</span>
+<span class="w">        </span><span class="nt">default_percentage</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">75</span>
+<span class="w">        </span><span class="nt">step_percentage</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">20</span>
+<span class="w">        </span><span class="nt">min_percentage</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">20</span>
 </code></pre></div>
 <p>Relative paths are resolved from the directory containing
 <code>robonix_manifest.yaml</code>. <code>config/nav2_params.example.yml</code> is a neutral example,
@@ -1077,6 +1082,23 @@ Set <code>config.velocity_output_topic</code> to a fully-qualified non-motion si
 <code>ROBONIX_VELOCITY_OUTPUT_TOPIC</code> environment variable is the fallback when the
 config field is absent; an explicit empty, relative, or malformed topic fails
 startup before the guard creates any ROS endpoint.</p>
+<p>Dynamic speed config uses Nav2-compatible SI semantics.
+<code>max_linear_speed_mps</code> is the actual hard planar limit
+<code>sqrt(vx^2 + vy^2)</code> in m/s after considering both the selected controller's
+<code>max_speed_xy</code> and stricter per-axis limits. The final velocity guard
+independently enforces this linear limit. <code>default_percentage</code> scales that
+maximum, so the example starts at <code>0.225 m/s</code>. <code>step_percentage</code> is an additive
+number of percentage points. Angular constraints such as DWB's
+<code>max_vel_theta</code> stay in the deploy-owned Nav2 YAML; a controller may
+proportionally adjust its internal kinematics when it processes a Nav2 speed
+limit, but Robonix does not expose a separate angular-speed policy here.</p>
+<p><code>adjust_speed</code> handles <code>faster</code>, <code>slower</code>, and <code>normal</code>;
+<code>set_speed_limit</code> applies an explicit percentage; and <code>get_speed_limit</code> reads
+the current and configured state. By default a mutation belongs to the
+selected active run and automatically restores the session limit when that run
+terminates. <code>persist=true</code> deliberately changes the provider-session limit
+across navigation runs. None of these operations restart Navigation, cancel a
+goal, or resubmit it.</p>
 <h2>Runtime</h2>
 <p>At <code>Driver(CMD_INIT)</code>, the wrapper:</p>
 <ol>
@@ -1084,7 +1106,8 @@ startup before the guard creates any ROS endpoint.</p>
 <li>resolves and materializes the deployment-owned Nav2 YAML;</li>
 <li>starts an optional PointCloud2-to-LaserScan adapter;</li>
 <li>starts Nav2 and waits for the <code>navigate_to_pose</code> action server;</li>
-<li>exposes navigate, status, and cancel capabilities.</li>
+<li>connects to Nav2's live <code>speed_limit</code> subscriber;</li>
+<li>exposes navigate, status, cancel, and dynamic speed capabilities.</li>
 </ol>
 <p>Missing required providers return <code>deferred</code>. Invalid config or a Nav2 startup
 failure returns <code>error</code> and tears down every child process.</p>
@@ -1100,7 +1123,9 @@ python3<span class="w"> </span>-m<span class="w"> </span>unittest<span class="w"
 <span class="w">  </span>test_configuration.py<span class="w"> </span><span class="se">\</span>
 <span class="w">  </span>test_runtime_integration.py<span class="w"> </span><span class="se">\</span>
 <span class="w">  </span>test_rotation_guard.py<span class="w"> </span><span class="se">\</span>
-<span class="w">  </span>test_scan_filter.py
+<span class="w">  </span>test_scan_filter.py<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>test_speed_control.py<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>test_velocity_limit.py
 </code></pre></div>
 <p>Jetson native builds require ROS 2 Humble and Nav2 packages compatible with the
 host JetPack image. Docker manifests remain available for simulator and CI
@@ -1127,10 +1152,13 @@ deployments.</p>
 <li>robonix/service/navigation/navigate</li>
 <li>robonix/service/navigation/navigate/status</li>
 <li>robonix/service/navigation/navigate/cancel</li>
+<li>robonix/service/navigation/adjust_speed</li>
+<li>robonix/service/navigation/set_speed_limit</li>
+<li>robonix/service/navigation/get_speed_limit</li>
         </ul>
       </aside>
     </div>
   </main>
-  <footer class="site-footer"><div class="shell">Generated on 2026-08-02T19:35:59+00:00.</div></footer>
+  <footer class="site-footer"><div class="shell">Generated on 2026-08-03T19:59:14+00:00.</div></footer>
 </body>
 </html>

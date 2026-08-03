@@ -1860,7 +1860,10 @@
       "robonix/service/navigation/driver",
       "robonix/service/navigation/navigate",
       "robonix/service/navigation/navigate/status",
-      "robonix/service/navigation/navigate/cancel"
+      "robonix/service/navigation/navigate/cancel",
+      "robonix/service/navigation/adjust_speed",
+      "robonix/service/navigation/set_speed_limit",
+      "robonix/service/navigation/get_speed_limit"
     ],
     "deploy_dependencies": [],
     "readme_url": "https://github.com/syswonder/service-navigation-rbnx/blob/main/README.md",
@@ -1868,14 +1871,14 @@
   },
   {
     "name": "robonix.service.navigation.vln",
-    "version": "0.4.1",
+    "version": "0.4.2",
     "description": "Instruction-following navigation service — cloud S2 semantic latents plus edge S1 action generation with adaptive cloud-edge synchronization.",
     "license": "MulanPSL-2.0",
     "tags": [
       "service",
       "navigation",
       "vln",
-      "compute-optimization",
+      "navigation-computing-optimization",
       "cloud-edge",
       "dual-system",
       "embodied-ai"
