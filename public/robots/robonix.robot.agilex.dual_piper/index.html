@@ -1095,8 +1095,20 @@ After editing the plan, validate every intermediate path under direct
 supervision before running the complete transfer.</p>
 <h2>Safety</h2>
 <p>Boot opens both CAN buses for feedback but does not enable or move hardware.
-Motion remains locked unless <code>ROBONIX_ALLOW_MOTION=1</code> is present in the boot
-environment. The checked-in <code>.env.example</code> keeps this switch at <code>0</code>.</p>
+<code>ROBONIX_ALLOW_MOTION</code> selects only the initial motion-gate state when each
+provider activates. The checked-in <code>.env.example</code> keeps this switch at <code>0</code>.</p>
+<p>When motion is locked, the provider's <code>status.detail</code> gives Pilot the exact
+absolute command that the on-site operator must run. Pilot cannot unlock motion
+itself. A typical command, run from the active cached Piper package directory,
+is:</p>
+<div class="highlight"><pre><span></span><code>rbnx-build/venv/bin/python<span class="w"> </span>scripts/motion_lock.py<span class="w"> </span>unlock<span class="w"> </span>--provider<span class="w"> </span>left_piper
+</code></pre></div>
+<p>Use <code>right_piper</code> for the right arm. The command reads an owner-only token that
+is replaced on each provider activation, so it must be run as the OS user that
+owns the active provider. After it succeeds, call <code>status</code> again and require
+<code>motion_unlocked=true</code>. Runtime lock is available through the same script with
+<code>lock</code> in place of <code>unlock</code>; locking needs no token and immediately sends a fast
+stop, including during an active trajectory.</p>
 <p>Joint jogging is limited to 5 degrees per request and 15 percent speed. Absolute
 trajectory execution accepts only validated J1-J6 waypoints, advances after all
 six joints settle within 1.5 degrees, and performs no collision checking.
@@ -1174,7 +1186,10 @@ robonix-client<span class="w"> </span>--robot-host<span class="w"> </span><span 
 workspaces as needed. The client starts its local computer-audio service
 automatically.</p>
 <h2>Demonstration Workflow</h2>
-<p>First clear both workspaces and manually close both grippers completely. Submit:</p>
+<p>First read both arm states. If either reports <code>gripper_enabled=true</code>, call its
+<code>disable_gripper</code> capability and verify <code>gripper_enabled=false</code>. Only after both
+grippers are disabled, clear both workspaces and manually close both grippers
+completely. Then submit:</p>
 <div class="highlight"><pre><span></span><code>左右机械臂工作区域已清场，我已手动将左右夹爪完全合拢。请初始化左右机械臂及其夹爪。
 </code></pre></div>
 <p>Wait for initialization and verify both arms and grippers are enabled and homed.
@@ -1247,6 +1262,6 @@ model retains its upstream MIT notice in
       </aside>
     </div>
   </main>
-  <footer class="site-footer"><div class="shell">Generated on 2026-08-05T05:02:03+00:00.</div></footer>
+  <footer class="site-footer"><div class="shell">Generated on 2026-08-05T19:55:47+00:00.</div></footer>
 </body>
 </html>

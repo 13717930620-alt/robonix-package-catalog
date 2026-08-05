@@ -216,7 +216,7 @@ but browser-facing links and new integrations should use the `.json` paths above
 The generated commit uses `[skip ci]`; normal CI only triggers from
 `catalog.yaml`, the builder script, the workflow, or manual dispatch.
 
-Generated on `2026-08-05T05:02:03+00:00`.
+Generated on `2026-08-05T19:55:47+00:00`.
 
 ## Packages
 
@@ -246,7 +246,7 @@ Generated on `2026-08-05T05:02:03+00:00`.
 | [`robonix.robot.beingbeyond.d1`](https://syswonder.github.io/robonix-package-catalog/robots/robonix.robot.beingbeyond.d1/) | `0.1.0` | `robot` | Felix <xi.lifeng@qq.com> | robot, deploy, beingbeyond, d1, manipulation, dexterous-hand | [repo](https://github.com/syswonder/robot-beingbeyond-d1) |
 | [`robonix.robot.deep_robotics.lite3`](https://syswonder.github.io/robonix-package-catalog/robots/robonix.robot.deep_robotics.lite3/) | `0.2.0` | `robot` | Bunnycxk <2501213313@stu.pku.edu.cn> | robot, deploy, deep_robotics, lite3, quadruped, jetson, lidar, rgbd, mapping, navigation | [repo](https://github.com/syswonder/robot-deep_robotics-lite3) |
 | [`robonix.robot.syswonder.minecraft_bot`](https://syswonder.github.io/robonix-package-catalog/robots/robonix.robot.syswonder.minecraft_bot/) | `0.1.0` | `robot` | ZZJJWarth <jzeng25@stu.pku.edu.cn> | robot, deploy, minecraft, simulation | [repo](https://github.com/syswonder/robot-syswonder-minecraft_bot) |
-| [`robonix.robot.unitree.go2`](https://syswonder.github.io/robonix-package-catalog/robots/robonix.robot.unitree.go2/) | `0.1.0` | `robot` | Origamii520 <Origamii520@users.noreply.github.com> | robot, deploy, unitree, go2, quadruped, lidar, camera, imu, mapping, navigation, speech | [repo](https://github.com/syswonder/robot-unitree-go2) |
+| [`robonix.robot.unitree.go2`](https://syswonder.github.io/robonix-package-catalog/robots/robonix.robot.unitree.go2/) | `0.1.0` | `robot` | Origamii520 <zxq13204030517@163.com> | robot, deploy, unitree, go2, quadruped, lidar, camera, imu, mapping, navigation, speech | [repo](https://github.com/syswonder/robot-unitree-go2) |
 | [`robonix.robot.wheeltec.r550`](https://syswonder.github.io/robonix-package-catalog/robots/robonix.robot.wheeltec.r550/) | `0.1.0` | `robot` | Xiangrui Cheng <ccc_7020@qq.com> | robot, deploy, robonix | [repo](https://github.com/syswonder/robot-wheeltec-r550) |
 | [`robonix.robot.wowrobo.roboarm`](https://syswonder.github.io/robonix-package-catalog/robots/robonix.robot.wowrobo.roboarm/) | `0.1.0` | `robot` | Yuzheng Gao <2300013159@stuu.pku.edu.cn> | robot, deploy, robonix, manipulator, lerobo | [repo](https://github.com/syswonder/robot-wowrobo-roboarm) |
 | [`robonix.service.grasp_pose`](https://syswonder.github.io/robonix-package-catalog/packages/robonix.service.grasp_pose/) | `0.1.0` | `service` | lhw2002426 <lhw2002426@users.noreply.github.com> | service, perception, grasp_pose, grasp, ros2 | [repo](https://github.com/syswonder/service-grasp-pose-rbnx) |

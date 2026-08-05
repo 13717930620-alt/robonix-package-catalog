@@ -2,7 +2,7 @@
   {
     "name": "robonix.primitive.agilex.piper.arm",
     "version": "0.1.0",
-    "description": "AgileX Piper 6-DoF arm primitive — declares joint_states / joint_command / end_pose / pos_command / arm_status.",
+    "description": "AgileX Piper 6-DoF arm primitive with selectable ROS 2 and direct-SDK backends.",
     "license": "Apache-2.0",
     "tags": [
       "primitive",
@@ -28,7 +28,21 @@
       "robonix/primitive/arm/joint_command",
       "robonix/primitive/arm/end_pose",
       "robonix/primitive/arm/pos_command",
-      "robonix/primitive/arm/arm_status"
+      "robonix/primitive/arm/arm_status",
+      "robonix/primitive/arm/status",
+      "robonix/primitive/arm/set_enabled",
+      "robonix/primitive/arm/enable_arm",
+      "robonix/primitive/arm/disable_arm",
+      "robonix/primitive/arm/enable_gripper",
+      "robonix/primitive/arm/disable_gripper",
+      "robonix/primitive/arm/jog_joint",
+      "robonix/primitive/arm/execute_joint_trajectory",
+      "robonix/primitive/arm/set_gripper",
+      "robonix/primitive/arm/set_gripper_zero",
+      "robonix/primitive/arm/emergency_stop",
+      "robonix/primitive/arm/motion_lock",
+      "robonix/primitive/health/state",
+      "robonix/primitive/health/stream"
     ],
     "deploy_dependencies": [],
     "readme_url": "https://github.com/syswonder/primitive-agilex-piper-arm-rbnx/blob/main/README.md",
@@ -1234,13 +1248,13 @@
       {
         "section": "primitive",
         "name": "audio_client_bridge",
-        "repo": "",
-        "path": "${ROBONIX_SOURCE_PATH}/examples/webots/primitives/audio_client_bridge",
-        "branch": "",
+        "repo": "https://github.com/syswonder/primitive-audio-client-bridge-rbnx",
+        "path": "",
+        "branch": "main",
         "manifest": "",
-        "resolution": "robonix_source",
-        "package_name": "",
-        "package_url": "",
+        "resolution": "catalog",
+        "package_name": "robonix.primitive.audio.client_bridge",
+        "package_url": "../robonix.primitive.audio.client_bridge/",
         "resolution_warning": ""
       },
       {
@@ -1290,12 +1304,31 @@
         "package_name": "robonix.skill.explore",
         "package_url": "../robonix.skill.explore/",
         "resolution_warning": ""
+      },
+      {
+        "section": "skill",
+        "name": "find_object",
+        "repo": "https://github.com/Bunnycxk/skill-find-object-rbnx.git",
+        "path": "",
+        "branch": "main",
+        "manifest": "",
+        "resolution": "unresolved",
+        "package_name": "",
+        "package_url": "",
+        "resolution_warning": "Repository 'https://github.com/Bunnycxk/skill-find-object-rbnx.git' is not indexed by catalog.yaml; add the package to the Catalog or use a repository-local dependency."
       }
     ],
     "readme_url": "https://github.com/syswonder/robot-deep_robotics-lite3/blob/main/README.md",
-    "preview_image_url": "",
-    "deployment_status": "ok",
-    "deployment_warnings": []
+    "preview_image_url": "https://raw.githubusercontent.com/syswonder/robot-deep_robotics-lite3/main/assets/robot.jpg",
+    "deployment_status": "warning",
+    "deployment_warnings": [
+      {
+        "section": "skill",
+        "name": "find_object",
+        "source": "https://github.com/Bunnycxk/skill-find-object-rbnx.git",
+        "reason": "Repository 'https://github.com/Bunnycxk/skill-find-object-rbnx.git' is not indexed by catalog.yaml; add the package to the Catalog or use a repository-local dependency."
+      }
+    ]
   },
   {
     "name": "robonix.robot.syswonder.minecraft_bot",
@@ -1395,7 +1428,7 @@
     ],
     "repo": "https://github.com/syswonder/robot-unitree-go2",
     "maintainers": [
-      "Origamii520 <Origamii520@users.noreply.github.com>"
+      "Origamii520 <zxq13204030517@163.com>"
     ],
     "repo_name": "robot-unitree-go2",
     "default_branch": "main",
@@ -1516,7 +1549,7 @@
       }
     ],
     "readme_url": "https://github.com/syswonder/robot-unitree-go2/blob/main/README.md",
-    "preview_image_url": "",
+    "preview_image_url": "https://raw.githubusercontent.com/syswonder/robot-unitree-go2/main/assets/robot.jpg",
     "deployment_status": "ok",
     "deployment_warnings": []
   },

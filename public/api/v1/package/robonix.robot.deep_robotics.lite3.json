@@ -91,13 +91,13 @@
     {
       "section": "primitive",
       "name": "audio_client_bridge",
-      "repo": "",
-      "path": "${ROBONIX_SOURCE_PATH}/examples/webots/primitives/audio_client_bridge",
-      "branch": "",
+      "repo": "https://github.com/syswonder/primitive-audio-client-bridge-rbnx",
+      "path": "",
+      "branch": "main",
       "manifest": "",
-      "resolution": "robonix_source",
-      "package_name": "",
-      "package_url": "",
+      "resolution": "catalog",
+      "package_name": "robonix.primitive.audio.client_bridge",
+      "package_url": "../robonix.primitive.audio.client_bridge/",
       "resolution_warning": ""
     },
     {
@@ -147,10 +147,29 @@
       "package_name": "robonix.skill.explore",
       "package_url": "../robonix.skill.explore/",
       "resolution_warning": ""
+    },
+    {
+      "section": "skill",
+      "name": "find_object",
+      "repo": "https://github.com/Bunnycxk/skill-find-object-rbnx.git",
+      "path": "",
+      "branch": "main",
+      "manifest": "",
+      "resolution": "unresolved",
+      "package_name": "",
+      "package_url": "",
+      "resolution_warning": "Repository 'https://github.com/Bunnycxk/skill-find-object-rbnx.git' is not indexed by catalog.yaml; add the package to the Catalog or use a repository-local dependency."
     }
   ],
   "readme_url": "https://github.com/syswonder/robot-deep_robotics-lite3/blob/main/README.md",
-  "preview_image_url": "",
-  "deployment_status": "ok",
-  "deployment_warnings": []
+  "preview_image_url": "https://raw.githubusercontent.com/syswonder/robot-deep_robotics-lite3/main/assets/robot.jpg",
+  "deployment_status": "warning",
+  "deployment_warnings": [
+    {
+      "section": "skill",
+      "name": "find_object",
+      "source": "https://github.com/Bunnycxk/skill-find-object-rbnx.git",
+      "reason": "Repository 'https://github.com/Bunnycxk/skill-find-object-rbnx.git' is not indexed by catalog.yaml; add the package to the Catalog or use a repository-local dependency."
+    }
+  ]
 }
