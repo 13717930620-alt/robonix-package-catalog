@@ -216,7 +216,7 @@ but browser-facing links and new integrations should use the `.json` paths above
 The generated commit uses `[skip ci]`; normal CI only triggers from
 `catalog.yaml`, the builder script, the workflow, or manual dispatch.
 
-Generated on `2026-08-04T19:57:31+00:00`.
+Generated on `2026-08-05T01:09:52+00:00`.
 
 ## Packages
 
@@ -240,6 +240,7 @@ Generated on `2026-08-04T19:57:31+00:00`.
 | [`robonix.primitive.orbbec.gemini330.camera`](https://syswonder.github.io/robonix-package-catalog/packages/robonix.primitive.orbbec.gemini330.camera/) | `0.1.1` | `primitive` | Bunnycxk <2501213313@stu.pku.edu.cn> | primitive, camera, orbbec, gemini330, rgbd, ros2 | [repo](https://github.com/syswonder/primitive-orbbec-camera) |
 | [`robonix.primitive.robot_description`](https://syswonder.github.io/robonix-package-catalog/packages/robonix.primitive.robot_description/) | `0.1.0` | `primitive` | wheatfox <wheatfox17@icloud.com> | primitive, robot-description, urdf, tf, ros2, zenoh | [repo](https://github.com/syswonder/primitive-robot-description-rbnx) |
 | [`robonix.primitive.syswonder.minecraft_bot`](https://syswonder.github.io/robonix-package-catalog/packages/robonix.primitive.syswonder.minecraft_bot/) | `0.1.0` | `primitive` | ZZJJWarth <jzeng25@stu.pku.edu.cn> | primitive, minecraft, simulation, camera, chassis, perception | [repo](https://github.com/syswonder/primitive-syswonder-minecraft_bot-rbnx) |
+| [`robonix.primitive.yahboom.rosmaster_x3.safe_move`](https://syswonder.github.io/robonix-package-catalog/packages/robonix.primitive.yahboom.rosmaster_x3.safe_move/) | `0.2.0-candidate.1` | `primitive` | luoyg0831 <luoyg0831@gmail.com> | primitive, chassis, yahboom, rosmaster_x3, ros1, navigation, safety | [repo](https://github.com/luoyg0831-a11y/robonix-rosmaster-x3-safe-move) |
 | [`robonix.robot.agilex.dual_piper`](https://syswonder.github.io/robonix-package-catalog/robots/robonix.robot.agilex.dual_piper/) | `0.1.0` | `robot` | Zhenyu Zhang <768726812@qq.com> | robot, deploy, agilex, piper, dual-arm, gripper | [repo](https://github.com/syswonder/robot-agilex-dual-piper) |
 | [`robonix.robot.agilex.ranger_mini_v3`](https://syswonder.github.io/robonix-package-catalog/robots/robonix.robot.agilex.ranger_mini_v3/) | `0.2.0` | `robot` | wheatfox <wheatfox17@icloud.com> | robot, deploy, agilex, ranger_mini_v3, jetson, lidar, rgbd, scene, mapping, navigation | [repo](https://github.com/syswonder/robot-agilex-ranger_mini_v3) |
 | [`robonix.robot.beingbeyond.d1`](https://syswonder.github.io/robonix-package-catalog/robots/robonix.robot.beingbeyond.d1/) | `0.1.0` | `robot` | Felix <xi.lifeng@qq.com> | robot, deploy, beingbeyond, d1, manipulation, dexterous-hand | [repo](https://github.com/syswonder/robot-beingbeyond-d1) |

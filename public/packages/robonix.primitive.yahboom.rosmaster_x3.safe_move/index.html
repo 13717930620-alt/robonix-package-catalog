@@ -19,9 +19,9 @@
       document.documentElement.style.colorScheme = resolved;
     })();
   </script>
-  <title>Robot deployments - Robonix Package Catalog</title>
-  <link rel="icon" type="image/svg+xml" href="../assets/robonix-mark.svg">
-  <link rel="stylesheet" href="../assets/vendor/pico/pico.classless.min.css">
+  <title>robonix.primitive.yahboom.rosmaster_x3.safe_move - Robonix Package Catalog</title>
+  <link rel="icon" type="image/svg+xml" href="../../assets/robonix-mark.svg">
+  <link rel="stylesheet" href="../../assets/vendor/pico/pico.classless.min.css">
   <style>
 @import url("https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Noto+Sans+SC:wght@400;500;700&display=swap");
 
@@ -955,15 +955,15 @@ html[data-theme="dark"] .highlight .il { color: #AE81FF } /* Literal.Number.Inte
 <body>
   <header class="site-header">
     <div class="shell topline">
-      <a class="brand" href="../">
-        <img class="brand-mark" src="../assets/robonix-mark.svg" alt="" aria-hidden="true" width="34" height="30">
+      <a class="brand" href="../../">
+        <img class="brand-mark" src="../../assets/robonix-mark.svg" alt="" aria-hidden="true" width="34" height="30">
         <span>Robonix <small>Package Catalog</small></span>
       </a>
       <div class="header-actions">
         <nav class="api-links" aria-label="Catalog navigation">
-          <a href="../packages/">Packages</a>
-          <a href="../robots/" aria-current="page">Robots</a>
-          <a href="../api/view/">API</a>
+          <a href="../../packages/" aria-current="page">Packages</a>
+          <a href="../../robots/">Robots</a>
+          <a href="../../api/view/">API</a>
         </nav>
         <div class="theme-switcher" role="group" aria-label="Color theme">
           <button type="button" data-theme-choice="auto" aria-pressed="false">Auto</button>
@@ -1021,307 +1021,149 @@ html[data-theme="dark"] .highlight .il { color: #AE81FF } /* Literal.Number.Inte
       }
     })();
   </script>
+  <header class="shell detail-hero">
+    <a class="back" href="../">Back to packages</a>
+    <h1>robonix.primitive.yahboom.rosmaster_x3.safe_move</h1>
+    <p class="lede">Guarded ROS1 short-distance navigation for Yahboom ROSMASTER X3.</p>
+  </header>
   <main class="shell">
-    <section class="page-intro">
-      <span class="eyebrow">Robonix ecosystem index</span>
-      <h1>Robot deployments</h1>
-      <p class="lede">Complete robot deployments, including the packages and platform metadata they assemble.</p>
-      <div class="search-strip">
-        <label for="q" class="visually-hidden">Search robot deployments</label>
-        <input class="search" id="q" type="search" autocomplete="off" placeholder="Search robot deployments, capabilities, tags, or maintainers">
-      </div>
-    </section>
-    <div class="catalog-frame">
-      <details class="panel filters" open>
-        <summary>Filters and catalog summary</summary>
-        <div class="filter-content">
-          <div class="stat-grid">
-            <div class="stat"><strong>8</strong><span>robot deployments</span></div>
-            <div class="stat"><strong>66</strong><span>indexed items</span></div>
-          </div>
-          <div class="filter-group">
-            <h2>Kind</h2>
-            <div class="filter-buttons" id="kindFilters">
-              <button class="filter-button active" data-kind="">All</button>
-              <button class="filter-button" data-kind="robot">robot</button>
-            </div>
-          </div>
-          <div class="filter-group">
-            <h2>Tags</h2>
-            <div class="filter-buttons" id="tagFilters">
-              <button class="filter-button active" data-tag-filter="">All</button>
-              <button class="filter-button" data-tag-filter="agilex">agilex</button><button class="filter-button" data-tag-filter="beingbeyond">beingbeyond</button><button class="filter-button" data-tag-filter="camera">camera</button><button class="filter-button" data-tag-filter="d1">d1</button><button class="filter-button" data-tag-filter="deep_robotics">deep_robotics</button><button class="filter-button" data-tag-filter="deploy">deploy</button><button class="filter-button" data-tag-filter="dexterous-hand">dexterous-hand</button><button class="filter-button" data-tag-filter="dual-arm">dual-arm</button><button class="filter-button" data-tag-filter="go2">go2</button><button class="filter-button" data-tag-filter="gripper">gripper</button><button class="filter-button" data-tag-filter="imu">imu</button><button class="filter-button" data-tag-filter="jetson">jetson</button><button class="filter-button" data-tag-filter="lerobo">lerobo</button><button class="filter-button" data-tag-filter="lidar">lidar</button><button class="filter-button" data-tag-filter="lite3">lite3</button><button class="filter-button" data-tag-filter="manipulation">manipulation</button><button class="filter-button" data-tag-filter="manipulator">manipulator</button><button class="filter-button" data-tag-filter="mapping">mapping</button><button class="filter-button" data-tag-filter="minecraft">minecraft</button><button class="filter-button" data-tag-filter="navigation">navigation</button><button class="filter-button" data-tag-filter="piper">piper</button><button class="filter-button" data-tag-filter="quadruped">quadruped</button><button class="filter-button" data-tag-filter="ranger_mini_v3">ranger_mini_v3</button><button class="filter-button" data-tag-filter="rgbd">rgbd</button><button class="filter-button" data-tag-filter="robonix">robonix</button><button class="filter-button" data-tag-filter="robot">robot</button><button class="filter-button" data-tag-filter="scene">scene</button><button class="filter-button" data-tag-filter="simulation">simulation</button><button class="filter-button" data-tag-filter="speech">speech</button><button class="filter-button" data-tag-filter="unitree">unitree</button>
-            </div>
-          </div>
-        </div>
-      </details>
-      <section class="panel content">
-        <div class="toolbar">
-          <div class="count" id="count" aria-live="polite"></div>
-          <button class="clear-filters" id="clearFilters" type="button">Clear filters</button>
-        </div>
-        <div class="package-list" id="packages">
-          <article class="package-card" data-kind="robot" data-tags="robot deploy agilex piper dual-arm gripper" data-search="robonix.robot.agilex.dual_piper 0.1.0 robot robonix deployment for two agilex piper arms and their factory can grippers. mit https://github.com/syswonder/robot-agilex-dual-piper zhenyu zhang &lt;768726812@qq.com&gt; robot deploy agilex piper dual-arm gripper left_piper  ./primitives/piper_arm  right_piper  ./primitives/piper_arm  audio_client_bridge https://github.com/syswonder/primitive-audio-client-bridge-rbnx   speech  ${robonix_source_path}/services/speech  dual_piper_initialize  ./skills/dual_piper_initialize  dual_piper_transfer  ./skills/dual_piper_transfer ">
-        <div>
-          <div class="card-status-line"><span class="kind-label">robot</span></div>
-          <div class="package-title">
-            <a href="robonix.robot.agilex.dual_piper/">robonix.robot.agilex.dual_piper</a>
-            <span class="version">v0.1.0</span>
-          </div>
-          <p class="description">Robonix deployment for two AgileX Piper arms and their factory CAN grippers.</p>
-          <div class="meta-line">
-            <span>maintainers <strong>Zhenyu Zhang &lt;768726812@qq.com&gt;</strong></span>
-            <span>6 dependencies</span>
-          </div>
-          <div class="tags"><button class="tag tag-red" data-tag="robot">robot</button> <button class="tag tag-slate" data-tag="deploy">deploy</button> <button class="tag tag-gray" data-tag="agilex">agilex</button> <button class="tag tag-gray" data-tag="piper">piper</button> <button class="tag tag-gray" data-tag="dual-arm">dual-arm</button> <button class="tag tag-gray" data-tag="gripper">gripper</button></div>
-        </div>
-        <div class="card-side">
-          <div class="card-actions">
-            <a href="robonix.robot.agilex.dual_piper/">Details</a>
-            <a href="https://github.com/syswonder/robot-agilex-dual-piper">GitHub</a>
-          </div>
-        </div>
-      </article><article class="package-card" data-kind="robot" data-tags="robot deploy agilex ranger_mini_v3 jetson lidar rgbd scene mapping navigation" data-search="robonix.robot.agilex.ranger_mini_v3 0.2.0 robot robonix deployment for the agilex ranger mini v3 robot. apache-2.0 https://github.com/syswonder/robot-agilex-ranger_mini_v3 wheatfox &lt;wheatfox17@icloud.com&gt; robot deploy agilex ranger_mini_v3 jetson lidar rgbd scene mapping navigation robot_description https://github.com/syswonder/primitive-robot-description-rbnx   mid360_lidar https://github.com/syswonder/primitive-livox-mid360-lidar-rbnx   mid360_imu https://github.com/syswonder/primitive-livox-mid360-imu-rbnx   orbbec_camera https://github.com/syswonder/primitive-orbbec-camera   orbbec_wrist_camera https://github.com/syswonder/primitive-orbbec-dabai_dcw-camera-rbnx   ranger_chassis https://github.com/syswonder/primitive-agilex-ranger_mini_v3-chassis-rbnx   piper_ctl https://github.com/syswonder/primitive-agilex-piper-arm-rbnx   audio_driver https://github.com/syswonder/primitive-audio-driver-rbnx   audio_client_bridge https://github.com/syswonder/primitive-audio-client-bridge-rbnx   memory  ${robonix_source_path}/services/memsearch  speech  ${robonix_source_path}/services/speech  voiceprint  ${robonix_source_path}/services/voiceprint  llm_detect https://github.com/syswonder/service-object-detect-rbnx   grasp_pose https://github.com/syswonder/service-grasp-pose-rbnx   roboarm_ik https://github.com/syswonder/service-roboarm-ik-rbnx   mapping https://github.com/syswonder/service-map-rbnx   nav2 https://github.com/syswonder/service-navigation-rbnx   explore https://github.com/syswonder/skill-explore-rbnx   greet  ./skills/greet  pick https://github.com/syswonder/skill-pick-vertical-grasp-rbnx  ">
-        <div>
-          <div class="card-status-line"><span class="kind-label">robot</span></div>
-          <div class="package-title">
-            <a href="robonix.robot.agilex.ranger_mini_v3/">robonix.robot.agilex.ranger_mini_v3</a>
-            <span class="version">v0.2.0</span>
-          </div>
-          <p class="description">Robonix deployment for the AgileX Ranger Mini v3 robot.</p>
-          <div class="meta-line">
-            <span>maintainers <strong>wheatfox &lt;wheatfox17@icloud.com&gt;</strong></span>
-            <span>20 dependencies</span>
-          </div>
-          <div class="tags"><button class="tag tag-red" data-tag="robot">robot</button> <button class="tag tag-slate" data-tag="deploy">deploy</button> <button class="tag tag-gray" data-tag="agilex">agilex</button> <button class="tag tag-gray" data-tag="ranger_mini_v3">ranger_mini_v3</button> <button class="tag tag-gray" data-tag="jetson">jetson</button> <button class="tag tag-purple" data-tag="lidar">lidar</button> <button class="tag tag-gray" data-tag="rgbd">rgbd</button> <button class="tag tag-gray" data-tag="scene">scene</button> <button class="tag tag-blue" data-tag="mapping">mapping</button> <button class="tag tag-green" data-tag="navigation">navigation</button></div>
-        </div>
-        <div class="card-side">
-          <div class="card-actions">
-            <a href="robonix.robot.agilex.ranger_mini_v3/">Details</a>
-            <a href="https://github.com/syswonder/robot-agilex-ranger_mini_v3">GitHub</a>
-          </div>
-          <img class="card-preview" src="../assets/previews/robonix.robot.agilex.ranger_mini_v3-380.webp" srcset="../assets/previews/robonix.robot.agilex.ranger_mini_v3-380.webp 380w, ../assets/previews/robonix.robot.agilex.ranger_mini_v3-720.webp 720w" sizes="(max-width: 520px) calc(100vw - 48px), 190px" width="380" height="285" alt="robonix.robot.agilex.ranger_mini_v3 preview" loading="lazy" decoding="async" fetchpriority="low">
-        </div>
-      </article><article class="package-card" data-kind="robot" data-tags="robot deploy beingbeyond d1 manipulation dexterous-hand" data-search="robonix.robot.beingbeyond.d1 0.1.0 robot beingbeyond d1 desktop robot deployment — dexterous-hand object pick/place skill. mulanpsl-2.0 https://github.com/syswonder/robot-beingbeyond-d1 felix &lt;xi.lifeng@qq.com&gt; robot deploy beingbeyond d1 manipulation dexterous-hand d1_arm https://github.com/syswonder/primitive-beingbeyond-d1-arm-rbnx   d1_hand https://github.com/syswonder/primitive-beingbeyond-d1-hand-rbnx   d1_camera https://github.com/syswonder/primitive-beingbeyond-d1-camera-rbnx   audio_driver https://github.com/syswonder/primitive-audio-driver-rbnx   speech  ${robonix_source_path}/services/speech  vertical_grasp_object https://github.com/syswonder/skill-vertical-grasp-object-rbnx   hand_gesture https://github.com/syswonder/skill-hand-gesture-rbnx  ">
-        <div>
-          <div class="card-status-line"><span class="kind-label">robot</span></div>
-          <div class="package-title">
-            <a href="robonix.robot.beingbeyond.d1/">robonix.robot.beingbeyond.d1</a>
-            <span class="version">v0.1.0</span>
-          </div>
-          <p class="description">BeingBeyond D1 desktop robot deployment — dexterous-hand object pick/place skill.</p>
-          <div class="meta-line">
-            <span>maintainers <strong>Felix &lt;xi.lifeng@qq.com&gt;</strong></span>
-            <span>7 dependencies</span>
-          </div>
-          <div class="tags"><button class="tag tag-red" data-tag="robot">robot</button> <button class="tag tag-slate" data-tag="deploy">deploy</button> <button class="tag tag-gray" data-tag="beingbeyond">beingbeyond</button> <button class="tag tag-gray" data-tag="d1">d1</button> <button class="tag tag-gray" data-tag="manipulation">manipulation</button> <button class="tag tag-gray" data-tag="dexterous-hand">dexterous-hand</button></div>
-        </div>
-        <div class="card-side">
-          <div class="card-actions">
-            <a href="robonix.robot.beingbeyond.d1/">Details</a>
-            <a href="https://github.com/syswonder/robot-beingbeyond-d1">GitHub</a>
-          </div>
-          <img class="card-preview" src="../assets/previews/robonix.robot.beingbeyond.d1-380.webp" srcset="../assets/previews/robonix.robot.beingbeyond.d1-380.webp 380w, ../assets/previews/robonix.robot.beingbeyond.d1-720.webp 720w" sizes="(max-width: 520px) calc(100vw - 48px), 190px" width="380" height="285" alt="robonix.robot.beingbeyond.d1 preview" loading="lazy" decoding="async" fetchpriority="low">
-        </div>
-      </article><article class="package-card" data-kind="robot" data-tags="robot deploy deep_robotics lite3 quadruped jetson lidar rgbd mapping navigation" data-search="robonix.robot.deep_robotics.lite3 0.2.0 robot minimal robonix deployment for the deep robotics lite3. apache-2.0 https://github.com/syswonder/robot-deep_robotics-lite3 bunnycxk &lt;2501213313@stu.pku.edu.cn&gt; robot deploy deep_robotics lite3 quadruped jetson lidar rgbd mapping navigation lite3_quadruped https://github.com/syswonder/primitive-deep_robotics-lite3_quadruped.git   mid360_lidar https://github.com/syswonder/primitive-livox-mid360-lidar-rbnx   mid360_imu https://github.com/syswonder/primitive-livox-mid360-imu-rbnx   robot_description https://github.com/syswonder/primitive-robot-description-rbnx   orbbec_camera https://github.com/syswonder/primitive-orbbec-camera.git   audio_client_bridge  ${robonix_source_path}/examples/webots/primitives/audio_client_bridge  mapping https://github.com/syswonder/service-map-rbnx   speech  ${robonix_source_path}/services/speech  nav2 https://github.com/syswonder/service-navigation-rbnx   explore https://github.com/syswonder/skill-explore-rbnx  ">
-        <div>
-          <div class="card-status-line"><span class="kind-label">robot</span></div>
-          <div class="package-title">
-            <a href="robonix.robot.deep_robotics.lite3/">robonix.robot.deep_robotics.lite3</a>
-            <span class="version">v0.2.0</span>
-          </div>
-          <p class="description">Minimal Robonix deployment for the Deep Robotics Lite3.</p>
-          <div class="meta-line">
-            <span>maintainers <strong>Bunnycxk &lt;2501213313@stu.pku.edu.cn&gt;</strong></span>
-            <span>10 dependencies</span>
-          </div>
-          <div class="tags"><button class="tag tag-red" data-tag="robot">robot</button> <button class="tag tag-slate" data-tag="deploy">deploy</button> <button class="tag tag-gray" data-tag="deep_robotics">deep_robotics</button> <button class="tag tag-gray" data-tag="lite3">lite3</button> <button class="tag tag-gray" data-tag="quadruped">quadruped</button> <button class="tag tag-gray" data-tag="jetson">jetson</button> <button class="tag tag-purple" data-tag="lidar">lidar</button> <button class="tag tag-gray" data-tag="rgbd">rgbd</button> <button class="tag tag-blue" data-tag="mapping">mapping</button> <button class="tag tag-green" data-tag="navigation">navigation</button></div>
-        </div>
-        <div class="card-side">
-          <div class="card-actions">
-            <a href="robonix.robot.deep_robotics.lite3/">Details</a>
-            <a href="https://github.com/syswonder/robot-deep_robotics-lite3">GitHub</a>
-          </div>
-        </div>
-      </article><article class="package-card" data-kind="robot" data-tags="robot deploy minecraft simulation" data-search="robonix.robot.syswonder.minecraft_bot 0.1.0 robot robonix deployment for an autonomous minecraft player. mulanpsl-2.0 https://github.com/syswonder/robot-syswonder-minecraft_bot zzjjwarth &lt;jzeng25@stu.pku.edu.cn&gt; robot deploy minecraft simulation minecraft_mod https://github.com/syswonder/primitive-syswonder-minecraft_bot-rbnx   minecraft_costmap https://github.com/syswonder/service-minecraft-costmap-rbnx   minecraft_navigation https://github.com/syswonder/service-minecraft-navigation-rbnx   minecraft_explore https://github.com/syswonder/skill-minecraft-explore-rbnx  ">
-        <div>
-          <div class="card-status-line"><span class="kind-label">robot</span></div>
-          <div class="package-title">
-            <a href="robonix.robot.syswonder.minecraft_bot/">robonix.robot.syswonder.minecraft_bot</a>
-            <span class="version">v0.1.0</span>
-          </div>
-          <p class="description">Robonix deployment for an autonomous Minecraft player.</p>
-          <div class="meta-line">
-            <span>maintainers <strong>ZZJJWarth &lt;jzeng25@stu.pku.edu.cn&gt;</strong></span>
-            <span>4 dependencies</span>
-          </div>
-          <div class="tags"><button class="tag tag-red" data-tag="robot">robot</button> <button class="tag tag-slate" data-tag="deploy">deploy</button> <button class="tag tag-gray" data-tag="minecraft">minecraft</button> <button class="tag tag-gray" data-tag="simulation">simulation</button></div>
-        </div>
-        <div class="card-side">
-          <div class="card-actions">
-            <a href="robonix.robot.syswonder.minecraft_bot/">Details</a>
-            <a href="https://github.com/syswonder/robot-syswonder-minecraft_bot">GitHub</a>
-          </div>
-          <img class="card-preview" src="../assets/previews/robonix.robot.syswonder.minecraft_bot-380.webp" srcset="../assets/previews/robonix.robot.syswonder.minecraft_bot-380.webp 380w, ../assets/previews/robonix.robot.syswonder.minecraft_bot-720.webp 720w" sizes="(max-width: 520px) calc(100vw - 48px), 190px" width="380" height="285" alt="robonix.robot.syswonder.minecraft_bot preview" loading="lazy" decoding="async" fetchpriority="low">
-        </div>
-      </article><article class="package-card" data-kind="robot" data-tags="robot deploy unitree go2 quadruped lidar camera imu mapping navigation speech" data-search="robonix.robot.unitree.go2 0.1.0 robot safe robonix deployment for unitree go2 with mapping, semantic navigation and read-only ui. apache-2.0 and bsd-3-clause and mit and (epl-2.0 or edl-1.0) https://github.com/syswonder/robot-unitree-go2 origamii520 &lt;origamii520@users.noreply.github.com&gt; robot deploy unitree go2 quadruped lidar camera imu mapping navigation speech go2_chassis  ${robonix_deploy_dir}/packages/go2_chassis  go2_sensors  ${robonix_deploy_dir}/packages/go2_sensors  robot_description  ${robonix_deploy_dir}/packages/go2_description  audio_client_bridge  ${robonix_source_path}/examples/webots/primitives/audio_client_bridge  mapping https://github.com/syswonder/service-map-rbnx   speech  ${robonix_source_path}/services/speech  nav2 https://github.com/syswonder/service-navigation-rbnx   go2_dashboard  ${robonix_deploy_dir}/packages/go2_dashboard  semantic_navigation  ${robonix_deploy_dir}/packages/semantic_navigation ">
-        <div>
-          <div class="card-status-line"><span class="kind-label">robot</span></div>
-          <div class="package-title">
-            <a href="robonix.robot.unitree.go2/">robonix.robot.unitree.go2</a>
-            <span class="version">v0.1.0</span>
-          </div>
-          <p class="description">Safe Robonix deployment for Unitree Go2 with mapping, semantic navigation and read-only UI.</p>
-          <div class="meta-line">
-            <span>maintainers <strong>Origamii520 &lt;Origamii520@users.noreply.github.com&gt;</strong></span>
-            <span>9 dependencies</span>
-          </div>
-          <div class="tags"><button class="tag tag-red" data-tag="robot">robot</button> <button class="tag tag-slate" data-tag="deploy">deploy</button> <button class="tag tag-gray" data-tag="unitree">unitree</button> <button class="tag tag-gray" data-tag="go2">go2</button> <button class="tag tag-gray" data-tag="quadruped">quadruped</button> <button class="tag tag-purple" data-tag="lidar">lidar</button> <button class="tag tag-cyan" data-tag="camera">camera</button> <button class="tag tag-slate" data-tag="imu">imu</button> <button class="tag tag-blue" data-tag="mapping">mapping</button> <button class="tag tag-green" data-tag="navigation">navigation</button> <button class="tag tag-gray" data-tag="speech">speech</button></div>
-        </div>
-        <div class="card-side">
-          <div class="card-actions">
-            <a href="robonix.robot.unitree.go2/">Details</a>
-            <a href="https://github.com/syswonder/robot-unitree-go2">GitHub</a>
-          </div>
-        </div>
-      </article><article class="package-card has-warning" data-kind="robot" data-tags="robot deploy robonix" data-search="robonix.robot.wheeltec.r550 0.1.0 robot wheeltec r550 mini_tank — 2d slam mapping deploy (n10p lidar + rtabmap). noassertion https://github.com/syswonder/robot-wheeltec-r550 xiangrui cheng &lt;ccc_7020@qq.com&gt; robot deploy robonix robot_description  ${robonix_deploy_dir}/robot_wheeltec_r550/primitives/robot_description  r550_chassis  ${robonix_deploy_dir}/robot_wheeltec_r550/primitives/r550_chassis  n10p_lslidar  ${robonix_deploy_dir}/robot_wheeltec_r550/primitives/n10p_lslidar  astra_s_camera  ./primitives/astra_s_camera  mapping  ${robonix_deploy_dir}/robot_wheeltec_r550/services/service-map-rbnx  nav2  ./services/service-navigation-rbnx  explore  ./skills/skill-explore-rbnx ">
-        <div>
-          <div class="card-status-line"><span class="kind-label">robot</span><span class="warning-badge">Warning · 1 issue</span></div>
-          <div class="package-title">
-            <a href="robonix.robot.wheeltec.r550/">robonix.robot.wheeltec.r550</a>
-            <span class="version">v0.1.0</span>
-          </div>
-          <p class="description">Wheeltec R550 mini_tank — 2D SLAM mapping deploy (N10P lidar + rtabmap).</p>
-          <div class="warning-summary"><strong>Catalog metadata warning</strong><ul><li>manifest catalog name is &#x27;robonix.robot.wheeltec_robot&#x27;, expected &#x27;robonix.robot.wheeltec.r550&#x27;</li></ul></div>
-          <div class="meta-line">
-            <span>maintainers <strong>Xiangrui Cheng &lt;ccc_7020@qq.com&gt;</strong></span>
-            <span>7 dependencies</span>
-          </div>
-          <div class="tags"><button class="tag tag-red" data-tag="robot">robot</button> <button class="tag tag-slate" data-tag="deploy">deploy</button> <button class="tag tag-gray" data-tag="robonix">robonix</button></div>
-        </div>
-        <div class="card-side">
-          <div class="card-actions">
-            <a href="robonix.robot.wheeltec.r550/">Details</a>
-            <a href="https://github.com/syswonder/robot-wheeltec-r550">GitHub</a>
-          </div>
-        </div>
-      </article><article class="package-card" data-kind="robot" data-tags="robot deploy robonix manipulator lerobo" data-search="robonix.robot.wowrobo.roboarm 0.1.0 robot roboarm lerobot koch 五自由度机械臂 robonix 部署。 apache-2.0 https://github.com/syswonder/robot-wowrobo-roboarm yuzheng gao &lt;2300013159@stuu.pku.edu.cn&gt; robot deploy robonix manipulator lerobo roboarm_arm  primitives/roboarm_arm  orbbec_camera_roboarm  primitives/orbbec_camera_roboarm  roboarm_grasp  skills/roboarm_grasp ">
-        <div>
-          <div class="card-status-line"><span class="kind-label">robot</span></div>
-          <div class="package-title">
-            <a href="robonix.robot.wowrobo.roboarm/">robonix.robot.wowrobo.roboarm</a>
-            <span class="version">v0.1.0</span>
-          </div>
-          <p class="description">Roboarm LeRobot Koch 五自由度机械臂 Robonix 部署。</p>
-          <div class="meta-line">
-            <span>maintainers <strong>Yuzheng Gao &lt;2300013159@stuu.pku.edu.cn&gt;</strong></span>
-            <span>3 dependencies</span>
-          </div>
-          <div class="tags"><button class="tag tag-red" data-tag="robot">robot</button> <button class="tag tag-slate" data-tag="deploy">deploy</button> <button class="tag tag-gray" data-tag="robonix">robonix</button> <button class="tag tag-gray" data-tag="manipulator">manipulator</button> <button class="tag tag-gray" data-tag="lerobo">lerobo</button></div>
-        </div>
-        <div class="card-side">
-          <div class="card-actions">
-            <a href="robonix.robot.wowrobo.roboarm/">Details</a>
-            <a href="https://github.com/syswonder/robot-wowrobo-roboarm">GitHub</a>
-          </div>
-        </div>
-      </article>
-        </div>
+    <div class="detail-layout">
+      <section class="panel detail-main">
+        <h2>README</h2>
+        <article class="readme">
+          <h1>Robonix x ROSMASTER X3 短距离安全移动</h1>
+<p><a href="https://github.com/luoyg0831-a11y/robonix-rosmaster-x3-safe-move/blob/main/README.en.md">English</a></p>
+<p>这是 Yahboom ROSMASTER X3 的 ROS1 短距离安全导航候选包。当前版本
+<code>0.2.0-candidate.1</code> 按 <a href="https://robonix-book.syswonder.org/integration-guide/package-catalog">Robonix Package Catalog 发布流程</a>
+整理：仓库根目录提供 <code>package_manifest.yaml</code>，发布名为
+<code>robonix.primitive.yahboom.rosmaster_x3.safe_move</code>。</p>
+<h2>操作流程</h2>
+<div class="highlight"><pre><span></span><code>扫描并展示最多 5 个服务端候选
+  -&gt; 用户选择编号
+  -&gt; 第二次安全校验并展示目标
+  -&gt; 用户必须准确输入“确认执行”
+  -&gt; 打开进程内执行门并完成第三次校验
+  -&gt; 单次发布 move_base 目标并关联观察结果
+</code></pre></div>
+<p>输入 <code>q</code> 或任何错误确认都不会进入执行门。<code>--dry-run</code> 完成候选与准备
+校验后直接退出，不请求确认，也不发送目标。</p>
+<h2>固定安全边界</h2>
+<ul>
+<li>候选半径最大 <code>0.08 m</code>。</li>
+<li>odom 累计路径与 AMCL 位移看门狗参数均不得超过 <code>0.10 m</code>。</li>
+<li>不直接发布 <code>/cmd_vel</code>；公开 manifest 只有 8 个受控 capability。</li>
+<li>不公开旧 <code>send_nav_goal</code>、<code>go_to_waypoint</code> 工具。</li>
+<li>测试、构建和包元数据不授权实车移动。</li>
+</ul>
+<h2>当前证据</h2>
+<table>
+<thead>
+<tr>
+<th>项目</th>
+<th>结果</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>完整生产 0.07 m <code>main.py</code></td>
+<td>SHA256 <code>9d8a40fab4c5e734d94ac79f31c53c9f06d139788c30f239d6d11a32e783508e</code></td>
+</tr>
+<tr>
+<td>公开 0.08 m 候选 <code>main.py</code></td>
+<td>SHA256 <code>a30eef41f392b440d6902b00f05811b6d7ccd463813d292e9bd5c06de91274bd</code></td>
+</tr>
+<tr>
+<td>生产到候选 diff</td>
+<td>1 个 hunk，2 行删除、3 行增加，仅注释与 <code>0.07 -&gt; 0.08</code></td>
+</tr>
+<tr>
+<td>日期化远端备份</td>
+<td>PASS，282 个文件，修改生产文件前完成</td>
+</tr>
+<tr>
+<td>Jetson Python 3.10 语法检查</td>
+<td>PASS</td>
+</tr>
+<tr>
+<td>四套 Jetson 离线测试</td>
+<td>PASS</td>
+</tr>
+<tr>
+<td><code>rbnx validate/build/validate</code></td>
+<td>PASS，独立 staging</td>
+</tr>
+<tr>
+<td>真实 ROS 无目标 dry-run</td>
+<td>INCOMPLETE：CLI 返回 <code>amcl_unavailable</code></td>
+</tr>
+<tr>
+<td>目标或非零速度</td>
+<td>均未观察到；未执行实车移动</td>
+</tr>
+</tbody>
+</table>
+<p>详见<a href="https://github.com/luoyg0831-a11y/robonix-rosmaster-x3-safe-move/blob/main/evidence/validation-2026-08-04.md">验证证据</a>、<a href="https://github.com/luoyg0831-a11y/robonix-rosmaster-x3-safe-move/blob/main/evidence/remote-inventory-2026-08-04.md">远端盘点</a>
+和<a href="https://github.com/luoyg0831-a11y/robonix-rosmaster-x3-safe-move/blob/main/docs/deployment-map.md">部署映射</a>。</p>
+<h2>演示视频</h2>
+<p><a href="https://github.com/luoyg0831-a11y/robonix-rosmaster-x3-safe-move/releases/download/v0.2.0-candidate.1/audio-test01.mp4">audio-test01.mp4</a>
+作为 <code>v0.2.0-candidate.1</code> 预发布版本的 Release 资产提供。文件 SHA256 为
+<code>c2a8dc1c3b187205f5efb5392562f0e1d41d5c58575656ca2cd10c18d8494e88</code>。
+该视频用于项目演示，不替代 0.08 m 候选版本的生产部署与实车验收。</p>
+<h2>离线检查</h2>
+<div class="highlight"><pre><span></span><code>python<span class="w"> </span>-m<span class="w"> </span>py_compile<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>jetson/main.py<span class="w"> </span>jetson/x3_bridge.py<span class="w"> </span>jetson/scripts/move_base_cli.py<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>jetson/stage1_unit_test.py<span class="w"> </span>jetson/stage2_unit_test.py<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>jetson/x3_bridge_navigation_unit_test.py<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>jetson/tests/move_base_cli_unit_test.py<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>tools/audit_candidate.py<span class="w"> </span>tools/audit_public_snapshot.py
+python<span class="w"> </span>jetson/stage1_unit_test.py
+python<span class="w"> </span>jetson/stage2_unit_test.py
+python<span class="w"> </span>jetson/x3_bridge_navigation_unit_test.py
+python<span class="w"> </span>jetson/tests/move_base_cli_unit_test.py
+python<span class="w"> </span>tools/audit_candidate.py
+python<span class="w"> </span>tools/audit_public_snapshot.py
+</code></pre></div>
+<p><code>.github/workflows/offline-tests.yml</code> 在 push 和 pull request 时执行同一组离线检查。</p>
+<h2>Catalog 发布</h2>
+<p>包仓库准备完成后，Catalog PR 只应向 <code>syswonder/robonix-package-catalog</code>
+的 <code>catalog.yaml</code> 增加一条 <code>name + repo</code>。所需片段和发布前检查见
+<a href="https://github.com/luoyg0831-a11y/robonix-rosmaster-x3-safe-move/blob/main/docs/catalog-submission.md">Catalog 提交说明</a>。候选版本已推送到 GitHub 默认分支，
+离线工作流已通过；Catalog PR 已提交为
+<a href="https://github.com/syswonder/robonix-package-catalog/pull/21">#21</a>，Catalog CI 已通过，
+等待维护者合并。</p>
+<h2>许可证</h2>
+<p>原创工程代码按 Apache-2.0 发布。Robonix、ROS、Yahboom 文件和 codegen
+产物仍受各自许可证约束；厂商 ROS 配置只记录来源、参数结论与哈希，不复制全文。</p>
+        </article>
       </section>
+      <aside class="panel detail-side">
+        <h2>Package</h2>
+        <div class="kv">
+          <div>Version</div><div><code>0.2.0-candidate.1</code></div>
+          <div>License</div><div><code>Apache-2.0</code></div>
+          <div>Kind</div><div>primitive</div>
+          <div>Type</div><div>package</div>
+          <div>Maintainers</div><div>luoyg0831 &lt;luoyg0831@gmail.com&gt;</div>
+          <div>Repository</div><div><a href="https://github.com/luoyg0831-a11y/robonix-rosmaster-x3-safe-move">robonix-rosmaster-x3-safe-move</a></div>
+          <div>Branch</div><div><code>main</code></div>
+          <div>Manifest</div><div><code>package_manifest.yaml</code></div>
+          <div>API</div><div><a href="../../api/view/?package=robonix.primitive.yahboom.rosmaster_x3.safe_move">package metadata</a></div>
+        </div>
+        <div class="tags"><button class="tag tag-blue" data-tag="primitive">primitive</button> <button class="tag tag-red" data-tag="chassis">chassis</button> <button class="tag tag-gray" data-tag="yahboom">yahboom</button> <button class="tag tag-gray" data-tag="rosmaster_x3">rosmaster_x3</button> <button class="tag tag-gray" data-tag="ros1">ros1</button> <button class="tag tag-green" data-tag="navigation">navigation</button> <button class="tag tag-gray" data-tag="safety">safety</button></div>
+        <h2>Capabilities</h2>
+        <ul class="cap-list">
+          <li>robonix/primitive/rosmaster_x3_bridge/get_status</li>
+<li>robonix/primitive/rosmaster_x3_bridge/check_nav_ready</li>
+<li>robonix/primitive/rosmaster_x3_bridge/preview_safe_waypoint</li>
+<li>robonix/primitive/rosmaster_x3_bridge/prepare_safe_navigation</li>
+<li>robonix/primitive/rosmaster_x3_bridge/preview_move_options</li>
+<li>robonix/primitive/rosmaster_x3_bridge/prepare_selected_move</li>
+<li>robonix/primitive/rosmaster_x3_bridge/execute_prepared_navigation</li>
+<li>robonix/primitive/rosmaster_x3_bridge/cancel_nav_goal</li>
+        </ul>
+      </aside>
     </div>
-    <details class="panel api-reference">
-      <summary>Catalog API</summary>
-      <div class="api-reference-body">
-      <h2>API Reference</h2>
-      <p class="muted">Static JSON API hosted by GitHub Pages. Use <code>GET</code>; no API key is required.</p>
-      <table>
-        <thead><tr><th>Method</th><th>Path</th><th>Parameters</th><th>Response</th></tr></thead>
-        <tbody>
-          <tr><td data-label="Method"><code>GET</code></td><td data-label="Path"><a href="../api/view/?resource=packages"><code>/api/v1/packages.json</code></a></td><td data-label="Parameters">none</td><td data-label="Response">catalog object with <code>api_version</code>, <code>generated_at</code>, and <code>packages[]</code></td></tr>
-          <tr><td data-label="Method"><code>GET</code></td><td data-label="Path"><a href="../api/view/?resource=search"><code>/api/v1/search.json</code></a></td><td data-label="Parameters">none</td><td data-label="Response">plain package array for client-side filtering</td></tr>
-          <tr><td data-label="Method"><code>GET</code></td><td data-label="Path"><code>/api/v1/package/&lt;package-name&gt;.json</code></td><td data-label="Parameters"><code>package-name</code>: exact <code>package.name</code>, URL-encoded</td><td data-label="Response">one package object; missing packages return GitHub Pages 404</td></tr>
-        </tbody>
-      </table>
-      <pre><code>const base = 'https://syswonder.github.io/robonix-package-catalog/api/v1';
-const catalog = await fetch(`${base}/packages`).then(r => r.json());
-const detail = await fetch(`${base}/package/${encodeURIComponent('robonix.service.mapping')}`).then(r => r.json());</code></pre>
-      </div>
-    </details>
   </main>
   <footer class="site-footer"><div class="shell">Generated on 2026-08-05T01:09:52+00:00.</div></footer>
-  <script>
-    const input = document.getElementById('q');
-    const cards = Array.from(document.querySelectorAll('.package-card'));
-    const count = document.getElementById('count');
-    const clearFilters = document.getElementById('clearFilters');
-    const filters = document.querySelector('.filters');
-    if (window.matchMedia('(max-width: 860px)').matches) filters.open = false;
-    const params = new URLSearchParams(window.location.search);
-    let kind = params.get('kind') || '';
-    let tag = params.get('tag') || '';
-    function setActive(group, selector, value) {
-      for (const button of document.querySelectorAll(group + ' .filter-button')) {
-        const active = button.getAttribute(selector) === value;
-        button.classList.toggle('active', active);
-        button.setAttribute('aria-pressed', String(active));
-      }
-    }
-    function applyFilters() {
-      const q = input.value.trim().toLowerCase();
-      let shown = 0;
-      for (const card of cards) {
-        const matchesText = !q || card.dataset.search.includes(q);
-        const matchesKind = !kind || card.dataset.kind === kind;
-        const tags = (card.dataset.tags || '').split(' ');
-        const matchesTag = !tag || tags.includes(tag);
-        const visible = matchesText && matchesKind && matchesTag;
-        card.style.display = visible ? '' : 'none';
-        if (visible) shown += 1;
-      }
-      count.textContent = shown + ' / ' + cards.length + ' robot deployments';
-      const hasFilters = Boolean(q || kind || tag);
-      clearFilters.classList.toggle('visible', hasFilters);
-      clearFilters.setAttribute('aria-hidden', hasFilters ? 'false' : 'true');
-      const next = new URL(window.location.href);
-      kind ? next.searchParams.set('kind', kind) : next.searchParams.delete('kind');
-      tag ? next.searchParams.set('tag', tag) : next.searchParams.delete('tag');
-      history.replaceState(null, '', next);
-    }
-    input.addEventListener('input', applyFilters);
-    document.getElementById('kindFilters').addEventListener('click', (event) => {
-      const button = event.target.closest('[data-kind]');
-      if (!button) return;
-      kind = button.dataset.kind;
-      setActive('#kindFilters', 'data-kind', kind);
-      applyFilters();
-    });
-    document.getElementById('tagFilters').addEventListener('click', (event) => {
-      const button = event.target.closest('[data-tag-filter]');
-      if (!button) return;
-      tag = button.dataset.tagFilter;
-      setActive('#tagFilters', 'data-tag-filter', tag);
-      applyFilters();
-    });
-    document.getElementById('packages').addEventListener('click', (event) => {
-      const button = event.target.closest('[data-tag]');
-      if (!button) return;
-      event.preventDefault();
-      tag = button.dataset.tag;
-      setActive('#tagFilters', 'data-tag-filter', tag);
-      applyFilters();
-    });
-    clearFilters.addEventListener('click', () => {
-      input.value = '';
-      kind = '';
-      tag = '';
-      setActive('#kindFilters', 'data-kind', '');
-      setActive('#tagFilters', 'data-tag-filter', '');
-      applyFilters();
-      input.focus();
-    });
-    setActive('#kindFilters', 'data-kind', kind);
-    setActive('#tagFilters', 'data-tag-filter', tag);
-    applyFilters();
-  </script>
 </body>
 </html>

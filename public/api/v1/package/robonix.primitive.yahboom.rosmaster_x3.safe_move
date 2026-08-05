@@ -1,0 +1,39 @@
+{
+  "name": "robonix.primitive.yahboom.rosmaster_x3.safe_move",
+  "version": "0.2.0-candidate.1",
+  "description": "Guarded ROS1 short-distance navigation for Yahboom ROSMASTER X3.",
+  "license": "Apache-2.0",
+  "tags": [
+    "primitive",
+    "chassis",
+    "yahboom",
+    "rosmaster_x3",
+    "ros1",
+    "navigation",
+    "safety"
+  ],
+  "repo": "https://github.com/luoyg0831-a11y/robonix-rosmaster-x3-safe-move",
+  "maintainers": [
+    "luoyg0831 <luoyg0831@gmail.com>"
+  ],
+  "repo_name": "robonix-rosmaster-x3-safe-move",
+  "default_branch": "main",
+  "kind": "primitive",
+  "catalog_type": "package",
+  "catalog_status": "ok",
+  "catalog_warnings": [],
+  "manifest": "package_manifest.yaml",
+  "capabilities": [
+    "robonix/primitive/rosmaster_x3_bridge/get_status",
+    "robonix/primitive/rosmaster_x3_bridge/check_nav_ready",
+    "robonix/primitive/rosmaster_x3_bridge/preview_safe_waypoint",
+    "robonix/primitive/rosmaster_x3_bridge/prepare_safe_navigation",
+    "robonix/primitive/rosmaster_x3_bridge/preview_move_options",
+    "robonix/primitive/rosmaster_x3_bridge/prepare_selected_move",
+    "robonix/primitive/rosmaster_x3_bridge/execute_prepared_navigation",
+    "robonix/primitive/rosmaster_x3_bridge/cancel_nav_goal"
+  ],
+  "deploy_dependencies": [],
+  "readme_url": "https://github.com/luoyg0831-a11y/robonix-rosmaster-x3-safe-move/blob/main/README.md",
+  "preview_image_url": ""
+}
