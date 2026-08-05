@@ -1,6 +1,6 @@
 {
   "api_version": "1",
-  "generated_at": "2026-08-05T01:09:52+00:00",
+  "generated_at": "2026-08-05T05:02:03+00:00",
   "packages": [
     {
       "name": "robonix.primitive.agilex.piper.arm",
