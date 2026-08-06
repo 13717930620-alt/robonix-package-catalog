@@ -1,6 +1,6 @@
 {
   "api_version": "1",
-  "generated_at": "2026-08-06T08:36:35+00:00",
+  "generated_at": "2026-08-06T08:58:25+00:00",
   "packages": [
     {
       "name": "robonix.primitive.agilex.piper.arm",
@@ -416,6 +416,43 @@
       ],
       "deploy_dependencies": [],
       "readme_url": "https://github.com/syswonder/primitive-intel-realsense_d435i-camera-rbnx/blob/main/README.md",
+      "preview_image_url": ""
+    },
+    {
+      "name": "robonix.primitive.linkerbot.linker_hand_o6.hand",
+      "version": "0.1.0",
+      "description": "LinkerHand O6 dexterous-hand primitive — axis-level position control + speed/torque limits over CAN.",
+      "license": "MulanPSL-2.0",
+      "tags": [
+        "primitive",
+        "hand",
+        "gripper",
+        "dexterous",
+        "linkerbot",
+        "linkerhand",
+        "o6"
+      ],
+      "repo": "https://github.com/syswonder/primitive-linkerbot-linker_hand_o6-hand-rbnx",
+      "maintainers": [
+        "Felix <xi.lifeng@qq.com>"
+      ],
+      "repo_name": "primitive-linkerbot-linker_hand_o6-hand-rbnx",
+      "default_branch": "main",
+      "kind": "primitive",
+      "catalog_type": "package",
+      "catalog_status": "ok",
+      "catalog_warnings": [],
+      "manifest": "package_manifest.yaml",
+      "capabilities": [
+        "robonix/primitive/hand/driver",
+        "robonix/primitive/hand/info",
+        "robonix/primitive/hand/move_joint",
+        "robonix/primitive/hand/set_joint_speed_limits",
+        "robonix/primitive/hand/set_joint_torque_limits",
+        "robonix/primitive/hand/get_state"
+      ],
+      "deploy_dependencies": [],
+      "readme_url": "https://github.com/syswonder/primitive-linkerbot-linker_hand_o6-hand-rbnx/blob/main/README.md",
       "preview_image_url": ""
     },
     {
@@ -1332,6 +1369,63 @@
           "reason": "Repository 'https://github.com/Bunnycxk/skill-find-object-rbnx.git' is not indexed by catalog.yaml; add the package to the Catalog or use a repository-local dependency."
         }
       ]
+    },
+    {
+      "name": "robonix.robot.linkerbot.linker_hand_o6",
+      "version": "0.1.0",
+      "description": "LinkerHand O6 standalone dexterous-hand deployment — finger dance and static gesture skill.",
+      "license": "MulanPSL-2.0",
+      "tags": [
+        "robot",
+        "deploy",
+        "linkerbot",
+        "linkerhand",
+        "o6",
+        "dexterous-hand",
+        "gesture"
+      ],
+      "repo": "https://github.com/syswonder/robot-linkerbot-linker_hand_o6",
+      "maintainers": [
+        "Felix <xi.lifeng@qq.com>"
+      ],
+      "repo_name": "robot-linkerbot-linker_hand_o6",
+      "default_branch": "main",
+      "kind": "robot",
+      "catalog_type": "robot",
+      "catalog_status": "ok",
+      "catalog_warnings": [],
+      "manifest": "robonix_manifest.yaml",
+      "capabilities": [],
+      "deploy_dependencies": [
+        {
+          "section": "primitive",
+          "name": "o6_hand",
+          "repo": "https://github.com/syswonder/primitive-linkerbot-linker_hand_o6-hand-rbnx",
+          "path": "",
+          "branch": "main",
+          "manifest": "",
+          "resolution": "catalog",
+          "package_name": "robonix.primitive.linkerbot.linker_hand_o6.hand",
+          "package_url": "../robonix.primitive.linkerbot.linker_hand_o6.hand/",
+          "resolution_warning": ""
+        },
+        {
+          "section": "skill",
+          "name": "hand_gesture",
+          "repo": "https://github.com/syswonder/skill-hand-gesture-rbnx",
+          "path": "",
+          "branch": "main",
+          "manifest": "",
+          "resolution": "catalog",
+          "package_name": "robonix.skill.hand_gesture",
+          "package_url": "../robonix.skill.hand_gesture/",
+          "resolution_warning": ""
+        }
+      ],
+      "readme_url": "https://github.com/syswonder/robot-linkerbot-linker_hand_o6/blob/main/README.md",
+      "preview_image_url": "https://raw.githubusercontent.com/syswonder/robot-linkerbot-linker_hand_o6/main/assets/robot.jpg",
+      "deployment_status": "ok",
+      "deployment_warnings": []
     },
     {
       "name": "robonix.robot.syswonder.minecraft_bot",

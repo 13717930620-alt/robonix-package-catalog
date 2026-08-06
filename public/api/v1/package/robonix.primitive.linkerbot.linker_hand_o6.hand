@@ -1,0 +1,37 @@
+{
+  "name": "robonix.primitive.linkerbot.linker_hand_o6.hand",
+  "version": "0.1.0",
+  "description": "LinkerHand O6 dexterous-hand primitive — axis-level position control + speed/torque limits over CAN.",
+  "license": "MulanPSL-2.0",
+  "tags": [
+    "primitive",
+    "hand",
+    "gripper",
+    "dexterous",
+    "linkerbot",
+    "linkerhand",
+    "o6"
+  ],
+  "repo": "https://github.com/syswonder/primitive-linkerbot-linker_hand_o6-hand-rbnx",
+  "maintainers": [
+    "Felix <xi.lifeng@qq.com>"
+  ],
+  "repo_name": "primitive-linkerbot-linker_hand_o6-hand-rbnx",
+  "default_branch": "main",
+  "kind": "primitive",
+  "catalog_type": "package",
+  "catalog_status": "ok",
+  "catalog_warnings": [],
+  "manifest": "package_manifest.yaml",
+  "capabilities": [
+    "robonix/primitive/hand/driver",
+    "robonix/primitive/hand/info",
+    "robonix/primitive/hand/move_joint",
+    "robonix/primitive/hand/set_joint_speed_limits",
+    "robonix/primitive/hand/set_joint_torque_limits",
+    "robonix/primitive/hand/get_state"
+  ],
+  "deploy_dependencies": [],
+  "readme_url": "https://github.com/syswonder/primitive-linkerbot-linker_hand_o6-hand-rbnx/blob/main/README.md",
+  "preview_image_url": ""
+}
