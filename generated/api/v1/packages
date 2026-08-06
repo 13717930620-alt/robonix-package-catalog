@@ -1,6 +1,6 @@
 {
   "api_version": "1",
-  "generated_at": "2026-08-05T19:55:47+00:00",
+  "generated_at": "2026-08-06T02:56:28+00:00",
   "packages": [
     {
       "name": "robonix.primitive.agilex.piper.arm",
@@ -865,7 +865,7 @@
     },
     {
       "name": "robonix.service.navigation.vln",
-      "version": "0.4.2",
+      "version": "0.4.3",
       "description": "Instruction-following navigation service — cloud S2 semantic latents plus edge S1 action generation with adaptive cloud-edge synchronization.",
       "license": "MulanPSL-2.0",
       "tags": [
@@ -877,11 +877,11 @@
         "dual-system",
         "embodied-ai"
       ],
-      "repo": "https://github.com/i6bimua/service-navigation-vln-rbnx",
+      "repo": "https://github.com/i6bimua/service-navigation-computing-optimization-rbnx",
       "maintainers": [
         "Seto <202330552461@mail.scut.edu.cn>"
       ],
-      "repo_name": "service-navigation-vln-rbnx",
+      "repo_name": "service-navigation-computing-optimization-rbnx",
       "default_branch": "main",
       "kind": "service",
       "catalog_type": "package",
@@ -896,7 +896,7 @@
         "robonix/service/navigation/vln/telemetry"
       ],
       "deploy_dependencies": [],
-      "readme_url": "https://github.com/i6bimua/service-navigation-vln-rbnx/blob/main/README.md",
+      "readme_url": "https://github.com/i6bimua/service-navigation-computing-optimization-rbnx/blob/main/README.md",
       "preview_image_url": ""
     },
     {
