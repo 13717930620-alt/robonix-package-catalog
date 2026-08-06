@@ -1025,6 +1025,7 @@ html[data-theme="dark"] .highlight .il { color: #AE81FF } /* Literal.Number.Inte
     <a class="back" href="../">Back to packages</a>
     <h1>robonix.service.navigation.vln</h1>
     <p class="lede">Instruction-following navigation service — cloud S2 semantic latents plus edge S1 action generation with adaptive cloud-edge synchronization.</p>
+    <div class="detail-warning" role="note" aria-label="Catalog metadata warning"><strong>Catalog metadata warning · 1 issue</strong><ul><li>manifest catalog name is &#x27;robonix.service.navigation.computing_optimization&#x27;, expected &#x27;robonix.service.navigation.vln&#x27;</li></ul></div>
   </header>
   <main class="shell">
     <div class="detail-layout">
@@ -1091,7 +1092,7 @@ the runtime binds to RoboNix lifecycle and robot I/O.</p>
 <p>The concrete S1/S2 model and weights are InternVLA-N1; the rest of this document
 focuses on this repository's cloud–edge deployment, runtime correctness,
 scheduling, and RoboNix integration.</p>
-<p>The catalog identity is <code>robonix.service.navigation.vln</code> because the external
+<p>The catalog identity is <code>robonix.service.navigation.computing_optimization</code> because the external
 RoboNix boundary is a long-running navigation service; cloud–edge compute
 optimization is its core implementation. Cloud S2 belongs to the same runtime
 on a GPU host outside the robot deployment. An HTTP lifecycle API remains for
@@ -1246,9 +1247,14 @@ in <a href="#benchmark-results">Benchmark Results</a>.</p>
 <p><a></a></p>
 <h2>📰 News</h2>
 <ul>
+<li><strong>2026-08-06 — v0.5.0:</strong> Package identity renamed
+  <code>robonix.service.navigation.vln</code> →
+  <code>robonix.service.navigation.computing_optimization</code>. Every contract id,
+  the provider <code>Service(id=…)</code>, the IDL package, and deployment instance names
+  move with it. See <a href="https://github.com/i6bimua/service-navigation-computing-optimization-rbnx/blob/main/CHANGELOG.md">CHANGELOG.md</a>.</li>
 <li><strong>2026-08-06 — v0.4.3:</strong> Repository renamed to
   <a href="https://github.com/i6bimua/service-navigation-computing-optimization-rbnx"><code>service-navigation-computing-optimization-rbnx</code></a>.
-  Package identity remains <code>robonix.service.navigation.vln</code>. See
+  Package identity remained <code>robonix.service.navigation.vln</code> in that release. See
   <a href="https://github.com/i6bimua/service-navigation-computing-optimization-rbnx/blob/main/CHANGELOG.md">CHANGELOG.md</a>.</li>
 <li><strong>2026-08-03 — v0.4.2:</strong> Public branding now uses <strong>Navigation Computing
   Optimization</strong>; the benchmark method label is <strong>Navigation Computing</strong>. See
@@ -1383,12 +1389,12 @@ memory, and optional diffusion latents remain behind adapters.</p>
 </div>
 <p><a></a></p>
 <h2>🔌 RoboNix Integration Boundary</h2>
-<p>This repository is a RoboNix <strong>Service package</strong> — <code>robonix.service.navigation.vln</code>.
+<p>This repository is a RoboNix <strong>Service package</strong> — <code>robonix.service.navigation.computing_optimization</code>.
 <code>package_manifest.yaml</code> at the repository root declares five capability
 contracts, so <code>rbnx boot</code> starts the provider and Atlas registers it. See
 <a href="https://github.com/i6bimua/service-navigation-computing-optimization-rbnx/blob/main/CAPABILITY.md">CAPABILITY.md</a> for the capability manual and
 <a href="https://github.com/i6bimua/service-navigation-computing-optimization-rbnx/blob/main/config.spec">config.spec</a> for every config field.</p>
-<p><code>navigation.vln</code> names the external RoboNix capability boundary: it accepts an
+<p><code>navigation.computing_optimization</code> names the external RoboNix capability boundary: it accepts an
 instruction and manages a long-running navigation task. Our contribution is the
 cloud–edge execution behind that boundary — split S1/S2 deployment, adaptive
 synchronization, consistent model history, failure handling, and step-level
@@ -1403,27 +1409,27 @@ telemetry — rather than redefining the VLN model itself.</p>
 </thead>
 <tbody>
 <tr>
-<td><code>robonix/service/navigation/vln/driver</code></td>
+<td><code>robonix/service/navigation/computing_optimization/driver</code></td>
 <td>gRPC</td>
 <td>Lifecycle (<code>CMD_INIT</code> / <code>CMD_ACTIVATE</code> / …)</td>
 </tr>
 <tr>
-<td><code>robonix/service/navigation/vln/navigate</code></td>
+<td><code>robonix/service/navigation/computing_optimization/navigate</code></td>
 <td>MCP</td>
 <td>Start a run from an instruction → <code>run_id</code></td>
 </tr>
 <tr>
-<td><code>robonix/service/navigation/vln/navigate/status</code></td>
+<td><code>robonix/service/navigation/computing_optimization/navigate/status</code></td>
 <td>MCP</td>
 <td>Poll <code>PENDING</code>/<code>RUNNING</code>/<code>SUCCEEDED</code>/<code>FAILED</code>/<code>CANCELED</code>/<code>TIMEOUT</code></td>
 </tr>
 <tr>
-<td><code>robonix/service/navigation/vln/navigate/cancel</code></td>
+<td><code>robonix/service/navigation/computing_optimization/navigate/cancel</code></td>
 <td>MCP</td>
 <td>Abort the active run (idempotent)</td>
 </tr>
 <tr>
-<td><code>robonix/service/navigation/vln/telemetry</code></td>
+<td><code>robonix/service/navigation/computing_optimization/telemetry</code></td>
 <td>MCP</td>
 <td>Per-run sync / timeout / reuse / latency counters</td>
 </tr>
@@ -1525,7 +1531,7 @@ benchmark numbers above.</p>
 <td>Reproducing the R2R-CE results. The evaluator owns <code>env.reset</code> / <code>env.step</code>, episode iteration and the SR/SPL metrics; the edge answers S1 requests over WebSocket.</td>
 </tr>
 <tr>
-<td><strong>Robot</strong> (<code>robonix.service.navigation.vln</code>)</td>
+<td><strong>Robot</strong> (<code>robonix.service.navigation.computing_optimization</code>)</td>
 <td>This service</td>
 <td>No simulator — a real robot</td>
 <td>Running on a RoboNix deployment. The service owns the loop, reads the camera and chassis contracts, and issues <code>chassis/move</code>.</td>
@@ -1540,7 +1546,7 @@ runtime that plugs into it.</p>
 <div class="highlight"><pre><span></span><code><span class="c1"># robonix_manifest.yaml</span>
 <span class="nt">service</span><span class="p">:</span>
 <span class="w">  </span><span class="c1"># `name` must equal Service(id=...) in robonix_compute/rbnx/provider.py</span>
-<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">navigation_vln</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">navigation_computing_optimization</span>
 <span class="w">    </span><span class="nt">url</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">https://github.com/i6bimua/service-navigation-computing-optimization-rbnx</span>
 <span class="w">    </span><span class="nt">branch</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">main</span>
 <span class="w">    </span><span class="nt">config</span><span class="p">:</span>
@@ -1553,7 +1559,7 @@ runtime that plugs into it.</p>
 <div class="highlight"><pre><span></span><code>robonix-compute-cloud<span class="w"> </span>--mode<span class="w"> </span>internnav<span class="w"> </span>--port<span class="w"> </span><span class="m">8765</span><span class="w">   </span><span class="c1"># on the GPU host</span>
 rbnx<span class="w"> </span>build<span class="w"> </span>-f<span class="w"> </span>robonix_manifest.yaml<span class="w">                  </span><span class="c1"># runs rbnx codegen --mcp</span>
 rbnx<span class="w"> </span>boot<span class="w">  </span>-f<span class="w"> </span>robonix_manifest.yaml
-rbnx<span class="w"> </span>caps<span class="w"> </span>-v<span class="w">                                         </span><span class="c1"># navigation_vln ACTIVE</span>
+rbnx<span class="w"> </span>caps<span class="w"> </span>-v<span class="w">                                         </span><span class="c1"># navigation_computing_optimization ACTIVE</span>
 rbnx<span class="w"> </span>tools<span class="w">                                           </span><span class="c1"># the four MCP tools appear</span>
 </code></pre></div>
 <h4>Why the model does not load at boot</h4>
@@ -2611,7 +2617,7 @@ MatterSim/object-grounding stack and is deliberately excluded here.</p>
 ├── config.spec                    # Every config field, documented
 ├── capabilities/
 │   ├── *.v1.toml                  # The five contracts this package provides
-│   └── lib/navigation_vln/srv/    # ROS 2 IDL for the four MCP tools
+│   └── lib/navigation_computing_optimization/srv/    # ROS 2 IDL for the four MCP tools
 ├── .github/workflows/ci.yml       # Python matrix, CLI, docs, audit and build
 ├── robonix_compute/
 │   ├── benchmark_data.py          # Licensed dataset integrity checks
@@ -2718,7 +2724,7 @@ and citing it:</p>
 <span class="w">  </span><span class="na">author</span><span class="w">  </span><span class="p">=</span><span class="w"> </span><span class="s">{Cao, Hangyu and Zheng, Zihao}</span><span class="p">,</span>
 <span class="w">  </span><span class="na">title</span><span class="w">   </span><span class="p">=</span><span class="w"> </span><span class="s">{RoboNix Navigation Computing Optimization}</span><span class="p">,</span>
 <span class="w">  </span><span class="na">year</span><span class="w">    </span><span class="p">=</span><span class="w"> </span><span class="s">{2026}</span><span class="p">,</span>
-<span class="w">  </span><span class="na">version</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="s">{0.4.3}</span><span class="p">,</span>
+<span class="w">  </span><span class="na">version</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="s">{0.5.0}</span><span class="p">,</span>
 <span class="w">  </span><span class="na">url</span><span class="w">     </span><span class="p">=</span><span class="w"> </span><span class="s">{https://github.com/i6bimua/service-navigation-computing-optimization-rbnx}</span>
 <span class="p">}</span>
 </code></pre></div>
@@ -2735,7 +2741,7 @@ see <code>THIRD_PARTY_LICENSES.md</code>.</p>
       <aside class="panel detail-side">
         <h2>Package</h2>
         <div class="kv">
-          <div>Version</div><div><code>0.4.3</code></div>
+          <div>Version</div><div><code>0.5.0</code></div>
           <div>License</div><div><code>MulanPSL-2.0</code></div>
           <div>Kind</div><div>service</div>
           <div>Type</div><div>package</div>
@@ -2748,15 +2754,15 @@ see <code>THIRD_PARTY_LICENSES.md</code>.</p>
         <div class="tags"><button class="tag tag-green" data-tag="service">service</button> <button class="tag tag-green" data-tag="navigation">navigation</button> <button class="tag tag-gray" data-tag="vln">vln</button> <button class="tag tag-gray" data-tag="navigation-computing-optimization">navigation-computing-optimization</button> <button class="tag tag-gray" data-tag="cloud-edge">cloud-edge</button> <button class="tag tag-gray" data-tag="dual-system">dual-system</button> <button class="tag tag-gray" data-tag="embodied-ai">embodied-ai</button></div>
         <h2>Capabilities</h2>
         <ul class="cap-list">
-          <li>robonix/service/navigation/vln/driver</li>
-<li>robonix/service/navigation/vln/navigate</li>
-<li>robonix/service/navigation/vln/navigate/status</li>
-<li>robonix/service/navigation/vln/navigate/cancel</li>
-<li>robonix/service/navigation/vln/telemetry</li>
+          <li>robonix/service/navigation/computing_optimization/driver</li>
+<li>robonix/service/navigation/computing_optimization/navigate</li>
+<li>robonix/service/navigation/computing_optimization/navigate/status</li>
+<li>robonix/service/navigation/computing_optimization/navigate/cancel</li>
+<li>robonix/service/navigation/computing_optimization/telemetry</li>
         </ul>
       </aside>
     </div>
   </main>
-  <footer class="site-footer"><div class="shell">Generated on 2026-08-06T02:56:28+00:00.</div></footer>
+  <footer class="site-footer"><div class="shell">Generated on 2026-08-06T08:36:35+00:00.</div></footer>
 </body>
 </html>
