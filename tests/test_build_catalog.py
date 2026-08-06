@@ -540,6 +540,137 @@ class CatalogMetadataTests(unittest.TestCase):
 
 
 class DeploymentDependencyWarningTests(unittest.TestCase):
+    def test_local_dependency_paths_exist_and_select_package_manifests(self):
+        robot_repo = "https://github.com/syswonder/robot-example"
+        packages = [
+            {
+                "name": "robonix.robot.example",
+                "repo": robot_repo,
+                "default_branch": "main",
+                "catalog_type": "robot",
+                "deployment_warnings": [],
+                "deploy_dependencies": [
+                    {
+                        "section": "primitive",
+                        "name": "valid_local",
+                        "path": "./primitives/valid",
+                        "manifest": "",
+                        "resolution": "robot_repository",
+                        "resolution_warning": "",
+                    },
+                    {
+                        "section": "primitive",
+                        "name": "missing_deploy",
+                        "path": "${ROBONIX_DEPLOY_DIR}/robot_example/primitives/missing",
+                        "manifest": "",
+                        "resolution": "robonix_deploy",
+                        "resolution_warning": "",
+                    },
+                    {
+                        "section": "service",
+                        "name": "not_a_package",
+                        "path": "./services/plain_directory",
+                        "manifest": "",
+                        "resolution": "robot_repository",
+                        "resolution_warning": "",
+                    },
+                    {
+                        "section": "service",
+                        "name": "target_manifest",
+                        "path": "${ROBONIX_DEPLOY_DIR}/services/target",
+                        "manifest": "package_manifest.jetson.yaml",
+                        "resolution": "robonix_deploy",
+                        "resolution_warning": "",
+                    },
+                    {
+                        "section": "service",
+                        "name": "builtin",
+                        "path": "${ROBONIX_SOURCE_PATH}/services/speech",
+                        "manifest": "",
+                        "resolution": "robonix_source",
+                        "resolution_warning": "",
+                    },
+                ],
+            }
+        ]
+        robot_tree = {
+            "primitives/valid": "tree",
+            "primitives/valid/package_manifest.yaml": "blob",
+            "services/plain_directory": "tree",
+            "services/plain_directory/README.md": "blob",
+            "services/target": "tree",
+            "services/target/package_manifest.jetson.yaml": "blob",
+        }
+        source_tree = {
+            "services/speech": "tree",
+            "services/speech/package_manifest.yaml": "blob",
+        }
+
+        def tree_for(repo_url, branch):
+            self.assertIn(branch, {"main", "dev"})
+            return source_tree if repo_url == BUILD_CATALOG.ROBONIX_SOURCE_REPO else robot_tree
+
+        with mock.patch.object(
+            BUILD_CATALOG, "load_remote_default_branch", return_value="dev"
+        ) as default_branch, mock.patch.object(
+            BUILD_CATALOG, "load_remote_repository_tree", side_effect=tree_for
+        ) as load_tree:
+            BUILD_CATALOG.validate_deploy_dependency_paths(packages)
+
+        dependencies = {dep["name"]: dep for dep in packages[0]["deploy_dependencies"]}
+        self.assertEqual(dependencies["valid_local"]["resolution_warning"], "")
+        self.assertEqual(dependencies["target_manifest"]["resolution_warning"], "")
+        self.assertEqual(dependencies["builtin"]["resolution_warning"], "")
+        self.assertIn(
+            "does not exist",
+            dependencies["missing_deploy"]["resolution_warning"],
+        )
+        self.assertIn(
+            "${ROBONIX_DEPLOY_DIR} (the robot repository root)",
+            dependencies["missing_deploy"]["resolution_warning"],
+        )
+        self.assertIn(
+            "not a usable Robonix package",
+            dependencies["not_a_package"]["resolution_warning"],
+        )
+        self.assertEqual(packages[0]["deployment_status"], "warning")
+        self.assertEqual(len(packages[0]["deployment_warnings"]), 2)
+        default_branch.assert_called_once_with(BUILD_CATALOG.ROBONIX_SOURCE_REPO)
+        self.assertEqual(load_tree.call_count, 2)
+
+    def test_local_dependency_path_accepts_legacy_package_manifest(self):
+        packages = [
+            {
+                "name": "robonix.robot.example",
+                "repo": "https://github.com/syswonder/robot-example",
+                "default_branch": "main",
+                "catalog_type": "robot",
+                "deployment_warnings": [],
+                "deploy_dependencies": [
+                    {
+                        "section": "skill",
+                        "name": "legacy",
+                        "path": "skills/legacy",
+                        "manifest": "",
+                        "resolution": "robot_repository",
+                        "resolution_warning": "",
+                    }
+                ],
+            }
+        ]
+        tree = {
+            "skills/legacy": "tree",
+            "skills/legacy/robonix_manifest.yaml": "blob",
+        }
+
+        with mock.patch.object(
+            BUILD_CATALOG, "load_remote_repository_tree", return_value=tree
+        ):
+            BUILD_CATALOG.validate_deploy_dependency_paths(packages)
+
+        self.assertEqual(packages[0]["deployment_status"], "ok")
+        self.assertEqual(packages[0]["deployment_warnings"], [])
+
     def test_invalid_robot_manifest_uses_cached_metadata_and_becomes_warning(self):
         cached = {
             "name": "robonix.robot.example",

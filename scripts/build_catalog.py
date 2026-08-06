@@ -28,6 +28,9 @@ ROBONIX_SOURCE_RE = re.compile(r"^\$\{ROBONIX_SOURCE_PATH\}(?:/|$)")
 ROBONIX_DEPLOY_RE = re.compile(r"^\$\{ROBONIX_DEPLOY_DIR\}(?:/|$)")
 ENV_ROOT_RE = re.compile(r"^\$\{([^}]+)\}(?:/|$)")
 WINDOWS_ABSOLUTE_RE = re.compile(r"^[A-Za-z]:[\\/]")
+ROBONIX_SOURCE_REPO = "https://github.com/syswonder/robonix"
+DEFAULT_PACKAGE_MANIFEST = "package_manifest.yaml"
+LEGACY_PACKAGE_MANIFEST = "robonix_manifest.yaml"
 VENDOR_ASSETS = Path("assets/vendor/pico")
 BRAND_MARK_ASSET = Path("assets/robonix-mark.svg")
 LEGACY_MISSING_LICENSE = {"robonix.robot.wheeltec.r550"}
@@ -182,6 +185,34 @@ def load_remote_manifest(repo_url: str, manifest_path: str) -> tuple[str, dict, 
         ) from e
     readme = load_remote_text(owner, repo, "README.md", branch, required=False)
     return branch, manifest, readme
+
+
+def load_remote_default_branch(repo_url: str) -> str:
+    owner, repo = parse_repo(repo_url)
+    meta = github_json(f"https://api.github.com/repos/{owner}/{repo}")
+    branch = meta.get("default_branch")
+    if not isinstance(branch, str) or not branch:
+        fail(f"{repo_url}: missing default_branch")
+    return branch
+
+
+def load_remote_repository_tree(repo_url: str, branch: str) -> dict[str, str]:
+    """Return repository-relative paths and Git object types for one ref."""
+    owner, repo = parse_repo(repo_url)
+    ref = urllib.parse.quote(branch, safe="")
+    payload = github_json(
+        f"https://api.github.com/repos/{owner}/{repo}/git/trees/{ref}?recursive=1"
+    )
+    if payload.get("truncated"):
+        fail(f"{repo_url}@{branch}: recursive Git tree is truncated")
+    entries = payload.get("tree")
+    if not isinstance(entries, list):
+        fail(f"{repo_url}@{branch}: Git tree response is missing tree entries")
+    return {
+        entry["path"]: entry.get("type", "")
+        for entry in entries
+        if isinstance(entry, dict) and isinstance(entry.get("path"), str)
+    }
 
 
 def package_slug(name: str) -> str:
@@ -484,6 +515,117 @@ def annotate_deploy_dependencies(packages: list[dict]) -> None:
         package["deployment_warnings"] = warnings
 
 
+def dependency_repository_location(
+    package: dict,
+    dep: dict,
+    robonix_source_branch: str,
+) -> tuple[str, str, str, str] | None:
+    """Resolve a local dependency to (repo, branch, path, root description)."""
+    path = str(dep.get("path") or "").strip()
+    resolution = dep.get("resolution")
+    if resolution == "robonix_source":
+        relative_path = ROBONIX_SOURCE_RE.sub("", path, count=1)
+        return (
+            ROBONIX_SOURCE_REPO,
+            robonix_source_branch,
+            relative_path,
+            f"${{ROBONIX_SOURCE_PATH}} ({ROBONIX_SOURCE_REPO})",
+        )
+    if resolution == "robonix_deploy":
+        relative_path = ROBONIX_DEPLOY_RE.sub("", path, count=1)
+        return (
+            package["repo"],
+            package["default_branch"],
+            relative_path,
+            "${ROBONIX_DEPLOY_DIR} (the robot repository root)",
+        )
+    if resolution == "robot_repository":
+        return (
+            package["repo"],
+            package["default_branch"],
+            path,
+            "the robot repository root",
+        )
+    return None
+
+
+def validate_deploy_dependency_paths(packages: list[dict]) -> None:
+    """Warn when a local deploy path is absent or is not a package directory."""
+    tree_cache: dict[tuple[str, str], dict[str, str]] = {}
+    source_branch = ""
+
+    for package in packages:
+        if package.get("catalog_type") != "robot":
+            continue
+        warnings = list(package.get("deployment_warnings", []))
+        for dep in package.get("deploy_dependencies", []):
+            if dep.get("resolution_warning"):
+                continue
+            if dep.get("resolution") == "robonix_source" and not source_branch:
+                source_branch = load_remote_default_branch(ROBONIX_SOURCE_REPO)
+            location = dependency_repository_location(package, dep, source_branch)
+            if location is None:
+                continue
+            repo_url, branch, relative_path, root_description = location
+            normalized_path = posixpath.normpath(relative_path.replace("\\", "/"))
+            if normalized_path == ".":
+                normalized_path = ""
+
+            warning = ""
+            if normalized_path == ".." or normalized_path.startswith("../"):
+                warning = (
+                    f"Resolved path {normalized_path!r} escapes {root_description}."
+                )
+            else:
+                cache_key = (repo_url, branch)
+                if cache_key not in tree_cache:
+                    tree_cache[cache_key] = load_remote_repository_tree(repo_url, branch)
+                tree = tree_cache[cache_key]
+                directory_exists = not normalized_path or tree.get(normalized_path) == "tree"
+                if not directory_exists:
+                    warning = (
+                        f"Resolved path {normalized_path or '.'!r} does not exist in "
+                        f"{repo_url}@{branch}; {root_description} is the path root."
+                    )
+                else:
+                    selected_manifest = str(dep.get("manifest") or "").strip()
+                    manifest_names = (
+                        [selected_manifest]
+                        if selected_manifest
+                        else [DEFAULT_PACKAGE_MANIFEST, LEGACY_PACKAGE_MANIFEST]
+                    )
+                    manifests = [
+                        posixpath.join(normalized_path, name) if normalized_path else name
+                        for name in manifest_names
+                    ]
+                    if not any(tree.get(path) == "blob" for path in manifests):
+                        if selected_manifest:
+                            expected = repr(selected_manifest)
+                        else:
+                            expected = (
+                                f"{DEFAULT_PACKAGE_MANIFEST!r} or legacy "
+                                f"{LEGACY_PACKAGE_MANIFEST!r}"
+                            )
+                        warning = (
+                            f"Resolved directory {normalized_path or '.'!r} exists in "
+                            f"{repo_url}@{branch} but is not a usable Robonix package: "
+                            f"expected {expected}."
+                        )
+
+            if warning:
+                dep["resolution_warning"] = warning
+                warnings.append(
+                    {
+                        "section": dep.get("section", ""),
+                        "name": dep.get("name", ""),
+                        "source": dep.get("path") or "",
+                        "reason": warning,
+                    }
+                )
+        package["deployment_status"] = "warning" if warnings else "ok"
+        package["deployment_warnings"] = warnings
+
+
 def github_command_escape(value: str) -> str:
     return value.replace("%", "%25").replace("\r", "%0D").replace("\n", "%0A")
 
@@ -762,6 +904,7 @@ def collect(
             }
         )
     annotate_deploy_dependencies(out)
+    validate_deploy_dependency_paths(out)
     out.sort(key=lambda x: x["name"])
     return out
 
@@ -2607,7 +2750,13 @@ def render_readme(path: Path, generated_at: str, packages: list[dict]) -> None:
         "`${ROBONIX_SOURCE_PATH}/...` source-tree root, uses the exact",
         "`${ROBONIX_DEPLOY_DIR}/...` boot-deployment root, or stays inside the",
         "robot repository through a relative path. Unresolved sources produce CI",
-        "warnings and a report without failing catalog generation.",
+        "warnings and a report without failing catalog generation. For local paths,",
+        "the builder also checks the corresponding GitHub repository tree: the",
+        "resolved directory must exist and contain the selected package manifest",
+        "(`package_manifest.yaml` by default, with legacy `robonix_manifest.yaml`",
+        "accepted when no override is selected). `${ROBONIX_DEPLOY_DIR}` resolves",
+        "to the robot repository root, while `${ROBONIX_SOURCE_PATH}` resolves to",
+        "the default branch of `https://github.com/syswonder/robonix`.",
         "",
         "## Generated Outputs",
         "",
