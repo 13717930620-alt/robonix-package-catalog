@@ -58,7 +58,7 @@ packages:
   - name: robonix.skill.minecraft_explore
     repo: https://github.com/syswonder/skill-minecraft-explore-rbnx
   - name: robonix.service.navigation.vln
-    repo: https://github.com/i6bimua/service-navigation-vln-rbnx
+    repo: https://github.com/i6bimua/service-navigation-computing-optimization-rbnx
   - name: robonix.service.memory.action_retrieval
     repo: https://github.com/lusunn111/service-memory-action-retrieval-rbnx
   - name: robonix.service.vla.action_decision
