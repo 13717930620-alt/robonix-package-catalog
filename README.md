@@ -191,7 +191,13 @@ portable when it resolves to a cataloged repository, uses the exact
 `${ROBONIX_SOURCE_PATH}/...` source-tree root, uses the exact
 `${ROBONIX_DEPLOY_DIR}/...` boot-deployment root, or stays inside the
 robot repository through a relative path. Unresolved sources produce CI
-warnings and a report without failing catalog generation.
+warnings and a report without failing catalog generation. For local paths,
+the builder also checks the corresponding GitHub repository tree: the
+resolved directory must exist and contain the selected package manifest
+(`package_manifest.yaml` by default, with legacy `robonix_manifest.yaml`
+accepted when no override is selected). `${ROBONIX_DEPLOY_DIR}` resolves
+to the robot repository root, while `${ROBONIX_SOURCE_PATH}` resolves to
+the default branch of `https://github.com/syswonder/robonix`.
 
 ## Generated Outputs
 
@@ -216,7 +222,7 @@ but browser-facing links and new integrations should use the `.json` paths above
 The generated commit uses `[skip ci]`; normal CI only triggers from
 `catalog.yaml`, the builder script, the workflow, or manual dispatch.
 
-Generated on `2026-08-06T08:58:25+00:00`.
+Generated on `2026-08-06T09:32:59+00:00`.
 
 ## Packages
 

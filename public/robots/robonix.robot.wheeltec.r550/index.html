@@ -1025,6 +1025,7 @@ html[data-theme="dark"] .highlight .il { color: #AE81FF } /* Literal.Number.Inte
     <a class="back" href="../">Back to robots</a>
     <h1>robonix.robot.wheeltec.r550</h1>
     <p class="lede">Wheeltec R550 mini_tank — 2D SLAM mapping deploy (N10P lidar + rtabmap).</p>
+    <div class="detail-warning" role="note" aria-label="Deployment warning"><strong>Deployment warning · 7 issues</strong><ul><li><code>primitive robot_description</code>: Resolved path &#x27;robot_wheeltec_r550/primitives/robot_description&#x27; does not exist in https://github.com/syswonder/robot-wheeltec-r550@main; ${ROBONIX_DEPLOY_DIR} (the robot repository root) is the path root.</li><li><code>primitive r550_chassis</code>: Resolved path &#x27;robot_wheeltec_r550/primitives/r550_chassis&#x27; does not exist in https://github.com/syswonder/robot-wheeltec-r550@main; ${ROBONIX_DEPLOY_DIR} (the robot repository root) is the path root.</li><li><code>primitive n10p_lslidar</code>: Resolved path &#x27;robot_wheeltec_r550/primitives/n10p_lslidar&#x27; does not exist in https://github.com/syswonder/robot-wheeltec-r550@main; ${ROBONIX_DEPLOY_DIR} (the robot repository root) is the path root.</li><li><code>primitive astra_s_camera</code>: Resolved path &#x27;primitives/astra_s_camera&#x27; does not exist in https://github.com/syswonder/robot-wheeltec-r550@main; the robot repository root is the path root.</li><li><code>service mapping</code>: Resolved path &#x27;robot_wheeltec_r550/services/service-map-rbnx&#x27; does not exist in https://github.com/syswonder/robot-wheeltec-r550@main; ${ROBONIX_DEPLOY_DIR} (the robot repository root) is the path root.</li><li><code>service nav2</code>: Resolved path &#x27;services/service-navigation-rbnx&#x27; does not exist in https://github.com/syswonder/robot-wheeltec-r550@main; the robot repository root is the path root.</li><li><code>skill explore</code>: Resolved path &#x27;skills/skill-explore-rbnx&#x27; does not exist in https://github.com/syswonder/robot-wheeltec-r550@main; the robot repository root is the path root.</li></ul></div>
   </header>
   <main class="shell">
     <div class="detail-layout">
@@ -1349,17 +1350,17 @@ rbnx<span class="w"> </span>chat
         <div class="tags"><button class="tag tag-red" data-tag="robot">robot</button> <button class="tag tag-slate" data-tag="deploy">deploy</button> <button class="tag tag-gray" data-tag="robonix">robonix</button></div>
         <h2>Deployment Packages</h2>
         <ul class="cap-list">
-          <li><span>primitive</span> <code>robot_description</code><br>${ROBONIX_DEPLOY_DIR}/robot_wheeltec_r550/primitives/robot_description</li>
-<li><span>primitive</span> <code>r550_chassis</code><br>${ROBONIX_DEPLOY_DIR}/robot_wheeltec_r550/primitives/r550_chassis</li>
-<li><span>primitive</span> <code>n10p_lslidar</code><br>${ROBONIX_DEPLOY_DIR}/robot_wheeltec_r550/primitives/n10p_lslidar</li>
-<li><span>primitive</span> <code>astra_s_camera</code><br>./primitives/astra_s_camera</li>
-<li><span>service</span> <code>mapping</code><br>${ROBONIX_DEPLOY_DIR}/robot_wheeltec_r550/services/service-map-rbnx</li>
-<li><span>service</span> <code>nav2</code><br>./services/service-navigation-rbnx</li>
-<li><span>skill</span> <code>explore</code><br>./skills/skill-explore-rbnx</li>
+          <li class="dependency-warning"><span>primitive</span> <code>robot_description</code><strong class="warning-badge">Warning</strong><br>${ROBONIX_DEPLOY_DIR}/robot_wheeltec_r550/primitives/robot_description<small class="dependency-warning-reason">Resolved path &#x27;robot_wheeltec_r550/primitives/robot_description&#x27; does not exist in https://github.com/syswonder/robot-wheeltec-r550@main; ${ROBONIX_DEPLOY_DIR} (the robot repository root) is the path root.</small></li>
+<li class="dependency-warning"><span>primitive</span> <code>r550_chassis</code><strong class="warning-badge">Warning</strong><br>${ROBONIX_DEPLOY_DIR}/robot_wheeltec_r550/primitives/r550_chassis<small class="dependency-warning-reason">Resolved path &#x27;robot_wheeltec_r550/primitives/r550_chassis&#x27; does not exist in https://github.com/syswonder/robot-wheeltec-r550@main; ${ROBONIX_DEPLOY_DIR} (the robot repository root) is the path root.</small></li>
+<li class="dependency-warning"><span>primitive</span> <code>n10p_lslidar</code><strong class="warning-badge">Warning</strong><br>${ROBONIX_DEPLOY_DIR}/robot_wheeltec_r550/primitives/n10p_lslidar<small class="dependency-warning-reason">Resolved path &#x27;robot_wheeltec_r550/primitives/n10p_lslidar&#x27; does not exist in https://github.com/syswonder/robot-wheeltec-r550@main; ${ROBONIX_DEPLOY_DIR} (the robot repository root) is the path root.</small></li>
+<li class="dependency-warning"><span>primitive</span> <code>astra_s_camera</code><strong class="warning-badge">Warning</strong><br>./primitives/astra_s_camera<small class="dependency-warning-reason">Resolved path &#x27;primitives/astra_s_camera&#x27; does not exist in https://github.com/syswonder/robot-wheeltec-r550@main; the robot repository root is the path root.</small></li>
+<li class="dependency-warning"><span>service</span> <code>mapping</code><strong class="warning-badge">Warning</strong><br>${ROBONIX_DEPLOY_DIR}/robot_wheeltec_r550/services/service-map-rbnx<small class="dependency-warning-reason">Resolved path &#x27;robot_wheeltec_r550/services/service-map-rbnx&#x27; does not exist in https://github.com/syswonder/robot-wheeltec-r550@main; ${ROBONIX_DEPLOY_DIR} (the robot repository root) is the path root.</small></li>
+<li class="dependency-warning"><span>service</span> <code>nav2</code><strong class="warning-badge">Warning</strong><br>./services/service-navigation-rbnx<small class="dependency-warning-reason">Resolved path &#x27;services/service-navigation-rbnx&#x27; does not exist in https://github.com/syswonder/robot-wheeltec-r550@main; the robot repository root is the path root.</small></li>
+<li class="dependency-warning"><span>skill</span> <code>explore</code><strong class="warning-badge">Warning</strong><br>./skills/skill-explore-rbnx<small class="dependency-warning-reason">Resolved path &#x27;skills/skill-explore-rbnx&#x27; does not exist in https://github.com/syswonder/robot-wheeltec-r550@main; the robot repository root is the path root.</small></li>
         </ul>
       </aside>
     </div>
   </main>
-  <footer class="site-footer"><div class="shell">Generated on 2026-08-06T08:58:25+00:00.</div></footer>
+  <footer class="site-footer"><div class="shell">Generated on 2026-08-06T09:32:59+00:00.</div></footer>
 </body>
 </html>

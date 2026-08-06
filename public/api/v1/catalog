@@ -1,6 +1,6 @@
 {
   "api_version": "1",
-  "generated_at": "2026-08-06T08:58:25+00:00",
+  "generated_at": "2026-08-06T09:32:59+00:00",
   "packages": [
     {
       "name": "robonix.primitive.agilex.piper.arm",
@@ -1683,7 +1683,7 @@
           "resolution": "robonix_deploy",
           "package_name": "",
           "package_url": "",
-          "resolution_warning": ""
+          "resolution_warning": "Resolved path 'robot_wheeltec_r550/primitives/robot_description' does not exist in https://github.com/syswonder/robot-wheeltec-r550@main; ${ROBONIX_DEPLOY_DIR} (the robot repository root) is the path root."
         },
         {
           "section": "primitive",
@@ -1695,7 +1695,7 @@
           "resolution": "robonix_deploy",
           "package_name": "",
           "package_url": "",
-          "resolution_warning": ""
+          "resolution_warning": "Resolved path 'robot_wheeltec_r550/primitives/r550_chassis' does not exist in https://github.com/syswonder/robot-wheeltec-r550@main; ${ROBONIX_DEPLOY_DIR} (the robot repository root) is the path root."
         },
         {
           "section": "primitive",
@@ -1707,7 +1707,7 @@
           "resolution": "robonix_deploy",
           "package_name": "",
           "package_url": "",
-          "resolution_warning": ""
+          "resolution_warning": "Resolved path 'robot_wheeltec_r550/primitives/n10p_lslidar' does not exist in https://github.com/syswonder/robot-wheeltec-r550@main; ${ROBONIX_DEPLOY_DIR} (the robot repository root) is the path root."
         },
         {
           "section": "primitive",
@@ -1719,7 +1719,7 @@
           "resolution": "robot_repository",
           "package_name": "",
           "package_url": "",
-          "resolution_warning": ""
+          "resolution_warning": "Resolved path 'primitives/astra_s_camera' does not exist in https://github.com/syswonder/robot-wheeltec-r550@main; the robot repository root is the path root."
         },
         {
           "section": "service",
@@ -1731,7 +1731,7 @@
           "resolution": "robonix_deploy",
           "package_name": "",
           "package_url": "",
-          "resolution_warning": ""
+          "resolution_warning": "Resolved path 'robot_wheeltec_r550/services/service-map-rbnx' does not exist in https://github.com/syswonder/robot-wheeltec-r550@main; ${ROBONIX_DEPLOY_DIR} (the robot repository root) is the path root."
         },
         {
           "section": "service",
@@ -1743,7 +1743,7 @@
           "resolution": "robot_repository",
           "package_name": "",
           "package_url": "",
-          "resolution_warning": ""
+          "resolution_warning": "Resolved path 'services/service-navigation-rbnx' does not exist in https://github.com/syswonder/robot-wheeltec-r550@main; the robot repository root is the path root."
         },
         {
           "section": "skill",
@@ -1755,13 +1755,56 @@
           "resolution": "robot_repository",
           "package_name": "",
           "package_url": "",
-          "resolution_warning": ""
+          "resolution_warning": "Resolved path 'skills/skill-explore-rbnx' does not exist in https://github.com/syswonder/robot-wheeltec-r550@main; the robot repository root is the path root."
         }
       ],
       "readme_url": "https://github.com/syswonder/robot-wheeltec-r550/blob/main/README.md",
       "preview_image_url": "https://raw.githubusercontent.com/syswonder/robot-wheeltec-r550/main/assets/robot.jpg",
-      "deployment_status": "ok",
-      "deployment_warnings": []
+      "deployment_status": "warning",
+      "deployment_warnings": [
+        {
+          "section": "primitive",
+          "name": "robot_description",
+          "source": "${ROBONIX_DEPLOY_DIR}/robot_wheeltec_r550/primitives/robot_description",
+          "reason": "Resolved path 'robot_wheeltec_r550/primitives/robot_description' does not exist in https://github.com/syswonder/robot-wheeltec-r550@main; ${ROBONIX_DEPLOY_DIR} (the robot repository root) is the path root."
+        },
+        {
+          "section": "primitive",
+          "name": "r550_chassis",
+          "source": "${ROBONIX_DEPLOY_DIR}/robot_wheeltec_r550/primitives/r550_chassis",
+          "reason": "Resolved path 'robot_wheeltec_r550/primitives/r550_chassis' does not exist in https://github.com/syswonder/robot-wheeltec-r550@main; ${ROBONIX_DEPLOY_DIR} (the robot repository root) is the path root."
+        },
+        {
+          "section": "primitive",
+          "name": "n10p_lslidar",
+          "source": "${ROBONIX_DEPLOY_DIR}/robot_wheeltec_r550/primitives/n10p_lslidar",
+          "reason": "Resolved path 'robot_wheeltec_r550/primitives/n10p_lslidar' does not exist in https://github.com/syswonder/robot-wheeltec-r550@main; ${ROBONIX_DEPLOY_DIR} (the robot repository root) is the path root."
+        },
+        {
+          "section": "primitive",
+          "name": "astra_s_camera",
+          "source": "./primitives/astra_s_camera",
+          "reason": "Resolved path 'primitives/astra_s_camera' does not exist in https://github.com/syswonder/robot-wheeltec-r550@main; the robot repository root is the path root."
+        },
+        {
+          "section": "service",
+          "name": "mapping",
+          "source": "${ROBONIX_DEPLOY_DIR}/robot_wheeltec_r550/services/service-map-rbnx",
+          "reason": "Resolved path 'robot_wheeltec_r550/services/service-map-rbnx' does not exist in https://github.com/syswonder/robot-wheeltec-r550@main; ${ROBONIX_DEPLOY_DIR} (the robot repository root) is the path root."
+        },
+        {
+          "section": "service",
+          "name": "nav2",
+          "source": "./services/service-navigation-rbnx",
+          "reason": "Resolved path 'services/service-navigation-rbnx' does not exist in https://github.com/syswonder/robot-wheeltec-r550@main; the robot repository root is the path root."
+        },
+        {
+          "section": "skill",
+          "name": "explore",
+          "source": "./skills/skill-explore-rbnx",
+          "reason": "Resolved path 'skills/skill-explore-rbnx' does not exist in https://github.com/syswonder/robot-wheeltec-r550@main; the robot repository root is the path root."
+        }
+      ]
     },
     {
       "name": "robonix.robot.wowrobo.roboarm",
