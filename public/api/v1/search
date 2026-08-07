@@ -2106,7 +2106,7 @@
     "preview_image_url": ""
   },
   {
-    "name": "robonix.service.navigation.vln",
+    "name": "robonix.service.navigation.computing_optimization",
     "version": "0.5.0",
     "description": "Instruction-following navigation service — cloud S2 semantic latents plus edge S1 action generation with adaptive cloud-edge synchronization.",
     "license": "MulanPSL-2.0",
@@ -2127,15 +2127,8 @@
     "default_branch": "main",
     "kind": "service",
     "catalog_type": "package",
-    "catalog_status": "warning",
-    "catalog_warnings": [
-      {
-        "type": "manifest_name_mismatch",
-        "manifest_name": "robonix.service.navigation.computing_optimization",
-        "expected_name": "robonix.service.navigation.vln",
-        "reason": "manifest catalog name is 'robonix.service.navigation.computing_optimization', expected 'robonix.service.navigation.vln'"
-      }
-    ],
+    "catalog_status": "ok",
+    "catalog_warnings": [],
     "manifest": "package_manifest.yaml",
     "capabilities": [
       "robonix/service/navigation/computing_optimization/driver",
