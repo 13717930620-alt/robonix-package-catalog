@@ -1,6 +1,6 @@
 {
   "api_version": "1",
-  "generated_at": "2026-08-07T10:56:02+00:00",
+  "generated_at": "2026-08-07T11:09:55+00:00",
   "packages": [
     {
       "name": "robonix.primitive.agilex.piper.arm",
@@ -658,6 +658,66 @@
       ],
       "deploy_dependencies": [],
       "readme_url": "https://github.com/syswonder/primitive-syswonder-minecraft_bot-rbnx/blob/main/README.md",
+      "preview_image_url": ""
+    },
+    {
+      "name": "robonix.primitive.wheeltec.lslidar_n10p.lidar",
+      "version": "0.1.0",
+      "description": "N10P Lidar driver for 2D SLAM mapping and navigation.",
+      "license": "Apache-2.0",
+      "tags": [
+        "primitive",
+        "robonix"
+      ],
+      "repo": "https://github.com/syswonder/primitive-wheeltec-lslidar_n10p-lidar-rbnx",
+      "maintainers": [
+        "Xiangrui Cheng <ccc_7020@qq.com>"
+      ],
+      "repo_name": "primitive-wheeltec-lslidar_n10p-lidar-rbnx",
+      "default_branch": "main",
+      "kind": "primitive",
+      "catalog_type": "package",
+      "catalog_status": "ok",
+      "catalog_warnings": [],
+      "manifest": "package_manifest.yaml",
+      "capabilities": [
+        "robinix/primitive/lidar/driver",
+        "robinix/primitive/lidar/lidar",
+        "robinix/primitive/lidar/lidar_snapshot"
+      ],
+      "deploy_dependencies": [],
+      "readme_url": "https://github.com/syswonder/primitive-wheeltec-lslidar_n10p-lidar-rbnx/blob/main/README.md",
+      "preview_image_url": ""
+    },
+    {
+      "name": "robonix.primitive.wheeltec.r550_minitank.chassis",
+      "version": "0.1.0",
+      "description": "wheeltec r550_minitank chassis driver wrapper.",
+      "license": "Apache-2.0",
+      "tags": [
+        "primitive",
+        "robonix"
+      ],
+      "repo": "https://github.com/syswonder/primitive-wheeltec-r550-chassis-rbnx",
+      "maintainers": [
+        "Xiangrui Cheng <ccc_7020@qq.com>"
+      ],
+      "repo_name": "primitive-wheeltec-r550-chassis-rbnx",
+      "default_branch": "main",
+      "kind": "primitive",
+      "catalog_type": "package",
+      "catalog_status": "ok",
+      "catalog_warnings": [],
+      "manifest": "package_manifest.yaml",
+      "capabilities": [
+        "robonix/primitive/chassis/driver",
+        "robonix/primitive/chassis/move",
+        "robonix/primitive/chassis/twist_in",
+        "robonix/primitive/chassis/odom",
+        "robonix/primitive/imu/imu"
+      ],
+      "deploy_dependencies": [],
+      "readme_url": "https://github.com/syswonder/primitive-wheeltec-r550-chassis-rbnx/blob/main/README.md",
       "preview_image_url": ""
     },
     {
@@ -1685,10 +1745,10 @@
           "path": "",
           "branch": "",
           "manifest": "",
-          "resolution": "unresolved",
-          "package_name": "",
-          "package_url": "",
-          "resolution_warning": "Repository 'https://github.com/syswonder/primitive-wheeltec-r550-chassis-rbnx' is not indexed by catalog.yaml; add the package to the Catalog or use a repository-local dependency."
+          "resolution": "catalog",
+          "package_name": "robonix.primitive.wheeltec.r550_minitank.chassis",
+          "package_url": "../robonix.primitive.wheeltec.r550_minitank.chassis/",
+          "resolution_warning": ""
         },
         {
           "section": "primitive",
@@ -1697,10 +1757,10 @@
           "path": "",
           "branch": "",
           "manifest": "",
-          "resolution": "unresolved",
-          "package_name": "",
-          "package_url": "",
-          "resolution_warning": "Repository 'https://github.com/syswonder/primitive-wheeltec-lslidar_n10p-lidar-rbnx' is not indexed by catalog.yaml; add the package to the Catalog or use a repository-local dependency."
+          "resolution": "catalog",
+          "package_name": "robonix.primitive.wheeltec.lslidar_n10p.lidar",
+          "package_url": "../robonix.primitive.wheeltec.lslidar_n10p.lidar/",
+          "resolution_warning": ""
         },
         {
           "section": "primitive",
@@ -1753,21 +1813,8 @@
       ],
       "readme_url": "https://github.com/syswonder/robot-wheeltec-r550/blob/main/README.md",
       "preview_image_url": "https://raw.githubusercontent.com/syswonder/robot-wheeltec-r550/main/assets/robot.jpg",
-      "deployment_status": "warning",
-      "deployment_warnings": [
-        {
-          "section": "primitive",
-          "name": "r550_chassis",
-          "source": "https://github.com/syswonder/primitive-wheeltec-r550-chassis-rbnx",
-          "reason": "Repository 'https://github.com/syswonder/primitive-wheeltec-r550-chassis-rbnx' is not indexed by catalog.yaml; add the package to the Catalog or use a repository-local dependency."
-        },
-        {
-          "section": "primitive",
-          "name": "n10p_lslidar",
-          "source": "https://github.com/syswonder/primitive-wheeltec-lslidar_n10p-lidar-rbnx",
-          "reason": "Repository 'https://github.com/syswonder/primitive-wheeltec-lslidar_n10p-lidar-rbnx' is not indexed by catalog.yaml; add the package to the Catalog or use a repository-local dependency."
-        }
-      ]
+      "deployment_status": "ok",
+      "deployment_warnings": []
     },
     {
       "name": "robonix.robot.wowrobo.roboarm",
