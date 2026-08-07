@@ -151,14 +151,14 @@
     {
       "section": "skill",
       "name": "find_object",
-      "repo": "https://github.com/Bunnycxk/skill-find-object-rbnx.git",
+      "repo": "https://github.com/syswonder/skill-find-object-rbnx",
       "path": "",
       "branch": "main",
       "manifest": "",
       "resolution": "unresolved",
       "package_name": "",
       "package_url": "",
-      "resolution_warning": "Repository 'https://github.com/Bunnycxk/skill-find-object-rbnx.git' is not indexed by catalog.yaml; add the package to the Catalog or use a repository-local dependency."
+      "resolution_warning": "Repository 'https://github.com/syswonder/skill-find-object-rbnx' is not indexed by catalog.yaml; add the package to the Catalog or use a repository-local dependency."
     }
   ],
   "readme_url": "https://github.com/syswonder/robot-deep_robotics-lite3/blob/main/README.md",
@@ -168,8 +168,8 @@
     {
       "section": "skill",
       "name": "find_object",
-      "source": "https://github.com/Bunnycxk/skill-find-object-rbnx.git",
-      "reason": "Repository 'https://github.com/Bunnycxk/skill-find-object-rbnx.git' is not indexed by catalog.yaml; add the package to the Catalog or use a repository-local dependency."
+      "source": "https://github.com/syswonder/skill-find-object-rbnx",
+      "reason": "Repository 'https://github.com/syswonder/skill-find-object-rbnx' is not indexed by catalog.yaml; add the package to the Catalog or use a repository-local dependency."
     }
   ]
 }
