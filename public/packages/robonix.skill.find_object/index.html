@@ -19,7 +19,7 @@
       document.documentElement.style.colorScheme = resolved;
     })();
   </script>
-  <title>robonix.skill.vla.openvla - Robonix Package Catalog</title>
+  <title>robonix.skill.find_object - Robonix Package Catalog</title>
   <link rel="icon" type="image/svg+xml" href="../../assets/robonix-mark.svg">
   <link rel="stylesheet" href="../../assets/vendor/pico/pico.classless.min.css">
   <style>
@@ -1023,212 +1023,35 @@ html[data-theme="dark"] .highlight .il { color: #AE81FF } /* Literal.Number.Inte
   </script>
   <header class="shell detail-hero">
     <a class="back" href="../">Back to packages</a>
-    <h1>robonix.skill.vla.openvla</h1>
-    <p class="lede">VLA client skill — LLM-callable entry point for vision-language-action inference and JOINT-SPACE execution.</p>
+    <h1>robonix.skill.find_object</h1>
+    <p class="lede">Capture an annotated 360-degree camera sweep for Pilot object recognition.</p>
   </header>
   <main class="shell">
     <div class="detail-layout">
       <section class="panel detail-main">
         <h2>README</h2>
         <article class="readme">
-          <h1>skill-vla-rbnx</h1>
-<p>Robonix package for the <strong>Vision-Language-Action (VLA) client skill</strong> — LLM-callable entry point for end-to-end neural-network manipulation on the Piper arm. Owns the <code>skill/vla/*</code> namespace.</p>
-<p>Catalog name: <code>robonix.skill.vla.openvla</code>.</p>
-<h2>Overview</h2>
-<p>Closed-loop VLA control pipeline:</p>
-<div class="highlight"><pre><span></span><code>Camera topics ─► observe ─► VLA Server (inference) ─► safety filter ─► /arm/joint_command ─► piper_ctl ─► arm
-                    ▲                                                                            │
-                    └──────────────────── joint_states feedback ◄─────────────────────────────────┘
-</code></pre></div>
-<p><strong>Key architecture decision</strong>: actions are sent directly to <code>primitive-agilex-piper-arm-rbnx</code> (<code>/arm/joint_command</code>), <strong>bypassing MoveIt entirely</strong>. VLA outputs are already planned trajectories — re-planning through MoveIt would destroy learned behavior and add 3–5 s latency per step.</p>
-<h2>Capability surface</h2>
-<table>
-<thead>
-<tr>
-<th>Contract</th>
-<th>Mode</th>
-<th>Transport</th>
-<th>Source / handler</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><code>robonix/skill/vla/driver</code></td>
-<td>rpc</td>
-<td>gRPC</td>
-<td><code>Driver(CMD_INIT, config_json)</code> — lifecycle gate</td>
-</tr>
-<tr>
-<td><code>robonix/skill/vla/execute</code></td>
-<td>rpc</td>
-<td>MCP</td>
-<td><code>Execute(instruction) → success/failure</code> (user_invocable — LLM can call directly)</td>
-</tr>
-</tbody>
-</table>
-<h2>Unit convention</h2>
-<p>Must match the dataset builder exactly:</p>
-<ul>
-<li>Joints 1..6: dataset SDK units = <code>0.001°</code> (rad = SDK / 57324.840764).</li>
-<li>Gripper (j7): dataset SDK units = <code>2 · µm</code> (meters = SDK / 2_000_000; <code>primitive-agilex-piper-arm-rbnx</code> multiplies meters by 1e6 then by <code>gripper_val_mutiple=2</code> before CAN).</li>
-</ul>
-<h2>Conflict with the vertical-grasp pipeline</h2>
-<p><code>skill-vla-rbnx</code> monopolizes the joint command topic for closed-loop inference at <code>action_hz</code>, which collides with <code>service-piper-moveit-rbnx</code>'s <code>execute_grasp</code>. In the same deploy manifest <strong>only one of the two skill stacks should be active</strong> at a time:</p>
-<ul>
-<li>vertical-grasp: enable <code>service-object-detect-rbnx</code> / <code>service-grasp-pose-rbnx</code> / <code>service-piper-moveit-rbnx</code> / <code>skill-pick-rbnx</code>, disable this package;</li>
-<li>VLA demo: enable this package, disable the four above.</li>
-</ul>
-<h2>Setup</h2>
-<div class="highlight"><pre><span></span><code><span class="c1"># Clone</span>
-git<span class="w"> </span>clone<span class="w"> </span>https://github.com/syswonder/skill-vla-rbnx.git
-
-<span class="c1"># Build</span>
-bash<span class="w"> </span>scripts/build.sh
-
-<span class="c1"># Requires (on target robot):</span>
-<span class="c1"># - ROS humble + rclpy</span>
-<span class="c1"># - vla_server_rbnx running (provides inference)</span>
-<span class="c1"># - primitive-orbbec-dabai_dcw-camera-rbnx running (provides camera images)</span>
-<span class="c1"># - primitive-agilex-piper-arm-rbnx running (accepts joint commands)</span>
-</code></pre></div>
-<h2>Layout</h2>
-<div class="highlight"><pre><span></span><code>skill-vla-rbnx/
-├── package_manifest.yaml
-├── capabilities/
-│   └── skill/vla/{driver,execute}.v1.toml
-├── vla_client/                 Python package: atlas bridge + action pipeline
-└── scripts/
-    ├── build.sh                rbnx codegen
-    └── start.sh                source ROS, exec atlas_bridge
-</code></pre></div>
-<h2>Driver-init lifecycle &amp; activation</h2>
-<p>Init validates the VLA server URL and other config. Activation resolves camera topics via atlas (when <code>use_atlas_discovery=true</code>), then declares <code>skill/vla/execute</code> on atlas. The control loop only runs while <code>Execute()</code> is in progress.</p>
-<h2>Safety</h2>
-<p>Since MoveIt is bypassed, the internal safety filter provides:</p>
-<ol>
-<li><strong>Joint limits hard clip</strong> — prevents exceeding physical joint bounds.</li>
-<li><strong>Rate limiting</strong> — prevents single-step jumps that could damage hardware.</li>
-<li><strong>Gripper range clip</strong> — keeps gripper commands in valid range.</li>
-</ol>
-<p>Emergency reset: if available, calls <code>manipulation/reset</code> (MoveIt joint-space) to park the arm safely.</p>
-<h2>Config (passed via <code>Driver(CMD_INIT, config_json)</code>)</h2>
-<p>Defaults are in <code>package_manifest.yaml → config_defaults</code>:</p>
-<div class="highlight"><pre><span></span><code><span class="nt">vla_server_url</span><span class="p">:</span><span class="w">       </span><span class="s">&quot;http://localhost:8777&quot;</span><span class="w">      </span><span class="c1"># Direct URL fallback</span>
-<span class="nt">use_atlas_discovery</span><span class="p">:</span><span class="w">  </span><span class="l l-Scalar l-Scalar-Plain">true</span><span class="w">                         </span><span class="c1"># Discover vla_server via atlas</span>
-
-<span class="c1"># Topics</span>
-<span class="nt">full_image_topic</span><span class="p">:</span><span class="w">     </span><span class="l l-Scalar l-Scalar-Plain">/camera/color/image_raw</span>
-<span class="nt">wrist_image_topic</span><span class="p">:</span><span class="w">    </span><span class="l l-Scalar l-Scalar-Plain">/wrist_camera/color/image_raw</span>
-<span class="nt">joint_states_topic</span><span class="p">:</span><span class="w">   </span><span class="l l-Scalar l-Scalar-Plain">/arm/joint_states_single</span><span class="w">     </span><span class="c1"># piper_ctl publishes proprio here</span>
-<span class="nt">joint_cmd_topic</span><span class="p">:</span><span class="w">      </span><span class="l l-Scalar l-Scalar-Plain">/arm/joint_command</span><span class="w">            </span><span class="c1"># piper_ctl subscribes here for joint ctl</span>
-
-<span class="nt">image_resize</span><span class="p">:</span><span class="w">  </span><span class="p p-Indicator">[</span><span class="nv">256</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">256</span><span class="p p-Indicator">]</span><span class="w">                          </span><span class="c1"># Resize before sending to VLA</span>
-<span class="nt">action_hz</span><span class="p">:</span><span class="w">     </span><span class="l l-Scalar l-Scalar-Plain">10.0</span><span class="w">                                </span><span class="c1"># Control frequency</span>
-<span class="nt">timeout_s</span><span class="p">:</span><span class="w">     </span><span class="l l-Scalar l-Scalar-Plain">60.0</span><span class="w">                                </span><span class="c1"># Default execution timeout</span>
-<span class="nt">joint_state_dim</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">7</span>
-
-<span class="c1"># ── Dataset action range (must match piper_grasp_2cam_dataset_builder.ACTION_MIN / MAX) ──</span>
-<span class="c1"># Joints 1..6 in dataset SDK units (0.001°); gripper in &quot;2 µm&quot; units.</span>
-<span class="nt">action_min</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">66563.0</span><span class="p p-Indicator">,</span><span class="w">  </span><span class="nv">-2921.0</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">-151557.0</span><span class="p p-Indicator">,</span><span class="w">  </span><span class="nv">-53279.0</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">-37605.0</span><span class="p p-Indicator">,</span><span class="w">  </span><span class="nv">-94743.0</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">-3000.0</span><span class="p p-Indicator">]</span>
-<span class="nt">action_max</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">132905.0</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">194064.0</span><span class="p p-Indicator">,</span><span class="w">     </span><span class="nv">712.0</span><span class="p p-Indicator">,</span><span class="w">  </span><span class="nv">103398.0</span><span class="p p-Indicator">,</span><span class="w">  </span><span class="nv">71141.0</span><span class="p p-Indicator">,</span><span class="w">  </span><span class="nv">119408.0</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">88500.0</span><span class="p p-Indicator">]</span>
-
-<span class="c1"># ── Hardware joint limits (safety clip — applied AFTER de-normalization) ──</span>
-<span class="c1"># Conservative superset of dataset bounds so dataset values pass through unclipped.</span>
-<span class="c1"># Gripper hard limits: [0, 80 mm] = [0, 80000] in 2 µm-style ⇒ [0, 160000].</span>
-<span class="nt">hw_action_min</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">-160000.0</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">-160000.0</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">-160000.0</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">-160000.0</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">-160000.0</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">-160000.0</span><span class="p p-Indicator">,</span><span class="w">      </span><span class="nv">0.0</span><span class="p p-Indicator">]</span>
-<span class="nt">hw_action_max</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="w"> </span><span class="nv">160000.0</span><span class="p p-Indicator">,</span><span class="w">  </span><span class="nv">160000.0</span><span class="p p-Indicator">,</span><span class="w">  </span><span class="nv">160000.0</span><span class="p p-Indicator">,</span><span class="w">  </span><span class="nv">160000.0</span><span class="p p-Indicator">,</span><span class="w">  </span><span class="nv">160000.0</span><span class="p p-Indicator">,</span><span class="w">  </span><span class="nv">160000.0</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">160000.0</span><span class="p p-Indicator">]</span>
-
-<span class="c1"># ── Per-step rate limit (in dataset SDK units) ──</span>
-<span class="c1"># 5000 SDK units = 5° per step  → at 10 Hz = 50 °/s.</span>
-<span class="c1"># Gripper: 20000 = 10 mm per step.</span>
-<span class="nt">max_delta_per_step_sdk</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">5000.0</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">5000.0</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">5000.0</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">5000.0</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">5000.0</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">5000.0</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">20000.0</span><span class="p p-Indicator">]</span>
-
-<span class="nt">enable_safety_filter</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
-
-<span class="c1"># ── JointState publish parameters ──</span>
-<span class="c1"># piper_ctl reads velocity[6] as global velocity % (1-100); 0 → default 30.</span>
-<span class="nt">joint_velocity_pct</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">30.0</span>
-<span class="c1"># piper_ctl reads effort[6] as gripper effort; clipped to [0.5, 3].</span>
-<span class="nt">gripper_effort</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1.0</span>
-</code></pre></div>
-<ul>
-<li><code>use_atlas_discovery=true</code> overrides the four topic strings via atlas resolution.</li>
-<li><code>enable_safety_filter=false</code> bypasses hardware-limit clipping — dev only.</li>
-</ul>
-<h2>Build / run standalone</h2>
-<div class="highlight"><pre><span></span><code>bash<span class="w"> </span>scripts/build.sh
-<span class="nv">ROBONIX_ATLAS</span><span class="o">=</span><span class="m">127</span>.0.0.1:50051<span class="w"> </span><span class="se">\</span>
-<span class="w">    </span>bash<span class="w"> </span>scripts/start.sh
-</code></pre></div>
-<h2>Verification</h2>
-<div class="highlight"><pre><span></span><code>rbnx<span class="w"> </span>caps<span class="w"> </span><span class="p">|</span><span class="w"> </span>grep<span class="w"> </span>skill/vla
-<span class="c1"># expect: vla_client  robonix.skill.vla.openvla  INITIALIZED</span>
-<span class="c1">#   robonix/skill/vla/driver   (rpc/grpc)</span>
-<span class="c1">#   robonix/skill/vla/execute  (rpc/mcp, user_invocable)</span>
-
-<span class="c1"># End-to-end via Pilot LLM:</span>
-rbnx<span class="w"> </span>ask<span class="w"> </span><span class="s2">&quot;put the block on the shelf&quot;</span>
-</code></pre></div>
-<h2>vs <code>skill-pick-rbnx</code></h2>
-<table>
-<thead>
-<tr>
-<th></th>
-<th><code>skill-pick-rbnx</code></th>
-<th><code>skill-vla-rbnx</code></th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>Method</td>
-<td>YOLO/VLM + geometry + MoveIt planning</td>
-<td>End-to-end neural VLA</td>
-</tr>
-<tr>
-<td>Control</td>
-<td>MoveIt (3–5 s / step)</td>
-<td>Direct joint command (10 Hz)</td>
-</tr>
-<tr>
-<td>Safety</td>
-<td>MoveIt collision detection</td>
-<td>Internal filter</td>
-</tr>
-<tr>
-<td>Use case</td>
-<td>Simple pick-and-place</td>
-<td>Complex language-guided manipulation</td>
-</tr>
-</tbody>
-</table>
-<h2>Coupling with neighbours</h2>
-<ul>
-<li><strong>Upstream</strong> <code>primitive-orbbec-dabai_dcw-camera-rbnx</code> — RGB stream(s).</li>
-<li><strong>Upstream</strong> <code>primitive-agilex-piper-arm-rbnx</code> — joint proprio + joint command topic.</li>
-<li>No hard dep on other services.</li>
-</ul>
-<h2>License</h2>
-<p>This package: MulanPSL-2.0.</p>
+          <p>No README.md was found in this package repository.</p>
         </article>
       </section>
       <aside class="panel detail-side">
         <h2>Package</h2>
         <div class="kv">
-          <div>Version</div><div><code>0.2.0</code></div>
-          <div>License</div><div><code>MulanPSL-2.0</code></div>
+          <div>Version</div><div><code>0.1.0</code></div>
+          <div>License</div><div><code>Apache-2.0</code></div>
           <div>Kind</div><div>skill</div>
           <div>Type</div><div>package</div>
-          <div>Maintainers</div><div>lhw2002426 &lt;lhw2002426@users.noreply.github.com&gt;</div>
-          <div>Repository</div><div><a href="https://github.com/syswonder/skill-vla-openvla-rbnx">skill-vla-openvla-rbnx</a></div>
+          <div>Maintainers</div><div>Bunnycxk &lt;2501213313@stu.pku.edu.cn&gt;</div>
+          <div>Repository</div><div><a href="https://github.com/syswonder/skill-find-object-rbnx">skill-find-object-rbnx</a></div>
           <div>Branch</div><div><code>main</code></div>
           <div>Manifest</div><div><code>package_manifest.yaml</code></div>
-          <div>API</div><div><a href="../../api/view/?package=robonix.skill.vla.openvla">package metadata</a></div>
+          <div>API</div><div><a href="../../api/view/?package=robonix.skill.find_object">package metadata</a></div>
         </div>
-        <div class="tags"><button class="tag tag-gold" data-tag="skill">skill</button> <button class="tag tag-gray" data-tag="vla">vla</button> <button class="tag tag-gray" data-tag="manipulation">manipulation</button> <button class="tag tag-gray" data-tag="llm">llm</button></div>
+        <div class="tags"><button class="tag tag-gold" data-tag="skill">skill</button> <button class="tag tag-cyan" data-tag="camera">camera</button> <button class="tag tag-gray" data-tag="object-search">object-search</button> <button class="tag tag-gray" data-tag="lite3">lite3</button></div>
         <h2>Capabilities</h2>
         <ul class="cap-list">
-          <li>robonix/skill/vla/driver</li>
-<li>robonix/skill/vla/execute</li>
+          <li>robonix/skill/find_object/driver</li>
+<li>robonix/skill/find_object/scan</li>
         </ul>
       </aside>
     </div>

@@ -222,7 +222,7 @@ but browser-facing links and new integrations should use the `.json` paths above
 The generated commit uses `[skip ci]`; normal CI only triggers from
 `catalog.yaml`, the builder script, the workflow, or manual dispatch.
 
-Generated on `2026-08-07T00:16:16+00:00`.
+Generated on `2026-08-07T10:56:02+00:00`.
 
 ## Packages
 
@@ -272,6 +272,7 @@ Generated on `2026-08-07T00:16:16+00:00`.
 | [`robonix.skill.dual_piper_initialize`](https://syswonder.github.io/robonix-package-catalog/packages/robonix.skill.dual_piper_initialize/) | `0.1.0` | `skill` | Zhenyu Zhang <768726812@qq.com> | skill, dual-arm, piper, initialization | [repo](https://github.com/syswonder/skill-dual-piper-initialize-rbnx) |
 | [`robonix.skill.dual_piper_transfer`](https://syswonder.github.io/robonix-package-catalog/packages/robonix.skill.dual_piper_transfer/) | `0.1.0` | `skill` | Zhenyu Zhang <768726812@qq.com> | skill, dual-arm, piper, transfer | [repo](https://github.com/syswonder/skill-dual-piper-transfer-rbnx) |
 | [`robonix.skill.explore`](https://syswonder.github.io/robonix-package-catalog/packages/robonix.skill.explore/) | `0.1.0` | `skill` | wheatfox <wheatfox17@icloud.com> | skill, explore, frontier, navigation, mapping | [repo](https://github.com/syswonder/skill-explore-rbnx) |
+| [`robonix.skill.find_object`](https://syswonder.github.io/robonix-package-catalog/packages/robonix.skill.find_object/) | `0.1.0` | `skill` | Bunnycxk <2501213313@stu.pku.edu.cn> | skill, camera, object-search, lite3 | [repo](https://github.com/syswonder/skill-find-object-rbnx) |
 | [`robonix.skill.hand_gesture`](https://syswonder.github.io/robonix-package-catalog/packages/robonix.skill.hand_gesture/) | `0.1.0` | `skill` | Felix <xi.lifeng@qq.com> | skill, gesture, dance, hand, beingbeyond, d1 | [repo](https://github.com/syswonder/skill-hand-gesture-rbnx) |
 | [`robonix.skill.minecraft_explore`](https://syswonder.github.io/robonix-package-catalog/packages/robonix.skill.minecraft_explore/) | `0.1.0` | `skill` | ZZJJWarth <jzeng25@stu.pku.edu.cn> | skill, minecraft, exploration, frontier, navigation | [repo](https://github.com/syswonder/skill-minecraft-explore-rbnx) |
 | [`robonix.skill.openvla_oft_accel`](https://syswonder.github.io/robonix-package-catalog/packages/robonix.skill.openvla_oft_accel/) | `0.2.0` | `skill` | Lingyue Zhang <zly3404842897@gmail.com> | skill, vla, openvla, oft, manipulation, multitask, piper | [repo](https://github.com/QingFeng34048/Robonix-Skill-Sim2Real-Completed) |

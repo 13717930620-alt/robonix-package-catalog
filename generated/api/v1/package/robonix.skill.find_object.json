@@ -1,0 +1,30 @@
+{
+  "name": "robonix.skill.find_object",
+  "version": "0.1.0",
+  "description": "Capture an annotated 360-degree camera sweep for Pilot object recognition.",
+  "license": "Apache-2.0",
+  "tags": [
+    "skill",
+    "camera",
+    "object-search",
+    "lite3"
+  ],
+  "repo": "https://github.com/syswonder/skill-find-object-rbnx",
+  "maintainers": [
+    "Bunnycxk <2501213313@stu.pku.edu.cn>"
+  ],
+  "repo_name": "skill-find-object-rbnx",
+  "default_branch": "main",
+  "kind": "skill",
+  "catalog_type": "package",
+  "catalog_status": "ok",
+  "catalog_warnings": [],
+  "manifest": "package_manifest.yaml",
+  "capabilities": [
+    "robonix/skill/find_object/driver",
+    "robonix/skill/find_object/scan"
+  ],
+  "deploy_dependencies": [],
+  "readme_url": "https://github.com/syswonder/skill-find-object-rbnx/blob/main/README.md",
+  "preview_image_url": ""
+}

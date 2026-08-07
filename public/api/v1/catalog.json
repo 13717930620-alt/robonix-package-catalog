@@ -1,6 +1,6 @@
 {
   "api_version": "1",
-  "generated_at": "2026-08-07T00:16:16+00:00",
+  "generated_at": "2026-08-07T10:56:02+00:00",
   "packages": [
     {
       "name": "robonix.primitive.agilex.piper.arm",
@@ -1352,23 +1352,16 @@
           "path": "",
           "branch": "main",
           "manifest": "",
-          "resolution": "unresolved",
-          "package_name": "",
-          "package_url": "",
-          "resolution_warning": "Repository 'https://github.com/syswonder/skill-find-object-rbnx' is not indexed by catalog.yaml; add the package to the Catalog or use a repository-local dependency."
+          "resolution": "catalog",
+          "package_name": "robonix.skill.find_object",
+          "package_url": "../robonix.skill.find_object/",
+          "resolution_warning": ""
         }
       ],
       "readme_url": "https://github.com/syswonder/robot-deep_robotics-lite3/blob/main/README.md",
       "preview_image_url": "https://raw.githubusercontent.com/syswonder/robot-deep_robotics-lite3/main/assets/robot.jpg",
-      "deployment_status": "warning",
-      "deployment_warnings": [
-        {
-          "section": "skill",
-          "name": "find_object",
-          "source": "https://github.com/syswonder/skill-find-object-rbnx",
-          "reason": "Repository 'https://github.com/syswonder/skill-find-object-rbnx' is not indexed by catalog.yaml; add the package to the Catalog or use a repository-local dependency."
-        }
-      ]
+      "deployment_status": "ok",
+      "deployment_warnings": []
     },
     {
       "name": "robonix.robot.linkerbot.linker_hand_o6",
@@ -1688,74 +1681,74 @@
         {
           "section": "primitive",
           "name": "r550_chassis",
-          "repo": "",
-          "path": "https://github.com/syswonder/primitive-wheeltec-r550-chassis-rbnx/tree/main/r550_chassis",
+          "repo": "https://github.com/syswonder/primitive-wheeltec-r550-chassis-rbnx",
+          "path": "",
           "branch": "",
           "manifest": "",
-          "resolution": "robot_repository",
+          "resolution": "unresolved",
           "package_name": "",
           "package_url": "",
-          "resolution_warning": "Resolved path 'https:/github.com/syswonder/primitive-wheeltec-r550-chassis-rbnx/tree/main/r550_chassis' does not exist in https://github.com/syswonder/robot-wheeltec-r550@main; the robot repository root is the path root."
+          "resolution_warning": "Repository 'https://github.com/syswonder/primitive-wheeltec-r550-chassis-rbnx' is not indexed by catalog.yaml; add the package to the Catalog or use a repository-local dependency."
         },
         {
           "section": "primitive",
           "name": "n10p_lslidar",
-          "repo": "",
-          "path": "https://github.com/syswonder/primitive-wheeltec-r550-chassis-rbnx/tree/main/n10p_lslidar",
+          "repo": "https://github.com/syswonder/primitive-wheeltec-lslidar_n10p-lidar-rbnx",
+          "path": "",
           "branch": "",
           "manifest": "",
-          "resolution": "robot_repository",
+          "resolution": "unresolved",
           "package_name": "",
           "package_url": "",
-          "resolution_warning": "Resolved path 'https:/github.com/syswonder/primitive-wheeltec-r550-chassis-rbnx/tree/main/n10p_lslidar' does not exist in https://github.com/syswonder/robot-wheeltec-r550@main; the robot repository root is the path root."
+          "resolution_warning": "Repository 'https://github.com/syswonder/primitive-wheeltec-lslidar_n10p-lidar-rbnx' is not indexed by catalog.yaml; add the package to the Catalog or use a repository-local dependency."
         },
         {
           "section": "primitive",
           "name": "astra_s_camera",
-          "repo": "",
-          "path": "https://github.com/syswonder/primitive-wheeltec-r550-chassis-rbnx/tree/main/astra_s_camera",
-          "branch": "",
+          "repo": "https://github.com/syswonder/primitive-orbbec-camera",
+          "path": "",
+          "branch": "main",
           "manifest": "",
-          "resolution": "robot_repository",
-          "package_name": "",
-          "package_url": "",
-          "resolution_warning": "Resolved path 'https:/github.com/syswonder/primitive-wheeltec-r550-chassis-rbnx/tree/main/astra_s_camera' does not exist in https://github.com/syswonder/robot-wheeltec-r550@main; the robot repository root is the path root."
+          "resolution": "catalog",
+          "package_name": "robonix.primitive.orbbec.gemini330.camera",
+          "package_url": "../robonix.primitive.orbbec.gemini330.camera/",
+          "resolution_warning": ""
         },
         {
           "section": "service",
           "name": "mapping",
-          "repo": "",
-          "path": "https://github.com/syswonder/service-map-rbnx",
+          "repo": "https://github.com/syswonder/service-map-rbnx",
+          "path": "",
           "branch": "",
           "manifest": "package_manifest.jetson-native.yaml",
-          "resolution": "robot_repository",
-          "package_name": "",
-          "package_url": "",
-          "resolution_warning": "Resolved path 'https:/github.com/syswonder/service-map-rbnx' does not exist in https://github.com/syswonder/robot-wheeltec-r550@main; the robot repository root is the path root."
+          "resolution": "catalog",
+          "package_name": "robonix.service.mapping",
+          "package_url": "../robonix.service.mapping/",
+          "resolution_warning": ""
         },
         {
           "section": "service",
           "name": "nav2",
-          "repo": "",
-          "path": "https://github.com/syswonder/service-navigation-rbnx",
+          "repo": "https://github.com/syswonder/service-navigation-rbnx",
+          "path": "",
           "branch": "",
           "manifest": "package_manifest.jetson-docker.yaml",
-          "resolution": "robot_repository",
-          "package_name": "",
-          "package_url": "",
-          "resolution_warning": "Resolved path 'https:/github.com/syswonder/service-navigation-rbnx' does not exist in https://github.com/syswonder/robot-wheeltec-r550@main; the robot repository root is the path root."
+          "resolution": "catalog",
+          "package_name": "robonix.service.navigation",
+          "package_url": "../robonix.service.navigation/",
+          "resolution_warning": ""
         },
         {
           "section": "skill",
           "name": "explore",
-          "repo": "",
-          "path": "https://github.com/syswonder/skill-explore-rbnx",
+          "repo": "https://github.com/syswonder/skill-explore-rbnx",
+          "path": "",
           "branch": "",
           "manifest": "",
-          "resolution": "robot_repository",
-          "package_name": "",
-          "package_url": "",
-          "resolution_warning": "Resolved path 'https:/github.com/syswonder/skill-explore-rbnx' does not exist in https://github.com/syswonder/robot-wheeltec-r550@main; the robot repository root is the path root."
+          "resolution": "catalog",
+          "package_name": "robonix.skill.explore",
+          "package_url": "../robonix.skill.explore/",
+          "resolution_warning": ""
         }
       ],
       "readme_url": "https://github.com/syswonder/robot-wheeltec-r550/blob/main/README.md",
@@ -1765,38 +1758,14 @@
         {
           "section": "primitive",
           "name": "r550_chassis",
-          "source": "https://github.com/syswonder/primitive-wheeltec-r550-chassis-rbnx/tree/main/r550_chassis",
-          "reason": "Resolved path 'https:/github.com/syswonder/primitive-wheeltec-r550-chassis-rbnx/tree/main/r550_chassis' does not exist in https://github.com/syswonder/robot-wheeltec-r550@main; the robot repository root is the path root."
+          "source": "https://github.com/syswonder/primitive-wheeltec-r550-chassis-rbnx",
+          "reason": "Repository 'https://github.com/syswonder/primitive-wheeltec-r550-chassis-rbnx' is not indexed by catalog.yaml; add the package to the Catalog or use a repository-local dependency."
         },
         {
           "section": "primitive",
           "name": "n10p_lslidar",
-          "source": "https://github.com/syswonder/primitive-wheeltec-r550-chassis-rbnx/tree/main/n10p_lslidar",
-          "reason": "Resolved path 'https:/github.com/syswonder/primitive-wheeltec-r550-chassis-rbnx/tree/main/n10p_lslidar' does not exist in https://github.com/syswonder/robot-wheeltec-r550@main; the robot repository root is the path root."
-        },
-        {
-          "section": "primitive",
-          "name": "astra_s_camera",
-          "source": "https://github.com/syswonder/primitive-wheeltec-r550-chassis-rbnx/tree/main/astra_s_camera",
-          "reason": "Resolved path 'https:/github.com/syswonder/primitive-wheeltec-r550-chassis-rbnx/tree/main/astra_s_camera' does not exist in https://github.com/syswonder/robot-wheeltec-r550@main; the robot repository root is the path root."
-        },
-        {
-          "section": "service",
-          "name": "mapping",
-          "source": "https://github.com/syswonder/service-map-rbnx",
-          "reason": "Resolved path 'https:/github.com/syswonder/service-map-rbnx' does not exist in https://github.com/syswonder/robot-wheeltec-r550@main; the robot repository root is the path root."
-        },
-        {
-          "section": "service",
-          "name": "nav2",
-          "source": "https://github.com/syswonder/service-navigation-rbnx",
-          "reason": "Resolved path 'https:/github.com/syswonder/service-navigation-rbnx' does not exist in https://github.com/syswonder/robot-wheeltec-r550@main; the robot repository root is the path root."
-        },
-        {
-          "section": "skill",
-          "name": "explore",
-          "source": "https://github.com/syswonder/skill-explore-rbnx",
-          "reason": "Resolved path 'https:/github.com/syswonder/skill-explore-rbnx' does not exist in https://github.com/syswonder/robot-wheeltec-r550@main; the robot repository root is the path root."
+          "source": "https://github.com/syswonder/primitive-wheeltec-lslidar_n10p-lidar-rbnx",
+          "reason": "Repository 'https://github.com/syswonder/primitive-wheeltec-lslidar_n10p-lidar-rbnx' is not indexed by catalog.yaml; add the package to the Catalog or use a repository-local dependency."
         }
       ]
     },
@@ -2388,6 +2357,36 @@
       ],
       "deploy_dependencies": [],
       "readme_url": "https://github.com/syswonder/skill-explore-rbnx/blob/main/README.md",
+      "preview_image_url": ""
+    },
+    {
+      "name": "robonix.skill.find_object",
+      "version": "0.1.0",
+      "description": "Capture an annotated 360-degree camera sweep for Pilot object recognition.",
+      "license": "Apache-2.0",
+      "tags": [
+        "skill",
+        "camera",
+        "object-search",
+        "lite3"
+      ],
+      "repo": "https://github.com/syswonder/skill-find-object-rbnx",
+      "maintainers": [
+        "Bunnycxk <2501213313@stu.pku.edu.cn>"
+      ],
+      "repo_name": "skill-find-object-rbnx",
+      "default_branch": "main",
+      "kind": "skill",
+      "catalog_type": "package",
+      "catalog_status": "ok",
+      "catalog_warnings": [],
+      "manifest": "package_manifest.yaml",
+      "capabilities": [
+        "robonix/skill/find_object/driver",
+        "robonix/skill/find_object/scan"
+      ],
+      "deploy_dependencies": [],
+      "readme_url": "https://github.com/syswonder/skill-find-object-rbnx/blob/main/README.md",
       "preview_image_url": ""
     },
     {
