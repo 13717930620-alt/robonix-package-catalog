@@ -65,6 +65,8 @@ packages:
     repo: https://github.com/lusunn111/service-vla-action-verify-rbnx
   - name: robonix.skill.openvla_oft_accel
     repo: https://github.com/QingFeng34048/Robonix-Skill-Sim2Real-Completed
+  - name: robonix.skill.find_object
+    repo: https://github.com/syswonder/skill-find-object-rbnx
 
   - name: robonix.primitive.beingbeyond.d1.arm
     repo: https://github.com/syswonder/primitive-beingbeyond-d1-arm-rbnx
