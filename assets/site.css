@@ -124,11 +124,46 @@ main { flex: 1 0 auto; padding-bottom: 4.5rem; }
 
 h1, h2, h3, h4, h5, h6 { letter-spacing: -0.015em; font-weight: 650; }
 
+/* A link has to look clickable. The accent is near-black here, so colour
+ * alone cannot carry it — content links are underlined outright and every
+ * link gets a hover state. Chrome that is obviously interactive for other
+ * reasons (buttons, nav items, whole-card links, pills) opts out below. */
 a { text-decoration: none; }
-.prose a:hover,
-.site-footer a:hover,
-.crumbs a:hover,
-.section-more:hover { text-decoration: underline; text-underline-offset: 2px; }
+a:hover { text-decoration: underline; text-underline-offset: 2px; }
+
+.navbar-brand:hover,
+.nav-link:hover,
+.btn:hover,
+.icon-btn:hover,
+.rail-link:hover,
+.page-link:hover,
+.tag:hover,
+.entry-name:hover,
+.card-link-block:hover,
+.card-link-block:hover * { text-decoration: none; }
+
+/* Links sitting in running content: underlined at rest, accented on hover.
+ * The API table's links wrap <code>, so without this they read as inline
+ * code and nobody would think to click them. */
+.api-table a,
+.kv a,
+.dep-target,
+.aside-card a:not(.btn):not(.tag),
+.field-help a,
+.check-list a {
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  text-decoration-color: color-mix(in srgb, currentColor 35%, transparent);
+}
+.api-table a:hover,
+.kv a:hover,
+.dep-target:hover,
+.aside-card a:not(.btn):not(.tag):hover,
+.field-help a:hover,
+.check-list a:hover {
+  color: var(--k-primitive-solid);
+  text-decoration-color: currentColor;
+}
 
 img { max-width: 100%; height: auto; }
 
