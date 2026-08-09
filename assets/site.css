@@ -308,9 +308,15 @@ code { color: inherit; }
 }
 .icon-btn:hover { color: var(--bs-body-color); background: var(--bs-secondary-bg); text-decoration: none; }
 .icon-btn svg { width: 17px; height: 17px; }
+/* The button shows which of the three states is selected, not which theme
+ * happens to be rendering: auto is a half-filled disc, the others their sun
+ * and moon. */
+.icon-btn .icon-auto,
+.icon-btn .icon-light,
 .icon-btn .icon-dark { display: none; }
-[data-bs-theme="dark"] .icon-btn .icon-light { display: none; }
-[data-bs-theme="dark"] .icon-btn .icon-dark { display: block; }
+[data-theme-pref="auto"] .icon-btn .icon-auto,
+[data-theme-pref="light"] .icon-btn .icon-light,
+[data-theme-pref="dark"] .icon-btn .icon-dark { display: block; }
 
 /* ------------------------------------------------------------------- chips */
 

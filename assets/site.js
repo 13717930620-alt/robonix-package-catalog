@@ -10,40 +10,52 @@
 
   const THEME_KEY = "robonix-catalog-theme";
   const media = window.matchMedia("(prefers-color-scheme: dark)");
+  const MODES = ["auto", "light", "dark"];
 
-  const readStored = () => {
+  // 'auto' is a real stored state, not the absence of one. Treating any
+  // truthy value as an explicit choice pinned everyone who had used the
+  // previous switcher to light, whatever their system was set to.
+  const readPref = () => {
+    let v = null;
     try {
-      const v = localStorage.getItem(THEME_KEY);
-      return v === "light" || v === "dark" ? v : null;
-    } catch (_) {
-      return null;
-    }
+      v = localStorage.getItem(THEME_KEY);
+    } catch (_) {}
+    return v === "light" || v === "dark" ? v : "auto";
   };
 
-  // No stored choice means "follow the OS", so the page keeps tracking the
-  // media query instead of freezing on whatever it resolved to at load.
-  // Bootstrap reads data-bs-theme, which drives its own components too.
-  const applyTheme = (resolved) => {
-    document.documentElement.dataset.bsTheme = resolved;
+  const apply = (pref) => {
+    const dark = pref === "dark" || (pref === "auto" && media.matches);
+    const root = document.documentElement;
+    root.dataset.bsTheme = dark ? "dark" : "light";
+    root.dataset.themePref = pref;
+    const toggle = document.querySelector("[data-theme-toggle]");
+    if (toggle) {
+      const label = { auto: "following system", light: "light", dark: "dark" }[pref];
+      toggle.title = `Colour theme: ${label}`;
+      toggle.setAttribute("aria-label", `Colour theme: ${label}`);
+    }
   };
 
   const toggle = document.querySelector("[data-theme-toggle]");
   if (toggle) {
     toggle.addEventListener("click", () => {
-      const next = document.documentElement.dataset.bsTheme === "dark" ? "light" : "dark";
-      applyTheme(next);
+      const next = MODES[(MODES.indexOf(readPref()) + 1) % MODES.length];
+      // Storing 'auto' keeps the choice explicit across pages; the reader
+      // asked to follow the system rather than merely never having chosen.
       try {
         localStorage.setItem(THEME_KEY, next);
       } catch (_) {}
+      apply(next);
     });
   }
-  media.addEventListener("change", (event) => {
-    if (!readStored()) applyTheme(event.matches ? "dark" : "light");
+
+  media.addEventListener("change", () => {
+    if (readPref() === "auto") apply("auto");
   });
   window.addEventListener("storage", (event) => {
-    if (event.key !== THEME_KEY) return;
-    applyTheme(readStored() || (media.matches ? "dark" : "light"));
+    if (event.key === THEME_KEY) apply(readPref());
   });
+  apply(readPref());
 
   /* --------------------------------------------------------- masthead */
 

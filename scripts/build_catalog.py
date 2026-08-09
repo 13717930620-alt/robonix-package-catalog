@@ -985,6 +985,7 @@ ICON_SEARCH = '<svg width="16" height="16" viewBox="0 0 16 16" fill="none" strok
 ICON_GITHUB = '<svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M8 .2a8 8 0 0 0-2.5 15.6c.4.07.55-.17.55-.38l-.01-1.34c-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82a7.4 7.4 0 0 1 4 0c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48l-.01 2.19c0 .21.15.46.55.38A8 8 0 0 0 8 .2Z"/></svg>'
 ICON_SUN = '<svg class="icon-light" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><circle cx="8" cy="8" r="3.1"/><path d="M8 1v1.6M8 13.4V15M15 8h-1.6M2.6 8H1M12.9 3.1l-1.1 1.1M4.2 11.8l-1.1 1.1M12.9 12.9l-1.1-1.1M4.2 4.2 3.1 3.1"/></svg>'
 ICON_MOON = '<svg class="icon-dark" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"><path d="M13.5 9.6A5.8 5.8 0 0 1 6.4 2.5a5.9 5.9 0 1 0 7.1 7.1Z"/></svg>'
+ICON_AUTO = '<svg class="icon-auto" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"><circle cx="8" cy="8" r="5.4"/><path d="M8 2.6a5.4 5.4 0 0 1 0 10.8Z" fill="currentColor" stroke="none"/></svg>'
 ICON_PLUS = '<svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M8 3.2v9.6M3.2 8h9.6"/></svg>'
 ICON_JSON = '<svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M6.2 2.2H4.6A1.6 1.6 0 0 0 3 3.8v2.6c0 .9-.7 1.6-1.6 1.6.9 0 1.6.7 1.6 1.6v2.6a1.6 1.6 0 0 0 1.6 1.6h1.6"/><path d="M9.8 2.2h1.6A1.6 1.6 0 0 1 13 3.8v2.6c0 .9.7 1.6 1.6 1.6-.9 0-1.6.7-1.6 1.6v2.6a1.6 1.6 0 0 1-1.6 1.6H9.8"/></svg>'
 ICON_ARROW = '<svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3.4 8h9.2M9 4.4 12.6 8 9 11.6"/></svg>'
@@ -1050,8 +1051,14 @@ def render_head(root: str, title: str) -> str:
     (() => {{
       let stored = null;
       try {{ stored = localStorage.getItem('robonix-catalog-theme'); }} catch (_) {{}}
-      const dark = stored ? stored === 'dark' : matchMedia('(prefers-color-scheme: dark)').matches;
+      // Only an explicit light/dark wins. Anything else — including the
+      // legacy 'auto' written by the previous switcher — follows the system,
+      // which a truthiness check would have pinned to light forever.
+      const pref = stored === 'light' || stored === 'dark' ? stored : 'auto';
+      const dark = pref === 'dark'
+        || (pref === 'auto' && matchMedia('(prefers-color-scheme: dark)').matches);
       document.documentElement.dataset.bsTheme = dark ? 'dark' : 'light';
+      document.documentElement.dataset.themePref = pref;
       // Arriving at ?kind=... must not flash the unfiltered list first. The
       // stylesheet hides non-matching rows off this attribute, before paint;
       // site.js clears it once it owns the filtering.
@@ -1120,7 +1127,7 @@ def render_navbar(root: str, current: str, *, search_target: str, search_placeho
           <a class="icon-btn" href="{CATALOG_REPO}" title="Catalog repository"
              aria-label="Catalog repository on GitHub">{ICON_GITHUB}</a>
           <button type="button" class="icon-btn" data-theme-toggle
-                  aria-label="Toggle dark mode" title="Toggle dark mode">{ICON_SUN}{ICON_MOON}</button>
+                  aria-label="Colour theme" title="Colour theme">{ICON_AUTO}{ICON_SUN}{ICON_MOON}</button>
         </div>
       </div>
     </div>
