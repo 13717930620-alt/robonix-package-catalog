@@ -138,14 +138,13 @@ class RobotListingTests(unittest.TestCase):
             )
             rendered = (public / "robots" / "index.html").read_text()
 
-        self.assertIn('class="entry-thumb"', rendered)
+        self.assertIn('class="entry-shot"', rendered)
         self.assertIn('width="380" height="285"', rendered)
         self.assertIn('loading="lazy" decoding="async"', rendered)
-        # The thumbnail follows the text, so a screen reader reaches the name,
-        # description and metadata before the decorative image.
-        self.assertLess(
-            rendered.index('class="entry-desc'), rendered.index('class="entry-thumb"')
-        )
+        # The card carries its kind's colour, so a grid of them reads as
+        # distinct families rather than one uniform wall.
+        self.assertIn('class="entry-card k-robot"', rendered)
+        self.assertIn('class="kind-tile"', rendered)
 
     def test_robot_preview_is_resized_to_responsive_webp_assets(self):
         image_buffer = io.BytesIO()
@@ -527,7 +526,7 @@ class CatalogMetadataTests(unittest.TestCase):
         self.assertEqual(count, 1)
         self.assertIn("::warning title=Catalog name mismatch", stderr.getvalue())
         self.assertIn("## Catalog metadata warning report", report)
-        self.assertIn('class="chip chip-warn"', listing)
+        self.assertIn('class="entry-warning"', listing)
         self.assertIn("1 issue found while indexing", listing)
         self.assertIn("manifest catalog name is", listing)
         self.assertIn("found while indexing this entry", detail)
@@ -869,7 +868,7 @@ class DeploymentDependencyWarningTests(unittest.TestCase):
                 public / "robots" / "robonix.robot.example" / "index.html"
             ).read_text()
 
-        self.assertIn('class="chip chip-warn"', listing)
+        self.assertIn('class="entry-warning"', listing)
         self.assertIn("1 issue found while indexing", listing)
         self.assertIn("host-specific absolute path", listing)
         self.assertIn('class="warn-box mt-3" role="note"', detail)

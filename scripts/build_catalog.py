@@ -990,6 +990,20 @@ ICON_JSON = '<svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke=
 ICON_ARROW = '<svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3.4 8h9.2M9 4.4 12.6 8 9 11.6"/></svg>'
 
 
+# One glyph per provider kind, plus the small monochrome marks used on the
+# metadata line of a listing card.
+KIND_GLYPH = {
+    "primitive": '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"><rect x="4.5" y="4.5" width="7" height="7" rx="1"/><path d="M6.5 2v2.5M9.5 2v2.5M6.5 11.5V14M9.5 11.5V14M2 6.5h2.5M2 9.5h2.5M11.5 6.5H14M11.5 9.5H14" stroke-linecap="round"/></svg>',
+    "service": '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"><path d="M8 1.8 14 5 8 8.2 2 5Z"/><path d="M2 8.2 8 11.4l6-3.2M2 11.2 8 14.4l6-3.2"/></svg>',
+    "skill": '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"><path d="M8.6 1.5 3.4 9h3.4l-1.4 5.5L13 6.8H9.3Z"/></svg>',
+    "robot": '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"><rect x="2.5" y="5" width="11" height="8" rx="2"/><path d="M8 2.2V5" stroke-linecap="round"/><circle cx="8" cy="2" r="1"/><path d="M6 8.5v1M10 8.5v1" stroke-linecap="round"/></svg>',
+}
+ICON_CAP = '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5.5 2v3.2M10.5 2v3.2M3.6 5.2h8.8v2.2a4.4 4.4 0 0 1-8.8 0Z"/><path d="M8 11.8V14"/></svg>'
+ICON_LICENSE = '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M8 1.8 13.2 4v4c0 3.1-2.2 5.2-5.2 6.2C5 13.2 2.8 11.1 2.8 8V4Z"/></svg>'
+ICON_USER = '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="5.4" r="2.6"/><path d="M3 13.4a5 5 0 0 1 10 0"/></svg>'
+ICON_IMAGE = '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"><rect x="2" y="3" width="12" height="10" rx="2"/><circle cx="5.8" cy="6.6" r="1.1"/><path d="m2.6 11.6 3.3-3 3 2.4 2-1.7 2.5 2.3"/></svg>'
+
+
 def render_tags(tags: list[str], *, interactive: bool) -> str:
     """Render tag pills.
 
@@ -1038,11 +1052,20 @@ def render_head(root: str, title: str) -> str:
       try {{ stored = localStorage.getItem('robonix-catalog-theme'); }} catch (_) {{}}
       const dark = stored ? stored === 'dark' : matchMedia('(prefers-color-scheme: dark)').matches;
       document.documentElement.dataset.bsTheme = dark ? 'dark' : 'light';
+      // Arriving at ?kind=... must not flash the unfiltered list first. The
+      // stylesheet hides non-matching rows off this attribute, before paint;
+      // site.js clears it once it owns the filtering.
+      const kind = new URLSearchParams(location.search).get('kind');
+      if (['primitive', 'service', 'skill', 'robot'].includes(kind)) {{
+        document.documentElement.dataset.prefilterKind = kind;
+      }}
     }})();
   </script>
   <link rel="icon" type="image/svg+xml" href="{root}assets/robonix-mark.svg">
+  <link rel="stylesheet" href="{root}assets/vendor/fonts/fonts.css">
   <link rel="stylesheet" href="{root}assets/vendor/bootstrap/bootstrap.min.css">
-  <link rel="stylesheet" href="{root}assets/site.css">"""
+  <link rel="stylesheet" href="{root}assets/site.css">
+  <link rel="stylesheet" href="{root}assets/highlight.css">"""
 
 
 def render_navbar(root: str, current: str, *, search_target: str, search_placeholder: str) -> str:
@@ -1207,19 +1230,31 @@ def preview_sources(package: dict, root: str) -> tuple[str, str]:
 
 
 def render_entry_row(package: dict) -> str:
-    """One row in a listing. Dense by design: a registry is scanned, not read."""
+    """One card in a listing.
+
+    Compact on purpose: an icon tile carrying the kind's colour, the name, two
+    clamped lines of description, and a single metadata line. A robot leads
+    with its photograph instead, the way an application listing would.
+    """
     slug = html.escape(package_slug(package["name"]))
+    kind = package["kind"]
+    known = kind if kind in KIND_GLYPH else "primitive"
     unit_count, unit_label = entry_units(package)
     warnings = warning_entries(package)
-    src, srcset = preview_sources(package, "../")
+    is_robot = package.get("catalog_type") == "robot"
 
-    thumb = ""
-    if src:
-        srcset_attr = f' srcset="{srcset}" sizes="86px"' if srcset else ""
-        thumb = (
-            f'<img class="entry-thumb" src="{src}"{srcset_attr} alt="" '
-            f'width="380" height="285" loading="lazy" decoding="async">'
-        )
+    shot = ""
+    if is_robot:
+        src, srcset = preview_sources(package, "../")
+        if src:
+            srcset_attr = f' srcset="{srcset}" sizes="(max-width: 768px) 100vw, 380px"' if srcset else ""
+            inner = (
+                f'<img src="{src}"{srcset_attr} alt="" width="380" height="285" '
+                f'loading="lazy" decoding="async">'
+            )
+        else:
+            inner = f'<span class="entry-shot-empty">{ICON_IMAGE}</span>'
+        shot = f'<div class="entry-shot">{inner}</div>'
 
     warning_block = ""
     if warnings:
@@ -1229,27 +1264,30 @@ def render_entry_row(package: dict) -> str:
             f'<details class="entry-warning"><summary>{len(warnings)} {label} found while indexing</summary>'
             f'<ul class="warn-box">{items}</ul></details>'
         )
-    warn_chip = f'<span class="chip chip-warn">{len(warnings)}</span>' if warnings else ""
 
-    return f"""<li class="entry" data-entry data-name="{html.escape(package['name'])}" data-kind="{html.escape(package['kind'])}" data-units="{unit_count}" data-tags="{html.escape(' '.join(package['tags']))}" data-search="{html.escape(entry_search_text(package))}">
-            <div class="entry-body">
-              <div class="d-flex flex-wrap align-items-center gap-2">
-                <a class="entry-name" href="{slug}/">{wrappable_name(package['name'])}</a>
-                {kind_chip(package['kind'])}
-                <span class="entry-version">v{html.escape(package['version'])}</span>
-                {warn_chip}
+    return f"""<li data-entry data-name="{html.escape(package['name'])}" data-kind="{html.escape(kind)}" data-units="{unit_count}" data-tags="{html.escape(' '.join(package['tags']))}" data-search="{html.escape(entry_search_text(package))}">
+            <article class="entry-card k-{html.escape(known)}">
+              {shot}
+              <div class="entry-card-body">
+                <div class="entry-card-top">
+                  <span class="kind-tile" aria-hidden="true">{KIND_GLYPH[known]}</span>
+                  <a class="entry-name stretched-link" href="{slug}/">{wrappable_name(package['name'])}</a>
+                </div>
+                <p class="entry-desc">{html.escape(package['description'])}</p>
+                {warning_block}
+                <div class="entry-meta">
+                  <span class="m-kind">{KIND_GLYPH[known]}{html.escape(kind)}</span>
+                  <span class="sep">·</span>
+                  <span title="{unit_label}">{ICON_CAP}{unit_count}</span>
+                  <span class="sep">·</span>
+                  <span title="License">{ICON_LICENSE}{html.escape(package['license'])}</span>
+                  <span class="sep">·</span>
+                  <span title="Maintainer">{ICON_USER}{html.escape(maintainer_names(package))}</span>
+                  <span class="sep">·</span>
+                  <span class="entry-version">v{html.escape(package['version'])}</span>
+                </div>
               </div>
-              <p class="entry-desc mt-1 mb-0">{html.escape(package['description'])}</p>
-              <div class="entry-meta d-flex flex-wrap align-items-center gap-2 mt-2">
-                <span class="who">{html.escape(maintainer_names(package))}</span>
-                <span>·</span>
-                <span>{unit_count} {unit_label}</span>
-                <span>·</span>
-                <span>{html.escape(package['license'])}</span>
-              </div>
-            </div>
-            {thumb}
-            {warning_block}
+            </article>
           </li>"""
 
 
@@ -1273,7 +1311,9 @@ def render_listing_page(
             tag_counts[tag] = tag_counts.get(tag, 0) + 1
 
     kind_options = "".join(
-        f'<button type="button" class="facet-option" data-kind-filter="{html.escape(kind)}" aria-pressed="false">'
+        f'<button type="button" class="facet-option k-{html.escape(kind if kind in KIND_GLYPH else "primitive")}" '
+        f'data-kind-filter="{html.escape(kind)}" aria-pressed="false">'
+        f'{KIND_GLYPH.get(kind, KIND_GLYPH["primitive"])}'
         f'<span>{html.escape(kind)}</span><span class="n">{count}</span></button>'
         for kind, count in sorted(kind_counts.items(), key=lambda kv: (-kv[1], kv[0]))
     )
@@ -1298,7 +1338,7 @@ def render_listing_page(
     kind_facet = (
         f"""<div class="mb-4">
               <div class="facet-title mb-2">Kind</div>
-              <div class="d-flex flex-column">{kind_options}</div>
+              <div class="facet-pills">{kind_options}</div>
             </div>"""
         if len(kind_counts) > 1
         else ""
@@ -1324,7 +1364,7 @@ def render_listing_page(
           </div>
         </aside>
         <div class="col-lg-9">
-          <div class="d-flex flex-wrap align-items-center justify-content-between gap-2 pb-2 border-bottom">
+          <div class="d-flex flex-wrap align-items-center justify-content-between gap-2 mb-3">
             <span class="result-count" data-count aria-live="polite"></span>
             <label class="sort-field d-flex align-items-center gap-2 mb-0">Sort
               <select class="form-select form-select-sm" data-sort aria-label="Sort order">
@@ -1334,7 +1374,7 @@ def render_listing_page(
               </select>
             </label>
           </div>
-          <ol class="entry-list" data-entry-list>
+          <ol class="entry-list d-flex flex-column gap-2" data-entry-list>
 {rows}
           </ol>
           <div class="text-center text-secondary py-5" data-empty hidden>
@@ -1443,7 +1483,43 @@ def render_home(public_dir: Path, generated_at: str, packages: list[dict]) -> No
           </div>"""
         )
 
-    body = f"""    <section class="container-xxl hero pt-5 pb-2">
+    rail_links = []
+    for kind in KIND_ORDER:
+        rail_links.append(
+            f'<a class="rail-link k-{kind}" href="packages/?kind={kind}">'
+            f'{KIND_GLYPH[kind]}<span>{kind.capitalize()}s</span>'
+            f'<span class="n">{len(by_kind[kind])}</span></a>'
+        )
+    rail_links.append(
+        f'<a class="rail-link k-robot" href="robots/">'
+        f'{KIND_GLYPH["robot"]}<span>Robots</span>'
+        f'<span class="n">{len(robot_entries)}</span></a>'
+    )
+    rail = f"""<nav class="home-rail" aria-label="Browse the catalog">
+            <div class="facet-title mb-2">Browse</div>
+            <div class="rail-links">{''.join(rail_links)}</div>
+            <div class="facet-title mt-4 mb-2">Contribute</div>
+            <div class="rail-links">
+              <a class="rail-link" href="submit/">{ICON_PLUS}<span>Submit a package</span></a>
+              <a class="rail-link" href="api/view/">{ICON_JSON}<span>Catalog API</span></a>
+              <a class="rail-link" href="{DOCS_URL}">{ICON_ARROW}<span>Documentation</span></a>
+            </div>
+          </nav>"""
+
+    body = f"""    <div class="container-xxl">
+      <div class="row g-4">
+        <aside class="col-lg-3">
+          {rail}
+        </aside>
+        <div class="col-lg-9">
+    <section class="hero">
+      <div class="hero-glow" aria-hidden="true"></div>
+      <div class="hero-marks" aria-hidden="true">
+        <span class="hero-mark">{KIND_GLYPH['primitive']}</span>
+        <span class="hero-mark">{KIND_GLYPH['service']}</span>
+        <span class="hero-mark">{KIND_GLYPH['skill']}</span>
+        <span class="hero-mark">{KIND_GLYPH['robot']}</span>
+      </div>
       <h1 class="mb-3">The Robonix package catalog.</h1>
       <p class="hero-lede mb-4">Skills, services, primitives, and complete robot deployments,
       published by the community. Every entry is read straight from its own repository's
@@ -1460,7 +1536,7 @@ def render_home(public_dir: Path, generated_at: str, packages: list[dict]) -> No
       </div>
     </section>
 
-    <section class="container-xxl mt-5">
+    <section class="mt-5">
       <div class="section-head d-flex flex-wrap align-items-baseline justify-content-between gap-3 mb-3">
         <div>
           <h2 class="mb-1">Skills</h2>
@@ -1473,7 +1549,7 @@ def render_home(public_dir: Path, generated_at: str, packages: list[dict]) -> No
       </div>
     </section>
 
-    <section class="container-xxl mt-5">
+    <section class="mt-5">
       <div class="section-head d-flex flex-wrap align-items-baseline justify-content-between gap-3 mb-3">
         <div>
           <h2 class="mb-1">Robot deployments</h2>
@@ -1486,7 +1562,7 @@ def render_home(public_dir: Path, generated_at: str, packages: list[dict]) -> No
       </div>
     </section>
 
-    <section class="container-xxl mt-5">
+    <section class="mt-5">
       <div class="section-head d-flex flex-wrap align-items-baseline justify-content-between gap-3 mb-3">
         <div>
           <h2 class="mb-1">The substrate</h2>
@@ -1499,7 +1575,7 @@ def render_home(public_dir: Path, generated_at: str, packages: list[dict]) -> No
       </div>
     </section>
 
-    <section class="container-xxl mt-5">
+    <section class="mt-5">
       <div class="row row-cols-1 row-cols-lg-2 g-3">
         <div class="col">
           <div class="card h-100 p-4">
@@ -1522,7 +1598,10 @@ def render_home(public_dir: Path, generated_at: str, packages: list[dict]) -> No
           </div>
         </div>
       </div>
-    </section>"""
+    </section>
+        </div>
+      </div>
+    </div>"""
 
     (public_dir / "index.html").write_text(
         render_page(
@@ -2075,6 +2154,25 @@ def copy_assets(public_dir: Path) -> None:
     for asset in SITE_ASSETS:
         shutil.copyfile(asset, asset_dir / asset.name)
     shutil.copytree(VENDOR_ASSETS, asset_dir / "vendor", dirs_exist_ok=True)
+    write_highlight_css(asset_dir / "highlight.css")
+
+
+def write_highlight_css(path: Path) -> None:
+    """Emit the Pygments colour rules for fenced code in rendered READMEs.
+
+    Generated rather than vendored so the classes always match the Pygments
+    that produced the markup. The dark variant is scoped under data-bs-theme,
+    so both themes ship in one stylesheet.
+    """
+    light = HtmlFormatter(style="friendly").get_style_defs(".prose .highlight")
+    dark = HtmlFormatter(style="monokai").get_style_defs(
+        '[data-bs-theme="dark"] .prose .highlight'
+    )
+    path.write_text(
+        "/* Generated by scripts/build_catalog.py from Pygments. */\n"
+        f"{light}\n{dark}\n",
+        encoding="utf-8",
+    )
 
 
 def main() -> None:

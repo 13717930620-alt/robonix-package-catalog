@@ -185,7 +185,17 @@
 
     const sorter = sorters[state.sort] || sorters.name;
     matched.sort(sorter);
-    for (const row of [...rows].sort(sorter)) list.appendChild(row);
+
+    // Re-inserting a node restarts any CSS animation on it, so only touch the
+    // DOM when the order actually changed. The server already emits rows in
+    // name order, which means the default sort moves nothing at all.
+    const ordered = [...rows].sort(sorter);
+    const current = Array.from(list.children);
+    if (ordered.some((row, i) => row !== current[i])) {
+      const frag = document.createDocumentFragment();
+      for (const row of ordered) frag.appendChild(row);
+      list.appendChild(frag);
+    }
 
     const total = Math.max(1, Math.ceil(matched.length / PAGE_SIZE));
     state.page = Math.min(Math.max(1, state.page), total);
@@ -293,4 +303,7 @@
   }
 
   render();
+  // The stylesheet's pre-paint filter has done its job; from here the script
+  // owns which rows are visible.
+  delete document.documentElement.dataset.prefilterKind;
 })();
