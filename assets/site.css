@@ -434,7 +434,20 @@ button.tag[aria-pressed="true"] {
 
 .section-head h2 { font-size: 1.0625rem; }
 .section-head p { color: var(--bs-secondary-color); font-size: 0.9375rem; max-width: 78ch; }
-.section-more { font-size: 0.9375rem; font-weight: 550; white-space: nowrap; }
+/* Underlined at rest like every other content link — the trailing arrow
+ * alone was not enough to read as clickable. */
+.section-more {
+  font-size: 0.9375rem;
+  font-weight: 550;
+  white-space: nowrap;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  text-decoration-color: color-mix(in srgb, currentColor 32%, transparent);
+}
+.section-more:hover {
+  color: var(--k-primitive-solid);
+  text-decoration-color: currentColor;
+}
 .section-more svg,
 .card-go svg { width: 14px; height: 14px; flex: none; }
 
