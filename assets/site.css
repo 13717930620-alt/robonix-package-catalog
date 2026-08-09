@@ -395,7 +395,7 @@ button.tag[aria-pressed="true"] {
   0%, 100% { transform: translateY(0); }
   50%      { transform: translateY(-7px); }
 }
-@media (max-width: 1199.98px) { .hero-marks { display: none; } }
+@media (max-width: 1199.98px) { .hero > .hero-marks { display: none; } }
 
 .section-head h2 { font-size: 1.0625rem; }
 .section-head p { color: var(--bs-secondary-color); font-size: 0.9375rem; max-width: 78ch; }
@@ -757,7 +757,13 @@ html[data-prefilter-kind="robot"] [data-entry]:not([data-kind="robot"]) { displa
 .rail-link.k-robot     { --k: var(--k-robot-solid); }
 
 @media (max-width: 991.98px) {
-  .home-rail { position: static; border-right: 0; padding-right: 0; }
+  /* The navbar's collapsed menu already lists Skills / Services / Primitives /
+   * Robots / Submit, so the rail here would be a second copy of the same
+   * links taking a whole screen before any content. */
+  .home-rail { display: none; }
+  /* A wash behind body text at phone width just muddies it. */
+  .hero > .hero-glow { display: none; }
+  .hero { padding-block: 2rem 1.25rem; }
 }
 
 /* ------------------------------------------------------------- detail page */
