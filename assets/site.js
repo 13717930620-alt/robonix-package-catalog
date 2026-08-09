@@ -90,13 +90,20 @@
   const emptyEl = listing.querySelector("[data-empty]");
   const sortEl = listing.querySelector("[data-sort]");
   const clearEl = listing.querySelector("[data-clear]");
+  const pagerEl = listing.querySelector("[data-pager]");
+  const pagerListEl = listing.querySelector("[data-pager-list]");
   const params = new URLSearchParams(window.location.search);
+
+  // Every row is already in the DOM, so paging is presentational: without
+  // JavaScript the page simply shows the whole list.
+  const PAGE_SIZE = 20;
 
   const state = {
     q: params.get("q") || "",
     kind: params.get("kind") || "",
     tag: params.get("tag") || "",
     sort: params.get("sort") || "name",
+    page: Math.max(1, Number(params.get("page")) || 1),
   };
 
   if (omni) omni.value = state.q;
@@ -119,27 +126,87 @@
     }
   };
 
+  /* Page controls: first and last are always reachable, the current page keeps
+   * a neighbour on each side, and the gaps collapse into an ellipsis. */
+  const pageItems = (current, total) => {
+    const wanted = new Set([1, total, current, current - 1, current + 1]);
+    const numbers = [...wanted].filter((n) => n >= 1 && n <= total).sort((a, b) => a - b);
+    const items = [];
+    let previous = 0;
+    for (const n of numbers) {
+      if (previous && n - previous > 1) items.push(null);
+      items.push(n);
+      previous = n;
+    }
+    return items;
+  };
+
+  const renderPager = (current, total) => {
+    if (!pagerEl || !pagerListEl) return;
+    pagerEl.hidden = total < 2;
+    if (total < 2) {
+      pagerListEl.replaceChildren();
+      return;
+    }
+    const build = (label, page, { disabled = false, active = false, gap = false } = {}) => {
+      const li = document.createElement("li");
+      li.className = `page-item${disabled || gap ? " disabled" : ""}${active ? " active" : ""}`;
+      const node = document.createElement(gap || disabled ? "span" : "button");
+      node.className = "page-link";
+      node.textContent = label;
+      if (!gap && !disabled) {
+        node.type = "button";
+        node.dataset.page = String(page);
+      }
+      if (active) node.setAttribute("aria-current", "page");
+      if (!gap && !disabled && typeof page === "number") {
+        node.setAttribute("aria-label", `Page ${page}`);
+      }
+      li.appendChild(node);
+      return li;
+    };
+
+    const children = [build("Previous", current - 1, { disabled: current === 1 })];
+    for (const n of pageItems(current, total)) {
+      children.push(n === null ? build("…", 0, { gap: true }) : build(String(n), n, { active: n === current }));
+    }
+    children.push(build("Next", current + 1, { disabled: current === total }));
+    pagerListEl.replaceChildren(...children);
+  };
+
   const render = () => {
     const q = state.q.trim().toLowerCase();
-    let shown = 0;
-    for (const row of rows) {
-      const visible =
+    const matched = rows.filter(
+      (row) =>
         (!q || row.dataset.search.includes(q)) &&
         (!state.kind || row.dataset.kind === state.kind) &&
-        (!state.tag || row.dataset.tags.split(" ").includes(state.tag));
-      row.hidden = !visible;
-      if (visible) shown += 1;
-    }
+        (!state.tag || row.dataset.tags.split(" ").includes(state.tag)),
+    );
 
     const sorter = sorters[state.sort] || sorters.name;
+    matched.sort(sorter);
     for (const row of [...rows].sort(sorter)) list.appendChild(row);
 
+    const total = Math.max(1, Math.ceil(matched.length / PAGE_SIZE));
+    state.page = Math.min(Math.max(1, state.page), total);
+    const start = (state.page - 1) * PAGE_SIZE;
+    const onPage = new Set(matched.slice(start, start + PAGE_SIZE));
+    for (const row of rows) row.hidden = !onPage.has(row);
+
+    const shown = matched.length;
     if (countEl) {
-      countEl.innerHTML =
-        shown === rows.length
-          ? `<b>${rows.length}</b> ${noun}`
-          : `<b>${shown}</b> of ${rows.length} ${noun}`;
+      if (!shown) countEl.innerHTML = `<b>0</b> ${noun}`;
+      else if (shown <= PAGE_SIZE) {
+        countEl.innerHTML =
+          shown === rows.length
+            ? `<b>${rows.length}</b> ${noun}`
+            : `<b>${shown}</b> of ${rows.length} ${noun}`;
+      } else {
+        const last = Math.min(start + PAGE_SIZE, shown);
+        countEl.innerHTML = `<b>${start + 1}–${last}</b> of ${shown} ${noun}`;
+      }
     }
+    renderPager(state.page, total);
     if (emptyEl) emptyEl.hidden = shown !== 0;
     if (clearEl) clearEl.hidden = !(q || state.kind || state.tag);
 
@@ -154,17 +221,24 @@
     }
 
     const url = new URL(window.location.href);
+    const defaults = { sort: "name", page: 1 };
     for (const [key, value] of Object.entries(state)) {
-      if (value && !(key === "sort" && value === "name")) url.searchParams.set(key, value);
+      if (value && value !== defaults[key]) url.searchParams.set(key, value);
       else url.searchParams.delete(key);
     }
     history.replaceState(null, "", url);
   };
 
+  // Any change to what is being listed invalidates the current page number.
+  const refilter = () => {
+    state.page = 1;
+    render();
+  };
+
   if (omni) {
     omni.addEventListener("input", () => {
       state.q = omni.value;
-      render();
+      refilter();
     });
     const form = document.getElementById("omnisearch-form");
     if (form) form.addEventListener("submit", (event) => event.preventDefault());
@@ -175,27 +249,36 @@
     if (kindButton) {
       // Clicking the active facet clears it, so the rail needs no "All" row.
       state.kind = state.kind === kindButton.dataset.kindFilter ? "" : kindButton.dataset.kindFilter;
-      render();
+      refilter();
       return;
     }
     const tagButton = event.target.closest("[data-tag-filter]");
     if (tagButton) {
       event.preventDefault();
       state.tag = state.tag === tagButton.dataset.tagFilter ? "" : tagButton.dataset.tagFilter;
-      render();
+      refilter();
       return;
     }
     const more = event.target.closest("[data-facet-more]");
     if (more) {
       for (const hidden of listing.querySelectorAll("[data-tag-overflow]")) hidden.hidden = false;
       more.hidden = true;
+      return;
+    }
+    const pageButton = event.target.closest("[data-page]");
+    if (pageButton) {
+      state.page = Number(pageButton.dataset.page);
+      render();
+      // Paging without this leaves the reader at the old scroll offset,
+      // looking at the middle of a list that just changed under them.
+      listing.scrollIntoView({ block: "start", behavior: "smooth" });
     }
   });
 
   if (sortEl) {
     sortEl.addEventListener("change", () => {
       state.sort = sortEl.value;
-      render();
+      refilter();
     });
   }
 
@@ -205,7 +288,7 @@
       state.kind = "";
       state.tag = "";
       if (omni) omni.value = "";
-      render();
+      refilter();
     });
   }
 

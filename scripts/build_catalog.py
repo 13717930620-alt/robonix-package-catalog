@@ -1341,6 +1341,11 @@ def render_listing_page(
             <p class="fw-semibold text-body mb-1">Nothing matches those filters.</p>
             <p class="mb-0">Try a shorter search term, or clear the kind and tag filters.</p>
           </div>
+          <!-- Filled in by site.js. Every row is rendered above, so without
+               JavaScript the whole list shows and an empty pager is correct. -->
+          <nav class="mt-4" aria-label="Pagination" data-pager hidden>
+            <ul class="pagination pagination-sm justify-content-center mb-0" data-pager-list></ul>
+          </nav>
         </div>
       </div>
     </div>"""
