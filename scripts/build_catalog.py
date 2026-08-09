@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 import argparse
 import base64
+import concurrent.futures
 import datetime as dt
 import html
 import io
@@ -10,6 +11,7 @@ import posixpath
 import re
 import shutil
 import sys
+import time
 import urllib.error
 import urllib.parse
 import urllib.request
@@ -31,11 +33,25 @@ WINDOWS_ABSOLUTE_RE = re.compile(r"^[A-Za-z]:[\\/]")
 ROBONIX_SOURCE_REPO = "https://github.com/syswonder/robonix"
 DEFAULT_PACKAGE_MANIFEST = "package_manifest.yaml"
 LEGACY_PACKAGE_MANIFEST = "robonix_manifest.yaml"
-VENDOR_ASSETS = Path("assets/vendor/pico")
-BRAND_MARK_ASSET = Path("assets/robonix-mark.svg")
+SITE_ASSETS = (
+    Path("assets/robonix-mark.svg"),
+    Path("assets/site.css"),
+    Path("assets/site.js"),
+    Path("assets/submit.js"),
+)
+VENDOR_ASSETS = Path("assets/vendor")
 LEGACY_MISSING_LICENSE = {"robonix.robot.wheeltec.r550"}
 PREVIEW_SIZES = ((380, 285), (720, 540))
 PREVIEW_WEBP_QUALITY = 76
+# Indexing is almost entirely GitHub round trips, so entries are fetched
+# concurrently. Kept well under GitHub's concurrent-request guidance, which
+# asks callers to avoid bursts that trip the secondary rate limit.
+COLLECT_WORKERS = int(os.environ.get("CATALOG_WORKERS", "8"))
+# 5xx and 429 are GitHub telling us to come back; everything else in the 4xx
+# range is a real answer about the resource.
+RETRYABLE_STATUS = frozenset({429, 500, 502, 503, 504})
+GITHUB_ATTEMPTS = 4
+GITHUB_RETRY_DELAY = 1.5
 
 
 class InvalidRemoteManifestError(RuntimeError):
@@ -50,7 +66,14 @@ def fail(msg: str) -> None:
     raise SystemExit(1)
 
 
-def github_json(url: str) -> dict:
+def github_fetch(url: str, *, optional: bool) -> dict | None:
+    """Read one GitHub API resource as JSON.
+
+    Retries transport failures and GitHub's own transient statuses with a
+    linear backoff. A build reads hundreds of URLs over several concurrent
+    connections, so a single dropped TLS handshake must not sink the run;
+    a 4xx other than the optional 404 is a real answer and fails immediately.
+    """
     headers = {
         "Accept": "application/vnd.github+json",
         "User-Agent": "robonix-package-catalog",
@@ -58,37 +81,34 @@ def github_json(url: str) -> dict:
     token = os.environ.get("GITHUB_TOKEN")
     if token:
         headers["Authorization"] = f"Bearer {token}"
-    req = urllib.request.Request(url, headers=headers)
-    try:
-        with urllib.request.urlopen(req, timeout=30) as resp:
-            return json.loads(resp.read().decode("utf-8"))
-    except urllib.error.HTTPError as e:
-        body = e.read().decode("utf-8", "replace")
-        fail(f"GitHub request failed {e.code}: {url}\n{body}")
-    except Exception as e:
-        fail(f"GitHub request failed: {url}: {e}")
+    request = urllib.request.Request(url, headers=headers)
+
+    last_error = ""
+    for attempt in range(1, GITHUB_ATTEMPTS + 1):
+        try:
+            with urllib.request.urlopen(request, timeout=30) as response:
+                return json.loads(response.read().decode("utf-8"))
+        except urllib.error.HTTPError as error:
+            if optional and error.code == 404:
+                return None
+            body = error.read().decode("utf-8", "replace")
+            last_error = f"{error.code}: {url}\n{body}"
+            if error.code not in RETRYABLE_STATUS:
+                break
+        except Exception as error:  # transport, TLS, timeout, malformed body
+            last_error = f"{url}: {error}"
+        if attempt < GITHUB_ATTEMPTS:
+            time.sleep(GITHUB_RETRY_DELAY * attempt)
+    fail(f"GitHub request failed after {GITHUB_ATTEMPTS} attempts: {last_error}")
+
+
+def github_json(url: str) -> dict:
+    return github_fetch(url, optional=False)
 
 
 def github_optional_json(url: str) -> dict | None:
     """Fetch an optional GitHub API resource, returning None only for 404."""
-    headers = {
-        "Accept": "application/vnd.github+json",
-        "User-Agent": "robonix-package-catalog",
-    }
-    token = os.environ.get("GITHUB_TOKEN")
-    if token:
-        headers["Authorization"] = f"Bearer {token}"
-    req = urllib.request.Request(url, headers=headers)
-    try:
-        with urllib.request.urlopen(req, timeout=30) as resp:
-            return json.loads(resp.read().decode("utf-8"))
-    except urllib.error.HTTPError as e:
-        if e.code == 404:
-            return None
-        body = e.read().decode("utf-8", "replace")
-        fail(f"GitHub request failed {e.code}: {url}\n{body}")
-    except Exception as e:
-        fail(f"GitHub request failed: {url}: {e}")
+    return github_fetch(url, optional=True)
 
 
 def download_bytes(url: str) -> bytes:
@@ -745,15 +765,158 @@ def report_catalog_warnings(packages: list[dict]) -> int:
     return len(warnings)
 
 
-def collect(
-    catalog_path: Path,
-    baseline_keys: set[tuple[str, str, str, str]] | None = None,
-) -> list[dict]:
-    entries = read_catalog(catalog_path)
-    baseline_keys = baseline_keys or set()
-    seen_names = set()
-    seen_repos = set()
-    out = []
+def collect_entry(
+    entry: dict,
+    baseline_keys: set[tuple[str, str, str, str]],
+) -> dict:
+    """Fetch and validate one catalog entry into its rendered-page record.
+
+    Every remote read for a single package happens here, which is what makes
+    the entries safe to fetch concurrently: nothing is shared between them.
+    Cross-entry checks (duplicates, dependency resolution) run in collect().
+    """
+    name = entry["name"]
+    repo = entry["repo"]
+    _, repo_name = parse_repo(repo)
+    manifest_path = entry.get("manifest")
+    if manifest_path is None:
+        manifest_path = "robonix_manifest.yaml" if name.startswith("robonix.robot.") else "package_manifest.yaml"
+    if not isinstance(manifest_path, str) or not manifest_path.strip():
+        fail(f"{name}: manifest must be a non-empty string")
+    catalog_type = entry.get("_catalog_type") or ("robot" if manifest_path == "robonix_manifest.yaml" or name.startswith("robonix.robot.") else "package")
+    allow_name_mismatch = catalog_entry_key(entry) in baseline_keys
+    source_warnings = []
+    cached = None
+    try:
+        branch, manifest, readme = load_remote_manifest(repo, manifest_path)
+    except InvalidRemoteManifestError as error:
+        if catalog_type != "robot":
+            fail(f"{repo}: {error}")
+        # Nothing generated is committed any more, so the published site is
+        # the only record of the last good metadata for this robot.
+        cached_url = f"{SITE_URL}/api/v1/package/{urllib.parse.quote(name, safe='')}.json"
+        try:
+            with urllib.request.urlopen(cached_url, timeout=30) as response:
+                cached = json.loads(response.read().decode("utf-8"))
+        except (urllib.error.URLError, json.JSONDecodeError, OSError) as cache_error:
+            fail(
+                f"{repo}: {error} No last-known-good catalog metadata is "
+                f"published at {cached_url}: {cache_error}"
+            )
+        branch = error.branch
+        manifest = {}
+        readme = error.readme
+        source_warnings.append(
+            {
+                "section": "manifest",
+                "name": manifest_path,
+                "source": f"{repo}/blob/{branch}/{manifest_path}",
+                "reason": (
+                    f"{error} Showing last-known-good catalog metadata; "
+                    "deployment dependencies cannot be inspected until the "
+                    "robot manifest is fixed."
+                ),
+            }
+        )
+    preview_image_url = ""
+    if catalog_type == "robot":
+        owner, parsed_repo = parse_repo(repo)
+        preview = github_optional_json(
+            f"https://api.github.com/repos/{owner}/{parsed_repo}/contents/assets/robot.jpg?ref={urllib.parse.quote(branch, safe='')}"
+        )
+        if preview and preview.get("type") == "file":
+            preview_image_url = preview.get("download_url") or ""
+    if catalog_type == "robot":
+        cap_names = []
+        if cached is None:
+            meta = manifest.get("catalog")
+            (
+                version,
+                description,
+                license_name,
+                tags,
+                maintainers,
+                catalog_warnings,
+            ) = validate_catalog_metadata(
+                name,
+                meta,
+                name,
+                allow_name_mismatch=allow_name_mismatch,
+            )
+            deploy_dependencies = collect_deploy_dependencies(name, manifest)
+        else:
+            version = cached.get("version", "")
+            description = cached.get("description", "")
+            license_name = cached.get("license", "")
+            tags = cached.get("tags", [])
+            maintainers = cached.get("maintainers", [])
+            validate_catalog_metadata(
+                name,
+                {
+                    "name": name,
+                    "version": version,
+                    "description": description,
+                    "license": license_name,
+                    "tags": tags,
+                    "maintainers": maintainers,
+                },
+                name,
+            )
+            deploy_dependencies = []
+            catalog_warnings = []
+    else:
+        package = manifest.get("package")
+        if not isinstance(package, dict):
+            fail(f"{name}: package_manifest.yaml missing package mapping")
+        (
+            version,
+            description,
+            license_name,
+            tags,
+            maintainers,
+            catalog_warnings,
+        ) = validate_catalog_metadata(
+            name,
+            package,
+            name,
+            allow_name_mismatch=allow_name_mismatch,
+        )
+        cap_names = collect_capabilities(name, manifest)
+        deploy_dependencies = []
+    kind = name.split(".")[1] if name.startswith("robonix.") and "." in name else ""
+    return {
+        "name": name,
+        "version": version,
+        "description": description,
+        "license": license_name,
+        "tags": tags,
+        "repo": repo,
+        "maintainers": maintainers,
+        "repo_name": repo_name,
+        "default_branch": branch,
+        "kind": kind,
+        "catalog_type": catalog_type,
+        "catalog_status": "warning" if catalog_warnings else "ok",
+        "catalog_warnings": catalog_warnings,
+        "manifest": manifest_path,
+        "capabilities": cap_names,
+        "deploy_dependencies": deploy_dependencies,
+        "readme_url": f"{repo}/blob/{branch}/README.md",
+        "preview_image_url": preview_image_url,
+        "_readme_markdown": readme,
+        "_source_warnings": source_warnings,
+    }
+
+
+def validate_catalog_entries(entries: list) -> list[dict]:
+    """Check the shape of catalog.yaml before any network work starts.
+
+    Duplicate names and repos are cross-entry facts, so they are settled here
+    rather than inside the per-entry fetch that runs concurrently.
+    """
+    seen_names: set[str] = set()
+    seen_repos: set[str] = set()
+    checked = []
     for entry in entries:
         if not isinstance(entry, dict):
             fail("each catalog package entry must be a mapping")
@@ -769,145 +932,30 @@ def collect(
             fail(f"duplicate repo in catalog.yaml: {repo}")
         seen_names.add(name)
         seen_repos.add(repo)
+        checked.append(entry)
+    return checked
 
-        _, repo_name = parse_repo(repo)
-        manifest_path = entry.get("manifest")
-        if manifest_path is None:
-            manifest_path = "robonix_manifest.yaml" if name.startswith("robonix.robot.") else "package_manifest.yaml"
-        if not isinstance(manifest_path, str) or not manifest_path.strip():
-            fail(f"{name}: manifest must be a non-empty string")
-        catalog_type = entry.get("_catalog_type") or ("robot" if manifest_path == "robonix_manifest.yaml" or name.startswith("robonix.robot.") else "package")
-        allow_name_mismatch = catalog_entry_key(entry) in baseline_keys
-        source_warnings = []
-        cached = None
-        try:
-            branch, manifest, readme = load_remote_manifest(repo, manifest_path)
-        except InvalidRemoteManifestError as error:
-            if catalog_type != "robot":
-                fail(f"{repo}: {error}")
-            cached_path = (
-                Path("generated")
-                / "api"
-                / "packages"
-                / f"{package_slug(name)}.json"
-            )
-            try:
-                cached = json.loads(cached_path.read_text(encoding="utf-8"))
-            except (OSError, json.JSONDecodeError) as cache_error:
-                fail(
-                    f"{repo}: {error} No last-known-good catalog metadata is "
-                    f"available at {cached_path}: {cache_error}"
-                )
-            branch = error.branch
-            manifest = {}
-            readme = error.readme
-            source_warnings.append(
-                {
-                    "section": "manifest",
-                    "name": manifest_path,
-                    "source": f"{repo}/blob/{branch}/{manifest_path}",
-                    "reason": (
-                        f"{error} Showing last-known-good catalog metadata; "
-                        "deployment dependencies cannot be inspected until the "
-                        "robot manifest is fixed."
-                    ),
-                }
-            )
-        preview_image_url = ""
-        if catalog_type == "robot":
-            owner, parsed_repo = parse_repo(repo)
-            preview = github_optional_json(
-                f"https://api.github.com/repos/{owner}/{parsed_repo}/contents/assets/robot.jpg?ref={urllib.parse.quote(branch, safe='')}"
-            )
-            if preview and preview.get("type") == "file":
-                preview_image_url = preview.get("download_url") or ""
-        if catalog_type == "robot":
-            cap_names = []
-            if cached is None:
-                meta = manifest.get("catalog")
-                (
-                    version,
-                    description,
-                    license_name,
-                    tags,
-                    maintainers,
-                    catalog_warnings,
-                ) = validate_catalog_metadata(
-                    name,
-                    meta,
-                    name,
-                    allow_name_mismatch=allow_name_mismatch,
-                )
-                deploy_dependencies = collect_deploy_dependencies(name, manifest)
-            else:
-                version = cached.get("version", "")
-                description = cached.get("description", "")
-                license_name = cached.get("license", "")
-                tags = cached.get("tags", [])
-                maintainers = cached.get("maintainers", [])
-                validate_catalog_metadata(
-                    name,
-                    {
-                        "name": name,
-                        "version": version,
-                        "description": description,
-                        "license": license_name,
-                        "tags": tags,
-                        "maintainers": maintainers,
-                    },
-                    name,
-                )
-                deploy_dependencies = []
-                catalog_warnings = []
-        else:
-            package = manifest.get("package")
-            if not isinstance(package, dict):
-                fail(f"{name}: package_manifest.yaml missing package mapping")
-            (
-                version,
-                description,
-                license_name,
-                tags,
-                maintainers,
-                catalog_warnings,
-            ) = validate_catalog_metadata(
-                name,
-                package,
-                name,
-                allow_name_mismatch=allow_name_mismatch,
-            )
-            cap_names = collect_capabilities(name, manifest)
-            deploy_dependencies = []
-        kind = name.split(".")[1] if name.startswith("robonix.") and "." in name else ""
-        out.append(
-            {
-                "name": name,
-                "version": version,
-                "description": description,
-                "license": license_name,
-                "tags": tags,
-                "repo": repo,
-                "maintainers": maintainers,
-                "repo_name": repo_name,
-                "default_branch": branch,
-                "kind": kind,
-                "catalog_type": catalog_type,
-                "catalog_status": "warning" if catalog_warnings else "ok",
-                "catalog_warnings": catalog_warnings,
-                "manifest": manifest_path,
-                "capabilities": cap_names,
-                "deploy_dependencies": deploy_dependencies,
-                "readme_url": f"{repo}/blob/{branch}/README.md",
-                "preview_image_url": preview_image_url,
-                "_readme_markdown": readme,
-                "_source_warnings": source_warnings,
-            }
-        )
+
+def collect(
+    catalog_path: Path,
+    baseline_keys: set[tuple[str, str, str, str]] | None = None,
+) -> list[dict]:
+    """Read catalog.yaml and fetch every listed repository.
+
+    Indexing one entry costs several GitHub round trips and almost no CPU, so
+    the entries are fetched concurrently; COLLECT_WORKERS stays well under
+    GitHub's concurrency guidance. A SystemExit raised by fail() inside a
+    worker surfaces from result() and still aborts the build.
+    """
+    entries = validate_catalog_entries(read_catalog(catalog_path))
+    baseline_keys = baseline_keys or set()
+    with concurrent.futures.ThreadPoolExecutor(max_workers=COLLECT_WORKERS) as pool:
+        futures = [pool.submit(collect_entry, entry, baseline_keys) for entry in entries]
+        out = [future.result() for future in futures]
     annotate_deploy_dependencies(out)
     validate_deploy_dependency_paths(out)
     out.sort(key=lambda x: x["name"])
     return out
-
 
 def write_json(path: Path, data) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
@@ -919,1198 +967,788 @@ def write_api(path: Path, data) -> None:
     write_json(path, data)
     write_json(path.with_name(f"{path.name}.json"), data)
 
+SITE_URL = "https://packages.robonix.ai"
+CATALOG_REPO = "https://github.com/syswonder/robonix-package-catalog"
+DOCS_URL = "https://book.robonix.ai/"
 
-def copy_assets(public_dir: Path) -> None:
-    asset_dir = public_dir / "assets"
-    vendor_dir = asset_dir / "vendor" / "pico"
-    vendor_dir.mkdir(parents=True, exist_ok=True)
-    shutil.copyfile(BRAND_MARK_ASSET, asset_dir / BRAND_MARK_ASSET.name)
-    shutil.copyfile(VENDOR_ASSETS / "pico.classless.min.css", vendor_dir / "pico.classless.min.css")
-    shutil.copyfile(VENDOR_ASSETS / "LICENSE.md", vendor_dir / "LICENSE.md")
+# One sentence per provider kind, in the vocabulary the developer guide uses:
+# capabilities are the interface, contracts are their shape, and primitive /
+# service / skill are the three kinds of provider.
+KIND_BLURB = {
+    "primitive": "Hardware-facing providers. One package per device, exposing what it can do through the standard capability contracts.",
+    "service": "Shared computation layered on top of primitives — mapping, navigation, perception, speech.",
+    "skill": "Task-level providers that compose services and primitives into something a robot can be asked to do.",
+}
+KIND_ORDER = ("primitive", "service", "skill")
 
-
-def tag_class(tag: str) -> str:
-    known = {
-        "primitive": "tag-blue",
-        "robot": "tag-red",
-        "deploy": "tag-slate",
-        "service": "tag-green",
-        "skill": "tag-gold",
-        "camera": "tag-cyan",
-        "lidar": "tag-purple",
-        "imu": "tag-slate",
-        "chassis": "tag-red",
-        "navigation": "tag-green",
-        "mapping": "tag-blue",
-        "slam": "tag-blue",
-        "explore": "tag-gold",
-    }
-    return known.get(tag, "tag-gray")
+ICON_SEARCH = '<svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><circle cx="7" cy="7" r="4.4"/><path d="m10.4 10.4 3.1 3.1"/></svg>'
+ICON_GITHUB = '<svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M8 .2a8 8 0 0 0-2.5 15.6c.4.07.55-.17.55-.38l-.01-1.34c-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82a7.4 7.4 0 0 1 4 0c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48l-.01 2.19c0 .21.15.46.55.38A8 8 0 0 0 8 .2Z"/></svg>'
+ICON_SUN = '<svg class="icon-light" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><circle cx="8" cy="8" r="3.1"/><path d="M8 1v1.6M8 13.4V15M15 8h-1.6M2.6 8H1M12.9 3.1l-1.1 1.1M4.2 11.8l-1.1 1.1M12.9 12.9l-1.1-1.1M4.2 4.2 3.1 3.1"/></svg>'
+ICON_MOON = '<svg class="icon-dark" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"><path d="M13.5 9.6A5.8 5.8 0 0 1 6.4 2.5a5.9 5.9 0 1 0 7.1 7.1Z"/></svg>'
+ICON_PLUS = '<svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M8 3.2v9.6M3.2 8h9.6"/></svg>'
+ICON_JSON = '<svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M6.2 2.2H4.6A1.6 1.6 0 0 0 3 3.8v2.6c0 .9-.7 1.6-1.6 1.6.9 0 1.6.7 1.6 1.6v2.6a1.6 1.6 0 0 0 1.6 1.6h1.6"/><path d="M9.8 2.2h1.6A1.6 1.6 0 0 1 13 3.8v2.6c0 .9.7 1.6 1.6 1.6-.9 0-1.6.7-1.6 1.6v2.6a1.6 1.6 0 0 1-1.6 1.6H9.8"/></svg>'
+ICON_ARROW = '<svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3.4 8h9.2M9 4.4 12.6 8 9 11.6"/></svg>'
 
 
-def render_tags(tags: list[str]) -> str:
-    return " ".join(
-        f"<button class=\"tag {tag_class(t)}\" data-tag=\"{html.escape(t)}\">{html.escape(t)}</button>"
-        for t in tags
-    )
+def render_tags(tags: list[str], *, interactive: bool) -> str:
+    """Render tag pills.
+
+    On listing pages a tag applies a filter, so it must be a real button; the
+    detail pages have nothing to filter, so the same pill renders inert.
+    """
+    if interactive:
+        return "".join(
+            f'<button type="button" class="tag" data-tag-filter="{html.escape(t)}" aria-pressed="false">{html.escape(t)}</button>'
+            for t in tags
+        )
+    return "".join(f'<span class="tag">{html.escape(t)}</span>' for t in tags)
 
 
-def render_css() -> str:
-    base_css = """
-    @import url("https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Noto+Sans+SC:wght@400;500;700&display=swap");
+def wrappable_name(name: str) -> str:
+    """Escape a package name and mark where it may wrap.
 
-    :root {
-      color-scheme: light;
-      --font-sans: "Noto Sans CJK SC", "Noto Sans SC", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-      --font-mono: "JetBrains Mono", "Noto Sans CJK SC", "Noto Sans SC", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
-      --pico-font-family: var(--font-sans);
-      --pico-border-radius: 6px;
-      --pico-spacing: 0.75rem;
-      --bg: #f7f8fc;
-      --paper: #ffffff;
-      --soft: #f1f3f9;
-      --ink: #11172a;
-      --muted: #5f677a;
-      --line: #dde1ec;
-      --line-strong: #bdc5d8;
-      --brand: #283689;
-      --brand-deep: #17205f;
-      --signal: #3674ff;
-      --signal-soft: #e9edff;
-      --warning: #8a4b08;
-      --warning-line: #e2ad58;
-      --warning-soft: #fff7e8;
-      --shadow: 0 8px 28px rgba(28, 38, 88, 0.06);
-      --header-bg: rgba(255, 255, 255, 0.9);
-      --field-bg: #ffffff;
-      --code-bg: #f8fafc;
-      --code-ink: #1d2939;
-      --body-copy: #343941;
-      --readme-ink: #1f2937;
-      --action-ink: #29303a;
-      --nav-ink: #344054;
-      --warning-copy: #5f3a12;
-      --hover-line: #bcc6ec;
-      --brand-contrast: #ffffff;
-      --site-header-height: 64px;
-      --header-control-height: 34px;
-      --sticky-gap: 14px;
-    }
-    html[data-theme="dark"] {
-      color-scheme: dark;
-      --bg: #0d1220;
-      --paper: #151c2d;
-      --soft: #1d263a;
-      --ink: #eef2ff;
-      --muted: #a9b3c9;
-      --line: #303b54;
-      --line-strong: #475574;
-      --brand: #9dacff;
-      --brand-deep: #c4ccff;
-      --signal: #7da2ff;
-      --signal-soft: #252f58;
-      --warning: #ffc46b;
-      --warning-line: #9c6927;
-      --warning-soft: #322514;
-      --shadow: 0 12px 32px rgba(0, 0, 0, 0.28);
-      --header-bg: rgba(16, 22, 36, 0.9);
-      --field-bg: #111827;
-      --code-bg: #101725;
-      --code-ink: #e5eaf6;
-      --body-copy: #d2d9e8;
-      --readme-ink: #dce3f1;
-      --action-ink: #d7deed;
-      --nav-ink: #c5cede;
-      --warning-copy: #f2cf96;
-      --hover-line: #6376ad;
-      --brand-contrast: #101426;
-    }
-    * { box-sizing: border-box; }
-    html { min-height: 100%; background: var(--bg); }
-    .visually-hidden {
-      position: absolute !important;
-      width: 1px !important;
-      height: 1px !important;
-      padding: 0 !important;
-      margin: -1px !important;
-      overflow: hidden !important;
-      clip: rect(0, 0, 0, 0) !important;
-      white-space: nowrap !important;
-      border: 0 !important;
-    }
-    body {
-      width: 100%;
-      max-width: none;
-      min-height: 100vh;
-      min-height: 100dvh;
-      padding: 0;
-      margin: 0;
-      display: flex;
-      flex-direction: column;
-      color: var(--ink);
-      background:
-        radial-gradient(circle at 18% -8%, rgba(54, 116, 255, 0.09), transparent 30rem),
-        var(--bg);
-      font-family: var(--font-sans);
-      font-size: 15px;
-      letter-spacing: 0;
-    }
-    a { color: var(--brand); text-decoration: none; }
-    a:hover { text-decoration: underline; }
-    :focus-visible {
-      outline: 3px solid rgba(54, 116, 255, 0.42);
-      outline-offset: 3px;
-    }
-    .shell {
-      width: min(100% - 48px, 1180px);
-      max-width: 1180px;
-      margin: 0 auto;
-    }
-    .site-header {
-      width: 100%;
-      max-width: none;
-      margin: 0;
-      padding: 0;
-      position: sticky;
-      top: 0;
-      z-index: 20;
-      color: var(--ink);
-      border-bottom: 1px solid var(--line);
-      background: var(--header-bg);
-      -webkit-backdrop-filter: blur(16px);
-      backdrop-filter: blur(16px);
-    }
-    .site-header .shell { padding-block: 12px; }
-    .topline { display: flex; justify-content: space-between; gap: 16px; align-items: center; }
-    .brand {
-      display: inline-flex;
-      align-items: center;
-      gap: 10px;
-      color: var(--ink);
-      font-weight: 700;
-      font-size: 17px;
-      letter-spacing: -0.01em;
-    }
-    .brand-mark {
-      display: block;
-      width: 34px;
-      height: 30px;
-      flex: 0 0 auto;
-      object-fit: contain;
-    }
-    .brand:hover { color: var(--brand); text-decoration: none; }
-    .brand small { color: var(--muted); font-size: 12px; font-weight: 500; }
-    .header-actions { display: flex; gap: 10px; align-items: stretch; justify-content: flex-end; }
-    .api-links {
-      display: flex;
-      min-height: var(--header-control-height);
-      gap: 8px;
-      align-items: stretch;
-      flex-wrap: nowrap;
-      justify-content: flex-end;
-    }
-    .api-links a {
-      display: inline-flex;
-      min-height: var(--header-control-height);
-      align-items: center;
-      justify-content: center;
-      color: var(--nav-ink);
-      border: 1px solid transparent;
-      background: transparent;
-      border-radius: 6px;
-      padding: 0 9px;
-      font-size: 13px;
-      font-weight: 600;
-      line-height: 1;
-      transition: color 160ms ease, background 160ms ease, border-color 160ms ease;
-    }
-    .api-links a:hover, .api-links a[aria-current="page"] {
-      color: var(--brand);
-      border-color: var(--line-strong);
-      background: var(--signal-soft);
-      text-decoration: none;
-    }
-    .theme-switcher {
-      display: inline-flex;
-      width: auto;
-      min-height: var(--header-control-height);
-      align-items: stretch;
-      gap: 2px;
-      margin: 0;
-      padding: 3px;
-      border: 1px solid var(--line);
-      border-radius: 8px;
-      background: var(--soft);
-      box-shadow: none;
-      white-space: nowrap;
-    }
-    .theme-switcher button {
-      display: inline-flex;
-      min-width: 0;
-      margin: 0;
-      padding: 4px 7px;
-      align-items: center;
-      justify-content: center;
-      border: 0;
-      border-radius: 5px;
-      background: transparent;
-      color: var(--muted);
-      font-size: 11px;
-      font-weight: 700;
-      line-height: 1;
-      box-shadow: none;
-    }
-    .theme-switcher button:hover { color: var(--ink); }
-    .theme-switcher button[aria-pressed="true"] {
-      color: var(--brand-contrast);
-      background: var(--brand);
-    }
-    h1 {
-      margin: 0;
-      font-family: var(--font-sans);
-      font-size: 22px;
-      line-height: 1.35;
-      letter-spacing: 0;
-      overflow-wrap: anywhere;
-      word-break: break-word;
-    }
-    .lede { color: var(--muted); max-width: 720px; margin: 8px 0 0; line-height: 1.55; font-size: 15px; }
-    .page-intro { padding: 28px 0 16px; }
-    .page-intro .eyebrow, .catalog-hero .eyebrow, .api-viewer .eyebrow {
-      color: var(--brand);
-      font-family: var(--font-mono);
-      font-size: 11px;
-      font-weight: 700;
-      letter-spacing: 0.09em;
-      text-transform: uppercase;
-    }
-    main.shell {
-      width: min(100% - 48px, 1180px);
-      flex: 1 0 auto;
-      padding-block: 0 34px;
-    }
-    .search-strip { padding: 16px 0 14px; }
-    .catalog-frame {
-      display: grid;
-      grid-template-columns: 265px 1fr;
-      gap: 14px;
-      align-items: start;
-    }
-    .panel {
-      background: var(--paper);
-      border: 1px solid var(--line);
-      box-shadow: var(--shadow);
-      border-radius: 8px;
-      overflow: hidden;
-      margin-bottom: 0;
-      transition: border-color 180ms ease, box-shadow 180ms ease, transform 180ms ease;
-    }
-    .filters {
-      padding: 14px;
-      position: sticky;
-      top: calc(var(--site-header-height) + var(--sticky-gap));
-      max-height: calc(100dvh - var(--site-header-height) - 28px);
-      overflow-y: auto;
-      overscroll-behavior: contain;
-      scrollbar-gutter: stable;
-    }
-    .filters > summary { display: none; }
-    .filter-content { min-width: 0; }
-    .filters h2, .content h2 { margin: 0 0 9px; font-size: 15px; }
-    .stat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 7px; margin-bottom: 14px; }
-    .stat { border: 1px solid var(--line); border-radius: 6px; padding: 8px; background: var(--soft); }
-    .stat strong { display: block; font-size: 20px; line-height: 1.15; }
-    .stat span { color: var(--muted); font-size: 12px; }
-    .filter-group { border-top: 1px solid var(--line); padding-top: 11px; margin-top: 11px; }
-    .filter-buttons { display: flex; gap: 6px; flex-wrap: wrap; }
-    .filter-button {
-      border: 1px solid var(--line);
-      background: var(--field-bg);
-      color: var(--ink);
-      border-radius: 999px;
-      padding: 5px 9px;
-      cursor: pointer;
-      font-size: 13px;
-      margin: 0;
-    }
-    .filter-button { transition: color 150ms ease, border-color 150ms ease, background 150ms ease; }
-    .filter-button:hover { border-color: var(--brand); }
-    .filter-button.active { background: var(--brand); color: var(--brand-contrast); border-color: var(--brand); }
-    .content { padding: 14px; min-width: 0; }
-    .api-reference {
-      margin-top: 14px;
-      padding: 0;
-      font-size: 14px;
-      line-height: 1.45;
-    }
-    .api-reference > summary {
-      cursor: pointer;
-      padding: 14px 18px;
-      color: var(--ink);
-      font-weight: 700;
-    }
-    .api-reference[open] > summary { border-bottom: 1px solid var(--line); }
-    .api-reference-body { padding: 16px 18px 18px; }
-    .api-reference h2 { margin: 0 0 8px; font-size: 16px; line-height: 1.3; }
-    .api-reference p { margin: 0 0 10px; font-size: 14px; line-height: 1.45; }
-    .api-reference table {
-      margin: 10px 0 12px;
-      width: 100%;
-      font-size: 13px;
-    }
-    .api-reference td,
-    .api-reference th {
-      vertical-align: top;
-      padding: 7px 8px;
-    }
-    .api-reference pre {
-      margin: 0;
-      overflow-x: auto;
-      border: 1px solid var(--line);
-      background: var(--code-bg);
-      border-radius: 6px;
-      padding: 10px;
-      font-size: 12px;
-      line-height: 1.45;
-    }
-    .api-reference code { font-size: 0.92em; }
-    .api-viewer { padding-block: 30px 40px; }
-    .api-viewer-head { margin-bottom: 16px; }
-    .api-viewer-head h1 { margin-top: 7px; }
-    .api-viewer-endpoint { margin: 10px 0 0; color: var(--muted); }
-    .api-json-panel { padding: 14px; }
-    .api-json {
-      width: 100%;
-      min-height: 420px;
-      max-height: calc(100vh - 260px);
-      margin: 0;
-      overflow: auto;
-      border: 0;
-      background: var(--code-bg);
-      color: var(--code-ink);
-      font-family: var(--font-mono);
-      font-size: 12px;
-      line-height: 1.5;
-      white-space: pre;
-    }
-    .api-json code { padding: 0; background: transparent; }
-    .muted { color: var(--muted); }
-    .toolbar { display: flex; justify-content: space-between; gap: 12px; align-items: center; margin-bottom: 10px; }
-    .search {
-      width: min(620px, 100%);
-      border: 1px solid var(--line-strong);
-      background: var(--field-bg);
-      border-radius: 6px;
-      padding: 9px 11px;
-      font-size: 15px;
-      margin: 0;
-    }
-    .count { color: var(--muted); white-space: nowrap; }
-    .clear-filters {
-      display: none;
-      width: auto;
-      margin: 0;
-      padding: 5px 8px;
-      border: 0;
-      background: transparent;
-      color: var(--brand);
-      font-size: 13px;
-    }
-    .clear-filters.visible { display: inline-block; }
-    .package-list { display: grid; gap: 9px; }
-    .package-card {
-      border: 1px solid var(--line);
-      background: var(--paper);
-      border-radius: 7px;
-      padding: 12px;
-      display: grid;
-      grid-template-columns: 1fr auto;
-      gap: 12px;
-      margin: 0;
-      animation: rise-in 360ms cubic-bezier(.2, .7, .2, 1) both;
-    }
-    .package-card:nth-child(2) { animation-delay: 35ms; }
-    .package-card:nth-child(3) { animation-delay: 70ms; }
-    .package-card:nth-child(4) { animation-delay: 105ms; }
-    .package-card:hover { border-color: var(--hover-line); box-shadow: var(--shadow); transform: translateY(-2px); }
-    .package-card.has-warning {
-      border-color: var(--warning-line);
-      background: linear-gradient(90deg, var(--warning-soft), var(--paper) 26%);
-    }
-    .package-card.has-warning:hover { border-color: #c9892f; }
-    @keyframes rise-in {
-      from { opacity: 0; transform: translateY(7px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-    .kind-label {
-      display: inline-block;
-      margin-bottom: 5px;
-      color: var(--brand);
-      font-family: var(--font-mono);
-      font-size: 10px;
-      font-weight: 700;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-    }
-    .card-status-line { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
-    .warning-badge {
-      display: inline-flex;
-      align-items: center;
-      width: fit-content;
-      min-width: 0;
-      border: 1px solid var(--warning-line);
-      border-radius: 999px;
-      padding: 2px 7px;
-      color: var(--warning);
-      background: var(--warning-soft);
-      font-family: var(--font-sans);
-      font-size: 11px;
-      font-weight: 700;
-      line-height: 1.35;
-    }
-    .warning-summary {
-      margin: 9px 0;
-      border-left: 3px solid var(--warning-line);
-      padding: 7px 9px;
-      color: var(--warning-copy);
-      background: var(--warning-soft);
-      font-size: 12px;
-      line-height: 1.4;
-    }
-    .warning-summary strong { display: block; margin-bottom: 3px; color: var(--warning); }
-    .warning-summary ul { margin: 0; padding-left: 17px; }
-    .warning-summary li { margin: 2px 0; }
-    .warning-summary code { color: var(--warning-copy); background: transparent; padding: 0; }
-    .package-title { display: flex; gap: 8px; align-items: baseline; flex-wrap: wrap; margin-bottom: 5px; }
-    .package-title a {
-      font-family: var(--font-mono);
-      font-size: 16px;
-      font-weight: 700;
-      color: var(--ink);
-      overflow-wrap: anywhere;
-    }
-    .version {
-      font-family: var(--font-mono);
-      color: var(--muted);
-      font-size: 12px;
-      border: 1px solid var(--line);
-      border-radius: 4px;
-      padding: 2px 5px;
-      background: var(--soft);
-    }
-    .description { color: var(--body-copy); margin: 0 0 8px; line-height: 1.38; }
-    .meta-line { color: var(--muted); font-size: 13px; display: flex; gap: 14px; flex-wrap: wrap; }
-    .meta-line strong, .meta-line code { overflow-wrap: anywhere; }
-    .meta-line code { font-size: 12px; }
-    .card-actions { display: flex; gap: 8px; align-items: start; }
-    .card-actions a {
-      border: 1px solid var(--line);
-      border-radius: 6px;
-      padding: 6px 8px;
-      background: var(--soft);
-      color: var(--action-ink);
-      font-size: 13px;
-      margin: 0;
-      font-weight: 600;
-      transition: background 160ms ease, border-color 160ms ease, color 160ms ease;
-    }
-    .card-actions a:first-child { color: var(--brand-contrast); border-color: var(--brand); background: var(--brand); }
-    .card-actions a:hover { border-color: var(--brand); text-decoration: none; }
-    .card-side {
-      display: grid;
-      gap: 10px;
-      justify-items: end;
-      align-content: start;
-    }
-    .card-preview {
-      display: block;
-      width: 190px;
-      aspect-ratio: 4 / 3;
-      object-fit: cover;
-      border: 1px solid var(--line);
-      border-radius: 6px;
-      background: var(--soft);
-    }
-    .tags { display: flex; gap: 5px; flex-wrap: wrap; margin-top: 8px; }
-    .tag {
-      border: 0;
-      border-radius: 999px;
-      padding: 3px 7px;
-      font-size: 12px;
-      cursor: pointer;
-      color: #1c2732;
-      margin: 0;
-    }
-    .tag-blue { background: #dcecf7; color: #164965; }
-    .tag-green { background: #dff0df; color: #23562a; }
-    .tag-gold { background: #f3e6bd; color: #6b4b10; }
-    .tag-cyan { background: #d8f0f0; color: #165456; }
-    .tag-purple { background: #eadff4; color: #4d2d68; }
-    .tag-slate { background: #e4e8ee; color: #344052; }
-    .tag-red { background: #f5ded8; color: #7b2c1f; }
-    .tag-gray { background: #ece8df; color: #4a4b4d; }
-    html[data-theme="dark"] .tag-blue { background: #172d3d; color: #8bc9ea; }
-    html[data-theme="dark"] .tag-green { background: #183522; color: #91d7a3; }
-    html[data-theme="dark"] .tag-gold { background: #3a2d13; color: #e8c96f; }
-    html[data-theme="dark"] .tag-cyan { background: #123638; color: #87d8da; }
-    html[data-theme="dark"] .tag-purple { background: #302440; color: #c9a7e5; }
-    html[data-theme="dark"] .tag-slate { background: #252e3d; color: #bdc8da; }
-    html[data-theme="dark"] .tag-red { background: #3b221e; color: #eda69a; }
-    html[data-theme="dark"] .tag-gray { background: #2b2a28; color: #cbc7c0; }
-    .detail-layout {
-      display: grid;
-      grid-template-columns: 1fr 340px;
-      gap: 14px;
-      align-items: start;
-      margin-top: 16px;
-    }
-    .detail-main, .detail-side { padding: 14px; }
-    .detail-main h2, .detail-side h2 { margin: 0 0 10px; font-size: 18px; }
-    .detail-side h2:not(:first-child) { margin-top: 16px; }
-    .kv {
-      display: grid;
-      grid-template-columns: 92px minmax(0, 1fr);
-      gap: 4px 10px;
-      font-size: 14px;
-      line-height: 1.32;
-      margin: 0 0 10px;
-    }
-    .kv div:nth-child(odd) { color: var(--muted); }
-    .kv div:nth-child(even) { min-width: 0; overflow-wrap: anywhere; }
-    .cap-list { margin: 0; padding-left: 0; list-style: none; display: grid; gap: 5px; }
-    .cap-list li {
-      font-family: var(--font-mono);
-      font-size: 13px;
-      border: 1px solid var(--line);
-      background: var(--soft);
-      border-radius: 5px;
-      padding: 6px 7px;
-      overflow-wrap: anywhere;
-      margin: 0;
-    }
-    .cap-list li span {
-      color: var(--muted);
-      display: inline-block;
-      min-width: 64px;
-    }
-    .cap-list li.dependency-warning {
-      border-color: var(--warning-line);
-      background: var(--warning-soft);
-    }
-    .dependency-warning .warning-badge { margin-left: 5px; }
-    .dependency-warning-reason {
-      display: block;
-      margin-top: 5px;
-      color: var(--warning-copy);
-      font-family: var(--font-sans);
-      font-size: 12px;
-      line-height: 1.4;
-    }
-    .detail-warning {
-      max-width: 920px;
-      margin-top: 12px;
-      border: 1px solid var(--warning-line);
-      border-radius: 7px;
-      padding: 10px 12px;
-      color: var(--warning-copy);
-      background: var(--warning-soft);
-      font-size: 13px;
-    }
-    .detail-warning strong { display: block; margin-bottom: 4px; color: var(--warning); }
-    .detail-warning ul { margin: 0; padding-left: 18px; }
-    .detail-warning li { margin: 3px 0; }
-    .detail-hero { padding: 20px 0 4px; }
-    .detail-hero h1 { font-family: var(--font-mono); }
-    .back { display: inline-block; margin: 0 0 12px; color: var(--brand); }
-    .generated { color: var(--muted); margin-top: 12px; font-size: 13px; }
-    .site-footer {
-      width: 100%;
-      max-width: none;
-      margin: 0;
-      padding: 0;
-      flex: 0 0 auto;
-      color: var(--muted);
-      border-top: 1px solid var(--line);
-      background: var(--paper);
-      font-size: 12px;
-    }
-    .site-footer .shell { padding-block: 18px 28px; }
-    .readme {
-      line-height: 1.58;
-      color: var(--readme-ink);
-      overflow-wrap: anywhere;
-    }
-    .readme h1 { font-size: 24px; margin-bottom: 10px; }
-    .readme h2 { font-size: 19px; border-bottom: 1px solid var(--line); padding-bottom: 6px; margin: 22px 0 10px; }
-    .readme h3 { font-size: 16px; margin: 18px 0 8px; }
-    .readme p, .readme ul, .readme ol { margin-bottom: 10px; }
-    .readme pre {
-      overflow: auto;
-      border: 1px solid var(--line);
-      border-radius: 6px;
-      background: var(--code-bg);
-      padding: 10px;
-      max-width: 100%;
-    }
-    .readme code {
-      background: var(--soft);
-      border-radius: 4px;
-      padding: 1px 4px;
-      font-size: 0.92em;
-    }
-    .readme pre code { background: transparent; padding: 0; }
-    .readme .highlight { margin: 10px 0; }
-    .readme .highlight pre { margin: 0; }
-    .readme img { display: block; max-width: 100%; height: auto; border-radius: 7px; }
-    .readme table { border-collapse: collapse; width: 100%; display: block; overflow-x: auto; }
-    .readme th, .readme td { border: 1px solid var(--line); padding: 6px 8px; }
-    code { font-family: var(--font-mono); }
-    .catalog-hero {
-      padding: clamp(38px, 8vw, 82px) 0 24px;
-    }
-    .catalog-hero h1 {
-      max-width: none;
-      margin-top: 10px;
-      font-size: clamp(32px, 4.2vw, 50px);
-      line-height: 1.05;
-      letter-spacing: -0.045em;
-    }
-    .catalog-hero .lede { max-width: 690px; font-size: 17px; }
-    .hero-search { width: min(720px, 100%); margin-top: 24px; }
-    .hero-search input {
-      width: 100%;
-      height: 52px;
-      margin: 0;
-      padding: 0 18px;
-      border: 1px solid #b9c3df;
-      border-radius: 9px;
-      background: var(--field-bg);
-      box-shadow: 0 14px 34px rgba(31, 43, 105, 0.1);
-      font-size: 16px;
-    }
-    .entry-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
-    .entry-card { position: relative; padding: 20px; }
-    .entry-card:hover { border-color: var(--hover-line); box-shadow: var(--shadow); transform: translateY(-2px); }
-    .entry-card h2 { margin: 0 0 7px; font-size: 19px; }
-    .entry-card strong { display: block; margin-top: 16px; color: var(--brand); font-size: 30px; line-height: 1; }
-    .entry-links { display: flex; flex-wrap: wrap; gap: 7px; margin-top: 14px; }
-    .entry-links a {
-      padding: 5px 8px;
-      border: 1px solid var(--line);
-      border-radius: 999px;
-      background: var(--soft);
-      font-size: 12px;
-      font-weight: 600;
-    }
-    .home-results { padding: 14px; }
-    .home-results[hidden], .home-empty[hidden], .entry-grid[hidden] { display: none; }
-    .home-results-head { display: flex; justify-content: space-between; gap: 12px; margin-bottom: 10px; }
-    .home-result-list { display: grid; gap: 8px; }
-    .home-result {
-      display: grid;
-      grid-template-columns: minmax(0, 1fr) auto;
-      gap: 12px;
-      padding: 11px 12px;
-      border: 1px solid var(--line);
-      border-radius: 7px;
-      color: var(--ink);
-      background: var(--paper);
-    }
-    .home-result:hover { border-color: var(--hover-line); background: var(--soft); text-decoration: none; }
-    .home-result-name { color: var(--brand-deep); font-family: var(--font-mono); font-weight: 700; overflow-wrap: anywhere; }
-    .home-result span { color: var(--muted); font-size: 13px; text-align: right; }
-    .home-empty { margin: 10px 0 0; color: var(--muted); }
-    @media (prefers-reduced-motion: reduce) {
-      *, *::before, *::after {
-        scroll-behavior: auto !important;
-        animation-duration: 0.01ms !important;
-        animation-iteration-count: 1 !important;
-        transition-duration: 0.01ms !important;
-      }
-    }
-    @media (max-width: 860px) {
-      .shell { width: min(100% - 28px, 1180px); }
-      main.shell { width: min(100% - 28px, 1180px); }
-      .topline { align-items: stretch; flex-direction: column; }
-      .header-actions { justify-content: space-between; }
-      .api-links {
-        display: grid;
-        grid-template-columns: repeat(3, minmax(0, 1fr));
-        justify-content: stretch;
-        width: 100%;
-      }
-      .api-links a { min-width: 0; text-align: center; overflow-wrap: anywhere; }
-      .catalog-frame, .detail-layout { grid-template-columns: 1fr; }
-      .detail-side { order: -1; }
-      .entry-grid { grid-template-columns: 1fr; }
-      .filters {
-        padding: 0;
-        position: static;
-        max-height: none;
-        overflow: visible;
-        scrollbar-gutter: auto;
-      }
-      .filters > summary {
-        display: block;
-        padding: 12px 14px;
-        color: var(--ink);
-        cursor: pointer;
-        font-weight: 700;
-        list-style-position: inside;
-      }
-      .filters[open] > summary { border-bottom: 1px solid var(--line); }
-      .filter-content { padding: 14px; }
-      .toolbar { align-items: stretch; flex-direction: column; }
-      .package-card { grid-template-columns: 1fr; }
-      .card-side { justify-items: start; }
-      .card-actions { justify-content: flex-start; }
-      .card-preview { width: min(100%, 360px); }
-      .api-reference-body { padding: 14px; }
-    }
-    @media (min-width: 861px) {
-      .catalog-hero h1 { white-space: nowrap; }
-    }
-    @media (max-width: 520px) {
-      body { font-size: 14px; }
-      .shell { width: min(100% - 20px, 1180px); }
-      main.shell { width: min(100% - 20px, 1180px); }
-      .site-header .shell { padding-block: 10px; }
-      .brand { font-size: 17px; overflow-wrap: anywhere; }
-      .brand small { display: none; }
-      .header-actions { align-items: stretch; flex-direction: column; gap: 7px; }
-      .api-links { gap: 6px; }
-      .theme-switcher { align-self: flex-end; }
-      .api-links a { padding: 7px 5px; font-size: 11px; }
-      .search-strip { padding: 12px 0; }
-      .content, .detail-main, .detail-side { padding: 12px; min-width: 0; }
-      .package-card { gap: 10px; padding: 11px; }
-      .package-title a { font-size: 14px; }
-      .card-actions { width: 100%; }
-      .card-actions a { flex: 1; text-align: center; }
-      .page-intro { padding-top: 20px; }
-      .catalog-hero { padding-top: 32px; }
-      .catalog-hero h1 { font-size: 34px; }
-      .catalog-hero .lede { font-size: 15px; }
-      .home-result { grid-template-columns: 1fr; gap: 3px; }
-      .home-result span { text-align: left; }
-      .kv { grid-template-columns: 1fr; gap: 2px; }
-      .kv div:nth-child(odd) { margin-top: 7px; font-size: 12px; font-weight: 700; }
-      .api-reference table,
-      .api-reference tbody,
-      .api-reference tr,
-      .api-reference td { display: block; width: 100%; }
-      .api-reference thead { display: none; }
-      .api-reference tr {
-        border: 1px solid var(--line);
-        border-radius: 6px;
-        margin-bottom: 8px;
-        overflow: hidden;
-      }
-      .api-reference td {
-        display: grid;
-        grid-template-columns: 76px minmax(0, 1fr);
-        gap: 8px;
-        border: 0;
-        border-bottom: 1px solid var(--line);
-        overflow-wrap: anywhere;
-      }
-      .api-reference td:last-child { border-bottom: 0; }
-      .api-reference td::before {
-        content: attr(data-label);
-        color: var(--muted);
-        font-size: 11px;
-        font-weight: 700;
-        letter-spacing: 0.03em;
-        text-transform: uppercase;
-      }
-    }
-    """.strip()
-    light_highlight = HtmlFormatter(style="friendly").get_style_defs(".highlight")
-    dark_highlight = HtmlFormatter(style="monokai").get_style_defs(
-        'html[data-theme="dark"] .highlight'
-    )
-    return base_css + "\n" + light_highlight + "\n" + dark_highlight
+    A dotted identifier is one unbreakable word as far as CSS is concerned, so
+    a narrow card either overflows or breaks mid-segment. An explicit <wbr>
+    after each separator keeps breaks on segment boundaries, where they read.
+    """
+    escaped = html.escape(name)
+    for separator in (".", "_"):
+        escaped = escaped.replace(separator, f"{separator}<wbr>")
+    return escaped
 
 
-def render_favicon(root: str) -> str:
-    return f'<link rel="icon" type="image/svg+xml" href="{root}assets/robonix-mark.svg">'
+def kind_chip(kind: str) -> str:
+    safe = html.escape(kind)
+    known = kind if kind in {"primitive", "service", "skill", "robot"} else "plain"
+    return f'<span class="chip chip-{known}">{safe}</span>'
 
 
-def render_theme_bootstrap() -> str:
-    return """<script>
-    (() => {
-      const storageKey = 'robonix-catalog-theme';
-      let preference = 'auto';
-      try {
-        const stored = localStorage.getItem(storageKey);
-        if (stored === 'light' || stored === 'dark' || stored === 'auto') preference = stored;
-      } catch (_) {}
-      const resolved = preference === 'auto'
-        ? (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light')
-        : preference;
-      document.documentElement.dataset.theme = resolved;
-      document.documentElement.dataset.themePreference = preference;
-      document.documentElement.style.colorScheme = resolved;
-    })();
-  </script>"""
+def render_head(root: str, title: str) -> str:
+    """<head> contents, including the pre-paint theme resolution.
+
+    The theme must be settled before first paint or a dark-mode reader gets a
+    white flash, so this one script stays inline on every page.
+    """
+    return f"""<meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{html.escape(title)}</title>
+  <script>
+    (() => {{
+      let stored = null;
+      try {{ stored = localStorage.getItem('robonix-catalog-theme'); }} catch (_) {{}}
+      const dark = stored ? stored === 'dark' : matchMedia('(prefers-color-scheme: dark)').matches;
+      document.documentElement.dataset.bsTheme = dark ? 'dark' : 'light';
+    }})();
+  </script>
+  <link rel="icon" type="image/svg+xml" href="{root}assets/robonix-mark.svg">
+  <link rel="stylesheet" href="{root}assets/vendor/bootstrap/bootstrap.min.css">
+  <link rel="stylesheet" href="{root}assets/site.css">"""
 
 
-def render_navigation(root: str, current: str = "") -> str:
-    def page_link(path: str, label: str, page: str) -> str:
-        active = ' aria-current="page"' if current == page else ""
-        return f'<a href="{root}{path}"{active}>{label}</a>'
+def render_navbar(root: str, current: str, *, search_target: str, search_placeholder: str) -> str:
+    """Site-wide navbar: brand, always-present search, sections, utilities.
 
-    return f"""<header class="site-header">
-    <div class="shell topline">
-      <a class="brand" href="{root}">
-        <img class="brand-mark" src="{root}assets/robonix-mark.svg" alt="" aria-hidden="true" width="34" height="30">
-        <span>Robonix <small>Package Catalog</small></span>
+    Search belongs here rather than in the page body: it is the same action on
+    every page. On listing pages the field filters in place; everywhere else it
+    submits through to the packages listing. It is deliberately outside the
+    collapse, so a phone still shows it while the sections fold behind the
+    toggler — hiding the primary action behind a menu would be a regression.
+    """
+
+    def nav_link(path: str, label: str, page: str, kind: str = "") -> str:
+        # The three kind links share one listing page, so which is current
+        # depends on ?kind=; site.js settles that once the page is up.
+        marker = f' data-nav-kind="{kind}"' if kind else ""
+        active = ' aria-current="page"' if current == page and not kind else ""
+        return (
+            f'<li class="nav-item"><a class="nav-link" href="{root}{path}"{marker}{active}>'
+            f"{label}</a></li>"
+        )
+
+    return f"""<nav class="navbar navbar-expand-lg sticky-top site-nav">
+    <div class="container-xxl">
+      <a class="navbar-brand" href="{root}">
+        <img src="{root}assets/robonix-mark.svg" alt="" width="26" height="23">
+        <span class="text-body">Robonix</span> <span>Packages</span>
       </a>
-      <div class="header-actions">
-        <nav class="api-links" aria-label="Catalog navigation">
-          {page_link('packages/', 'Packages', 'packages')}
-          {page_link('robots/', 'Robots', 'robots')}
-          {page_link('api/view/', 'API', 'api')}
-        </nav>
-        <div class="theme-switcher" role="group" aria-label="Color theme">
-          <button type="button" data-theme-choice="auto" aria-pressed="false">Auto</button>
-          <button type="button" data-theme-choice="light" aria-pressed="false">Light</button>
-          <button type="button" data-theme-choice="dark" aria-pressed="false">Dark</button>
+      <form class="site-search order-lg-1 mx-2 ms-lg-3 me-lg-auto" role="search"
+            id="omnisearch-form" data-target="{root}{search_target}">
+        {ICON_SEARCH}
+        <label class="visually-hidden" for="omnisearch">Search the catalog</label>
+        <input class="form-control" id="omnisearch" type="search" autocomplete="off"
+               spellcheck="false" placeholder="{html.escape(search_placeholder)}">
+        <kbd class="d-none d-lg-block">/</kbd>
+      </form>
+      <button class="navbar-toggler border-0 px-2 order-lg-3" type="button" data-bs-toggle="collapse"
+              data-bs-target="#site-menu" aria-controls="site-menu" aria-expanded="false"
+              aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse flex-lg-grow-0 order-lg-2" id="site-menu">
+        <ul class="navbar-nav align-items-lg-center">
+          {nav_link('packages/?kind=skill', 'Skills', 'packages', 'skill')}
+          {nav_link('packages/?kind=service', 'Services', 'packages', 'service')}
+          {nav_link('packages/?kind=primitive', 'Primitives', 'packages', 'primitive')}
+          {nav_link('robots/', 'Robots', 'robots')}
+          {nav_link('api/view/', 'API', 'api')}
+        </ul>
+        <div class="d-flex align-items-center gap-2 mt-3 mt-lg-0 ms-lg-3">
+          <a class="btn btn-primary btn-sm" href="{root}submit/">{ICON_PLUS} Submit</a>
+          <a class="icon-btn" href="{CATALOG_REPO}" title="Catalog repository"
+             aria-label="Catalog repository on GitHub">{ICON_GITHUB}</a>
+          <button type="button" class="icon-btn" data-theme-toggle
+                  aria-label="Toggle dark mode" title="Toggle dark mode">{ICON_SUN}{ICON_MOON}</button>
         </div>
       </div>
     </div>
-  </header>
-  <script>
-    (() => {{
-      const header = document.currentScript.previousElementSibling;
-      const storageKey = 'robonix-catalog-theme';
-      const media = matchMedia('(prefers-color-scheme: dark)');
-      const choices = Array.from(header.querySelectorAll('[data-theme-choice]'));
-      const validPreference = (value) => ['auto', 'light', 'dark'].includes(value);
-      const readPreference = () => {{
-        const current = document.documentElement.dataset.themePreference;
-        return validPreference(current) ? current : 'auto';
-      }};
-      const applyTheme = (preference, persist = false) => {{
-        const safePreference = validPreference(preference) ? preference : 'auto';
-        const resolved = safePreference === 'auto'
-          ? (media.matches ? 'dark' : 'light')
-          : safePreference;
-        document.documentElement.dataset.theme = resolved;
-        document.documentElement.dataset.themePreference = safePreference;
-        document.documentElement.style.colorScheme = resolved;
-        choices.forEach((button) => {{
-          button.setAttribute('aria-pressed', String(button.dataset.themeChoice === safePreference));
-        }});
-        if (persist) {{
-          try {{ localStorage.setItem(storageKey, safePreference); }} catch (_) {{}}
-        }}
-      }};
-      choices.forEach((button) => {{
-        button.addEventListener('click', () => applyTheme(button.dataset.themeChoice, true));
-      }});
-      media.addEventListener?.('change', () => {{
-        if (readPreference() === 'auto') applyTheme('auto');
-      }});
-      window.addEventListener('storage', (event) => {{
-        if (event.key === storageKey) applyTheme(validPreference(event.newValue) ? event.newValue : 'auto');
-      }});
-      applyTheme(readPreference());
-      const updateHeaderHeight = () => {{
-        const height = Math.ceil(header.getBoundingClientRect().height);
-        document.documentElement.style.setProperty('--site-header-height', `${{height}}px`);
-      }};
-      updateHeaderHeight();
-      if ('ResizeObserver' in window) {{
-        new ResizeObserver(updateHeaderHeight).observe(header);
-      }} else {{
-        window.addEventListener('resize', updateHeaderHeight, {{ passive: true }});
-      }}
-    }})();
-  </script>"""
+  </nav>"""
+
+
+def render_footer(generated_at: str) -> str:
+    return f"""<footer class="site-footer py-4">
+    <div class="container-xxl d-flex flex-wrap justify-content-between gap-2">
+      <span>Robonix Package Catalog · indexed {html.escape(generated_at[:10])}</span>
+      <span><a href="{CATALOG_REPO}">Source</a> · <a href="{DOCS_URL}">Documentation</a> · <a href="{CATALOG_REPO}/blob/main/catalog.yaml">catalog.yaml</a></span>
+    </div>
+  </footer>"""
+
+
+def render_page(
+    *,
+    root: str,
+    title: str,
+    current: str,
+    body: str,
+    generated_at: str,
+    search_placeholder: str = "Search packages, capabilities, robots",
+    extra_scripts: str = "",
+) -> str:
+    """Assemble one complete page from the shared chrome and a body fragment."""
+    search_target = "packages/" if current in {"", "submit", "api"} else ""
+    return f"""<!doctype html>
+<html lang="en">
+<head>
+  {render_head(root, title)}
+</head>
+<body>
+  {render_navbar(root, current, search_target=search_target, search_placeholder=search_placeholder)}
+  <main>
+{body}
+  </main>
+  {render_footer(generated_at)}
+  <script src="{root}assets/vendor/bootstrap/bootstrap.min.js" defer></script>
+  <script src="{root}assets/site.js" defer></script>{extra_scripts}
+</body>
+</html>
+"""
 
 
 def detail_base(package: dict) -> str:
     return "robots" if package.get("catalog_type") == "robot" else "packages"
 
 
-def render_listing_page(public_dir: Path, generated_at: str, packages: list[dict], *, page: str, title: str, empty_label: str) -> None:
-    cards = []
-    kinds = sorted({p["kind"] for p in packages if p["kind"]})
-    all_tags = sorted({t for p in packages for t in p["tags"]})
-    for p in packages:
-        detail_href = f"{html.escape(package_slug(p['name']))}/"
-        unit_label = "dependencies" if p.get("catalog_type") == "robot" else "capabilities"
-        unit_count = len(p.get("deploy_dependencies", [])) if p.get("catalog_type") == "robot" else len(p.get("capabilities", []))
-        search_text = " ".join(
-            [
-                p["name"],
-                p["version"],
-                p["kind"],
-                p["description"],
-                p["license"],
-                p["repo"],
-                " ".join(p["maintainers"]),
-            ]
-            + p["tags"]
-            + p["capabilities"]
-            + [
-                " ".join(
-                    [
-                        d.get("name", ""),
-                        d.get("repo", ""),
-                        d.get("path", ""),
-                        d.get("resolution_warning", ""),
-                    ]
-                )
-                for d in p.get("deploy_dependencies", [])
-            ]
+def entry_units(package: dict) -> tuple[int, str]:
+    """Count the thing a page's rows are measured in.
+
+    Ordinary packages advertise capabilities; robot deployments assemble
+    packages. Both are the honest "size" signal for their kind of entry.
+    """
+    if package.get("catalog_type") == "robot":
+        count = len(package.get("deploy_dependencies", []))
+        return count, "dependency" if count == 1 else "dependencies"
+    count = len(package.get("capabilities", []))
+    return count, "capability" if count == 1 else "capabilities"
+
+
+def entry_search_text(package: dict) -> str:
+    parts = [
+        package["name"],
+        package["version"],
+        package["kind"],
+        package["description"],
+        package["license"],
+        package["repo"],
+        " ".join(package["maintainers"]),
+        " ".join(package["tags"]),
+        " ".join(package.get("capabilities", [])),
+    ]
+    parts += [
+        " ".join([d.get("name", ""), d.get("repo", ""), d.get("path", "")])
+        for d in package.get("deploy_dependencies", [])
+    ]
+    return " ".join(parts).lower()
+
+
+def maintainer_names(package: dict) -> str:
+    """Strip the <email> part; the listing has no room for addresses."""
+    names = [m.split("<")[0].strip() or m for m in package["maintainers"]]
+    return ", ".join(names)
+
+
+def warning_entries(package: dict) -> list[str]:
+    """Flatten catalog and deployment warnings into display strings."""
+    items = [html.escape(w.get("reason", "")) for w in package.get("catalog_warnings", [])]
+    for warning in package.get("deployment_warnings", []):
+        label = f"{warning.get('section', '')} {warning.get('name', '')}".strip()
+        prefix = f"<code>{html.escape(label)}</code>: " if label else ""
+        items.append(prefix + html.escape(warning.get("reason", "")))
+    return items
+
+
+def preview_sources(package: dict, root: str) -> tuple[str, str]:
+    """Return (src, srcset) for a robot preview, or ("", "") when it has none."""
+    if package.get("_preview_image_380"):
+        small = f"{root}{package['_preview_image_380']}"
+        large = f"{root}{package['_preview_image_720']}"
+        return html.escape(small), f"{html.escape(small)} 380w, {html.escape(large)} 720w"
+    if package.get("preview_image_url"):
+        return html.escape(package["preview_image_url"]), ""
+    return "", ""
+
+
+def render_entry_row(package: dict) -> str:
+    """One row in a listing. Dense by design: a registry is scanned, not read."""
+    slug = html.escape(package_slug(package["name"]))
+    unit_count, unit_label = entry_units(package)
+    warnings = warning_entries(package)
+    src, srcset = preview_sources(package, "../")
+
+    thumb = ""
+    if src:
+        srcset_attr = f' srcset="{srcset}" sizes="86px"' if srcset else ""
+        thumb = (
+            f'<img class="entry-thumb" src="{src}"{srcset_attr} alt="" '
+            f'width="380" height="285" loading="lazy" decoding="async">'
         )
-        preview_html = ""
-        if p.get("_preview_image_380"):
-            small = f"../{p['_preview_image_380']}"
-            large = f"../{p['_preview_image_720']}"
-            preview_html = (
-                f'<img class="card-preview" src="{html.escape(small)}" '
-                f'srcset="{html.escape(small)} 380w, {html.escape(large)} 720w" '
-                f'sizes="(max-width: 520px) calc(100vw - 48px), 190px" '
-                f'width="380" height="285" alt="{html.escape(p["name"])} preview" '
-                f'loading="lazy" decoding="async" fetchpriority="low">'
-            )
-        elif p.get("preview_image_url"):
-            preview_html = (
-                f'<img class="card-preview" src="{html.escape(p["preview_image_url"])}" '
-                f'width="380" height="285" alt="{html.escape(p["name"])} preview" '
-                f'loading="lazy" decoding="async" fetchpriority="low">'
-            )
-        preview_line = f"\n          {preview_html}" if preview_html else ""
-        catalog_warnings = p.get("catalog_warnings", [])
-        deployment_warnings = p.get("deployment_warnings", [])
-        warning_count = len(catalog_warnings) + len(deployment_warnings)
-        card_class = "package-card has-warning" if warning_count else "package-card"
-        warning_badge = (
-            f'<span class="warning-badge">Warning · {warning_count} '
-            f'{"issue" if warning_count == 1 else "issues"}</span>'
-            if warning_count
-            else ""
+
+    warning_block = ""
+    if warnings:
+        label = "issue" if len(warnings) == 1 else "issues"
+        items = "".join(f"<li>{w}</li>" for w in warnings)
+        warning_block = (
+            f'<details class="entry-warning"><summary>{len(warnings)} {label} found while indexing</summary>'
+            f'<ul class="warn-box">{items}</ul></details>'
         )
-        warning_summaries = []
-        if catalog_warnings:
-            warning_items = "".join(
-                "<li>" + html.escape(warning.get("reason", "")) + "</li>"
-                for warning in catalog_warnings
-            )
-            warning_summaries.append(
-                '<div class="warning-summary"><strong>Catalog metadata warning</strong>'
-                f"<ul>{warning_items}</ul></div>"
-            )
-        if deployment_warnings:
-            warning_items = "".join(
-                "<li><code>"
-                + html.escape(f"{warning.get('section', '')} {warning.get('name', '')}".strip())
-                + "</code>: "
-                + html.escape(warning.get("reason", ""))
-                + "</li>"
-                for warning in deployment_warnings
-            )
-            warning_summaries.append(
-                '<div class="warning-summary"><strong>Deployment source warning</strong>'
-                f"<ul>{warning_items}</ul></div>"
-            )
-        warning_summary = "".join(warning_summaries)
-        warning_summary_line = f"\n          {warning_summary}" if warning_summary else ""
-        cards.append(
-            f"""<article class="{card_class}" data-kind="{html.escape(p['kind'])}" data-tags="{html.escape(' '.join(p['tags']))}" data-search="{html.escape(search_text.lower())}">
-        <div>
-          <div class="card-status-line"><span class="kind-label">{html.escape(p['kind'])}</span>{warning_badge}</div>
-          <div class="package-title">
-            <a href="{detail_href}">{html.escape(p['name'])}</a>
-            <span class="version">v{html.escape(p['version'])}</span>
-          </div>
-          <p class="description">{html.escape(p['description'])}</p>{warning_summary_line}
-          <div class="meta-line">
-            <span>maintainers <strong>{html.escape(', '.join(p['maintainers']))}</strong></span>
-            <span>{html.escape(str(unit_count))} {html.escape(unit_label)}</span>
-          </div>
-          <div class="tags">{render_tags(p['tags'])}</div>
-        </div>
-        <div class="card-side">
-          <div class="card-actions">
-            <a href="{detail_href}">Details</a>
-            <a href="{html.escape(p['repo'])}">GitHub</a>
-          </div>{preview_line}
-        </div>
-      </article>"""
-        )
-    kind_buttons = "".join(
-        f"<button class=\"filter-button\" data-kind=\"{html.escape(kind)}\">{html.escape(kind)}</button>"
-        for kind in kinds
+    warn_chip = f'<span class="chip chip-warn">{len(warnings)}</span>' if warnings else ""
+
+    return f"""<li class="entry" data-entry data-name="{html.escape(package['name'])}" data-kind="{html.escape(package['kind'])}" data-units="{unit_count}" data-tags="{html.escape(' '.join(package['tags']))}" data-search="{html.escape(entry_search_text(package))}">
+            <div class="entry-body">
+              <div class="d-flex flex-wrap align-items-center gap-2">
+                <a class="entry-name" href="{slug}/">{wrappable_name(package['name'])}</a>
+                {kind_chip(package['kind'])}
+                <span class="entry-version">v{html.escape(package['version'])}</span>
+                {warn_chip}
+              </div>
+              <p class="entry-desc mt-1 mb-0">{html.escape(package['description'])}</p>
+              <div class="entry-meta d-flex flex-wrap align-items-center gap-2 mt-2">
+                <span class="who">{html.escape(maintainer_names(package))}</span>
+                <span>·</span>
+                <span>{unit_count} {unit_label}</span>
+                <span>·</span>
+                <span>{html.escape(package['license'])}</span>
+              </div>
+            </div>
+            {thumb}
+            {warning_block}
+          </li>"""
+
+
+def render_listing_page(
+    public_dir: Path,
+    generated_at: str,
+    packages: list[dict],
+    *,
+    page: str,
+    title: str,
+    lede: str,
+    noun: str,
+) -> None:
+    """Write /packages/ or /robots/: a sticky facet rail beside dense rows."""
+    kind_counts: dict[str, int] = {}
+    tag_counts: dict[str, int] = {}
+    for package in packages:
+        if package["kind"]:
+            kind_counts[package["kind"]] = kind_counts.get(package["kind"], 0) + 1
+        for tag in package["tags"]:
+            tag_counts[tag] = tag_counts.get(tag, 0) + 1
+
+    kind_options = "".join(
+        f'<button type="button" class="facet-option" data-kind-filter="{html.escape(kind)}" aria-pressed="false">'
+        f'<span>{html.escape(kind)}</span><span class="n">{count}</span></button>'
+        for kind, count in sorted(kind_counts.items(), key=lambda kv: (-kv[1], kv[0]))
     )
-    tag_buttons = "".join(
-        f"<button class=\"filter-button\" data-tag-filter=\"{html.escape(tag)}\">{html.escape(tag)}</button>"
-        for tag in all_tags
+
+    # A long tail of one-off tags pushes the useful facets off screen, so the
+    # rail shows the common ones and hides the rest behind "Show all".
+    ranked_tags = sorted(tag_counts.items(), key=lambda kv: (-kv[1], kv[0]))
+    visible_tag_limit = 14
+    tag_buttons = []
+    for index, (tag, _count) in enumerate(ranked_tags):
+        overflow = " hidden data-tag-overflow" if index >= visible_tag_limit else ""
+        tag_buttons.append(
+            f'<button type="button" class="tag" data-tag-filter="{html.escape(tag)}" aria-pressed="false"{overflow}>{html.escape(tag)}</button>'
+        )
+    tag_more = (
+        f'<button type="button" class="facet-more mt-2" data-facet-more>Show all {len(ranked_tags)} tags</button>'
+        if len(ranked_tags) > visible_tag_limit
+        else ""
     )
-    public_dir.mkdir(parents=True, exist_ok=True)
-    copy_assets(public_dir)
+
+    unit_sort_label = "Most dependencies" if page == "robots" else "Most capabilities"
+    kind_facet = (
+        f"""<div class="mb-4">
+              <div class="facet-title mb-2">Kind</div>
+              <div class="d-flex flex-column">{kind_options}</div>
+            </div>"""
+        if len(kind_counts) > 1
+        else ""
+    )
+
+    rows = "\n".join(render_entry_row(p) for p in packages)
+
+    body = f"""    <div class="container-xxl">
+      <header class="pt-4 pb-3">
+        <h1 class="h3 mb-2">{html.escape(title)}</h1>
+        <p class="text-secondary mb-0" style="max-width: 62ch">{html.escape(lede)}</p>
+      </header>
+      <div class="row g-4" data-listing="{html.escape(noun)}">
+        <aside class="col-lg-3">
+          <div class="facets">
+            {kind_facet}
+            <div class="mb-4">
+              <div class="facet-title mb-2">Tags</div>
+              <div class="d-flex flex-wrap gap-1">{''.join(tag_buttons)}</div>
+              {tag_more}
+            </div>
+            <button type="button" class="btn btn-outline-secondary btn-sm" data-clear hidden>Clear filters</button>
+          </div>
+        </aside>
+        <div class="col-lg-9">
+          <div class="d-flex flex-wrap align-items-center justify-content-between gap-2 pb-2 border-bottom">
+            <span class="result-count" data-count aria-live="polite"></span>
+            <label class="sort-field d-flex align-items-center gap-2 mb-0">Sort
+              <select class="form-select form-select-sm" data-sort aria-label="Sort order">
+                <option value="name">Name</option>
+                <option value="kind">Kind</option>
+                <option value="units">{html.escape(unit_sort_label)}</option>
+              </select>
+            </label>
+          </div>
+          <ol class="entry-list" data-entry-list>
+{rows}
+          </ol>
+          <div class="text-center text-secondary py-5" data-empty hidden>
+            <p class="fw-semibold text-body mb-1">Nothing matches those filters.</p>
+            <p class="mb-0">Try a shorter search term, or clear the kind and tag filters.</p>
+          </div>
+        </div>
+      </div>
+    </div>"""
+
     page_dir = public_dir / page
     page_dir.mkdir(parents=True, exist_ok=True)
     page_dir.joinpath("index.html").write_text(
-        f"""<!doctype html>
-<html lang="en">
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  {render_theme_bootstrap()}
-  <title>{html.escape(title)} - Robonix Package Catalog</title>
-  {render_favicon('../')}
-  <link rel="stylesheet" href="../assets/vendor/pico/pico.classless.min.css">
-  <style>
-{render_css()}
-  </style>
-</head>
-<body>
-  {render_navigation('../', page)}
-  <main class="shell">
-    <section class="page-intro">
-      <span class="eyebrow">Robonix ecosystem index</span>
-      <h1>{html.escape(title)}</h1>
-      <p class="lede">{'Complete robot deployments, including the packages and platform metadata they assemble.' if page == 'robots' else 'Reusable primitive, service, and skill packages, indexed by capability, source, and maintainer.'}</p>
-      <div class="search-strip">
-        <label for="q" class="visually-hidden">Search {html.escape(empty_label)}</label>
-        <input class="search" id="q" type="search" autocomplete="off" placeholder="Search {html.escape(empty_label)}, capabilities, tags, or maintainers">
+        render_page(
+            root="../",
+            title=f"{title} · Robonix Package Catalog",
+            current=page,
+            body=body,
+            generated_at=generated_at,
+            search_placeholder=f"Filter {noun}",
+        ),
+        encoding="utf-8",
+    )
+
+
+def render_home(public_dir: Path, generated_at: str, packages: list[dict]) -> None:
+    """Write the landing page.
+
+    No search box in the page body — search lives in the navbar. The page is
+    ordered by what a visitor most likely wants: the skills a robot can be
+    asked to run, then the robots themselves, then the substrate those are
+    built on, then how to publish and how to consume.
+    """
+    package_entries = [p for p in packages if p.get("catalog_type") != "robot"]
+    robot_entries = [p for p in packages if p.get("catalog_type") == "robot"]
+    capability_total = sum(len(p.get("capabilities", [])) for p in package_entries)
+    by_kind = {kind: [p for p in package_entries if p["kind"] == kind] for kind in KIND_ORDER}
+
+    # Skills are the applications of the platform, so the homepage shows real
+    # skill packages rather than a link to a filtered list.
+    skills = sorted(by_kind["skill"], key=lambda p: p["name"])
+    shelf_limit = 7
+    skill_cards = []
+    for skill in skills[:shelf_limit]:
+        slug = html.escape(package_slug(skill["name"]))
+        count = len(skill.get("capabilities", []))
+        unit = "capability" if count == 1 else "capabilities"
+        skill_cards.append(
+            f"""<div class="col">
+            <a class="card card-link-block h-100 p-3 d-flex flex-column gap-2" href="packages/{slug}/">
+              <span class="card-name">{wrappable_name(skill['name'])}</span>
+              <p class="card-desc mb-0">{html.escape(skill['description'])}</p>
+              <span class="card-foot mt-auto">{count} {unit}</span>
+            </a>
+          </div>"""
+        )
+    if len(skills) > shelf_limit:
+        skill_cards.append(
+            f"""<div class="col">
+            <a class="card card-link-block card-more h-100 d-flex flex-row align-items-center justify-content-center gap-2" href="packages/?kind=skill">
+              <span>All {len(skills)} skills</span>{ICON_ARROW}
+            </a>
+          </div>"""
+        )
+
+    robot_cards = []
+    for robot in robot_entries:
+        slug = html.escape(package_slug(robot["name"]))
+        src, srcset = preview_sources(robot, "")
+        if src:
+            srcset_attr = f' srcset="{srcset}" sizes="220px"' if srcset else ""
+            shot = (
+                f'<img src="{src}"{srcset_attr} alt="" width="380" height="285" '
+                f'loading="lazy" decoding="async">'
+            )
+        else:
+            shot = "<span>no preview</span>"
+        robot_cards.append(
+            f"""<a class="card card-link-block overflow-hidden" href="robots/{slug}/">
+            <div class="robot-shot">{shot}</div>
+            <div class="p-3">
+              <span class="card-name d-block">{wrappable_name(robot['name'])}</span>
+              <p class="card-desc mb-0 mt-1">{html.escape(robot['description'])}</p>
+            </div>
+          </a>"""
+        )
+
+    substrate_cards = []
+    for kind in ("primitive", "service"):
+        substrate_cards.append(
+            f"""<div class="col">
+            <a class="card card-link-block h-100 p-3" href="packages/?kind={kind}">
+              <div class="d-flex align-items-center justify-content-between gap-2 mb-2">
+                {kind_chip(kind)}
+                <span class="card-foot">{len(by_kind[kind])}</span>
+              </div>
+              <h3 class="h6 mb-2">{kind.capitalize()}s</h3>
+              <p class="card-desc mb-3" style="-webkit-line-clamp: 4; line-clamp: 4">{html.escape(KIND_BLURB[kind])}</p>
+              <span class="card-go d-inline-flex align-items-center gap-1 mt-auto">Browse {kind}s {ICON_ARROW}</span>
+            </a>
+          </div>"""
+        )
+
+    body = f"""    <section class="container-xxl hero pt-5 pb-2">
+      <h1 class="mb-3">The Robonix package catalog.</h1>
+      <p class="hero-lede mb-4">Skills, services, primitives, and complete robot deployments,
+      published by the community. Every entry is read straight from its own repository's
+      manifest, so what you see here is what the package actually declares.</p>
+      <div class="d-flex flex-wrap gap-4 mb-4">
+        <span class="hero-stat d-flex align-items-baseline gap-2"><b>{len(skills)}</b><span>skills</span></span>
+        <span class="hero-stat d-flex align-items-baseline gap-2"><b>{len(package_entries)}</b><span>packages</span></span>
+        <span class="hero-stat d-flex align-items-baseline gap-2"><b>{len(robot_entries)}</b><span>robot deployments</span></span>
+        <span class="hero-stat d-flex align-items-baseline gap-2"><b>{capability_total}</b><span>declared capabilities</span></span>
+      </div>
+      <div class="d-flex flex-wrap gap-2">
+        <a class="btn btn-primary" href="packages/?kind=skill">Browse skills</a>
+        <a class="btn btn-outline-secondary" href="submit/">{ICON_PLUS} Submit a package</a>
       </div>
     </section>
-    <div class="catalog-frame">
-      <details class="panel filters" open>
-        <summary>Filters and catalog summary</summary>
-        <div class="filter-content">
-          <div class="stat-grid">
-            <div class="stat"><strong>{len(packages)}</strong><span>{html.escape(empty_label)}</span></div>
-            <div class="stat"><strong>{sum(len(p.get("deploy_dependencies", [])) if p.get("catalog_type") == "robot" else len(p.get("capabilities", [])) for p in packages)}</strong><span>indexed items</span></div>
-          </div>
-          <div class="filter-group">
-            <h2>Kind</h2>
-            <div class="filter-buttons" id="kindFilters">
-              <button class="filter-button active" data-kind="">All</button>
-              {kind_buttons}
-            </div>
-          </div>
-          <div class="filter-group">
-            <h2>Tags</h2>
-            <div class="filter-buttons" id="tagFilters">
-              <button class="filter-button active" data-tag-filter="">All</button>
-              {tag_buttons}
-            </div>
-          </div>
+
+    <section class="container-xxl mt-5">
+      <div class="section-head d-flex flex-wrap align-items-baseline justify-content-between gap-3 mb-3">
+        <div>
+          <h2 class="mb-1">Skills</h2>
+          <p class="mb-0">{html.escape(KIND_BLURB['skill'])}</p>
         </div>
-      </details>
-      <section class="panel content">
-        <div class="toolbar">
-          <div class="count" id="count" aria-live="polite"></div>
-          <button class="clear-filters" id="clearFilters" type="button">Clear filters</button>
-        </div>
-        <div class="package-list" id="packages">
-          {''.join(cards)}
-        </div>
-      </section>
-    </div>
-    <details class="panel api-reference">
-      <summary>Catalog API</summary>
-      <div class="api-reference-body">
-      <h2>API Reference</h2>
-      <p class="muted">Static JSON API hosted by GitHub Pages. Use <code>GET</code>; no API key is required.</p>
-      <table>
-        <thead><tr><th>Method</th><th>Path</th><th>Parameters</th><th>Response</th></tr></thead>
-        <tbody>
-          <tr><td data-label="Method"><code>GET</code></td><td data-label="Path"><a href="../api/view/?resource=packages"><code>/api/v1/packages.json</code></a></td><td data-label="Parameters">none</td><td data-label="Response">catalog object with <code>api_version</code>, <code>generated_at</code>, and <code>packages[]</code></td></tr>
-          <tr><td data-label="Method"><code>GET</code></td><td data-label="Path"><a href="../api/view/?resource=search"><code>/api/v1/search.json</code></a></td><td data-label="Parameters">none</td><td data-label="Response">plain package array for client-side filtering</td></tr>
-          <tr><td data-label="Method"><code>GET</code></td><td data-label="Path"><code>/api/v1/package/&lt;package-name&gt;.json</code></td><td data-label="Parameters"><code>package-name</code>: exact <code>package.name</code>, URL-encoded</td><td data-label="Response">one package object; missing packages return GitHub Pages 404</td></tr>
-        </tbody>
-      </table>
-      <pre><code>const base = 'https://syswonder.github.io/robonix-package-catalog/api/v1';
-const catalog = await fetch(`${{base}}/packages`).then(r => r.json());
-const detail = await fetch(`${{base}}/package/${{encodeURIComponent('robonix.service.mapping')}}`).then(r => r.json());</code></pre>
+        <a class="section-more d-inline-flex align-items-center gap-1" href="packages/?kind=skill">All skills {ICON_ARROW}</a>
       </div>
-    </details>
-  </main>
-  <footer class="site-footer"><div class="shell">Generated on {html.escape(generated_at)}.</div></footer>
+      <div class="row row-cols-1 row-cols-sm-2 row-cols-lg-3 row-cols-xl-4 g-3">
+        {''.join(skill_cards)}
+      </div>
+    </section>
+
+    <section class="container-xxl mt-5">
+      <div class="section-head d-flex flex-wrap align-items-baseline justify-content-between gap-3 mb-3">
+        <div>
+          <h2 class="mb-1">Robot deployments</h2>
+          <p class="mb-0">Repositories that assemble a whole robot: body description, drivers, services, skills, runtime configuration.</p>
+        </div>
+        <a class="section-more d-inline-flex align-items-center gap-1" href="robots/">All robots {ICON_ARROW}</a>
+      </div>
+      <div class="robot-rail">
+        {''.join(robot_cards)}
+      </div>
+    </section>
+
+    <section class="container-xxl mt-5">
+      <div class="section-head d-flex flex-wrap align-items-baseline justify-content-between gap-3 mb-3">
+        <div>
+          <h2 class="mb-1">The substrate</h2>
+          <p class="mb-0">What skills are built on. Providers of the same capability are interchangeable, so a skill written once runs on any robot that has them.</p>
+        </div>
+        <a class="section-more d-inline-flex align-items-center gap-1" href="packages/">All packages {ICON_ARROW}</a>
+      </div>
+      <div class="row row-cols-1 row-cols-md-2 g-3">
+        {''.join(substrate_cards)}
+      </div>
+    </section>
+
+    <section class="container-xxl mt-5">
+      <div class="row row-cols-1 row-cols-lg-2 g-3">
+        <div class="col">
+          <div class="card h-100 p-4">
+            <h3 class="h6 mb-2">Publish a package</h3>
+            <p class="text-secondary small mb-3">Your code stays in your repository. Listing it
+            takes one entry in <code>catalog.yaml</code> — everything else is read from your manifest.</p>
+            <pre class="snippet mb-3"><code>packages:
+  - name: robonix.service.mapping
+    repo: https://github.com/syswonder/service-map-rbnx</code></pre>
+            <a class="btn btn-primary align-self-start mt-auto" href="submit/">{ICON_PLUS} Submit a package</a>
+          </div>
+        </div>
+        <div class="col">
+          <div class="card h-100 p-4">
+            <h3 class="h6 mb-2">Read it as an API</h3>
+            <p class="text-secondary small mb-3">The whole catalog is static JSON on the same host.
+            No key, no rate limit, no query parameters — fetch it and filter on the client.</p>
+            <pre class="snippet mb-3"><code>curl -s {SITE_URL}/api/v1/packages.json</code></pre>
+            <a class="btn btn-outline-secondary align-self-start mt-auto" href="api/view/">{ICON_JSON} Explore the API</a>
+          </div>
+        </div>
+      </div>
+    </section>"""
+
+    (public_dir / "index.html").write_text(
+        render_page(
+            root="",
+            title="Robonix Package Catalog",
+            current="",
+            body=body,
+            generated_at=generated_at,
+        ),
+        encoding="utf-8",
+    )
+
+
+def render_submit_page(public_dir: Path, generated_at: str, packages: list[dict]) -> None:
+    """Write /submit/.
+
+    GitHub Pages is static, so the page cannot open a pull request itself. What
+    it can do is everything up to that point: validate the entry against the
+    same rules the builder enforces, emit the exact YAML, and hand the reader
+    to GitHub's own edit-and-propose flow, which forks the catalog for them.
+    """
+    body = f"""    <div class="container-xxl">
+      <nav class="crumbs pt-3"><a href="../">Catalog</a> / <span>Submit</span></nav>
+      <header class="pt-2 pb-4">
+        <h1 class="h3 mb-2">Submit a package</h1>
+        <p class="text-secondary mb-0" style="max-width: 68ch">Listing a package takes one
+        <code>name</code> + <code>repo</code> entry in <code>catalog.yaml</code>. Your code stays
+        in your own repository; the catalog reads its manifest and rebuilds this site daily.</p>
+      </header>
+
+      <div class="row g-4">
+        <div class="col-lg-7">
+          <div class="submit-form d-flex flex-column gap-3">
+            <div class="card p-4">
+              <h2 class="aside-title mb-3">1 · Describe the entry</h2>
+              <div class="mb-3">
+                <span class="field-label d-block mb-2" id="entryKind">What are you listing?</span>
+                <div class="btn-group btn-group-sm" role="group" aria-labelledby="entryKind">
+                  <button type="button" class="btn btn-outline-secondary active" data-section="packages" aria-pressed="true">A package</button>
+                  <button type="button" class="btn btn-outline-secondary" data-section="robots" aria-pressed="false">A whole robot</button>
+                </div>
+                <p class="field-help mt-2 mb-0" data-section-help>Primitives, services and skills all go under <code>packages:</code>.</p>
+              </div>
+              <div data-entry-row>
+                <div class="field mb-3">
+                  <label class="field-label d-block mb-2" for="entryName">Catalog name</label>
+                  <input class="form-control submit-input" id="entryName" data-name type="text"
+                         spellcheck="false" autocomplete="off" placeholder="robonix.skill.pick.vertical_grasp">
+                  <p class="field-help mt-2 mb-0">Must match <code>package.name</code> in your manifest exactly.</p>
+                  <p class="field-error mt-2 mb-0" data-error hidden></p>
+                </div>
+                <div class="field mb-3">
+                  <label class="field-label d-block mb-2" for="entryRepo">GitHub repository</label>
+                  <input class="form-control submit-input" id="entryRepo" data-repo type="url"
+                         spellcheck="false" autocomplete="off" placeholder="https://github.com/owner/repo">
+                  <p class="field-help mt-2 mb-0">Public repository with a root-level manifest on its default branch.</p>
+                  <p class="field-error mt-2 mb-0" data-error hidden></p>
+                </div>
+              </div>
+              <button type="button" class="btn btn-outline-secondary btn-sm align-self-start" data-add>{ICON_PLUS} Add another entry</button>
+            </div>
+
+            <div class="card p-4">
+              <h2 class="aside-title mb-3">2 · Copy the YAML</h2>
+              <pre class="snippet mb-3"><code data-yaml>packages:
+  - name: robonix.service.mapping
+    repo: https://github.com/syswonder/service-map-rbnx</code></pre>
+              <button type="button" class="btn btn-outline-secondary btn-sm align-self-start" data-copy>Copy snippet</button>
+            </div>
+
+            <div class="card p-4">
+              <h2 class="aside-title mb-3">3 · Open the pull request</h2>
+              <p class="field-help mb-3">GitHub forks the catalog for you and turns the edit into a
+              pull request. Paste your entry into the matching section, keeping the list in
+              alphabetical order.</p>
+              <div class="d-flex flex-wrap gap-2 mb-3">
+                <a class="btn btn-primary" data-edit-link href="{CATALOG_REPO}/edit/main/catalog.yaml">{ICON_GITHUB} Edit catalog.yaml on GitHub</a>
+                <a class="btn btn-outline-secondary" data-issue-link href="{CATALOG_REPO}/issues/new">Open a request instead</a>
+              </div>
+              <p class="field-help mb-0">Not comfortable with YAML? The second button files an issue
+              with your details filled in, and a maintainer adds the entry.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-lg-5">
+          <div class="d-flex flex-column gap-3">
+            <div class="card p-4">
+              <h2 class="aside-title mb-3">What CI checks</h2>
+              <ul class="check-list mb-0 ps-3">
+                <li>The repository is public and has a root-level
+                <code>package_manifest.yaml</code> (or <code>robonix_manifest.yaml</code> for a robot).</li>
+                <li><code>package.name</code> in that manifest matches the name you submit here.</li>
+                <li><code>version</code>, <code>description</code>, <code>license</code>,
+                <code>tags</code> and <code>maintainers</code> are all present.</li>
+                <li>Maintainers are written as <code>Name &lt;email@domain&gt;</code>.</li>
+                <li>Every declared capability names a real Robonix contract.</li>
+                <li>For robots, each dependency resolves to a cataloged repository or a path
+                inside the robot repository itself.</li>
+              </ul>
+            </div>
+            <div class="card p-4">
+              <h2 class="aside-title mb-3">Manifest template</h2>
+              <pre class="snippet mb-3"><code>package:
+  name: robonix.service.mapping
+  version: 0.4.0
+  description: Map and SLAM service package.
+  license: MulanPSL-2.0
+  tags: [service, mapping, slam]
+  maintainers:
+    - Your Name &lt;you@example.com&gt;
+
+capabilities:
+  - name: robonix/service/map/save_map</code></pre>
+              <a class="section-more d-inline-flex align-items-center gap-1" href="{DOCS_URL}">Full packaging guide {ICON_ARROW}</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>"""
+
+    existing_json = json.dumps(sorted(p["name"] for p in packages))
+    extra = (
+        f'\n  <script id="catalog-names" type="application/json">{existing_json}</script>'
+        '\n  <script src="../assets/submit.js" defer></script>'
+    )
+
+    submit_dir = public_dir / "submit"
+    submit_dir.mkdir(parents=True, exist_ok=True)
+    submit_dir.joinpath("index.html").write_text(
+        render_page(
+            root="../",
+            title="Submit a package · Robonix Package Catalog",
+            current="submit",
+            body=body,
+            generated_at=generated_at,
+            extra_scripts=extra,
+        ),
+        encoding="utf-8",
+    )
+
+
+def render_api_viewer(public_dir: Path, generated_at: str) -> None:
+    """Write /api/view/: the reference table plus a live JSON pane."""
+    rows = [
+        ("catalog", "/api/v1/catalog.json", "Both ordinary packages and robot deployments in one object."),
+        ("packages", "/api/v1/packages.json", "Primitive, service and skill packages only."),
+        ("robots", "/api/v1/robots.json", "Robot deployment entries only."),
+        ("search", "/api/v1/search.json", "The combined catalog as a plain array, for client-side indexes."),
+    ]
+    table_rows = "".join(
+        f'<tr><td><span class="method">GET</span></td>'
+        f'<td><a href="?resource={key}"><code>{path}</code></a></td>'
+        f"<td>{desc}</td></tr>"
+        for key, path, desc in rows
+    )
+    table_rows += (
+        '<tr><td><span class="method">GET</span></td>'
+        "<td><code>/api/v1/package/&lt;name&gt;.json</code></td>"
+        "<td>One package or robot deployment. Unknown names return a Pages 404.</td></tr>"
+    )
+
+    body = f"""    <div class="container-xxl">
+      <nav class="crumbs pt-3"><a href="../../">Catalog</a> / <span>API</span></nav>
+      <header class="pt-2 pb-4">
+        <h1 class="h3 mb-2">Catalog API</h1>
+        <p class="text-secondary mb-0" style="max-width: 72ch">Static JSON served from the same
+        host as this site. Use <code>GET</code>; there is no key, no rate limit and no server-side
+        query parameter — fetch a resource and filter it on the client.</p>
+      </header>
+      <div class="card overflow-hidden">
+        <div class="table-responsive">
+          <table class="table table-borderless api-table align-top mb-0">
+            <thead><tr><th>Method</th><th>Resource</th><th>Returns</th></tr></thead>
+            <tbody>{table_rows}</tbody>
+          </table>
+        </div>
+      </div>
+      <div class="mt-5">
+        <div class="section-head mb-3">
+          <h2 class="mb-1" id="apiTitle">Response</h2>
+          <p class="mb-0"><code id="apiEndpoint">GET /api/v1/catalog.json</code></p>
+        </div>
+        <div class="card overflow-hidden">
+          <div class="readme-head px-3 py-2 border-bottom"><span>JSON</span></div>
+          <pre class="api-json mb-0"><code id="apiJson">Loading…</code></pre>
+        </div>
+      </div>
+    </div>"""
+
+    extra = """
   <script>
-    const input = document.getElementById('q');
-    const cards = Array.from(document.querySelectorAll('.package-card'));
-    const count = document.getElementById('count');
-    const clearFilters = document.getElementById('clearFilters');
-    const filters = document.querySelector('.filters');
-    if (window.matchMedia('(max-width: 860px)').matches) filters.open = false;
-    const params = new URLSearchParams(window.location.search);
-    let kind = params.get('kind') || '';
-    let tag = params.get('tag') || '';
-    function setActive(group, selector, value) {{
-      for (const button of document.querySelectorAll(group + ' .filter-button')) {{
-        const active = button.getAttribute(selector) === value;
-        button.classList.toggle('active', active);
-        button.setAttribute('aria-pressed', String(active));
-      }}
-    }}
-    function applyFilters() {{
-      const q = input.value.trim().toLowerCase();
-      let shown = 0;
-      for (const card of cards) {{
-        const matchesText = !q || card.dataset.search.includes(q);
-        const matchesKind = !kind || card.dataset.kind === kind;
-        const tags = (card.dataset.tags || '').split(' ');
-        const matchesTag = !tag || tags.includes(tag);
-        const visible = matchesText && matchesKind && matchesTag;
-        card.style.display = visible ? '' : 'none';
-        if (visible) shown += 1;
-      }}
-      count.textContent = shown + ' / ' + cards.length + ' {empty_label}';
-      const hasFilters = Boolean(q || kind || tag);
-      clearFilters.classList.toggle('visible', hasFilters);
-      clearFilters.setAttribute('aria-hidden', hasFilters ? 'false' : 'true');
-      const next = new URL(window.location.href);
-      kind ? next.searchParams.set('kind', kind) : next.searchParams.delete('kind');
-      tag ? next.searchParams.set('tag', tag) : next.searchParams.delete('tag');
-      history.replaceState(null, '', next);
-    }}
-    input.addEventListener('input', applyFilters);
-    document.getElementById('kindFilters').addEventListener('click', (event) => {{
-      const button = event.target.closest('[data-kind]');
-      if (!button) return;
-      kind = button.dataset.kind;
-      setActive('#kindFilters', 'data-kind', kind);
-      applyFilters();
-    }});
-    document.getElementById('tagFilters').addEventListener('click', (event) => {{
-      const button = event.target.closest('[data-tag-filter]');
-      if (!button) return;
-      tag = button.dataset.tagFilter;
-      setActive('#tagFilters', 'data-tag-filter', tag);
-      applyFilters();
-    }});
-    document.getElementById('packages').addEventListener('click', (event) => {{
-      const button = event.target.closest('[data-tag]');
-      if (!button) return;
-      event.preventDefault();
-      tag = button.dataset.tag;
-      setActive('#tagFilters', 'data-tag-filter', tag);
-      applyFilters();
-    }});
-    clearFilters.addEventListener('click', () => {{
-      input.value = '';
-      kind = '';
-      tag = '';
-      setActive('#kindFilters', 'data-kind', '');
-      setActive('#tagFilters', 'data-tag-filter', '');
-      applyFilters();
-      input.focus();
-    }});
-    setActive('#kindFilters', 'data-kind', kind);
-    setActive('#tagFilters', 'data-tag-filter', tag);
-    applyFilters();
-  </script>
-</body>
-</html>
-""",
+    (() => {
+      const params = new URLSearchParams(window.location.search);
+      const packageName = params.get('package');
+      const allowed = new Set(['catalog', 'packages', 'robots', 'search']);
+      const requested = params.get('resource') || 'catalog';
+      const resource = allowed.has(requested) ? requested : 'catalog';
+      const file = packageName
+        ? `../v1/package/${encodeURIComponent(packageName)}.json`
+        : `../v1/${resource}.json`;
+      const endpoint = packageName
+        ? `/api/v1/package/${packageName}.json`
+        : `/api/v1/${resource}.json`;
+      document.getElementById('apiTitle').textContent = packageName || 'Response';
+      document.getElementById('apiEndpoint').textContent = `GET ${endpoint}`;
+      fetch(file)
+        .then((response) => {
+          if (!response.ok) throw new Error(`HTTP ${response.status}`);
+          return response.json();
+        })
+        .then((data) => {
+          document.getElementById('apiJson').textContent = JSON.stringify(data, null, 2);
+        })
+        .catch((error) => {
+          document.getElementById('apiJson').textContent = `Unable to load ${endpoint}: ${error.message}`;
+        });
+    })();
+  </script>"""
+
+    viewer_dir = public_dir / "api" / "view"
+    viewer_dir.mkdir(parents=True, exist_ok=True)
+    viewer_dir.joinpath("index.html").write_text(
+        render_page(
+            root="../../",
+            title="Catalog API · Robonix Package Catalog",
+            current="api",
+            body=body,
+            generated_at=generated_at,
+            extra_scripts=extra,
+        ),
         encoding="utf-8",
     )
 
@@ -2121,195 +1759,27 @@ def render_site(public_dir: Path, generated_at: str, packages: list[dict]) -> No
     public_dir.mkdir(parents=True, exist_ok=True)
     copy_assets(public_dir)
     prepare_preview_images(public_dir, packages)
-    render_listing_page(public_dir, generated_at, package_entries, page="packages", title="Packages", empty_label="packages")
-    render_listing_page(public_dir, generated_at, robot_entries, page="robots", title="Robot deployments", empty_label="robot deployments")
-    home_results = []
-    for package in packages:
-        base = detail_base(package)
-        search_text = " ".join(
-            [
-                package["name"],
-                package["kind"],
-                package["description"],
-                " ".join(package["maintainers"]),
-                " ".join(package["tags"]),
-                " ".join(package.get("capabilities", [])),
-            ]
-        ).lower()
-        home_results.append(
-            f"""<a class="home-result" href="{base}/{html.escape(package_slug(package['name']))}/" data-search="{html.escape(search_text)}" hidden>
-          <strong class="home-result-name">{html.escape(package['name'])}</strong>
-          <span>{html.escape(package['kind'])} · {html.escape(package['description'])}</span>
-        </a>"""
-        )
-    (public_dir / "index.html").write_text(
-        f"""<!doctype html>
-<html lang="en">
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  {render_theme_bootstrap()}
-  <title>Robonix Package Catalog</title>
-  {render_favicon('')}
-  <link rel="stylesheet" href="assets/vendor/pico/pico.classless.min.css">
-  <style>
-{render_css()}
-  </style>
-</head>
-<body>
-  {render_navigation('')}
-  <main class="shell">
-    <section class="catalog-hero">
-      <span class="eyebrow">{len(package_entries)} packages · {len(robot_entries)} robot deployments</span>
-      <h1>Find what your robot can run.</h1>
-      <p class="lede">Search Robonix primitives, services, skills, and complete robot deployments. Inspect capability contracts, maintainers, platform support, and source before integrating.</p>
-      <div class="hero-search">
-        <label for="catalogSearch" class="visually-hidden">Search the Robonix package catalog</label>
-        <input id="catalogSearch" type="search" autocomplete="off" placeholder="Search packages, capabilities, hardware, or robots">
-      </div>
-    </section>
-    <section class="entry-grid" id="entryGrid">
-      <article class="panel entry-card">
-        <span class="kind-label">Reusable software</span>
-        <h2>Packages</h2>
-        <p class="muted">Hardware primitives, system services, and robot skills with declared capability contracts.</p>
-        <strong>{len(package_entries)}</strong>
-        <div class="entry-links">
-          <a href="packages/">All packages</a>
-          <a href="packages/?kind=primitive">Primitives</a>
-          <a href="packages/?kind=service">Services</a>
-          <a href="packages/?kind=skill">Skills</a>
-        </div>
-      </article>
-      <article class="panel entry-card">
-        <span class="kind-label">Complete platforms</span>
-        <h2>Robots</h2>
-        <p class="muted">Deployment repositories that assemble body descriptions, drivers, services, skills, and runtime configuration.</p>
-        <strong>{len(robot_entries)}</strong>
-        <div class="entry-links"><a href="robots/">Browse robot deployments</a></div>
-      </article>
-    </section>
-    <section class="panel home-results" id="homeResults" hidden>
-      <div class="home-results-head">
-        <strong>Search results</strong>
-        <span class="count" id="homeCount" aria-live="polite"></span>
-      </div>
-      <div class="home-result-list">{''.join(home_results)}</div>
-      <p class="home-empty" id="homeEmpty" hidden>No catalog entries match that search.</p>
-    </section>
-    <details class="panel api-reference" open>
-      <summary>Catalog API</summary>
-      <div class="api-reference-body">
-      <h2>API Reference</h2>
-      <p class="muted">Static JSON API hosted by GitHub Pages. Use <code>GET</code>; no API key is required.</p>
-      <table>
-        <thead><tr><th>Method</th><th>Path</th><th>Response</th></tr></thead>
-        <tbody>
-          <tr><td data-label="Method"><code>GET</code></td><td data-label="Path"><a href="api/view/?resource=packages"><code>/api/v1/packages.json</code></a></td><td data-label="Response">ordinary primitive/service/skill package entries</td></tr>
-          <tr><td data-label="Method"><code>GET</code></td><td data-label="Path"><a href="api/view/?resource=robots"><code>/api/v1/robots.json</code></a></td><td data-label="Response">robot deployment entries parsed from robonix_manifest.yaml</td></tr>
-          <tr><td data-label="Method"><code>GET</code></td><td data-label="Path"><a href="api/view/?resource=catalog"><code>/api/v1/catalog.json</code></a></td><td data-label="Response">combined catalog object</td></tr>
-          <tr><td data-label="Method"><code>GET</code></td><td data-label="Path"><a href="api/view/?resource=search"><code>/api/v1/search.json</code></a></td><td data-label="Response">plain combined catalog array for client-side filtering</td></tr>
-          <tr><td data-label="Method"><code>GET</code></td><td data-label="Path"><code>/api/v1/package/&lt;name&gt;.json</code></td><td data-label="Response">one package or robot deployment object</td></tr>
-        </tbody>
-      </table>
-      </div>
-    </details>
-  </main>
-  <footer class="site-footer"><div class="shell">Generated on {html.escape(generated_at)}.</div></footer>
-  <script>
-    const catalogSearch = document.getElementById('catalogSearch');
-    const entryGrid = document.getElementById('entryGrid');
-    const homeResults = document.getElementById('homeResults');
-    const homeCount = document.getElementById('homeCount');
-    const homeEmpty = document.getElementById('homeEmpty');
-    const homeItems = Array.from(document.querySelectorAll('.home-result'));
-    function searchCatalog() {{
-      const query = catalogSearch.value.trim().toLowerCase();
-      entryGrid.hidden = Boolean(query);
-      homeResults.hidden = !query;
-      let shown = 0;
-      for (const item of homeItems) {{
-        const visible = Boolean(query) && item.dataset.search.includes(query);
-        item.hidden = !visible;
-        if (visible) shown += 1;
-      }}
-      homeCount.textContent = shown + ' result' + (shown === 1 ? '' : 's');
-      homeEmpty.hidden = shown !== 0;
-    }}
-    catalogSearch.addEventListener('input', searchCatalog);
-    catalogSearch.addEventListener('keydown', (event) => {{
-      if (event.key === 'Escape') {{ catalogSearch.value = ''; searchCatalog(); }}
-    }});
-  </script>
-</body>
-</html>
-""",
-        encoding="utf-8",
+    render_listing_page(
+        public_dir,
+        generated_at,
+        package_entries,
+        page="packages",
+        title="Packages",
+        lede="Reusable primitive, service and skill packages, indexed by capability, source and maintainer.",
+        noun="packages",
     )
+    render_listing_page(
+        public_dir,
+        generated_at,
+        robot_entries,
+        page="robots",
+        title="Robot deployments",
+        lede="Complete robot deployments, and the packages each one assembles.",
+        noun="robot deployments",
+    )
+    render_home(public_dir, generated_at, packages)
+    render_submit_page(public_dir, generated_at, packages)
     render_api_viewer(public_dir, generated_at)
-
-
-def render_api_viewer(public_dir: Path, generated_at: str) -> None:
-    viewer_dir = public_dir / "api" / "view"
-    viewer_dir.mkdir(parents=True, exist_ok=True)
-    viewer_dir.joinpath("index.html").write_text(
-        f"""<!doctype html>
-<html lang="en">
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  {render_theme_bootstrap()}
-  <title>Catalog API - Robonix Package Catalog</title>
-  {render_favicon('../../')}
-  <link rel="stylesheet" href="../../assets/vendor/pico/pico.classless.min.css">
-  <style>
-{render_css()}
-  </style>
-</head>
-<body>
-  {render_navigation('../../', 'api')}
-  <main class="shell api-viewer">
-    <header class="api-viewer-head">
-      <span class="eyebrow">Static JSON API</span>
-      <h1 id="apiTitle">Catalog API</h1>
-      <p class="api-viewer-endpoint"><code id="apiEndpoint">GET /api/v1/catalog.json</code></p>
-    </header>
-    <section class="panel api-json-panel">
-      <pre class="api-json"><code id="apiJson">Loading JSON…</code></pre>
-    </section>
-  </main>
-  <footer class="site-footer"><div class="shell">Generated on {html.escape(generated_at)}.</div></footer>
-  <script>
-    const params = new URLSearchParams(window.location.search);
-    const packageName = params.get('package');
-    const allowed = new Set(['catalog', 'packages', 'robots', 'search']);
-    const requested = params.get('resource') || 'catalog';
-    const resource = allowed.has(requested) ? requested : 'catalog';
-    const file = packageName
-      ? `../v1/package/${{encodeURIComponent(packageName)}}.json`
-      : `../v1/${{resource}}.json`;
-    const endpoint = packageName
-      ? `/api/v1/package/${{packageName}}.json`
-      : `/api/v1/${{resource}}.json`;
-    document.getElementById('apiTitle').textContent = packageName || `${{resource[0].toUpperCase() + resource.slice(1)}} API`;
-    document.getElementById('apiEndpoint').textContent = `GET ${{endpoint}}`;
-    fetch(file)
-      .then((response) => {{
-        if (!response.ok) throw new Error(`HTTP ${{response.status}}`);
-        return response.json();
-      }})
-      .then((data) => {{
-        document.getElementById('apiJson').textContent = JSON.stringify(data, null, 2);
-      }})
-      .catch((error) => {{
-        document.getElementById('apiJson').textContent = `Unable to load ${{endpoint}}: ${{error.message}}`;
-      }});
-  </script>
-</body>
-</html>
-""",
-        encoding="utf-8",
-    )
 
 
 def absolute_readme_url(value: str, repo_url: str, branch: str, *, raw: bool) -> str:
@@ -2428,380 +1898,183 @@ def render_markdown(md: str, repo_url: str, branch: str) -> str:
     }
     return bleach.clean(rendered, tags=allowed_tags, attributes=allowed_attrs, strip=True)
 
+def render_dependency_items(package: dict) -> str:
+    """Render a robot's assembled packages, linking the ones we index."""
+    items = []
+    for dep in package.get("deploy_dependencies", []):
+        if dep.get("package_name"):
+            slug = html.escape(package_slug(dep["package_name"]))
+            target = f'<a class="dep-target" href="../../packages/{slug}/">{html.escape(dep["package_name"])}</a>'
+        elif dep.get("repo"):
+            target = f'<a class="dep-target" href="{html.escape(dep["repo"])}">{html.escape(dep["repo"])}</a>'
+        else:
+            label = dep.get("path") or dep.get("name") or "unresolved"
+            target = f'<span class="dep-target">{html.escape(label)}</span>'
+        warning = dep.get("resolution_warning", "")
+        reason = f'<span class="dep-reason">{html.escape(warning)}</span>' if warning else ""
+        badge = '<span class="chip chip-warn">!</span>' if warning else ""
+        items.append(
+            f'<li><div class="d-flex flex-wrap align-items-center gap-2">'
+            f'<span class="dep-section">{html.escape(dep.get("section", ""))}</span>'
+            f'<code>{html.escape(dep.get("name", ""))}</code>{badge}</div>'
+            f"{target}{reason}</li>"
+        )
+    return "".join(items)
+
 
 def render_package_pages(public_dir: Path, generated_at: str, packages: list[dict]) -> None:
+    """Write one detail page per catalog entry.
+
+    README-first with a sticky metadata rail: the README is what a reader came
+    for, and the rail keeps version, license and capabilities in view while
+    they scroll through it.
+    """
     for p in packages:
         base = detail_base(p)
+        is_robot = p.get("catalog_type") == "robot"
         package_dir = public_dir / base / package_slug(p["name"])
         package_dir.mkdir(parents=True, exist_ok=True)
-        detail_warnings = []
-        catalog_warnings = p.get("catalog_warnings", [])
-        if catalog_warnings:
-            warning_items = "".join(
-                "<li>" + html.escape(warning.get("reason", "")) + "</li>"
-                for warning in catalog_warnings
+
+        warnings = warning_entries(p)
+        warning_block = ""
+        if warnings:
+            label = "issue" if len(warnings) == 1 else "issues"
+            items = "".join(f"<li>{w}</li>" for w in warnings)
+            warning_block = (
+                f'<div class="warn-box mt-3" role="note">'
+                f'<p class="fw-semibold mb-2">{len(warnings)} {label} found while indexing this entry</p>'
+                f'<ul class="mb-0 ps-3">{items}</ul></div>'
             )
-            detail_warnings.append(
-                '\n    <div class="detail-warning" role="note" aria-label="Catalog metadata warning">'
-                f"<strong>Catalog metadata warning · {len(catalog_warnings)} "
-                f'{"issue" if len(catalog_warnings) == 1 else "issues"}</strong>'
-                f"<ul>{warning_items}</ul></div>"
-            )
-        if p.get("catalog_type") == "robot":
-            cap_title = "Deployment Packages"
-            dep_items = []
-            for dep in p.get("deploy_dependencies", []):
-                dep_name = dep.get("package_name") or dep.get("repo") or dep.get("path") or dep.get("name")
-                if dep.get("package_name"):
-                    dep_label = f"<a href=\"../../packages/{html.escape(package_slug(dep['package_name']))}/\">{html.escape(dep['package_name'])}</a>"
-                elif dep.get("repo"):
-                    dep_label = f"<a href=\"{html.escape(dep['repo'])}\">{html.escape(dep['repo'])}</a>"
-                else:
-                    dep_label = html.escape(dep_name)
-                warning = dep.get("resolution_warning", "")
-                warning_badge = '<strong class="warning-badge">Warning</strong>' if warning else ""
-                warning_reason = (
-                    f'<small class="dependency-warning-reason">{html.escape(warning)}</small>'
-                    if warning
-                    else ""
-                )
-                item_class = ' class="dependency-warning"' if warning else ""
-                dep_items.append(
-                    f"<li{item_class}><span>{html.escape(dep.get('section', ''))}</span> "
-                    f"<code>{html.escape(dep.get('name', ''))}</code>{warning_badge}<br>"
-                    f"{dep_label}{warning_reason}</li>"
-                )
-            cap_items = "\n".join(dep_items)
-            deployment_warnings = p.get("deployment_warnings", [])
-            if deployment_warnings:
-                warning_items = "".join(
-                    "<li><code>"
-                    + html.escape(
-                        f"{warning.get('section', '')} {warning.get('name', '')}".strip()
-                    )
-                    + "</code>: "
-                    + html.escape(warning.get("reason", ""))
-                    + "</li>"
-                    for warning in deployment_warnings
-                )
-                detail_warnings.append(
-                    '\n    <div class="detail-warning" role="note" aria-label="Deployment warning">'
-                    f"<strong>Deployment warning · {len(deployment_warnings)} "
-                    f'{"issue" if len(deployment_warnings) == 1 else "issues"}</strong>'
-                    f"<ul>{warning_items}</ul></div>"
-                )
+
+        if is_robot:
+            provides_title = "Assembled packages"
+            provides = render_dependency_items(p)
+            provides_class = "dep-list"
+            empty_note = "This deployment lists no packages."
         else:
-            cap_title = "Capabilities"
-            cap_items = "\n".join(f"<li>{html.escape(cap)}</li>" for cap in p["capabilities"])
+            provides_title = "Capabilities"
+            provides = "".join(f"<li>{html.escape(c)}</li>" for c in p["capabilities"])
+            provides_class = "cap-list"
+            empty_note = "This package declares no capability contracts."
+        provides_block = (
+            f'<ul class="{provides_class}">{provides}</ul>'
+            if provides
+            else f'<p class="text-secondary small mb-0">{empty_note}</p>'
+        )
+
+        src, srcset = preview_sources(p, "../../")
+        shot = ""
+        if src:
+            srcset_attr = f' srcset="{srcset}" sizes="360px"' if srcset else ""
+            shot = (
+                f'<div class="robot-shot"><img src="{src}"{srcset_attr} alt="" '
+                f'width="380" height="285" decoding="async"></div>'
+            )
+
+        tags_block = (
+            f'<div class="card p-3"><h2 class="aside-title mb-2">Tags</h2>'
+            f'<div class="d-flex flex-wrap gap-1">{render_tags(p["tags"], interactive=False)}</div></div>'
+            if p["tags"]
+            else ""
+        )
+
         readme_html = render_markdown(
             p.get("_readme_markdown", ""), p["repo"], p["default_branch"]
         )
-        detail_warning = "".join(detail_warnings)
-        package_dir.joinpath("index.html").write_text(
-            f"""<!doctype html>
-<html lang="en">
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  {render_theme_bootstrap()}
-  <title>{html.escape(p['name'])} - Robonix Package Catalog</title>
-  {render_favicon('../../')}
-  <link rel="stylesheet" href="../../assets/vendor/pico/pico.classless.min.css">
-  <style>
-{render_css()}
-  </style>
-</head>
-<body>
-  {render_navigation('../../', base)}
-  <header class="shell detail-hero">
-    <a class="back" href="../">Back to {html.escape(base)}</a>
-    <h1>{html.escape(p['name'])}</h1>
-    <p class="lede">{html.escape(p['description'])}</p>{detail_warning}
-  </header>
-  <main class="shell">
-    <div class="detail-layout">
-      <section class="panel detail-main">
-        <h2>README</h2>
-        <article class="readme">
-          {readme_html}
-        </article>
-      </section>
-      <aside class="panel detail-side">
-        <h2>Package</h2>
-        <div class="kv">
-          <div>Version</div><div><code>{html.escape(p['version'])}</code></div>
-          <div>License</div><div><code>{html.escape(p['license'])}</code></div>
-          <div>Kind</div><div>{html.escape(p['kind'])}</div>
-          <div>Type</div><div>{html.escape(p['catalog_type'])}</div>
-          <div>Maintainers</div><div>{html.escape(', '.join(p['maintainers']))}</div>
-          <div>Repository</div><div><a href="{html.escape(p['repo'])}">{html.escape(p['repo_name'])}</a></div>
-          <div>Branch</div><div><code>{html.escape(p['default_branch'])}</code></div>
-          <div>Manifest</div><div><code>{html.escape(p['manifest'])}</code></div>
-          <div>API</div><div><a href="../../api/view/?package={urllib.parse.quote(p['name'], safe='')}">package metadata</a></div>
+        api_href = f"../../api/view/?package={urllib.parse.quote(p['name'], safe='')}"
+        # Same target as the readme_url field, derived here so rendering needs
+        # only the repository and branch a page already shows.
+        readme_href = f"{p['repo']}/blob/{p['default_branch']}/README.md"
+        crumb_label = "Robots" if is_robot else "Packages"
+
+        body = f"""    <div class="container-xxl">
+      <nav class="crumbs pt-3">
+        <a href="../../">Catalog</a> / <a href="../">{crumb_label}</a> / <span>{html.escape(p['name'])}</span>
+      </nav>
+      <header class="pt-3 pb-4 border-bottom">
+        <div class="d-flex flex-wrap align-items-center gap-2">
+          <h1 class="detail-name mb-0">{wrappable_name(p['name'])}</h1>
+          {kind_chip(p['kind'])}
+          <span class="chip chip-plain">v{html.escape(p['version'])}</span>
         </div>
-        <div class="tags">{render_tags(p['tags'])}</div>
-        <h2>{html.escape(cap_title)}</h2>
-        <ul class="cap-list">
-          {cap_items}
-        </ul>
-      </aside>
-    </div>
-  </main>
-  <footer class="site-footer"><div class="shell">Generated on {html.escape(generated_at)}.</div></footer>
-</body>
-</html>
-""",
+        <p class="detail-desc mt-3 mb-0">{html.escape(p['description'])}</p>
+        {warning_block}
+        <div class="d-flex flex-wrap gap-2 mt-4">
+          <a class="btn btn-primary" href="{html.escape(p['repo'])}">{ICON_GITHUB} View source</a>
+          <a class="btn btn-outline-secondary" href="{html.escape(readme_href)}">Open README on GitHub</a>
+          <a class="btn btn-outline-secondary" href="{api_href}">{ICON_JSON} JSON</a>
+        </div>
+      </header>
+      <div class="row g-4 mt-0">
+        <div class="col-lg-8">
+          <div class="card overflow-hidden">
+            <div class="readme-head d-flex align-items-center justify-content-between gap-3 px-4 py-2 border-bottom">
+              <span>README</span>
+              <span>{html.escape(p['repo_name'])}@{html.escape(p['default_branch'])}</span>
+            </div>
+            <div class="prose p-4">
+{readme_html}
+            </div>
+          </div>
+        </div>
+        <aside class="col-lg-4">
+          <div class="detail-aside d-flex flex-column gap-3">
+            <div class="card overflow-hidden">
+              {shot}
+              <div class="p-3">
+                <h2 class="aside-title mb-3">Entry</h2>
+                <dl class="kv mb-0">
+                  <dt>Version</dt><dd><code>{html.escape(p['version'])}</code></dd>
+                  <dt>License</dt><dd><code>{html.escape(p['license'])}</code></dd>
+                  <dt>Kind</dt><dd>{html.escape(p['kind'])}</dd>
+                  <dt>Repository</dt><dd><a href="{html.escape(p['repo'])}">{html.escape(p['repo_name'])}</a></dd>
+                  <dt>Branch</dt><dd><code>{html.escape(p['default_branch'])}</code></dd>
+                  <dt>Manifest</dt><dd><code>{html.escape(p['manifest'])}</code></dd>
+                  <dt>Maintainers</dt><dd>{html.escape(maintainer_names(p))}</dd>
+                </dl>
+              </div>
+            </div>
+            <div class="card p-3">
+              <h2 class="aside-title mb-2">{provides_title}</h2>
+              {provides_block}
+            </div>
+            {tags_block}
+          </div>
+        </aside>
+      </div>
+    </div>"""
+
+        package_dir.joinpath("index.html").write_text(
+            render_page(
+                root="../../",
+                title=f"{p['name']} · Robonix Package Catalog",
+                current=base,
+                body=body,
+                generated_at=generated_at,
+            ),
             encoding="utf-8",
         )
 
 
-def render_readme(path: Path, generated_at: str, packages: list[dict]) -> None:
-    lines = [
-        "# Robonix Package Catalog",
-        "",
-        "<!-- This file is generated by scripts/build_catalog.py. Edit catalog.yaml instead. -->",
-        "",
-        "This repository is the Robonix community package catalog.",
-        "",
-        "Package source and robot deployment manifests stay in their own GitHub",
-        "repositories. The only manual catalog input is the root-level",
-        "[`catalog.yaml`](catalog.yaml). Ordinary packages go under `packages:`;",
-        "whole-robot deploy repositories go under `robots:`:",
-        "",
-        "```yaml",
-        "packages:",
-        "  - name: robonix.service.mapping",
-        "    repo: https://github.com/syswonder/service-map-rbnx",
-        "",
-        "robots:",
-        "  - name: robonix.robot.agilex.ranger_mini_v3",
-        "    repo: https://github.com/syswonder/robot-agilex-ranger_mini_v3",
-        "```",
-        "",
-        "To submit a community package or robot deployment, add one `name` + `repo`",
-        "entry to the correct section in `catalog.yaml`. Do not edit generated files by hand.",
-        "",
-        "## Website",
-        "",
-        "- Homepage: https://syswonder.github.io/robonix-package-catalog/",
-        "- Package page: https://syswonder.github.io/robonix-package-catalog/packages/",
-        "- Robot deployment page: https://syswonder.github.io/robonix-package-catalog/robots/",
-        "- Full catalog API: `GET https://syswonder.github.io/robonix-package-catalog/api/v1/catalog.json`",
-        "- Package list API: `GET https://syswonder.github.io/robonix-package-catalog/api/v1/packages.json`",
-        "- Robot deployment API: `GET https://syswonder.github.io/robonix-package-catalog/api/v1/robots.json`",
-        "- Search index API: `GET https://syswonder.github.io/robonix-package-catalog/api/v1/search.json`",
-        "- Package detail API: `GET https://syswonder.github.io/robonix-package-catalog/api/v1/package/<package-name>.json`",
-        "- Package detail page: `https://syswonder.github.io/robonix-package-catalog/packages/<package-name>/`",
-        "- Robot detail page: `https://syswonder.github.io/robonix-package-catalog/robots/<robot-name>/`",
-        "",
-        "The catalog is hosted on GitHub Pages, so these are static JSON resources",
-        "with stable API-style paths. Clients should treat the shape below as the v1",
-        "contract.",
-        "",
-        "## API Reference",
-        "",
-        "All endpoints are static JSON resources served from GitHub Pages. Use",
-        "`GET`; no API key is required. There are no server-side query parameters",
-        "because Pages is static. Filter by name, kind, tag, maintainer, or",
-        "capability on the client using the returned JSON.",
-        "",
-        "| Method | Path | Parameters | Response |",
-        "| --- | --- | --- | --- |",
-        "| `GET` | `/api/v1/catalog.json` | none | combined catalog object with both ordinary packages and robot deployments |",
-        "| `GET` | `/api/v1/packages.json` | none | ordinary primitive/service/skill packages only |",
-        "| `GET` | `/api/v1/robots.json` | none | robot deployment entries only |",
-        "| `GET` | `/api/v1/search.json` | none | plain combined catalog array, intended for client-side search/filter indexes |",
-        "| `GET` | `/api/v1/package/<package-name>.json` | `package-name`: exact catalog `name`, URL-encoded | one ordinary package or robot deployment object; missing entries return GitHub Pages `404` |",
-        "",
-        "Package object fields:",
-        "",
-        "| Field | Type | Meaning |",
-        "| --- | --- | --- |",
-        "| `name` | string | canonical package name, e.g. `robonix.service.mapping` |",
-        "| `version` | string | package version from `package_manifest.yaml` |",
-        "| `description` | string | short package description |",
-        "| `license` | string | SPDX license identifier; legacy entries without one are exposed as `NOASSERTION` |",
-        "| `tags` | string[] | UI/search tags |",
-        "| `maintainers` | string[] | maintainers in `Name <email@domain>` format |",
-        "| `repo` | string | GitHub repository URL |",
-        "| `repo_name` | string | repository name without owner |",
-        "| `default_branch` | string | package repository default branch used for indexing |",
-        "| `kind` | string | `primitive`, `service`, `skill`, or `robot` inferred from catalog name |",
-        "| `catalog_type` | string | `package` for ordinary packages, `robot` for whole-robot deployments |",
-        "| `manifest` | string | source manifest path, usually `package_manifest.yaml` or `robonix_manifest.yaml` |",
-        "| `capabilities` | string[] | declared Robonix contract IDs |",
-        "| `deploy_dependencies` | object[] | robot deployment dependencies parsed from `robonix_manifest.yaml` |",
-        "| `deployment_status` | string | robot dependency health: `ok` or `warning` |",
-        "| `deployment_warnings` | object[] | robot manifest or dependency warnings with section, name, source, and reason |",
-        "| `readme_url` | string | GitHub README URL for the indexed branch |",
-        "| `preview_image_url` | string | optional robot preview discovered at `assets/robot.jpg`; empty when absent |",
-        "",
-        "### JavaScript",
-        "",
-        "```js",
-        "const base = 'https://syswonder.github.io/robonix-package-catalog/api/v1';",
-        "const res = await fetch(`${base}/packages.json`);",
-        "const catalog = await res.json();",
-        "const mapping = catalog.packages.find(p => p.name === 'robonix.service.mapping');",
-        "",
-        "const detail = await fetch(`${base}/package/${encodeURIComponent(mapping.name)}.json`)",
-        "  .then(r => r.json());",
-        "```",
-        "",
-        "### curl",
-        "",
-        "```bash",
-        "curl -s https://syswonder.github.io/robonix-package-catalog/api/v1/packages.json",
-        "curl -s https://syswonder.github.io/robonix-package-catalog/api/v1/package/robonix.service.mapping.json",
-        "```",
-        "",
-        "### Python",
-        "",
-        "```python",
-        "import urllib.request, json",
-        "",
-        "base = 'https://syswonder.github.io/robonix-package-catalog/api/v1'",
-        "catalog = json.load(urllib.request.urlopen(f'{base}/packages.json'))",
-        "mapping = next(p for p in catalog['packages'] if p['name'] == 'robonix.service.mapping')",
-        "detail = json.load(urllib.request.urlopen(f\"{base}/package/{mapping['name']}.json\"))",
-        "```",
-        "",
-        "### API schema",
-        "",
-        "`GET /api/v1/packages.json` returns:",
-        "",
-        "```json",
-        "{",
-        "  \"api_version\": \"1\",",
-        "  \"generated_at\": \"2026-07-06T12:00:00+00:00\",",
-        "  \"packages\": [",
-        "    {",
-        "      \"name\": \"robonix.service.mapping\",",
-        "      \"version\": \"0.4.0\",",
-        "      \"description\": \"Map and SLAM service package for Robonix.\",",
-        "      \"license\": \"MulanPSL-2.0\",",
-        "      \"tags\": [\"service\", \"mapping\", \"slam\"],",
-        "      \"maintainers\": [\"wheatfox <wheatfox17@icloud.com>\"],",
-        "      \"repo\": \"https://github.com/syswonder/service-map-rbnx\",",
-        "      \"repo_name\": \"service-map-rbnx\",",
-        "      \"default_branch\": \"main\",",
-        "      \"kind\": \"service\",",
-        "      \"capabilities\": [\"robonix/service/map/save_map\"],",
-        "      \"readme_url\": \"https://github.com/syswonder/service-map-rbnx/blob/main/README.md\"",
-        "    }",
-        "  ]",
-        "}",
-        "```",
-        "",
-        "`GET /api/v1/robots.json` returns robot deployments under a top-level `robots[]` field.",
-        "",
-        "`GET /api/v1/search.json` returns the combined catalog entries as a plain array.",
-        "",
-        "`GET /api/v1/package/<package-name>.json` returns one package object.",
-        "",
-        "## Package Manifest",
-        "",
-        "Each package repository must provide a root-level `package_manifest.yaml`.",
-        "The catalog builder reads these fields from that file:",
-        "",
-        "- `package.name`",
-        "- `package.version`",
-        "- `package.description`",
-        "- `package.license`",
-        "- `package.tags`",
-        "- `package.maintainers`",
-        "- `capabilities[].name`",
-        "",
-        "The `package.name` in `package_manifest.yaml` must exactly match the name in",
-        "`catalog.yaml`.",
-        "",
-        "## Robot Deployment Manifest",
-        "",
-        "Robot deployment repositories are indexed from root-level `robonix_manifest.yaml`.",
-        "They do not need a separate `package_manifest.yaml`. The catalog metadata lives",
-        "under a top-level `catalog:` block with the same fields as package metadata:",
-        "",
-        "```yaml",
-        "manifestVersion: 1",
-        "name: robonix-ranger-mini-deploy",
-        "catalog:",
-        "  name: robonix.robot.agilex.ranger_mini_v3",
-        "  version: 0.1.0",
-        "  description: Robonix deploy manifest for the AgileX Ranger Mini v3 robot.",
-        "  license: Apache-2.0",
-        "  tags: [robot, deploy, agilex, ranger_mini_v3]",
-        "  maintainers:",
-        "    - wheatfox <wheatfox17@icloud.com>",
-        "```",
-        "",
-        "A robot deployment repository may add `assets/robot.jpg`. When present,",
-        "the catalog exposes its raw URL as `preview_image_url`, then generates",
-        "380 px and 720 px WebP previews for responsive robot list cards. Repositories",
-        "without the file keep",
-        "the same metadata and layout without an image placeholder.",
-        "",
-        "The builder also parses `primitive:`, `service:`, and `skill:` entries from",
-        "`robonix_manifest.yaml` into `deploy_dependencies[]`, linking dependencies",
-        "back to cataloged ordinary packages when their repository is known. Each",
-        "dependency includes `resolution` (`catalog`, `robonix_source`,",
-        "`robonix_deploy`, `robot_repository`, or `unresolved`) and",
-        "`resolution_warning`. A source is",
-        "portable when it resolves to a cataloged repository, uses the exact",
-        "`${ROBONIX_SOURCE_PATH}/...` source-tree root, uses the exact",
-        "`${ROBONIX_DEPLOY_DIR}/...` boot-deployment root, or stays inside the",
-        "robot repository through a relative path. Unresolved sources produce CI",
-        "warnings and a report without failing catalog generation. For local paths,",
-        "the builder also checks the corresponding GitHub repository tree: the",
-        "resolved directory must exist and contain the selected package manifest",
-        "(`package_manifest.yaml` by default, with legacy `robonix_manifest.yaml`",
-        "accepted when no override is selected). `${ROBONIX_DEPLOY_DIR}` resolves",
-        "to the robot repository root, while `${ROBONIX_SOURCE_PATH}` resolves to",
-        "the default branch of `https://github.com/syswonder/robonix`.",
-        "",
-        "## Generated Outputs",
-        "",
-        "CI validates `catalog.yaml`, fetches every package manifest through the GitHub",
-        "API, and generates:",
-        "",
-        "- `generated/api/v1/packages.json`",
-        "- `generated/api/v1/robots.json`",
-        "- `generated/api/v1/catalog.json`",
-        "- `generated/api/v1/search.json`",
-        "- `generated/api/v1/package/<package-name>.json`",
-        "- `public/index.html`",
-        "- `public/packages/index.html`",
-        "- `public/packages/<package-name>/index.html`",
-        "- `public/robots/index.html`",
-        "- `public/robots/<robot-name>/index.html`",
-        "- `public/api/...`",
-        "",
-        "For compatibility, CI also keeps extensionless `/api/v1/...` resources,",
-        "but browser-facing links and new integrations should use the `.json` paths above.",
-        "",
-        "The generated commit uses `[skip ci]`; normal CI only triggers from",
-        "`catalog.yaml`, the builder script, the workflow, or manual dispatch.",
-        "",
-        f"Generated on `{generated_at}`.",
-        "",
-        "## Packages",
-        "",
-        "| Name | Version | Kind | Maintainer | Tags | Repository |",
-        "| --- | --- | --- | --- | --- | --- |",
-    ]
-    for package in packages:
-        tags = ", ".join(package["tags"])
-        page_base = "robots" if package.get("catalog_type") == "robot" else "packages"
-        lines.append(
-            f"| [`{package['name']}`](https://syswonder.github.io/robonix-package-catalog/{page_base}/{package_slug(package['name'])}/) | `{package['version']}` | `{package['kind']}` | {', '.join(package['maintainers'])} | {tags} | [repo]({package['repo']}) |"
-        )
-    lines.append("")
-    path.write_text("\n".join(lines), encoding="utf-8")
+def copy_assets(public_dir: Path) -> None:
+    """Copy the static assets every page links to.
+
+    The stylesheet and scripts are real files rather than inline blocks, so a
+    browser fetches them once for the whole site instead of re-parsing a copy
+    embedded in each of the generated pages. Bootstrap is vendored rather than
+    loaded from a CDN: the catalog is read mostly from mainland China, where
+    third-party CDNs are unreliable.
+    """
+    asset_dir = public_dir / "assets"
+    asset_dir.mkdir(parents=True, exist_ok=True)
+    for asset in SITE_ASSETS:
+        shutil.copyfile(asset, asset_dir / asset.name)
+    shutil.copytree(VENDOR_ASSETS, asset_dir / "vendor", dirs_exist_ok=True)
 
 
 def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--catalog", default="catalog.yaml")
-    parser.add_argument("--out", default="generated")
     parser.add_argument("--public", default="public")
     args = parser.parse_args()
 
@@ -2810,13 +2083,9 @@ def main() -> None:
     packages = collect(catalog_path, catalog_baseline_keys(catalog_path))
     report_catalog_warnings(packages)
     report_deployment_warnings(packages)
-    out = Path(args.out)
     public = Path(args.public)
-    if out.exists():
-        shutil.rmtree(out)
     if public.exists():
         shutil.rmtree(public)
-    api = out / "api"
     public_api = public / "api"
     public_packages = [
         {k: v for k, v in package.items() if not k.startswith("_")} for package in packages
@@ -2826,30 +2095,19 @@ def main() -> None:
     catalog_payload = {"api_version": "1", "generated_at": generated_at, "packages": public_packages}
     package_payload = {"api_version": "1", "generated_at": generated_at, "packages": package_entries}
     robot_payload = {"api_version": "1", "generated_at": generated_at, "robots": robot_entries}
-    write_json(api / "catalog.json", catalog_payload)
-    write_json(api / "packages.json", package_payload)
-    write_json(api / "robots.json", robot_payload)
-    write_json(api / "search.json", public_packages)
     write_json(public_api / "catalog.json", catalog_payload)
     write_json(public_api / "packages.json", package_payload)
     write_json(public_api / "robots.json", robot_payload)
     write_json(public_api / "search.json", public_packages)
-    write_api(api / "v1" / "catalog", catalog_payload)
-    write_api(api / "v1" / "packages", package_payload)
-    write_api(api / "v1" / "robots", robot_payload)
-    write_api(api / "v1" / "search", public_packages)
     write_api(public_api / "v1" / "catalog", catalog_payload)
     write_api(public_api / "v1" / "packages", package_payload)
     write_api(public_api / "v1" / "robots", robot_payload)
     write_api(public_api / "v1" / "search", public_packages)
     for package in public_packages:
-        write_json(api / "packages" / f"{package['name']}.json", package)
         write_json(public_api / "packages" / f"{package['name']}.json", package)
-        write_api(api / "v1" / "package" / package["name"], package)
         write_api(public_api / "v1" / "package" / package["name"], package)
     render_site(public, generated_at, packages)
     render_package_pages(public, generated_at, packages)
-    render_readme(Path("README.md"), generated_at, packages)
     print(f"generated {len(packages)} package(s)")
 
 
