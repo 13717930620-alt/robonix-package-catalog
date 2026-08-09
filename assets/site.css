@@ -110,6 +110,8 @@ h1, h2, h3, h4, h5, h6 { letter-spacing: -0.015em; font-weight: 650; }
 a { text-decoration: none; }
 a:hover { text-decoration: underline; }
 
+img { max-width: 100%; height: auto; }
+
 .card {
   --bs-card-bg: var(--surface);
   --bs-card-border-radius: var(--bs-border-radius-xl);
@@ -486,6 +488,10 @@ button.tag[aria-pressed="true"] {
 .entry-meta .who { color: var(--bs-secondary-color); }
 .entry-thumb {
   width: 86px;
+  /* The width/height attributes on the tag reserve layout space before the
+   * image loads, but a definite height also disables aspect-ratio. Without
+   * this the thumbnail renders 86x285 and triples the row height. */
+  height: auto;
   aspect-ratio: 4 / 3;
   object-fit: cover;
   border: 1px solid var(--bs-border-color);
