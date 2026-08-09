@@ -17,6 +17,26 @@ BUILD_CATALOG = importlib.util.module_from_spec(SPEC)
 SPEC.loader.exec_module(BUILD_CATALOG)
 
 
+class _PublishedResponse:
+    """Minimal stand-in for the urlopen context manager in tests."""
+
+    def __init__(self, payload: dict) -> None:
+        self._body = json.dumps(payload).encode("utf-8")
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, *exc_info):
+        return False
+
+    def read(self) -> bytes:
+        return self._body
+
+
+def published(payload: dict) -> _PublishedResponse:
+    return _PublishedResponse(payload)
+
+
 class MarkdownRenderingTests(unittest.TestCase):
     def test_markdown_inside_centered_html_div_is_rendered(self):
         rendered = BUILD_CATALOG.render_markdown(
@@ -87,7 +107,7 @@ class MarkdownRenderingTests(unittest.TestCase):
 
 
 class RobotListingTests(unittest.TestCase):
-    def test_robot_preview_is_rendered_below_actions(self):
+    def test_robot_preview_renders_in_the_listing_row(self):
         package = {
             "name": "robonix.robot.example",
             "version": "0.1.0",
@@ -113,15 +133,19 @@ class RobotListingTests(unittest.TestCase):
                 [package],
                 page="robots",
                 title="Robot deployments",
-                empty_label="robot deployments",
+                lede="Complete robot deployments.",
+                noun="robot deployments",
             )
             rendered = (public / "robots" / "index.html").read_text()
 
-        self.assertIn('class="card-side"', rendered)
-        self.assertIn('class="card-preview"', rendered)
+        self.assertIn('class="entry-thumb"', rendered)
         self.assertIn('width="380" height="285"', rendered)
-        self.assertIn('decoding="async" fetchpriority="low"', rendered)
-        self.assertLess(rendered.index('class="card-actions"'), rendered.index('class="card-preview"'))
+        self.assertIn('loading="lazy" decoding="async"', rendered)
+        # The thumbnail follows the text, so a screen reader reaches the name,
+        # description and metadata before the decorative image.
+        self.assertLess(
+            rendered.index('class="entry-desc'), rendered.index('class="entry-thumb"')
+        )
 
     def test_robot_preview_is_resized_to_responsive_webp_assets(self):
         image_buffer = io.BytesIO()
@@ -147,7 +171,7 @@ class RobotListingTests(unittest.TestCase):
             with Image.open(large) as preview:
                 self.assertEqual(preview.size, (720, 540))
 
-    def test_listing_has_mobile_navigation_filters_and_api_rows(self):
+    def test_listing_page_has_filters_and_only_local_assets(self):
         package = {
             "name": "robonix.robot.example",
             "version": "0.1.0",
@@ -172,39 +196,29 @@ class RobotListingTests(unittest.TestCase):
                 [package],
                 page="robots",
                 title="Robot deployments",
-                empty_label="robot deployments",
+                lede="Complete robot deployments.",
+                noun="robot deployments",
             )
             rendered = (public / "robots" / "index.html").read_text()
 
-        self.assertIn('<details class="panel filters" open>', rendered)
-        self.assertIn("<summary>Filters and catalog summary</summary>", rendered)
-        self.assertIn("filters.open = false", rendered)
-        self.assertIn("top: calc(var(--site-header-height) + var(--sticky-gap))", rendered)
-        self.assertIn("max-height: calc(100dvh - var(--site-header-height) - 28px)", rendered)
-        self.assertIn("new ResizeObserver(updateHeaderHeight).observe(header)", rendered)
-        self.assertIn("max-height: none", rendered)
-        self.assertIn("@media (max-width: 520px)", rendered)
-        self.assertIn(".topline { align-items: stretch; flex-direction: column; }", rendered)
-        self.assertIn("@media (prefers-reduced-motion: reduce)", rendered)
-        self.assertNotIn('class="brand-bus"', rendered)
-        self.assertIn('class="clear-filters"', rendered)
-        self.assertIn('family=Noto+Sans+SC', rendered)
-        self.assertIn('--font-sans: "Noto Sans CJK SC", "Noto Sans SC"', rendered)
-        self.assertIn('--font-mono: "JetBrains Mono", "Noto Sans CJK SC"', rendered)
-        self.assertIn('data-label="Method"', rendered)
-        self.assertIn('data-label="Response"', rendered)
-        self.assertIn('href="../api/view/?resource=packages"', rendered)
-        self.assertNotIn('<span><code>example-robot</code></span>', rendered)
+        self.assertIn('data-listing="robot deployments"', rendered)
+        self.assertIn("data-tag-filter=", rendered)
+        self.assertIn("data-clear", rendered)
+        self.assertIn("data-sort", rendered)
+        self.assertIn('data-empty', rendered)
+        # Every asset is served from this host: the catalog is read mostly from
+        # mainland China, where third-party CDNs are unreliable.
+        self.assertNotIn("//cdn.", rendered)
+        self.assertNotIn("fonts.googleapis.com", rendered)
+        self.assertIn('href="../assets/vendor/bootstrap/bootstrap.min.css"', rendered)
+        self.assertIn('href="../assets/site.css"', rendered)
+        self.assertIn('src="../assets/site.js"', rendered)
         self.assertIn(
             '<link rel="icon" type="image/svg+xml" href="../assets/robonix-mark.svg">',
             rendered,
         )
-        self.assertIn(
-            'class="brand-mark" src="../assets/robonix-mark.svg" alt="" aria-hidden="true"',
-            rendered,
-        )
 
-    def test_homepage_is_search_first_and_links_package_layers(self):
+    def test_homepage_leads_with_skills_and_keeps_search_in_the_navbar(self):
         package = {
             "name": "robonix.service.example",
             "version": "0.1.0",
@@ -229,39 +243,32 @@ class RobotListingTests(unittest.TestCase):
             api_viewer = (public / "api" / "view" / "index.html").read_text()
             copied_mark = (public / "assets" / "robonix-mark.svg").read_bytes()
 
-        self.assertIn("Find what your robot can run.", rendered)
-        self.assertIn('id="catalogSearch"', rendered)
-        self.assertIn('class="home-result"', rendered)
+        # Skills are the applications of the platform, so the homepage shows
+        # real skill entries first rather than a link to a filtered list.
+        self.assertIn("<h2 class=\"mb-1\">Skills</h2>", rendered)
+        self.assertLess(rendered.index(">Skills<"), rendered.index("The substrate"))
+        self.assertIn('href="packages/?kind=skill"', rendered)
         self.assertIn('href="packages/?kind=primitive"', rendered)
-        self.assertIn("searchCatalog()", rendered)
-        self.assertIn("<summary>Catalog API</summary>", rendered)
-        self.assertIn('<details class="panel api-reference" open>', rendered)
+        self.assertIn('href="packages/?kind=service"', rendered)
+        self.assertIn('href="submit/"', rendered)
         self.assertIn('href="api/view/"', rendered)
-        self.assertIn('class="home-result-name"', rendered)
-        self.assertNotIn('class="brand-bus"', rendered)
+
+        # Search belongs in the navbar, which is the same on every page. The
+        # homepage body must not grow a second search box of its own.
+        self.assertIn('id="omnisearch"', rendered)
+        body = rendered[rendered.index("<main>"):]
+        self.assertNotIn('type="search"', body)
+
         self.assertIn("fetch(file)", api_viewer)
         self.assertIn("../v1/${resource}.json", api_viewer)
-        self.assertIn("min-height: 100dvh", rendered)
-        self.assertIn("flex-direction: column", rendered)
-        self.assertIn('class="site-footer"', rendered)
-        self.assertIn(".site-footer {", rendered)
-        self.assertIn("max-width: none", rendered)
-        self.assertIn("-webkit-backdrop-filter: blur(16px)", rendered)
+        self.assertIn('class="site-footer', rendered)
         self.assertEqual(copied_mark, (ROOT / "assets" / "robonix-mark.svg").read_bytes())
         self.assertIn(
             '<link rel="icon" type="image/svg+xml" href="assets/robonix-mark.svg">',
             rendered,
         )
         self.assertIn(
-            'class="brand-mark" src="assets/robonix-mark.svg" alt="" aria-hidden="true"',
-            rendered,
-        )
-        self.assertIn(
             '<link rel="icon" type="image/svg+xml" href="../../assets/robonix-mark.svg">',
-            api_viewer,
-        )
-        self.assertIn(
-            'class="brand-mark" src="../../assets/robonix-mark.svg" alt="" aria-hidden="true"',
             api_viewer,
         )
 
@@ -271,7 +278,7 @@ class RobotListingTests(unittest.TestCase):
         self.assertIn("python scripts/build_catalog.py", workflow)
         self.assertGreaterEqual(workflow.count("- assets/**"), 2)
 
-    def test_theme_switcher_defaults_to_auto_and_is_present_on_every_page_type(self):
+    def test_theme_toggle_follows_the_system_and_is_on_every_page_type(self):
         package = {
             "name": "robonix.service.example",
             "version": "0.1.0",
@@ -306,30 +313,17 @@ class RobotListingTests(unittest.TestCase):
             for page in pages:
                 rendered = page.read_text()
                 self.assertIn("robonix-catalog-theme", rendered)
-                self.assertIn('data-theme-choice="auto"', rendered)
-                self.assertIn('data-theme-choice="light"', rendered)
-                self.assertIn('data-theme-choice="dark"', rendered)
-                self.assertIn("let preference = 'auto'", rendered)
+                self.assertIn("data-theme-toggle", rendered)
+                # Resolved inline before first paint, or a dark-mode reader
+                # gets a white flash while the stylesheet loads.
                 self.assertIn("prefers-color-scheme: dark", rendered)
-                self.assertIn(
-                    "localStorage.setItem(storageKey, safePreference)", rendered
+                self.assertIn("dataset.bsTheme", rendered)
+                self.assertLess(
+                    rendered.index("dataset.bsTheme"), rendered.index("<body>")
                 )
-                self.assertIn("media.addEventListener?.('change'", rendered)
-                self.assertIn('html[data-theme="dark"]', rendered)
-                self.assertIn("--header-control-height: 34px", rendered)
-                self.assertIn(
-                    "min-height: var(--header-control-height)", rendered
-                )
-                self.assertIn("width: auto;", rendered)
-                self.assertIn("margin: 0;", rendered)
-                self.assertIn(
-                    'html[data-theme="dark"] .tag-blue { background: #172d3d;',
-                    rendered,
-                )
-                self.assertIn(
-                    'html[data-theme="dark"] .tag-red { background: #3b221e;',
-                    rendered,
-                )
+                # No stored choice means "follow the OS", so nothing is written
+                # to storage until the reader actually picks a side.
+                self.assertNotIn("localStorage.setItem", rendered)
 
     def test_api_writer_keeps_extensionless_resource_and_json_preview(self):
         with tempfile.TemporaryDirectory() as tmp:
@@ -507,7 +501,8 @@ class CatalogMetadataTests(unittest.TestCase):
                 [package],
                 page="packages",
                 title="Packages",
-                empty_label="packages",
+                lede="Reusable packages.",
+                noun="packages",
             )
             BUILD_CATALOG.render_package_pages(
                 public, "2026-08-01T00:00:00+00:00", [package]
@@ -532,9 +527,10 @@ class CatalogMetadataTests(unittest.TestCase):
         self.assertEqual(count, 1)
         self.assertIn("::warning title=Catalog name mismatch", stderr.getvalue())
         self.assertIn("## Catalog metadata warning report", report)
-        self.assertIn('class="package-card has-warning"', listing)
-        self.assertIn("Catalog metadata warning", listing)
-        self.assertIn('aria-label="Catalog metadata warning"', detail)
+        self.assertIn('class="chip chip-warn"', listing)
+        self.assertIn("1 issue found while indexing", listing)
+        self.assertIn("manifest catalog name is", listing)
+        self.assertIn("found while indexing this entry", detail)
         self.assertIn('"catalog_status": "warning"', api_data)
         self.assertIn('"manifest_name_mismatch"', api_data)
 
@@ -701,22 +697,17 @@ class DeploymentDependencyWarningTests(unittest.TestCase):
             BUILD_CATALOG,
             "github_optional_json",
             return_value=None,
-        ):
-            cached_path = (
-                Path(tmp)
-                / "generated"
-                / "api"
-                / "packages"
-                / "robonix.robot.example.json"
-            )
-            cached_path.parent.mkdir(parents=True)
-            cached_path.write_text(json.dumps(cached))
-            old_cwd = BUILD_CATALOG.os.getcwd()
-            BUILD_CATALOG.os.chdir(tmp)
-            try:
-                packages = BUILD_CATALOG.collect(Path("catalog.yaml"))
-            finally:
-                BUILD_CATALOG.os.chdir(old_cwd)
+        ), mock.patch.object(
+            BUILD_CATALOG.urllib.request, "urlopen", return_value=published(cached)
+        ) as urlopen:
+            packages = BUILD_CATALOG.collect(Path("catalog.yaml"))
+
+        # Nothing generated is committed, so the last good metadata for a robot
+        # whose manifest just broke can only come from the published site.
+        self.assertIn(
+            "packages.robonix.ai/api/v1/package/robonix.robot.example.json",
+            urlopen.call_args.args[0],
+        )
 
         robot = packages[0]
         self.assertEqual(robot["version"], "0.1.0")
@@ -867,7 +858,8 @@ class DeploymentDependencyWarningTests(unittest.TestCase):
                 [robot],
                 page="robots",
                 title="Robot deployments",
-                empty_label="robot deployments",
+                lede="Complete robot deployments.",
+                noun="robot deployments",
             )
             BUILD_CATALOG.render_package_pages(
                 public, "2026-07-27T00:00:00+00:00", [robot]
@@ -877,13 +869,14 @@ class DeploymentDependencyWarningTests(unittest.TestCase):
                 public / "robots" / "robonix.robot.example" / "index.html"
             ).read_text()
 
-        self.assertIn('class="package-card has-warning"', listing)
-        self.assertIn("Warning · 1 issue", listing)
+        self.assertIn('class="chip chip-warn"', listing)
+        self.assertIn("1 issue found while indexing", listing)
         self.assertIn("host-specific absolute path", listing)
-        self.assertIn('class="detail-warning" role="note"', detail)
-        self.assertIn('class="dependency-warning"', detail)
+        self.assertIn('class="warn-box mt-3" role="note"', detail)
         self.assertIn("robot_description", detail)
         self.assertIn("host-specific absolute path", detail)
+        # The unresolved dependency is flagged again where it is listed.
+        self.assertIn('class="dep-reason"', detail)
 
     def test_ci_warning_annotations_and_summary_do_not_fail(self):
         packages = [

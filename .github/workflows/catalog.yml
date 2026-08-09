@@ -22,7 +22,7 @@ on:
     - cron: "17 18 * * *"
 
 permissions:
-  contents: write
+  contents: read
   pages: write
   id-token: write
 
@@ -83,18 +83,5 @@ jobs:
           fi
           echo "GitHub Pages deployment failed after 3 attempts"
           exit 1
-      - name: Commit generated catalog
-        if: github.event_name != 'pull_request'
-        continue-on-error: true
-        run: |
-          set -euo pipefail
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add README.md generated public
-          if git diff --cached --quiet; then
-            echo "generated catalog unchanged"
-            exit 0
-          fi
-          git commit -m "catalog: update generated package index [skip ci]"
-          git pull --rebase origin main
-          git push
+      # Nothing is committed back. The website is build output served by Pages
+      # from the artifact uploaded above, and README.md is hand-maintained.
