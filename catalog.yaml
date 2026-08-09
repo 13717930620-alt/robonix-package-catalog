@@ -71,7 +71,6 @@ packages:
     repo: https://github.com/QingFeng34048/Robonix-Skill-Sim2Real-Completed
   - name: robonix.skill.find_object
     repo: https://github.com/syswonder/skill-find-object-rbnx
-
   - name: robonix.primitive.beingbeyond.d1.arm
     repo: https://github.com/syswonder/primitive-beingbeyond-d1-arm-rbnx
   - name: robonix.primitive.beingbeyond.d1.hand
@@ -82,13 +81,10 @@ packages:
     repo: https://github.com/syswonder/skill-vertical-grasp-object-rbnx
   - name: robonix.skill.hand_gesture
     repo: https://github.com/syswonder/skill-hand-gesture-rbnx
-
   - name: robonix.skill.dual_piper_initialize
     repo: https://github.com/syswonder/skill-dual-piper-initialize-rbnx
-
   - name: robonix.skill.dual_piper_transfer
     repo: https://github.com/syswonder/skill-dual-piper-transfer-rbnx
-
   - name: robonix.primitive.linkerbot.linker_hand_o6.hand
     repo: https://github.com/syswonder/primitive-linkerbot-linker_hand_o6-hand-rbnx
 
