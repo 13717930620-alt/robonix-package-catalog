@@ -1997,10 +1997,13 @@ def render_dependency_items(package: dict) -> str:
         warning = dep.get("resolution_warning", "")
         reason = f'<span class="dep-reason">{html.escape(warning)}</span>' if warning else ""
         badge = '<span class="chip chip-warn">!</span>' if warning else ""
+        section = dep.get("section", "")
+        # The section is exactly a provider kind, so colour it like one.
+        kind_class = f" k-{section}" if section in KIND_GLYPH else ""
         items.append(
             f'<li><div class="d-flex flex-wrap align-items-center gap-2">'
-            f'<span class="dep-section">{html.escape(dep.get("section", ""))}</span>'
-            f'<code>{html.escape(dep.get("name", ""))}</code>{badge}</div>'
+            f'<span class="dep-section{kind_class}">{html.escape(section)}</span>'
+            f'<code class="dep-name">{html.escape(dep.get("name", ""))}</code>{badge}</div>'
             f"{target}{reason}</li>"
         )
     return "".join(items)

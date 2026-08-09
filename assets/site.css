@@ -46,6 +46,8 @@
   --bs-border-radius-lg: 0.625rem;
   --bs-border-radius-xl: 0.75rem;
 
+  --link: #2f3f96;
+  --link-hover: #1b2a72;
   --surface: #ffffff;
   --surface-hover: #fafbfc;
   --rule: #dfe3e8;          /* visible divider, stronger than a card hairline */
@@ -73,6 +75,8 @@
   --bs-link-hover-color: #ffffff;
   --bs-link-hover-color-rgb: 255, 255, 255;
 
+  --link: #93a6f5;
+  --link-hover: #b8c4ff;
   --surface: #0b0f16;
   --surface-hover: #111721;
   --rule: #2c3542;
@@ -147,21 +151,24 @@ a:hover { text-decoration: underline; text-underline-offset: 2px; }
  * code and nobody would think to click them. */
 .api-table a,
 .kv a,
-.dep-target,
+a.dep-target,
 .aside-card a:not(.btn):not(.tag),
 .field-help a,
-.check-list a {
+.check-list a,
+.section-more,
+.prose a {
+  color: var(--link);
   text-decoration: underline;
   text-underline-offset: 2px;
   text-decoration-color: color-mix(in srgb, currentColor 35%, transparent);
 }
 .api-table a:hover,
 .kv a:hover,
-.dep-target:hover,
+a.dep-target:hover,
 .aside-card a:not(.btn):not(.tag):hover,
 .field-help a:hover,
 .check-list a:hover {
-  color: var(--k-primitive-solid);
+  color: var(--link-hover);
   text-decoration-color: currentColor;
 }
 
@@ -445,7 +452,7 @@ button.tag[aria-pressed="true"] {
   text-decoration-color: color-mix(in srgb, currentColor 32%, transparent);
 }
 .section-more:hover {
-  color: var(--k-primitive-solid);
+  color: var(--link-hover);
   text-decoration-color: currentColor;
 }
 .section-more svg,
@@ -871,14 +878,33 @@ html[data-prefilter-kind="robot"] [data-entry]:not([data-kind="robot"]) { displa
 .dep-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.55rem; }
 .dep-list li { font-size: 0.875rem; line-height: 1.5; }
 .dep-section {
-  font-size: 0.8125rem;
+  --k: var(--bs-tertiary-color);
+  padding: 0.05rem 0.4rem;
+  font-size: 0.75rem;
   font-weight: 650;
-  letter-spacing: 0.06em;
+  letter-spacing: 0.04em;
   text-transform: uppercase;
-  color: var(--bs-tertiary-color);
+  color: var(--k);
+  background: color-mix(in srgb, var(--k) 12%, transparent);
+  border: 1px solid color-mix(in srgb, var(--k) 26%, transparent);
+  border-radius: 999px;
+}
+.dep-section.k-primitive { --k: var(--k-primitive-solid); }
+.dep-section.k-service   { --k: var(--k-service-solid); }
+.dep-section.k-skill     { --k: var(--k-skill-solid); }
+.dep-name {
+  font-family: var(--bs-font-monospace);
+  font-size: 0.875rem;
+  font-weight: 700;
+  color: var(--bs-emphasis-color);
 }
 .dep-list code { font-size: 0.875rem; color: var(--bs-body-color); }
 .dep-target { display: block; word-break: break-all; }
+span.dep-target {
+  font-family: var(--bs-font-monospace);
+  font-size: 0.8125rem;
+  color: var(--bs-tertiary-color);
+}
 .dep-reason { display: block; margin-top: 2px; color: var(--k-warn-fg); font-size: 0.875rem; line-height: 1.45; }
 
 /* ------------------------------------------------- rendered README (prose) */
