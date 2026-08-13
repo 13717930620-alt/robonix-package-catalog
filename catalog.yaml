@@ -87,6 +87,12 @@ packages:
     repo: https://github.com/syswonder/skill-dual-piper-transfer-rbnx
   - name: robonix.primitive.linkerbot.linker_hand_o6.hand
     repo: https://github.com/syswonder/primitive-linkerbot-linker_hand_o6-hand-rbnx
+  - name: robonix.skill.deployment_data_collection
+    repo: https://github.com/QingFeng34048/Robonix-Skill-dataset_collect
+  - name: robonix.skill.deployment_data_coversion
+    repo: https://github.com/QingFeng34048/Robonix-Skill-dataset_convert
+  - name: robonix.skill.adaptive_fine-tuning_for_deployment
+    repo: https://github.com/QingFeng34048/Robonix-Skill-openvla_finetune
 
 robots:
   - name: robonix.robot.agilex.ranger_mini_v3
