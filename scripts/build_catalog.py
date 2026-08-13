@@ -235,6 +235,34 @@ def load_remote_repository_tree(repo_url: str, branch: str) -> dict[str, str]:
     }
 
 
+def load_remote_submodule(
+    repo_url: str,
+    path: str,
+    branch: str,
+) -> tuple[str, str] | None:
+    """Return a GitHub submodule's canonical repository URL and pinned SHA."""
+    owner, repo = parse_repo(repo_url)
+    encoded_path = urllib.parse.quote(path, safe="/")
+    query = urllib.parse.urlencode({"ref": branch})
+    payload = github_optional_json(
+        f"https://api.github.com/repos/{owner}/{repo}/contents/{encoded_path}?{query}"
+    )
+    # GitHub's Contents API currently reports submodules as either "file" or
+    # "submodule" depending on the API representation. The two dedicated
+    # fields are the stable discriminator.
+    if not isinstance(payload, dict):
+        return None
+
+    submodule_url = payload.get("submodule_git_url")
+    sha = payload.get("sha")
+    if not isinstance(submodule_url, str) or not isinstance(sha, str) or not sha:
+        return None
+    match = GITHUB_RE.match(submodule_url.strip())
+    if not match:
+        return None
+    return f"https://github.com/{match.group(1)}/{match.group(2)}", sha
+
+
 def package_slug(name: str) -> str:
     return name.replace("/", "_")
 
@@ -572,6 +600,7 @@ def dependency_repository_location(
 def validate_deploy_dependency_paths(packages: list[dict]) -> None:
     """Warn when a local deploy path is absent or is not a package directory."""
     tree_cache: dict[tuple[str, str], dict[str, str]] = {}
+    submodule_cache: dict[tuple[str, str, str], tuple[str, str] | None] = {}
     source_branch = ""
 
     for package in packages:
@@ -601,13 +630,47 @@ def validate_deploy_dependency_paths(packages: list[dict]) -> None:
                 if cache_key not in tree_cache:
                     tree_cache[cache_key] = load_remote_repository_tree(repo_url, branch)
                 tree = tree_cache[cache_key]
-                directory_exists = not normalized_path or tree.get(normalized_path) == "tree"
+                package_tree = tree
+                package_path = normalized_path
+                package_repo_url = repo_url
+                package_ref = branch
+                entry_type = tree.get(normalized_path) if normalized_path else "tree"
+                if entry_type == "commit":
+                    submodule_key = (repo_url, branch, normalized_path)
+                    if submodule_key not in submodule_cache:
+                        submodule_cache[submodule_key] = load_remote_submodule(
+                            repo_url,
+                            normalized_path,
+                            branch,
+                        )
+                    submodule = submodule_cache[submodule_key]
+                    if submodule is None:
+                        warning = (
+                            f"Resolved path {normalized_path!r} is a Git submodule in "
+                            f"{repo_url}@{branch}, but GitHub did not provide a "
+                            "verifiable repository URL and pinned commit."
+                        )
+                    else:
+                        package_repo_url, package_ref = submodule
+                        submodule_tree_key = (package_repo_url, package_ref)
+                        if submodule_tree_key not in tree_cache:
+                            tree_cache[submodule_tree_key] = load_remote_repository_tree(
+                                package_repo_url,
+                                package_ref,
+                            )
+                        package_tree = tree_cache[submodule_tree_key]
+                        package_path = ""
+
+                directory_exists = entry_type == "tree" or (
+                    entry_type == "commit" and not warning
+                )
                 if not directory_exists:
-                    warning = (
-                        f"Resolved path {normalized_path or '.'!r} does not exist in "
-                        f"{repo_url}@{branch}; {root_description} is the path root."
-                    )
-                else:
+                    if not warning:
+                        warning = (
+                            f"Resolved path {normalized_path or '.'!r} does not exist in "
+                            f"{repo_url}@{branch}; {root_description} is the path root."
+                        )
+                if not warning:
                     selected_manifest = str(dep.get("manifest") or "").strip()
                     manifest_names = (
                         [selected_manifest]
@@ -615,10 +678,10 @@ def validate_deploy_dependency_paths(packages: list[dict]) -> None:
                         else [DEFAULT_PACKAGE_MANIFEST, LEGACY_PACKAGE_MANIFEST]
                     )
                     manifests = [
-                        posixpath.join(normalized_path, name) if normalized_path else name
+                        posixpath.join(package_path, name) if package_path else name
                         for name in manifest_names
                     ]
-                    if not any(tree.get(path) == "blob" for path in manifests):
+                    if not any(package_tree.get(path) == "blob" for path in manifests):
                         if selected_manifest:
                             expected = repr(selected_manifest)
                         else:
@@ -626,11 +689,19 @@ def validate_deploy_dependency_paths(packages: list[dict]) -> None:
                                 f"{DEFAULT_PACKAGE_MANIFEST!r} or legacy "
                                 f"{LEGACY_PACKAGE_MANIFEST!r}"
                             )
-                        warning = (
-                            f"Resolved directory {normalized_path or '.'!r} exists in "
-                            f"{repo_url}@{branch} but is not a usable Robonix package: "
-                            f"expected {expected}."
-                        )
+                        if entry_type == "commit":
+                            warning = (
+                                f"Resolved Git submodule {normalized_path!r} points to "
+                                f"{package_repo_url}@{package_ref} but is not a usable "
+                                f"Robonix package: expected {expected} at the submodule "
+                                "root."
+                            )
+                        else:
+                            warning = (
+                                f"Resolved directory {normalized_path or '.'!r} exists in "
+                                f"{package_repo_url}@{package_ref} but is not a usable "
+                                f"Robonix package: expected {expected}."
+                            )
 
             if warning:
                 dep["resolution_warning"] = warning
