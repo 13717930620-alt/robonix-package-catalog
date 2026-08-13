@@ -535,6 +535,181 @@ class CatalogMetadataTests(unittest.TestCase):
 
 
 class DeploymentDependencyWarningTests(unittest.TestCase):
+    def test_load_remote_submodule_resolves_canonical_pinned_repository(self):
+        payload = {
+            # GitHub documents this legacy "file" value for submodules.
+            "type": "file",
+            "submodule_git_url": "https://github.com/syswonder/service-map-rbnx.git",
+            "sha": "48adfc3ac138443e5ba9347639aeba2e11650ea5",
+        }
+
+        with mock.patch.object(
+            BUILD_CATALOG,
+            "github_optional_json",
+            return_value=payload,
+        ) as fetch:
+            result = BUILD_CATALOG.load_remote_submodule(
+                "https://github.com/syswonder/robot-example",
+                "third_party/service map",
+                "feature/catalog fix",
+            )
+
+        self.assertEqual(
+            result,
+            (
+                "https://github.com/syswonder/service-map-rbnx",
+                "48adfc3ac138443e5ba9347639aeba2e11650ea5",
+            ),
+        )
+        fetch.assert_called_once_with(
+            "https://api.github.com/repos/syswonder/robot-example/contents/"
+            "third_party/service%20map?ref=feature%2Fcatalog+fix"
+        )
+
+    def test_local_dependency_path_accepts_pinned_git_submodule(self):
+        robot_repo = "https://github.com/syswonder/robot-example"
+        submodule_repo = "https://github.com/syswonder/service-map-rbnx"
+        submodule_sha = "48adfc3ac138443e5ba9347639aeba2e11650ea5"
+        submodule_path = "third_party/service-map-rbnx"
+        packages = [
+            {
+                "name": "robonix.robot.example",
+                "repo": robot_repo,
+                "default_branch": "main",
+                "catalog_type": "robot",
+                "deployment_warnings": [],
+                "deploy_dependencies": [
+                    {
+                        "section": "service",
+                        "name": "mapping",
+                        "path": f"${{ROBONIX_DEPLOY_DIR}}/{submodule_path}",
+                        "manifest": "",
+                        "resolution": "robonix_deploy",
+                        "resolution_warning": "",
+                    },
+                    {
+                        "section": "service",
+                        "name": "mapping_alias",
+                        "path": f"${{ROBONIX_DEPLOY_DIR}}/{submodule_path}",
+                        "manifest": "",
+                        "resolution": "robonix_deploy",
+                        "resolution_warning": "",
+                    },
+                ],
+            }
+        ]
+
+        def tree_for(repo_url, branch):
+            if (repo_url, branch) == (robot_repo, "main"):
+                return {submodule_path: "commit"}
+            if (repo_url, branch) == (submodule_repo, submodule_sha):
+                return {"package_manifest.yaml": "blob"}
+            self.fail(f"unexpected tree request: {repo_url}@{branch}")
+
+        with mock.patch.object(
+            BUILD_CATALOG,
+            "load_remote_repository_tree",
+            side_effect=tree_for,
+        ) as load_tree, mock.patch.object(
+            BUILD_CATALOG,
+            "load_remote_submodule",
+            return_value=(submodule_repo, submodule_sha),
+        ) as load_submodule:
+            BUILD_CATALOG.validate_deploy_dependency_paths(packages)
+
+        self.assertEqual(packages[0]["deployment_status"], "ok")
+        self.assertEqual(packages[0]["deployment_warnings"], [])
+        self.assertEqual(packages[0]["deploy_dependencies"][0]["resolution_warning"], "")
+        self.assertEqual(packages[0]["deploy_dependencies"][1]["resolution_warning"], "")
+        load_submodule.assert_called_once_with(robot_repo, submodule_path, "main")
+        self.assertEqual(load_tree.call_count, 2)
+
+    def test_local_dependency_path_rejects_unresolved_gitlink(self):
+        submodule_path = "third_party/unknown"
+        packages = [
+            {
+                "name": "robonix.robot.example",
+                "repo": "https://github.com/syswonder/robot-example",
+                "default_branch": "main",
+                "catalog_type": "robot",
+                "deployment_warnings": [],
+                "deploy_dependencies": [
+                    {
+                        "section": "service",
+                        "name": "unknown",
+                        "path": submodule_path,
+                        "manifest": "",
+                        "resolution": "robot_repository",
+                        "resolution_warning": "",
+                    }
+                ],
+            }
+        ]
+
+        with mock.patch.object(
+            BUILD_CATALOG,
+            "load_remote_repository_tree",
+            return_value={submodule_path: "commit"},
+        ), mock.patch.object(
+            BUILD_CATALOG,
+            "load_remote_submodule",
+            return_value=None,
+        ):
+            BUILD_CATALOG.validate_deploy_dependency_paths(packages)
+
+        warning = packages[0]["deploy_dependencies"][0]["resolution_warning"]
+        self.assertIn("is a Git submodule", warning)
+        self.assertIn("repository URL and pinned commit", warning)
+        self.assertEqual(packages[0]["deployment_status"], "warning")
+
+    def test_local_dependency_git_submodule_requires_root_manifest(self):
+        robot_repo = "https://github.com/syswonder/robot-example"
+        submodule_repo = "https://github.com/syswonder/service-example-rbnx"
+        submodule_sha = "0123456789abcdef0123456789abcdef01234567"
+        submodule_path = "third_party/service-example-rbnx"
+        packages = [
+            {
+                "name": "robonix.robot.example",
+                "repo": robot_repo,
+                "default_branch": "main",
+                "catalog_type": "robot",
+                "deployment_warnings": [],
+                "deploy_dependencies": [
+                    {
+                        "section": "service",
+                        "name": "example",
+                        "path": submodule_path,
+                        "manifest": "",
+                        "resolution": "robot_repository",
+                        "resolution_warning": "",
+                    }
+                ],
+            }
+        ]
+
+        def tree_for(repo_url, branch):
+            if (repo_url, branch) == (robot_repo, "main"):
+                return {submodule_path: "commit"}
+            if (repo_url, branch) == (submodule_repo, submodule_sha):
+                return {"README.md": "blob"}
+            self.fail(f"unexpected tree request: {repo_url}@{branch}")
+
+        with mock.patch.object(
+            BUILD_CATALOG,
+            "load_remote_repository_tree",
+            side_effect=tree_for,
+        ), mock.patch.object(
+            BUILD_CATALOG,
+            "load_remote_submodule",
+            return_value=(submodule_repo, submodule_sha),
+        ):
+            BUILD_CATALOG.validate_deploy_dependency_paths(packages)
+
+        warning = packages[0]["deploy_dependencies"][0]["resolution_warning"]
+        self.assertIn(f"points to {submodule_repo}@{submodule_sha}", warning)
+        self.assertIn("at the submodule root", warning)
+        self.assertEqual(packages[0]["deployment_status"], "warning")
+
     def test_local_dependency_paths_exist_and_select_package_manifests(self):
         robot_repo = "https://github.com/syswonder/robot-example"
         packages = [
