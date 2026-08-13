@@ -84,6 +84,8 @@ packages:
 robots:
   - name: robonix.robot.agilex.ranger_mini_v3
     repo: https://github.com/syswonder/robot-agilex-ranger_mini_v3
+  - name: robonix.robot.yahboom.rosmaster_x3
+    repo: https://github.com/luoyg0831-a11y/robot-yahboom-rosmaster-x3
   - name: robonix.robot.deep_robotics.lite3
     repo: https://github.com/syswonder/robot-deep_robotics-lite3
   - name: robonix.robot.wheeltec.r550
